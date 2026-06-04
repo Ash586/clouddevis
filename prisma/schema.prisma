@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserMode {
+  ARTISAN
+  ENTREPRISE
+}
+
+enum SubscriptionStatus {
+  FREE
+  TRIAL
+  BASIC
+  PRO
+  EXPIRED
+}
+
+enum DocumentType {
+  DEVIS
+  PROFORMA
+  BC
+  BR
+  FACTURE
+}
+
+enum DocumentStatus {
+  DRAFT
+  ACCEPTED
+  PROGRESS
+  DELIVERED
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  password          String
+  name              String
+  phone             String?
+  country           String             @default("algeria")
+  sector            String?
+  mode              UserMode           @default(ARTISAN)
+  language          String             @default("fr")
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  trialStartAt      DateTime?
+  subscriptionEndAt DateTime?
+  companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature }
+  settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  resetTokens       PasswordResetToken[]
+  clients           Client[]
+  documents         Document[]
+  backups           Backup[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String  // "google" or "github"
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  address   String?
+  phone     String?
+  email     String?
+  nif       String?  // Algérie
+  nis       String?
+  rc        String?
+  ice       String?  // Maroc
+  matriculeFiscal String? // Tunisie
+  siret     String?  // France
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents Document[]
+}
+
+model Document {
+  id            String         @id @default(cuid())
+  userId        String
+  clientId      String?
+  type          DocumentType   @default(DEVIS)
+  status        DocumentStatus @default(DRAFT)
+  number        String         @default("")
+  date          DateTime       @default(now())
+  validUntil    DateTime?
+  deliveryDate  DateTime?
+  mode          UserMode       @default(ARTISAN)
+  country       String         @default("algeria")
+  sector        String?
+  taxRegime     String         @default("tva_19")
+  paymentMode   String         @default("cheque")
+  items         Json           @default("[]")
+  subTotalHT    Float          @default(0)
+  tvaAmount     Float          @default(0)
+  timbreFiscal  Float          @default(0)
+  totalTTC      Float          @default(0)
+  acompte       Float          @default(0)
+  netAPayer     Float          @default(0)
+  totalInWords  String         @default("")
+  notes         String?
+  customFields  Json           @default("{}")
+  template      String         @default("classic")
+  signature     String?
+  bcRef         String?        // Lien vers Bon de Commande
+  brRef         String?        // Lien vers Bon de Réception
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client        Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+}
+
+model Backup {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   @default("auto") // auto / manual
+  fileUrl   String?
+  size      Int?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
