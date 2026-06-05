@@ -70,16 +70,16 @@ export default function HomePage() {
       </section>
 
       {showEditor && (
-        <div ref={editorRef} className="max-w-6xl mx-auto px-4 pb-24">
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
-            <div className="bg-slate-900 text-white px-6 py-3 flex items-center justify-between">
+        <div ref={editorRef} className="max-w-6xl mx-auto px-4 h-[calc(100vh-56px)] overflow-hidden flex flex-col">
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-xl flex-1 overflow-hidden flex flex-col">
+            <div className="bg-slate-900 text-white px-6 py-3 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{t('editorBannerTitle')}</p>
               </div>
               <span className="text-[9px] text-slate-500">{t('editorBannerSubtitle')}</span>
             </div>
-            <div className="p-6">
+            <div className="px-6 py-4 flex-1 overflow-hidden">
               <DemoEditor onDownload={handleDownload} />
             </div>
           </div>
