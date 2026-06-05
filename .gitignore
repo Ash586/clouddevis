@@ -36,6 +36,9 @@ yarn-error.log*
 # nested remnants
 clouddevis/
 
+# generated guides
+git-guide.html
+
 # server logs
 server.log
 
