@@ -87,32 +87,32 @@ function SidebarInner() {
       {/* User Pill */}
       <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-          className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 transition dark:bg-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800">
-          <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-white text-sm font-semibold shrink-0 dark:bg-zinc-700">
+          className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-50/60 border border-blue-100/60 hover:bg-blue-50 transition">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-black shrink-0">
             {userInitial}
           </div>
           <div className="flex-1 min-w-0 text-start">
-            <div className="text-sm font-semibold text-zinc-900 truncate dark:text-zinc-50">{userName}</div>
-            <div className="text-xs text-zinc-400 font-medium dark:text-zinc-500">
+            <div className="text-sm font-bold text-slate-900 truncate">{userName}</div>
+            <div className="text-xs text-slate-400 font-semibold">
               {user?.mode === 'ENTREPRISE' ? s('company') : s('artisan')}
             </div>
           </div>
-          <ChevronDown size={16} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${userDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown size={16} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {userDropdownOpen && (
           <>
-            <div className="absolute top-full start-0 end-0 mt-2 bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden z-20 animate-in dark:bg-zinc-900 dark:border-zinc-700">
-              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
+            <div className="absolute top-full start-0 end-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/90 rounded-lg shadow-xl overflow-hidden z-20 animate-in">
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
-              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
-              <div className="h-px bg-zinc-200 mx-3 dark:bg-zinc-700" />
-              <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition dark:text-red-400 dark:hover:bg-red-900/20">
+              <div className="h-px bg-slate-200/60 mx-3" />
+              <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 transition">
                 <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
               </button>
@@ -126,8 +126,8 @@ function SidebarInner() {
       <nav className="flex-1 overflow-y-auto space-y-0.5">
         {/* Stats */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-            isActive('/dashboard') ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
+            isActive('/dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
           }`}>
           <LayoutDashboard size={16} strokeWidth={1.5} className="shrink-0" />
           {s('stats')}
@@ -136,13 +136,13 @@ function SidebarInner() {
         {/* Documents & Factures */}
         <div>
           <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              documentsOpen ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
+              documentsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
             }`}>
             <FileText size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('documents')}</span>
-            <span className="bg-zinc-100 text-zinc-700 text-[10px] font-medium px-1.5 py-0.5 rounded-full dark:bg-zinc-800 dark:text-zinc-300">{docCount > 0 ? docCount : ''}</span>
-            <ChevronDown size={14} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${documentsOpen ? 'rotate-180' : ''}`} />
+            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{docCount > 0 ? docCount : ''}</span>
+            <ChevronDown size={14} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
           </button>
           <div className={`overflow-hidden transition-all duration-200 ${documentsOpen ? 'max-h-72' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
@@ -150,13 +150,13 @@ function SidebarInner() {
                 const count = typeBreakdown[TYPE_MAP[dt.id] ?? ''] ?? 0;
                 return (
                   <button key={dt.id} onClick={() => navigateTo(dt.id)}
-                    className={`w-full flex items-center px-3 py-2 rounded-lg text-sm text-start transition border-s-2 ${
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-start transition border-s-2 ${
                       isDocType(dt.id)
-                        ? 'bg-zinc-100 text-zinc-900 border-s-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 dark:border-s-zinc-50'
-                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border-s-transparent hover:border-s-zinc-400 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50 dark:hover:border-s-zinc-600'
+                        ? 'bg-blue-50 text-blue-600 border-s-blue-600'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 border-s-transparent hover:border-s-blue-200'
                     }`}>
                     <span className="flex-1">{s(dt.key)}</span>
-                    {count > 0 && <span className="text-xs text-zinc-400 ms-1 dark:text-zinc-500">{count}</span>}
+                    {count > 0 && <span className="text-[10px] font-bold text-slate-400 ms-1">{count}</span>}
                   </button>
                 );
               })}
@@ -167,18 +167,18 @@ function SidebarInner() {
         {/* Clients */}
         <div>
           <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              clientsOpen ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
+              clientsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
             }`}>
             <Users size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('clients')}</span>
-            <span className="bg-zinc-100 text-zinc-700 text-[10px] font-medium px-1.5 py-0.5 rounded-full dark:bg-zinc-800 dark:text-zinc-300">{clientCount > 0 ? clientCount : ''}</span>
-            <ChevronDown size={14} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${clientsOpen ? 'rotate-180' : ''}`} />
+            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{clientCount > 0 ? clientCount : ''}</span>
+            <ChevronDown size={14} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${clientsOpen ? 'rotate-180' : ''}`} />
           </button>
           <div className={`overflow-hidden transition-all duration-200 ${clientsOpen ? 'max-h-20' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
               <button onClick={() => router.push('/dashboard/editor')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition border-s-2 border-transparent hover:border-s-zinc-400 text-start dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50 dark:hover:border-s-zinc-600">
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
                 <Plus size={14} strokeWidth={1.5} />
                 Nouveau document
               </button>
@@ -191,21 +191,21 @@ function SidebarInner() {
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white border-r border-zinc-200 dark:bg-[#0a0a0a] dark:border-zinc-800">
+      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-r border-slate-200 shadow-sm">
         {sidebarContent()}
       </aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in dark:bg-[#0a0a0a]">
+          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in">
             {sidebarContent(true)}
           </aside>
         </div>
       )}
 
       <button onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-zinc-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-zinc-800 transition active:scale-95 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
+        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition active:scale-95">
         <Menu size={20} strokeWidth={1.5} />
       </button>
     </>
