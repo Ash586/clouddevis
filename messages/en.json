@@ -477,6 +477,7 @@
     "signatureStamp": "Signature",
     "footer": "Generated via CloudDevis.io",
     "categories": {
+      "none": "— No category —",
       "preparation": "Preparation",
       "peinture": "Painting",
       "finition": "Finishing",

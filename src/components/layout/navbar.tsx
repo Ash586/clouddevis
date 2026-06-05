@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUser } from '@/hooks/useUser';
 
 const FLAGS: Record<string, string> = { fr: '🇫🇷', ar: '🇩🇿', en: '🇬🇧' };
 const LANGS = ['fr', 'ar', 'en'] as const;
@@ -13,21 +14,12 @@ export function Navbar() {
   const t = useTranslations('navbar');
   const router = useRouter();
   const { lang, setLang } = useLanguage();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, refresh } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { setUser(data?.user ?? null); })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
-    setUser(null);
+    refresh();
     router.push('/');
   }
 

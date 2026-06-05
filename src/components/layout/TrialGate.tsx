@@ -1,24 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Modal } from '@/components/ui/modal';
+import { useUser } from '@/hooks/useUser';
 
 export function TrialGate({ children }: { children: React.ReactNode }) {
   const t = useTranslations('trial');
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useUser();
   const [showUpgrade, setShowUpgrade] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => setUser(data?.user ?? null))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) return null;
 

@@ -103,15 +103,15 @@ export const DEFAULT_SECTION_ORDER: string[] = [
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   design: 'Design & Logo',
-  general: 'Données Générales',
+  general: 'General',
   mode: 'Mode',
   client: 'Client',
   chantier: 'Chantier',
-  materiaux: 'Matériaux',
+  materiaux: 'Materials',
   prestations: 'Prestations',
-  remise: 'Remise',
-  garanties: 'Garanties',
-  paiement: 'Règlement & Paiement',
+  remise: 'Discount',
+  garanties: 'Warranties',
+  paiement: 'Payment',
   notes: 'Notes',
 };
 
@@ -179,42 +179,42 @@ export const SECTION_FIELDS: Record<SectionId, string[]> = {
   notes: ['notes'],
 };
 
-export const UNIT_OPTIONS: { value: UnitMeasure; label: string }[] = [
-  { value: 'u', label: 'Unité' },
-  { value: 'h', label: 'Heure' },
-  { value: 'j', label: 'Jour' },
-  { value: 'm2', label: 'm²' },
-  { value: 'm3', label: 'm³' },
-  { value: 'ml', label: 'ml' },
-  { value: 'kg', label: 'Kg' },
-  { value: 'forfait', label: 'Forfait' },
+export const UNIT_OPTIONS: { value: UnitMeasure; labelKey: string }[] = [
+  { value: 'u', labelKey: 'preview.units.u' },
+  { value: 'h', labelKey: 'preview.units.h' },
+  { value: 'j', labelKey: 'preview.units.j' },
+  { value: 'm2', labelKey: 'preview.units.m2' },
+  { value: 'm3', labelKey: 'preview.units.m3' },
+  { value: 'ml', labelKey: 'preview.units.ml' },
+  { value: 'kg', labelKey: 'preview.units.kg' },
+  { value: 'forfait', labelKey: 'preview.units.forfait' },
 ];
 
-export const CATEGORY_OPTIONS = [
-  { value: '', label: '— Sans catégorie —' },
-  { value: 'preparation', label: 'Préparation' },
-  { value: 'peinture', label: 'Peinture' },
-  { value: 'finition', label: 'Finition' },
-  { value: 'revetement', label: 'Revêtement sol' },
-  { value: 'facade', label: 'Façade' },
-  { value: 'enduit', label: 'Enduit' },
-  { value: 'main_oeuvre', label: 'Main-d\'œuvre' },
-  { value: 'materiaux', label: 'Matériaux' },
-  { value: 'transport', label: 'Transport' },
-  { value: 'divers', label: 'Divers' },
+export const CATEGORY_OPTIONS: { value: string; labelKey: string }[] = [
+  { value: '', labelKey: 'preview.categories.none' },
+  { value: 'preparation', labelKey: 'preview.categories.preparation' },
+  { value: 'peinture', labelKey: 'preview.categories.peinture' },
+  { value: 'finition', labelKey: 'preview.categories.finition' },
+  { value: 'revetement', labelKey: 'preview.categories.revetement' },
+  { value: 'facade', labelKey: 'preview.categories.facade' },
+  { value: 'enduit', labelKey: 'preview.categories.enduit' },
+  { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+  { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+  { value: 'transport', labelKey: 'preview.categories.transport' },
+  { value: 'divers', labelKey: 'preview.categories.divers' },
 ];
 
 export const BLOCK_LABELS: Record<BlockId, string> = {
-  header: 'En-tête société',
+  header: 'Header',
   client: 'Client',
-  chantier: 'Chantier',
-  materiaux: 'Matériaux',
-  table: 'Tableau prestations',
-  remise: 'Remise',
-  tafqit: 'Arrêté en lettres',
+  chantier: 'Site',
+  materiaux: 'Materials',
+  table: 'Items table',
+  remise: 'Discount',
+  tafqit: 'Amount in words',
   situations: 'Situations',
-  payment: 'Paiement',
-  garanties: 'Garanties',
-  legal: 'Mentions légales',
+  payment: 'Payment',
+  garanties: 'Warranties',
+  legal: 'Legal mentions',
   signature: 'Signature',
 };

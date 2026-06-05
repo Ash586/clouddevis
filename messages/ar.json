@@ -477,6 +477,7 @@
     "signatureStamp": "التوقيع",
     "footer": "تم الإنشاء عبر CloudDevis.io",
     "categories": {
+      "none": "— بدون فئة —",
       "preparation": "تحضير",
       "peinture": "دهان",
       "finition": "تشطيب",

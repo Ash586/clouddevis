@@ -8,56 +8,15 @@ import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
+import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
+import { FieldSelector } from '@/components/editor/FieldSelector';
+import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
 import { cn } from '@/lib/utils';
-
-interface SectionProps {
-  title: string;
-  sectionId: SectionId;
-  blockId?: BlockId;
-  visible: boolean;
-  onToggle: (b: BlockId) => void;
-  sectionOrder: SectionId[];
-  moveSection: (id: SectionId, dir: 'up' | 'down') => void;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}
-
-function CollapsibleSection({ title, sectionId, blockId, visible, onToggle, sectionOrder, moveSection, children, defaultOpen = true }: SectionProps) {
-  const [open, setOpen] = useState(defaultOpen);
-  const te = useTranslations('editor');
-  const idx = sectionOrder.indexOf(sectionId);
-  const canUp = idx > 0;
-  const canDown = idx >= 0 && idx < sectionOrder.length - 1;
-  return (
-    <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-100">
-        <div className="flex items-center gap-0.5">
-          <button onClick={() => moveSection(sectionId, 'up')} disabled={!canUp}
-            className={cn('text-[9px] leading-none p-0.5 rounded', canUp ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-200' : 'text-slate-200 cursor-default')}>▲</button>
-          <button onClick={() => moveSection(sectionId, 'down')} disabled={!canDown}
-            className={cn('text-[9px] leading-none p-0.5 rounded', canDown ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-200' : 'text-slate-200 cursor-default')}>▼</button>
-          <button onClick={() => setOpen(!open)} className="flex items-center gap-2 text-[11px] font-bold text-slate-700 uppercase tracking-wider hover:text-slate-900 ml-1">
-            <span className="text-[10px] text-slate-400 transition-transform" style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-            {title}
-          </button>
-        </div>
-        {blockId && (
-          <button onClick={() => onToggle(blockId)}
-            className={cn('text-[13px] px-1.5 py-0.5 rounded-md transition', visible ? 'text-slate-400 hover:text-slate-600 hover:bg-slate-200' : 'text-red-400 bg-red-50 hover:bg-red-100')}
-            title={visible ? te('hideBlock') : te('showBlock')}>
-            {visible ? '👁' : '👁‍🗨'}
-          </button>
-        )}
-      </div>
-      {open && <div className="p-3 space-y-2">{children}</div>}
-    </section>
-  );
-}
 
 function EditorContent() {
   const sp = useSearchParams();
@@ -329,11 +288,11 @@ function EditorContent() {
                 <input type="number" className="w-full border p-1.5 rounded-lg text-[11px] bg-white text-right outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.unit')}</label>
                 <select className="w-full border p-1.5 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as any }))}>
-                  {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}</select></div>
+                  {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}</select></div>
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.category')}</label>
                 <select className="w-full border p-1.5 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
                   <option value="">{te('prestations.noCategory')}</option>
-                  {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
+                  {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
               <div className="flex justify-center gap-1">
                 <button onClick={handleAddItem} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-green-700">✓</button>
                 <button onClick={() => setAddingItem(false)} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-red-600">✕</button></div>
@@ -349,7 +308,7 @@ function EditorContent() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="text-[11px] font-medium text-slate-800 truncate block">{item.designation}</span>
-                    {item.category && <span className="text-[8px] text-slate-400 uppercase">{CATEGORY_OPTIONS.find(c => c.value === item.category)?.label ?? item.category}</span>}
+                    {item.category && <span className="text-[8px] text-slate-400 uppercase">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? 'preview.categories.none')}</span>}
                   </div>
                 </div>
                 <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1">✕</button>
@@ -605,140 +564,7 @@ function EditorContent() {
 
 }
 
-// ─── Section Creator Form ───
-function SectionCreatorForm({ initialSection, onSave, onCancel, te }: {
-  initialSection: CustomSectionDef | null; onSave: (s: CustomSectionDef) => void; onCancel: () => void; te: (k: string) => string;
-}) {
-  const [label, setLabel] = useState(initialSection?.label ?? '');
-  const [fields, setFields] = useState<CustomFieldDef[]>(initialSection?.fields ?? []);
-  const fieldTypes: CustomFieldType[] = ['text', 'number', 'date', 'textarea', 'select'];
-  const addField = () => setFields(prev => [...prev, { id: `f_${Date.now()}`, label: '', type: 'text' }]);
-  const removeField = (idx: number) => setFields(prev => prev.filter((_, i) => i !== idx));
-  const updateField = (idx: number, upd: Partial<CustomFieldDef>) => setFields(prev => prev.map((f, i) => i === idx ? { ...f, ...upd } : f));
-  const isValid = label.trim().length > 0 && fields.some(f => f.label.trim().length > 0);
-  return (
-    <div className="space-y-3">
-      <div>
-        <label className="block text-[10px] font-bold text-slate-400 mb-1">{te('sectionCreatorLabel')}</label>
-        <input type="text" className="w-full border p-2 rounded-lg text-[12px] outline-none focus:ring-2 focus:ring-blue-500" value={label} onChange={e => setLabel(e.target.value)} placeholder={te('sectionCreatorLabel')} />
-      </div>
-      <div className="space-y-2 max-h-64 overflow-y-auto">
-        {fields.map((field, idx) => (
-          <div key={field.id} className="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
-            <div className="flex items-center gap-1.5">
-              <input type="text" className="flex-1 border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={field.label} onChange={e => updateField(idx, { label: e.target.value })} placeholder={te('sectionCreatorFieldLabel')} />
-              <select className="border p-1.5 rounded-lg text-[10px] outline-none focus:ring-2 focus:ring-blue-500" value={field.type} onChange={e => updateField(idx, { type: e.target.value as CustomFieldType })}>
-                {fieldTypes.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              <button onClick={() => removeField(idx)} className="text-red-400 hover:text-red-600 px-1">✕</button>
-            </div>
-            {field.type === 'select' && (
-              <textarea className="w-full border p-1.5 rounded-lg text-[10px] h-12 resize-none outline-none focus:ring-2 focus:ring-blue-500" value={field.options?.join('\n') ?? ''} onChange={e => updateField(idx, { options: e.target.value.split('\n').filter(Boolean) })} placeholder={te('sectionCreatorOptions')} />
-            )}
-          </div>
-        ))}
-      </div>
-      <button onClick={addField} className="w-full py-1.5 border border-dashed border-slate-300 rounded-lg text-slate-400 hover:bg-slate-50 transition text-[11px] font-medium">+ {te('sectionCreatorAddField')}</button>
-      <div className="flex gap-2 pt-1">
-        <button onClick={onCancel} className="flex-1 py-2 border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-500 hover:bg-slate-50 transition">{te('sectionCreatorCancel')}</button>
-        <button onClick={() => {
-          if (!isValid) return;
-          const id = initialSection?.id || `custom_${Date.now()}`;
-          onSave({ id, label: label.trim(), fields });
-        }} disabled={!isValid} className="flex-1 py-2 bg-blue-600 text-white rounded-xl text-[11px] font-semibold hover:bg-blue-700 transition disabled:opacity-40">{te('sectionCreatorSave')}</button>
-      </div>
-    </div>
-  );
-}
 
-// ─── Field Selector Component ───
-function FieldSelector({ sections, fieldPrefs, setFieldPrefs, te, SECTION_FIELDS: sf, customSections, onEditSection, onDeleteSection }: {
-  sections: string[]; fieldPrefs: Record<string, string[]>; setFieldPrefs: (p: Record<string, string[]>) => void; te: (k: string) => string; SECTION_FIELDS: Record<string, string[]>; customSections: CustomSectionDef[]; onEditSection?: (cs: CustomSectionDef) => void; onDeleteSection?: (id: string) => void;
-}) {
-  const [expanded, setExpanded] = useState<string[]>([]);
-  const toggleSection = (id: string) => {
-    setExpanded(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
-  };
-  const getFields = (id: string): string[] => {
-    if (sf[id]) return sf[id];
-    const cs = customSections.find(c => c.id === id);
-    if (cs) return cs.fields.map(f => f.id);
-    return [];
-  };
-  const toggleAllInSection = (id: string) => {
-    const selected = fieldPrefs[id] ?? [];
-    const all = getFields(id);
-    const allChecked = all.every(f => selected.includes(f));
-    setFieldPrefs({ ...fieldPrefs, [id]: allChecked ? [] : [...all] });
-  };
-  const toggleField = (sectionId: string, fieldId: string) => {
-    const selected = fieldPrefs[sectionId] ?? [];
-    setFieldPrefs({ ...fieldPrefs, [sectionId]: selected.includes(fieldId) ? selected.filter(f => f !== fieldId) : [...selected, fieldId] });
-  };
-  const isBuiltinSection = (id: string) => DEFAULT_SECTION_ORDER.includes(id as any);
-  const isBuiltinField = (fieldId: string) => Object.values(sf).some(arr => arr.includes(fieldId));
-  const getSectionLabel = (id: string): string => {
-    if (isBuiltinSection(id)) { const t = te(`sections.${id}`); if (t) return t; }
-    const cs = customSections.find(c => c.id === id);
-    return cs?.label ?? id;
-  };
-  const getFieldLabel = (sectionId: string, fieldId: string): string => {
-    if (isBuiltinField(fieldId)) { const t = te(`fields.${fieldId}`); if (t) return t; }
-    const cs = customSections.find(c => c.id === sectionId);
-    const fd = cs?.fields.find(f => f.id === fieldId);
-    return fd?.label ?? fieldId;
-  };
-  return (
-    <div className="divide-y divide-slate-100">
-      {sections.map(id => {
-        const fields = getFields(id);
-        const selected = fieldPrefs[id] ?? [];
-        const isAll = fields.length > 0 && fields.every(f => selected.includes(f));
-        const isNone = selected.length === 0;
-        return (
-          <div key={id} className="py-0.5">
-            <button onClick={() => toggleSection(id)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition group">
-              <div className="relative flex items-center justify-center w-5 h-5">
-                <div onClick={(e) => { e.stopPropagation(); toggleAllInSection(id); }}
-                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center cursor-pointer transition-all duration-150 ${isAll ? 'bg-blue-600 border-blue-600' : isNone ? 'border-slate-300 bg-white' : 'bg-blue-500 border-blue-500'}`}>
-                  {isAll && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                  {!isAll && !isNone && <div className="w-1.5 h-1.5 rounded-sm bg-white" />}
-                </div>
-              </div>
-              <span className="text-[13px] font-medium text-slate-700 group-hover:text-slate-900 flex-1 text-left">{getSectionLabel(id)}</span>
-              {!sf[id] && customSections.find(c => c.id === id) && onEditSection && (
-                <span onClick={(e) => { e.stopPropagation(); onEditSection({ ...customSections.find(c => c.id === id)! }); }}
-                  className="text-[10px] text-slate-400 hover:text-blue-600 px-1 py-0.5 rounded hover:bg-blue-50 transition cursor-pointer">✎</span>
-              )}
-              {!sf[id] && customSections.find(c => c.id === id) && onDeleteSection && (
-                <span onClick={(e) => { e.stopPropagation(); onDeleteSection(id); }}
-                  className="text-[10px] text-slate-300 hover:text-red-500 px-1 py-0.5 rounded hover:bg-red-50 transition cursor-pointer">✕</span>
-              )}
-              <svg className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expanded.includes(id) ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            <div className={`overflow-hidden transition-all duration-200 ${expanded.includes(id) ? 'max-h-96' : 'max-h-0'}`}>
-              <div className="ml-10 mr-2 pb-1 space-y-0.5">
-                {fields.map(fieldId => {
-                  const isOn = selected.includes(fieldId);
-                  return (
-                    <button key={fieldId} onClick={() => toggleField(id, fieldId)}
-                      className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-slate-50 transition group">
-                      <span className={`text-[12px] ${isOn ? 'text-slate-700 font-medium' : 'text-slate-400'} text-left`}>{getFieldLabel(id, fieldId)}</span>
-                      <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${isOn ? 'bg-blue-600' : 'bg-slate-300'}`}>
-                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${isOn ? 'translate-x-4' : 'translate-x-0'}`} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function EditorPage() {
   const tc = useTranslations('common');

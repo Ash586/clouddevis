@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/hooks/useUser';
 import {
   LayoutDashboard,
   FileText,
@@ -30,7 +31,7 @@ function SidebarInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState<any>(null);
+  const { user } = useUser();
   const [docCount, setDocCount] = useState(0);
   const [clientCount, setClientCount] = useState(0);
   const [typeBreakdown, setTypeBreakdown] = useState<Record<string, number>>({});
@@ -45,22 +46,18 @@ function SidebarInner() {
   };
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/auth/me').then(r => r.ok ? r.json() : null),
-      fetch('/api/dashboard').then(r => r.ok ? r.json() : { stats: {} }),
-    ])
-      .then(([userData, dashData]) => {
-        setUser(userData?.user ?? null);
+    fetch('/api/dashboard')
+      .then(r => r.ok ? r.json() : { stats: {} })
+      .then(dashData => {
         setDocCount(dashData.stats?.totalDocs ?? 0);
         setClientCount(dashData.stats?.totalClients ?? 0);
         setTypeBreakdown(dashData.stats?.typeBreakdown ?? {});
       })
-      .catch(() => setUser(null));
+      .catch(() => {});
   }, []);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
-    setUser(null);
     router.push('/');
   }
 
