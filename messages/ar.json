@@ -89,7 +89,10 @@
     "feature2Title": "مطابق",
     "feature2Desc": "NIF, RC, NIS, AI, ضريبة 9/19% والطابع الجبائي تلقائياً.",
     "feature3Title": "مستندات متعددة",
-    "feature3Desc": "تقدير، فاتورة Proforma، أمر شراء، فاتورة."
+    "feature3Desc": "تقدير، فاتورة Proforma، أمر شراء، فاتورة.",
+    "footerRights": "جميع الحقوق محفوظة.",
+    "footerCompliant": "متوافق مع المعايير الجزائرية",
+    "footerFeatures": "NIF، RC، NIS، AI، TVA، الطابع الجبائي"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول إلى حسابك",
@@ -233,6 +236,7 @@
     "selectAll": "تحديد الكل",
     "deselectAll": "إلغاء التحديد",
     "addCustomSection": "+ إضافة قسم مخصص",
+    "backToDashboard": "العودة إلى لوحة التحكم",
     "sectionCreatorLabel": "اسم القسم",
     "sectionCreatorFieldLabel": "اسم الحقل",
     "sectionCreatorOptions": "خيار واحد في كل سطر",

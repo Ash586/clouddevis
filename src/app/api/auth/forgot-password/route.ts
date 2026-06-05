@@ -42,13 +42,8 @@ export async function POST(req: Request) {
 
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password?token=${token}`;
 
-    // Log to console (in production, send email via Resend/Nodemailer)
-    console.log('═══════════════════════════════════════════');
-    console.log('  PASSWORD RESET LINK');
-    console.log(`  Email: ${email}`);
-    console.log(`  Lien: ${resetUrl}`);
-    console.log('  (Envoyer cet email en production via Resend/Nodemailer)');
-    console.log('═══════════════════════════════════════════');
+    // TODO: Send reset email via Resend/Nodemailer in production
+    // For now, return success silently (no console.log of reset URL in production)
 
     return NextResponse.json({ success: true, message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
   } catch (error) {

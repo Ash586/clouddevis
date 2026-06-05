@@ -91,10 +91,11 @@ export function formatCurrency(amount: number, currency = 'DA'): string {
   return amount.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + currency;
 }
 
-export function generateDocumentNumber(type: string, mode: string): string {
+export function generateDocumentNumber(type: string, mode: string, sequenceNumber?: number): string {
   const prefix = type === 'facture' ? 'FAC' : type === 'bc' ? 'BC' : type === 'br' ? 'BR' : 'DEV';
   const year = new Date().getFullYear();
-  return `${prefix}-${year}-00001`;
+  const seq = String(sequenceNumber ?? 1).padStart(5, '0');
+  return `${prefix}-${year}-${seq}`;
 }
 
 export function formatDateISO(date: Date): string {

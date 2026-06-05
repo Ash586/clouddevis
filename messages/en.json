@@ -89,7 +89,10 @@
     "feature2Title": "Compliant",
     "feature2Desc": "NIF, RC, NIS, AI, VAT 9/19% and stamp duty automatically.",
     "feature3Title": "Multi-document",
-    "feature3Desc": "Quote, Proforma Invoice, Purchase Order, Invoice."
+    "feature3Desc": "Quote, Proforma Invoice, Purchase Order, Invoice.",
+    "footerRights": "All rights reserved.",
+    "footerCompliant": "Compliant with Algerian standards",
+    "footerFeatures": "NIF, RC, NIS, AI, VAT, Stamp duty"
   },
   "auth": {
     "loginTitle": "Log in to your account",
@@ -233,6 +236,7 @@
     "selectAll": "Select all",
     "deselectAll": "Deselect all",
     "addCustomSection": "+ Add custom section",
+    "backToDashboard": "Back to dashboard",
     "sectionCreatorLabel": "Section name",
     "sectionCreatorFieldLabel": "Field label",
     "sectionCreatorOptions": "One option per line",

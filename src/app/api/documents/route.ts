@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { calculateDocument } from '@/lib/calculations';
+import { calculateDocument, generateDocumentNumber } from '@/lib/calculations';
 
 const DOC_TYPE_MAP: Record<string, string> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
 
@@ -68,13 +68,25 @@ export async function POST(req: Request) {
     existingClientId = existing?.id ?? null;
   }
 
+  // Auto-generate unique document number based on count of same type this year
+  const docType = (DOC_TYPE_MAP[doc.documentType] || 'DEVIS') as string;
+  const yearStart = new Date(`${new Date().getFullYear()}-01-01`);
+  const sameTypeCount = await prisma.document.count({
+    where: {
+      userId: session.userId,
+      type: docType as any,
+      createdAt: { gte: yearStart },
+    },
+  });
+  const autoNumber = doc.documentNumber || generateDocumentNumber(doc.documentType || 'devis', doc.mode || 'artisan', sameTypeCount + 1);
+
   const created = await prisma.document.create({
     data: {
       userId: session.userId,
       clientId: existingClientId,
-      type: (DOC_TYPE_MAP[doc.documentType] || 'DEVIS') as any,
+      type: docType as any,
       status: 'DRAFT' as any,
-      number: doc.documentNumber || '',
+      number: autoNumber,
       date: doc.date ? new Date(doc.date) : new Date(),
       mode: (doc.mode?.toUpperCase?.() || 'ARTISAN') as any,
       paymentMode: doc.paymentMode || 'cheque',

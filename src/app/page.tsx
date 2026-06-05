@@ -141,12 +141,12 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <span className="text-lg font-black text-blue-600 tracking-tight">CloudDevis</span>
-              <p className="text-xs text-slate-400 mt-1">© {new Date().getFullYear()} CloudDevis. Tous droits réservés.</p>
+              <p className="text-xs text-slate-400 mt-1">© {new Date().getFullYear()} CloudDevis. {t('footerRights')}</p>
             </div>
             <div className="flex gap-6 text-xs text-slate-400">
-              <span>Conforme aux normes algériennes</span>
+              <span>{t('footerCompliant')}</span>
               <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">NIF, RC, NIS, AI, TVA, Timbre fiscal</span>
+              <span className="hidden sm:inline">{t('footerFeatures')}</span>
             </div>
           </div>
         </div>

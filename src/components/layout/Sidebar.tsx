@@ -87,6 +87,7 @@ function SidebarInner() {
       {/* User Pill */}
       <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+          aria-expanded={userDropdownOpen}
           className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-50/60 border border-blue-100/60 hover:bg-blue-50 transition">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-black shrink-0">
             {userInitial}
@@ -123,9 +124,10 @@ function SidebarInner() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto space-y-0.5">
+      <nav aria-label="Main navigation" className="flex-1 overflow-y-auto space-y-0.5">
         {/* Stats */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
+          aria-current={isActive('/dashboard') ? 'page' : undefined}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
             isActive('/dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
           }`}>
@@ -136,6 +138,7 @@ function SidebarInner() {
         {/* Documents & Factures */}
         <div>
           <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
+            aria-expanded={documentsOpen}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
               documentsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
             }`}>
@@ -167,6 +170,7 @@ function SidebarInner() {
         {/* Clients */}
         <div>
           <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); }}
+            aria-expanded={clientsOpen}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
               clientsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
             }`}>
@@ -191,7 +195,7 @@ function SidebarInner() {
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-r border-slate-200 shadow-sm">
+      <aside aria-label="Navigation" className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-r border-slate-200 shadow-sm">
         {sidebarContent()}
       </aside>
 
@@ -205,6 +209,8 @@ function SidebarInner() {
       )}
 
       <button onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label="Open menu"
+        aria-expanded={mobileOpen}
         className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition active:scale-95">
         <Menu size={20} strokeWidth={1.5} />
       </button>

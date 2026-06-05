@@ -89,7 +89,10 @@
     "feature2Title": "Conforme",
     "feature2Desc": "NIF, RC, NIS, AI, TVA 9/19% et Timbre fiscal automatique.",
     "feature3Title": "Multi-documents",
-    "feature3Desc": "Devis, Facture Proforma, Bon de Commande, Facture."
+    "feature3Desc": "Devis, Facture Proforma, Bon de Commande, Facture.",
+    "footerRights": "Tous droits réservés.",
+    "footerCompliant": "Conforme aux normes algériennes",
+    "footerFeatures": "NIF, RC, NIS, AI, TVA, Timbre fiscal"
   },
   "auth": {
     "loginTitle": "Connectez-vous à votre compte",
@@ -233,6 +236,7 @@
     "selectAll": "Tout sélectionner",
     "deselectAll": "Tout désélectionner",
     "addCustomSection": "+ Ajouter une section personnalisée",
+    "backToDashboard": "Retour au tableau de bord",
     "sectionCreatorLabel": "Nom de la section",
     "sectionCreatorFieldLabel": "Libellé du champ",
     "sectionCreatorOptions": "Une option par ligne",
