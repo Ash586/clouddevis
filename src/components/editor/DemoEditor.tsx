@@ -214,9 +214,9 @@ export function DemoEditor({ onDownload }: Props) {
           <div className="sticky top-0 bg-slate-900 text-white px-4 py-2 flex items-center justify-between rounded-t-xl z-10">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('livePreview')}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">{t('livePreview')}</span>
             </div>
-            <span className="text-[9px] text-slate-500">{doc.items.length} {doc.items.length > 1 ? t('itemPlural') : t('itemSingular')}</span>
+            <span className="text-[10px] text-slate-500">{doc.items.length} {doc.items.length > 1 ? t('itemPlural') : t('itemSingular')}</span>
           </div>
           <div className="p-4 flex justify-center bg-slate-100">
             <div className="scale-[0.55] origin-top transform-gpu w-[21cm]">
