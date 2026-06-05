@@ -51,22 +51,28 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <section className="max-w-4xl mx-auto text-center px-6 pt-16 pb-12">
-        <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full mb-6">
+      <section className="max-w-4xl mx-auto text-center px-4 sm:px-6 pt-10 sm:pt-16 pb-8 sm:pb-12">
+        <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full mb-4 sm:mb-6">
           🇩🇿 {t('heroBadge')}
         </span>
-        <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-none mb-4 sm:mb-6 px-2 sm:px-0">
           {t('heroTitle1')}<br />
           <span className="text-blue-600">{t('heroTitle2')}</span>
         </h1>
-        <p className="text-base md:text-lg text-slate-500 max-w-xl mx-auto mb-10 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-slate-500 max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2 sm:px-0">
           {t('heroSubtitle')}
         </p>
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Button size="lg" onClick={handleTryEditor}>
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+          <Button size="md" className="sm:hidden w-full max-w-[280px]" onClick={handleTryEditor}>
             {mounted && isDemoUsedToday() ? t('ctaTryNow') : t('ctaFree')}
           </Button>
-          <Button variant="outline" size="lg" onClick={() => router.push('/auth/register')}>
+          <Button size="lg" className="hidden sm:inline-flex" onClick={handleTryEditor}>
+            {mounted && isDemoUsedToday() ? t('ctaTryNow') : t('ctaFree')}
+          </Button>
+          <Button variant="outline" size="md" className="sm:hidden w-full max-w-[280px]" onClick={() => router.push('/auth/register')}>
+            {t('ctaCreateAccount')}
+          </Button>
+          <Button variant="outline" size="lg" className="hidden sm:inline-flex" onClick={() => router.push('/auth/register')}>
             {t('ctaCreateAccount')}
           </Button>
         </div>
@@ -127,8 +133,8 @@ export default function HomePage() {
         </div>
       )}
 
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-6">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
           {[
             { emoji: '⚡', title: t('feature1Title'), desc: t('feature1Desc') },
             { emoji: '🇩🇿', title: t('feature2Title'), desc: t('feature2Desc') },

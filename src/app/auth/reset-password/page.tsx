@@ -87,7 +87,7 @@ function ResetForm() {
           <Input label={t('confirmPassword')} type="password" value={confirm}
             onChange={(e) => setConfirm(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={6} />
 
-          <Button className="w-full" type="submit">{t('resetButton')}</Button>
+          <Button className="w-full py-2 sm:py-2.5" type="submit">{t('resetButton')}</Button>
         </form>
       </Card>
     </div>

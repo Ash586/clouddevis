@@ -168,7 +168,7 @@ export default function RegisterPage() {
           <Select label={t('languageLabel')} value={language}
             onChange={(e) => setLanguage(e.target.value)} options={LANGUAGE_OPTIONS} />
 
-          <Button className="w-full" type="submit" disabled={loading}>
+          <Button className="w-full py-2 sm:py-2.5" type="submit" disabled={loading}>
             {loading ? t('registerLoading') : t('registerButton')}
           </Button>
         </form>

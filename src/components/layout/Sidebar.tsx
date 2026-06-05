@@ -26,6 +26,7 @@ function SidebarInner() {
   const [documentsOpen, setDocumentsOpen] = useState(true);
   const [clientsOpen, setClientsOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const TYPE_MAP: Record<string, string> = {
     facture: 'FACTURE', devis: 'DEVIS', proforma: 'PROFORMA',
@@ -63,14 +64,15 @@ function SidebarInner() {
   function navigateTo(type: string) {
     setClientsOpen(false);
     setDocumentsOpen(true);
+    setMobileOpen(false);
     router.push(`/dashboard/editor?type=${type}`);
   }
 
   const userName = user?.name || 'مستخدم';
   const userInitial = userName.charAt(0);
 
-  return (
-    <aside className="w-[220px] flex-shrink-0 sticky top-0 h-screen flex flex-col p-4 bg-white/60 backdrop-blur-xl border-s border-white/80 shadow-sm z-10">
+  const sidebarContent = (inDrawer = false) => (
+    <>
       {/* User Pill */}
       <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -188,7 +190,31 @@ function SidebarInner() {
           <span className="absolute top-1.5 start-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shadow-sm" />
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-s border-white/80 shadow-sm z-10">
+        {sidebarContent()}
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in">
+            {sidebarContent(true)}
+          </aside>
+        </div>
+      )}
+
+      <button onClick={() => setMobileOpen(!mobileOpen)}
+        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition active:scale-95">
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </>
   );
 }
 

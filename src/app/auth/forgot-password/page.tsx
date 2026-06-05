@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-slate-500 mb-4 text-center">{t('forgotInstruction')}</p>
             <Input label={t('emailLabel')} type="email" value={email}
               onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} required />
-            <Button className="w-full" type="submit" disabled={loading}>{loading ? t('forgotLoading') : t('forgotButton')}</Button>
+            <Button className="w-full py-2 sm:py-2.5" type="submit" disabled={loading}>{loading ? t('forgotLoading') : t('forgotButton')}</Button>
           </form>
         )}
         <a href="/auth/login" className="block text-xs text-blue-600 font-semibold mt-6 hover:underline">{t('forgotBack')}</a>

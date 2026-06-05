@@ -17,7 +17,7 @@ export function Button({ variant = 'primary', size = 'md', className, children, 
   const sizes: Record<string, string> = {
     sm: 'px-4 py-2 text-xs gap-1.5',
     md: 'px-5 py-2.5 text-sm gap-2',
-    lg: 'px-8 py-4 text-sm gap-2',
+    lg: 'px-6 sm:px-8 py-3 sm:py-4 text-sm gap-2',
   };
   return (
     <button className={cn(base, variants[variant], sizes[size], className)} {...props}>
