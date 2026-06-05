@@ -164,32 +164,19 @@ function SidebarInner() {
             <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{clientCount > 0 ? clientCount : ''}</span>
             <svg className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${clientsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
           </button>
-          <div className={`overflow-hidden transition-all duration-200 ${clientsOpen ? 'max-h-28' : 'max-h-0'}`}>
+          <div className={`overflow-hidden transition-all duration-200 ${clientsOpen ? 'max-h-20' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
-              <button onClick={() => router.push('/dashboard')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-                {s('clientsMy')}
-              </button>
               <button onClick={() => router.push('/dashboard/editor')}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                {s('clientsAdd')}
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                Nouveau document
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Footer - Settings */}
-      <div className="pt-3 mt-auto border-t border-slate-200/20">
-        <button onClick={() => router.push('/dashboard')}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition relative">
-          <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          {s('settings')}
-          <span className="absolute top-1.5 start-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shadow-sm" />
-        </button>
-      </div>
+
     </>
   );
 

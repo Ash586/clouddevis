@@ -130,12 +130,9 @@ export function EnterpriseDashboard({ userName, companyInfo, stats, docs, loadin
         {loading ? (
           <div className="text-center py-12"><p className="text-sm text-slate-400">{tc('loading')}</p></div>
         ) : docs.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-3">📄</div>
+          <div className="text-center py-8">
+            <div className="text-3xl mb-2">📄</div>
             <p className="text-sm text-slate-400">{t('noDocs')}</p>
-            <Button className="mt-4" size="sm" onClick={() => router.push('/dashboard/editor?mode=entreprise')}>
-              {t('createFirst')}
-            </Button>
           </div>
         ) : (
           <>

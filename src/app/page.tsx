@@ -102,14 +102,9 @@ export default function HomePage() {
             <div className="w-14 h-14 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
             <h3 className="text-2xl font-black text-slate-900">{t('successTitle')}</h3>
             <p className="text-slate-500 text-sm mt-2 mb-6">{t('successBody')}</p>
-            <div className="space-y-3">
-              <Button className="w-full" onClick={() => { setShowSuccess(false); router.push('/auth/register'); }}>
-                {t('successCTA')}
-              </Button>
-              <Button variant="outline" className="w-full" onClick={() => setShowSuccess(false)}>
+            <Button variant="outline" className="w-full" onClick={() => setShowSuccess(false)}>
                 {t('successContinue')}
               </Button>
-            </div>
           </div>
         </div>
       )}
