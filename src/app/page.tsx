@@ -70,7 +70,7 @@ export default function HomePage() {
       </section>
 
       {showEditor && (
-        <div ref={editorRef} className="max-w-6xl mx-auto px-4 h-[calc(100vh-56px)] overflow-hidden flex flex-col">
+        <div ref={editorRef} className="max-w-6xl mx-auto px-4 min-h-screen flex flex-col">
           <div className="bg-white border border-slate-200 rounded-3xl shadow-xl flex-1 overflow-hidden flex flex-col">
             <div className="bg-slate-900 text-white px-6 py-3 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
