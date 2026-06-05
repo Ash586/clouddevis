@@ -126,7 +126,7 @@ export function DemoEditor({ onDownload }: Props) {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row h-full gap-4 sm:gap-6">
+    <div className="flex flex-col lg:flex-row h-full items-start gap-4 sm:gap-6">
       {/* Preview toggle on mobile */}
       <button onClick={() => setShowPreview(!showPreview)}
         className="lg:hidden text-[11px] font-semibold text-blue-600 bg-blue-50 px-3 py-2 rounded-xl flex items-center justify-center gap-2">
