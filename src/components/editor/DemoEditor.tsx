@@ -126,7 +126,7 @@ export function DemoEditor({ onDownload }: Props) {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row h-full items-start gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 h-full gap-4 sm:gap-6">
       {/* Preview toggle on mobile */}
       <button onClick={() => setShowPreview(!showPreview)}
         className="lg:hidden text-[11px] font-semibold text-blue-600 bg-blue-50 px-3 py-2 rounded-xl flex items-center justify-center gap-2">
@@ -135,78 +135,81 @@ export function DemoEditor({ onDownload }: Props) {
       </button>
 
       {/* Left Panel — Form */}
-      <div className={`w-full lg:flex-1 max-w-lg space-y-5 overflow-y-auto ${showPreview ? 'hidden lg:block' : ''}`}>
-        {/* Mode toggle */}
-        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('mode')}</span>
-          <button
-            onClick={toggleMode}
-            className={`relative w-12 h-6 rounded-full transition-colors ${doc.mode === 'entreprise' ? 'bg-blue-600' : 'bg-slate-300'}`}
-          >
-            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${doc.mode === 'entreprise' ? 'translate-x-6' : ''}`} />
-          </button>
-          <span className="text-xs font-semibold text-slate-700">{doc.mode === 'entreprise' ? t('entreprise') : t('artisan')}</span>
-        </div>
-
-        {/* Client */}
-        <fieldset className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-          <legend className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">{t('client')}</legend>
-          <input className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.name} onChange={e => updateClient('name', e.target.value)} placeholder={t('clientNamePlaceholder')} />
-          <input className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.address} onChange={e => updateClient('address', e.target.value)} placeholder={t('addressPlaceholder')} />
-          <div className="flex gap-2">
-            <input className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.phone} onChange={e => updateClient('phone', e.target.value)} placeholder={t('phonePlaceholder')} />
-            <input className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.email} onChange={e => updateClient('email', e.target.value)} placeholder={t('emailPlaceholder')} />
+      <div className={`max-w-lg overflow-y-auto ${showPreview ? 'hidden lg:block' : ''}`}>
+        <div className="flex flex-col gap-5 min-h-full">
+          {/* Mode toggle */}
+          <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('mode')}</span>
+            <button
+              onClick={toggleMode}
+              className={`relative w-12 h-6 rounded-full transition-colors ${doc.mode === 'entreprise' ? 'bg-blue-600' : 'bg-slate-300'}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${doc.mode === 'entreprise' ? 'translate-x-6' : ''}`} />
+            </button>
+            <span className="text-xs font-semibold text-slate-700">{doc.mode === 'entreprise' ? t('entreprise') : t('artisan')}</span>
           </div>
-        </fieldset>
 
-        {/* Items */}
-        <fieldset className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
-          <legend className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">{t('prestations')}</legend>
-          <div className="space-y-1.5 max-h-64 overflow-y-auto">
-            {doc.items.map(item => (
-              <div key={item.id} className="flex items-start gap-1.5 bg-slate-50 rounded-lg p-2">
-                <div className="flex-1 min-w-0">
-                  <input
-                    className="w-full text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 mb-1"
-                    value={item.designation} onChange={e => updateItem(item.id, 'designation', e.target.value)}
-                    placeholder={t('designation')}
-                  />
-                  <div className="flex gap-1">
+          {/* Client */}
+          <fieldset className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+            <legend className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">{t('client')}</legend>
+            <input className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.name} onChange={e => updateClient('name', e.target.value)} placeholder={t('clientNamePlaceholder')} />
+            <input className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.address} onChange={e => updateClient('address', e.target.value)} placeholder={t('addressPlaceholder')} />
+            <div className="flex gap-2">
+              <input className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.phone} onChange={e => updateClient('phone', e.target.value)} placeholder={t('phonePlaceholder')} />
+              <input className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400" value={doc.clientInfo.email} onChange={e => updateClient('email', e.target.value)} placeholder={t('emailPlaceholder')} />
+            </div>
+          </fieldset>
+
+          {/* Items */}
+          <fieldset className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+            <legend className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">{t('prestations')}</legend>
+            <div className="space-y-1.5 max-h-64 overflow-y-auto">
+              {doc.items.map(item => (
+                <div key={item.id} className="flex items-start gap-1.5 bg-slate-50 rounded-lg p-2">
+                  <div className="flex-1 min-w-0">
                     <input
-                      className="w-14 text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-right"
-                      type="number" min="0" value={item.quantity} onChange={e => updateItem(item.id, 'quantity', Number(e.target.value))}
+                      className="w-full text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 mb-1"
+                      value={item.designation} onChange={e => updateItem(item.id, 'designation', e.target.value)}
+                      placeholder={t('designation')}
                     />
-                    <select
-                      className="text-[11px] border border-slate-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                      value={item.unit} onChange={e => updateItem(item.id, 'unit', e.target.value as UnitMeasure)}
-                    >
-                      {UNIT_OPTIONS_LOCAL.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
-                    </select>
-                    <input
-                      className="w-20 text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-right"
-                      type="number" min="0" value={item.unitPrice} onChange={e => updateItem(item.id, 'unitPrice', Number(e.target.value))}
-                      placeholder={t('unitPricePlaceholder')}
-                    />
-                    <span className="text-[11px] font-bold text-slate-600 whitespace-nowrap self-center min-w-[60px] text-right">
-                      {(item.quantity * item.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}
-                    </span>
-                    <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 text-sm leading-none mt-0.5">✕</button>
+                    <div className="flex gap-1">
+                      <input
+                        className="w-14 text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-right"
+                        type="number" min="0" value={item.quantity} onChange={e => updateItem(item.id, 'quantity', Number(e.target.value))}
+                      />
+                      <select
+                        className="text-[11px] border border-slate-200 rounded-md px-1.5 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                        value={item.unit} onChange={e => updateItem(item.id, 'unit', e.target.value as UnitMeasure)}
+                      >
+                        {UNIT_OPTIONS_LOCAL.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+                      </select>
+                      <input
+                        className="w-20 text-[11px] border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-right"
+                        type="number" min="0" value={item.unitPrice} onChange={e => updateItem(item.id, 'unitPrice', Number(e.target.value))}
+                        placeholder={t('unitPricePlaceholder')}
+                      />
+                      <span className="text-[11px] font-bold text-slate-600 whitespace-nowrap self-center min-w-[60px] text-right">
+                        {(item.quantity * item.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}
+                      </span>
+                      <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 text-sm leading-none mt-0.5">✕</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <Button variant="outline" size="sm" onClick={addItem} className="w-full text-[11px]">{t('addLine')}</Button>
-        </fieldset>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" onClick={addItem} className="w-full text-[11px]">{t('addLine')}</Button>
+          </fieldset>
 
-        {/* Download button */}
-        <Button onClick={onDownload} className="w-full">
-          {t('downloadPdf')}
-        </Button>
+          {/* Download button */}
+          <Button onClick={onDownload} className="w-full">
+            {t('downloadPdf')}
+          </Button>
+          <div className="flex-1 min-h-0" />
+        </div>
       </div>
 
       {/* Right Panel — Live Preview */}
-      <div className={`w-full lg:flex-1 min-w-0 overflow-y-auto rounded-xl border border-slate-200 shadow-lg bg-white ${showPreview ? '' : 'hidden lg:block'}`}>
+      <div className={`overflow-y-auto rounded-xl border border-slate-200 shadow-lg bg-white ${showPreview ? '' : 'hidden lg:block'}`}>
         <div className="sticky top-0 bg-slate-900 text-white px-4 py-2 flex items-center justify-between rounded-t-xl z-10">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
