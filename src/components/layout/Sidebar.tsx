@@ -3,6 +3,17 @@
 import { useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  ChevronDown,
+  Plus,
+  User,
+  Bell,
+  LogOut,
+  Menu,
+} from 'lucide-react';
 
 const DOCUMENT_TYPES = [
   { id: 'facture', key: 'facture' },
@@ -76,33 +87,33 @@ function SidebarInner() {
       {/* User Pill */}
       <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-          className="w-full flex items-center gap-2.5 p-2.5 rounded-xl bg-blue-50/60 border border-blue-100/60 hover:bg-blue-50 transition">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-black shrink-0">
+          className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 transition dark:bg-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800">
+          <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-white text-sm font-semibold shrink-0 dark:bg-zinc-700">
             {userInitial}
           </div>
           <div className="flex-1 min-w-0 text-start">
-            <div className="text-xs font-bold text-slate-900 truncate">{userName}</div>
-            <div className="text-[10px] text-slate-400 font-semibold">
+            <div className="text-sm font-semibold text-zinc-900 truncate dark:text-zinc-50">{userName}</div>
+            <div className="text-xs text-zinc-400 font-medium dark:text-zinc-500">
               {user?.mode === 'ENTREPRISE' ? s('company') : s('artisan')}
             </div>
           </div>
-          <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          <ChevronDown size={16} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${userDropdownOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {userDropdownOpen && (
           <>
-            <div className="absolute top-full start-0 end-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/90 rounded-xl shadow-xl overflow-hidden z-20 animate-in">
-              <button className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            <div className="absolute top-full start-0 end-0 mt-2 bg-white border border-zinc-200 rounded-lg shadow-lg overflow-hidden z-20 animate-in dark:bg-zinc-900 dark:border-zinc-700">
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
+                <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
-              <button className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
+                <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
-              <div className="h-px bg-slate-200/60 mx-3" />
-              <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-red-500 hover:bg-red-50 transition">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              <div className="h-px bg-zinc-200 mx-3 dark:bg-zinc-700" />
+              <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition dark:text-red-400 dark:hover:bg-red-900/20">
+                <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
               </button>
             </div>
@@ -115,23 +126,23 @@ function SidebarInner() {
       <nav className="flex-1 overflow-y-auto space-y-0.5">
         {/* Stats */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-            isActive('/dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+            isActive('/dashboard') ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
           }`}>
-          <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+          <LayoutDashboard size={16} strokeWidth={1.5} className="shrink-0" />
           {s('stats')}
         </button>
 
         {/* Documents & Factures */}
         <div>
           <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-              documentsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              documentsOpen ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
             }`}>
-            <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <FileText size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('documents')}</span>
-            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{docCount > 0 ? docCount : ''}</span>
-            <svg className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            <span className="bg-zinc-100 text-zinc-700 text-[10px] font-medium px-1.5 py-0.5 rounded-full dark:bg-zinc-800 dark:text-zinc-300">{docCount > 0 ? docCount : ''}</span>
+            <ChevronDown size={14} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${documentsOpen ? 'rotate-180' : ''}`} />
           </button>
           <div className={`overflow-hidden transition-all duration-200 ${documentsOpen ? 'max-h-72' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
@@ -139,13 +150,13 @@ function SidebarInner() {
                 const count = typeBreakdown[TYPE_MAP[dt.id] ?? ''] ?? 0;
                 return (
                   <button key={dt.id} onClick={() => navigateTo(dt.id)}
-                    className={`w-full flex items-center px-3 py-2 rounded-lg text-[11px] font-semibold text-start transition border-s-2 ${
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-sm text-start transition border-s-2 ${
                       isDocType(dt.id)
-                        ? 'bg-blue-50 text-blue-600 border-s-blue-600'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 border-s-transparent hover:border-s-blue-200'
+                        ? 'bg-zinc-100 text-zinc-900 border-s-zinc-900 dark:bg-zinc-900 dark:text-zinc-50 dark:border-s-zinc-50'
+                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border-s-transparent hover:border-s-zinc-400 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50 dark:hover:border-s-zinc-600'
                     }`}>
                     <span className="flex-1">{s(dt.key)}</span>
-                    {count > 0 && <span className="text-[10px] font-bold text-slate-400 ms-1">{count}</span>}
+                    {count > 0 && <span className="text-xs text-zinc-400 ms-1 dark:text-zinc-500">{count}</span>}
                   </button>
                 );
               })}
@@ -156,50 +167,46 @@ function SidebarInner() {
         {/* Clients */}
         <div>
           <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
-              clientsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              clientsOpen ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-100'
             }`}>
-            <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <Users size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('clients')}</span>
-            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{clientCount > 0 ? clientCount : ''}</span>
-            <svg className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${clientsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            <span className="bg-zinc-100 text-zinc-700 text-[10px] font-medium px-1.5 py-0.5 rounded-full dark:bg-zinc-800 dark:text-zinc-300">{clientCount > 0 ? clientCount : ''}</span>
+            <ChevronDown size={14} strokeWidth={1.5} className={`text-zinc-400 transition-transform duration-200 dark:text-zinc-500 ${clientsOpen ? 'rotate-180' : ''}`} />
           </button>
           <div className={`overflow-hidden transition-all duration-200 ${clientsOpen ? 'max-h-20' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
               <button onClick={() => router.push('/dashboard/editor')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition border-s-2 border-transparent hover:border-s-zinc-400 text-start dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900/50 dark:hover:border-s-zinc-600">
+                <Plus size={14} strokeWidth={1.5} />
                 Nouveau document
               </button>
             </div>
           </div>
         </div>
       </nav>
-
-
     </>
   );
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-s border-white/80 shadow-sm z-10">
+      <aside className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white border-r border-zinc-200 dark:bg-[#0a0a0a] dark:border-zinc-800">
         {sidebarContent()}
       </aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in">
+          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in dark:bg-[#0a0a0a]">
             {sidebarContent(true)}
           </aside>
         </div>
       )}
 
       <button onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition active:scale-95">
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-zinc-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-zinc-800 transition active:scale-95 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
+        <Menu size={20} strokeWidth={1.5} />
       </button>
     </>
   );
