@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 export const metadata: Metadata = {
   title: 'CloudDevis — Devis & Factures conformes',
   description: 'Générez vos devis et factures conformes à la réglementation algérienne.',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
