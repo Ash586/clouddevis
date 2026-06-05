@@ -62,18 +62,9 @@ export default function HomePage() {
         <p className="text-sm sm:text-base md:text-lg text-slate-500 max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2 sm:px-0">
           {t('heroSubtitle')}
         </p>
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
-          <Button size="md" className="sm:hidden w-full max-w-[280px]" onClick={handleTryEditor}>
+        <div className="flex justify-center">
+          <Button size="lg" onClick={handleTryEditor}>
             {mounted && isDemoUsedToday() ? t('ctaTryNow') : t('ctaFree')}
-          </Button>
-          <Button size="lg" className="hidden sm:inline-flex" onClick={handleTryEditor}>
-            {mounted && isDemoUsedToday() ? t('ctaTryNow') : t('ctaFree')}
-          </Button>
-          <Button variant="outline" size="md" className="sm:hidden w-full max-w-[280px]" onClick={() => router.push('/auth/register')}>
-            {t('ctaCreateAccount')}
-          </Button>
-          <Button variant="outline" size="lg" className="hidden sm:inline-flex" onClick={() => router.push('/auth/register')}>
-            {t('ctaCreateAccount')}
           </Button>
         </div>
       </section>
