@@ -122,18 +122,35 @@ export default function HomePage() {
       <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
           {[
-            { emoji: '⚡', title: t('feature1Title'), desc: t('feature1Desc') },
-            { emoji: '🇩🇿', title: t('feature2Title'), desc: t('feature2Desc') },
-            { emoji: '📄', title: t('feature3Title'), desc: t('feature3Desc') },
+            { icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>, title: t('feature1Title'), desc: t('feature1Desc') },
+            { icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>, title: t('feature2Title'), desc: t('feature2Desc') },
+            { icon: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>, title: t('feature3Title'), desc: t('feature3Desc') },
           ].map((f) => (
             <Card key={f.title} className="text-center p-6">
-              <div className="text-2xl mb-3">{f.emoji}</div>
+              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">{f.icon}</div>
               <h3 className="font-bold text-slate-900 mb-1">{f.title}</h3>
               <p className="text-sm text-slate-500">{f.desc}</p>
             </Card>
           ))}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <span className="text-lg font-black text-blue-600 tracking-tight">CloudDevis</span>
+              <p className="text-xs text-slate-400 mt-1">© {new Date().getFullYear()} CloudDevis. Tous droits réservés.</p>
+            </div>
+            <div className="flex gap-6 text-xs text-slate-400">
+              <span>Conforme aux normes algériennes</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline">NIF, RC, NIS, AI, TVA, Timbre fiscal</span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

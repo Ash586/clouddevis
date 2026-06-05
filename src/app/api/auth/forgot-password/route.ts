@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/rateLimit';
 import crypto from 'crypto';
 
 export async function POST(req: Request) {
@@ -8,6 +9,12 @@ export async function POST(req: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email requis' }, { status: 400 });
+    }
+
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateCheck = checkRateLimit(`forgot:${email}:${ip}`, 3, 60000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

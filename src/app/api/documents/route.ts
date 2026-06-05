@@ -58,9 +58,20 @@ export async function POST(req: Request) {
     acompte: doc.acompte || 0,
   } as unknown as import('@/types').DocumentState);
 
+  let existingClientId: string | null = null;
+  const clientName = doc.clientInfo?.name?.trim();
+  if (clientName) {
+    const existing = await prisma.client.findFirst({
+      where: { userId: session.userId, name: clientName },
+      select: { id: true },
+    });
+    existingClientId = existing?.id ?? null;
+  }
+
   const created = await prisma.document.create({
     data: {
       userId: session.userId,
+      clientId: existingClientId,
       type: (DOC_TYPE_MAP[doc.documentType] || 'DEVIS') as any,
       status: 'DRAFT' as any,
       number: doc.documentNumber || '',
@@ -68,7 +79,11 @@ export async function POST(req: Request) {
       mode: (doc.mode?.toUpperCase?.() || 'ARTISAN') as any,
       paymentMode: doc.paymentMode || 'cheque',
       items: JSON.stringify(items),
-      customFields: JSON.stringify(doc.customFields || {}),
+      customFields: JSON.stringify({
+        ...(doc.customFields || {}),
+        sectionOrder: doc.sectionOrder || [],
+        hiddenBlocks: doc.hiddenBlocks || [],
+      }),
       subTotalHT: result.subTotalHT,
       tvaAmount: result.tvaAmount,
       timbreFiscal: result.timbreFiscal,

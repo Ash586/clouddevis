@@ -34,7 +34,8 @@
     "upgradeToPro": "الترقية إلى Pro",
     "trialDaysLeft": "تبقى لك {days} أيام تجريبية. بعد هذه الفترة، ستظهر أسماء وأرقام المستندات فقط.",
     "currency": "دج",
-    "yesDelete": "حذف؟"
+    "yesDelete": "حذف؟",
+    "search": "بحث…"
   },
   "navbar": {
     "dashboard": "لوحة التحكم",
@@ -56,6 +57,7 @@
     "intervention": "استمارة تدخل",
     "attachement": "ملحق الأشغال",
     "clients": "العملاء",
+    "newDocument": "مستند جديد",
     "clientsMy": "عملائي",
     "clientsAdd": "إضافة عميل",
     "settings": "الإعدادات",

@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rateLimit';
+import { validateAuthInput } from '@/lib/validation';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, rememberMe } = await req.json();
+    const body = await req.json();
+    const validation = validateAuthInput(body, 'login');
+    if (!validation.valid) {
+      return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
+    }
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email et mot de passe requis' }, { status: 400 });
+    const { email, password, rememberMe } = body;
+
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateCheck = checkRateLimit(`login:${ip}`, 5, 60000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

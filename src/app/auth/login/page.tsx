@@ -53,7 +53,7 @@ export default function LoginPage() {
           <Input label={t('emailLabel')} type="email" value={email}
             onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} required />
 
-          <Input label={t('passwordLabel')} type="password" value={password}
+          <Input label={t('passwordLabel')} type="password" showPasswordToggle value={password}
             onChange={(e) => setPassword(e.target.value)} placeholder={t('passwordPlaceholder')} required />
 
           <div className="flex items-center justify-between text-sm">

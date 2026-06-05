@@ -34,7 +34,8 @@
     "upgradeToPro": "Passer à Pro",
     "trialDaysLeft": "Il vous reste {days} jours d'essai. Après cette période, seuls les noms et numéros de documents seront visibles.",
     "currency": "DA",
-    "yesDelete": "Supprimer ?"
+    "yesDelete": "Supprimer ?",
+    "search": "Rechercher…"
   },
   "navbar": {
     "dashboard": "Tableau de bord",
@@ -56,6 +57,7 @@
     "intervention": "Fiche d'Intervention",
     "attachement": "Attachement des Travaux",
     "clients": "Clients",
+    "newDocument": "Nouveau document",
     "clientsMy": "Mes clients",
     "clientsAdd": "Ajouter un client",
     "settings": "Paramètres",
@@ -71,7 +73,7 @@
     "heroSubtitle": "Une solution simple, rapide et conforme aux normes commerciales algériennes. Idéal pour les artisans, TPE et PME.",
     "ctaFree": "Créer un Devis gratuit",
     "ctaCreateAccount": "Créer mon compte →",
-    "ctaTryNow": "Essayé aujourd'hui — Créez un compte",
+    "ctaTryNow": "Essayez aujourd'hui — Créez un compte",
     "editorBannerTitle": "Éditeur en direct — Essayez gratuitement",
     "editorBannerSubtitle": "Modifiez les données en temps réel",
     "successTitle": "Document prêt !",

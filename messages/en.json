@@ -34,7 +34,8 @@
     "upgradeToPro": "Upgrade to Pro",
     "trialDaysLeft": "You have {days} trial days left. After this period, only document names and numbers will be visible.",
     "currency": "DA",
-    "yesDelete": "Delete?"
+    "yesDelete": "Delete?",
+    "search": "Search…"
   },
   "navbar": {
     "dashboard": "Dashboard",
@@ -56,6 +57,7 @@
     "intervention": "Intervention Sheet",
     "attachement": "Work Attachment",
     "clients": "Clients",
+    "newDocument": "New document",
     "clientsMy": "My clients",
     "clientsAdd": "Add client",
     "settings": "Settings",

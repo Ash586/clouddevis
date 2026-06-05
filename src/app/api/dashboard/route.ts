@@ -41,11 +41,15 @@ export async function GET() {
     select: { name: true, mode: true, phone: true, companyInfo: true, trialStartAt: true, subscriptionEndAt: true, subscriptionStatus: true },
   });
 
-  let trialDaysRemaining = 0;
-  if (user?.subscriptionStatus === 'TRIAL' && user.trialStartAt) {
-    const trialEnd = new Date(user.trialStartAt);
-    trialEnd.setDate(trialEnd.getDate() + 14);
-    trialDaysRemaining = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  let trialDaysRemaining = 14;
+  if (user?.subscriptionStatus === 'TRIAL') {
+    if (user.trialStartAt) {
+      const trialEnd = new Date(user.trialStartAt);
+      trialEnd.setDate(trialEnd.getDate() + 14);
+      trialDaysRemaining = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    }
+  } else {
+    trialDaysRemaining = 0;
   }
 
   return NextResponse.json({

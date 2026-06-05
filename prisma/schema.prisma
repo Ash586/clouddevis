@@ -72,6 +72,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -80,6 +81,7 @@ model Session {
   expiresAt DateTime
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 model PasswordResetToken {
@@ -91,6 +93,7 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 model Client {
@@ -111,6 +114,8 @@ model Client {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents Document[]
+  @@index([userId])
+  @@index([name])
 }
 
 model Document {
@@ -147,16 +152,23 @@ model Document {
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   client        Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  @@index([userId])
+  @@index([clientId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Backup {
   id        String   @id @default(cuid())
   userId    String
-  type      String   @default("auto") // auto / manual
+  type      String   @default("auto")
   fileUrl   String?
   size      Int?
   status    String   @default("pending")
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([createdAt])
 }

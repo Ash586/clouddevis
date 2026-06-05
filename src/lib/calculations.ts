@@ -37,7 +37,7 @@ export function calculateDocument(doc: DocumentState): CalculationResult {
 }
 
 export function numberToFrenchWords(n: number): string {
-  if (n === 0) return 'Zéro dinar algérien';
+  if (n <= 0) return 'Zéro dinar algérien';
   const intPart = Math.floor(Math.abs(n));
   const decPart = Math.round((Math.abs(n) - intPart) * 100);
 
@@ -102,9 +102,9 @@ export function formatDateISO(date: Date): string {
 }
 
 export function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID().slice(0, 9);
+  }
   return Math.random().toString(36).substring(2, 11);
 }
 
-const COMPANIES: Record<string, { name: string; address: string; taxIds: { nif: string; rc: string; nis: string; ai: string }; capital: string }> = {};
-export function getCompanyData(userId: string) { return COMPANIES[userId]; }
-export function saveCompanyData(userId: string, data: any) { COMPANIES[userId] = data; }

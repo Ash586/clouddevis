@@ -180,7 +180,7 @@ function SidebarInner() {
               <button onClick={() => router.push('/dashboard/editor')}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
                 <Plus size={14} strokeWidth={1.5} />
-                Nouveau document
+                {s('newDocument')}
               </button>
             </div>
           </div>

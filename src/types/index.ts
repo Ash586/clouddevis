@@ -103,16 +103,16 @@ export const DEFAULT_SECTION_ORDER: string[] = [
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   design: 'Design & Logo',
-  general: '1. Données Générales',
-  mode: '2. Mode',
-  client: '3. Client',
-  chantier: '4. Chantier',
-  materiaux: '5. Matériaux',
-  prestations: '7. Prestations',
-  remise: '8. Remise',
-  garanties: '9. Garanties',
-  paiement: '10. Règlement & Paiement',
-  notes: '11. Notes',
+  general: 'Données Générales',
+  mode: 'Mode',
+  client: 'Client',
+  chantier: 'Chantier',
+  materiaux: 'Matériaux',
+  prestations: 'Prestations',
+  remise: 'Remise',
+  garanties: 'Garanties',
+  paiement: 'Règlement & Paiement',
+  notes: 'Notes',
 };
 
 export interface CalculationResult {

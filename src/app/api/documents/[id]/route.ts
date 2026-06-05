@@ -40,16 +40,31 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     acompte: doc.acompte || 0,
   } as unknown as import('@/types').DocumentState);
 
+  let existingClientId: string | null = null;
+  const clientName = doc.clientInfo?.name?.trim();
+  if (clientName) {
+    const existingClient = await prisma.client.findFirst({
+      where: { userId: session.userId, name: clientName },
+      select: { id: true },
+    });
+    existingClientId = existingClient?.id ?? null;
+  }
+
   const updated = await prisma.document.update({
     where: { id },
     data: {
+      clientId: existingClientId,
       type: (DOC_TYPE_MAP[doc.documentType] || 'DEVIS') as any,
       number: doc.documentNumber || '',
       date: doc.date ? new Date(doc.date) : new Date(),
       mode: (doc.mode?.toUpperCase?.() || 'ARTISAN') as any,
       paymentMode: doc.paymentMode || 'cheque',
       items: JSON.stringify(items),
-      customFields: JSON.stringify(doc.customFields || {}),
+      customFields: JSON.stringify({
+        ...(doc.customFields || {}),
+        sectionOrder: doc.sectionOrder || [],
+        hiddenBlocks: doc.hiddenBlocks || [],
+      }),
       subTotalHT: result.subTotalHT,
       tvaAmount: result.tvaAmount,
       timbreFiscal: result.timbreFiscal,

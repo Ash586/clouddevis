@@ -5,8 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
-import { ArtisanDashboard } from '@/components/dashboard/ArtisanDashboard';
-import { EnterpriseDashboard } from '@/components/dashboard/EnterpriseDashboard';
+import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
 
 interface CompanyInfo {
   name?: string;
@@ -50,10 +49,9 @@ export default function DashboardPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!confirm(common('yesDelete'))) return;
     const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
     if (res.ok) setDocs(prev => prev.filter(d => d.id !== id));
-  }, [common]);
+  }, []);
 
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === 'visible') fetchData(); };
@@ -68,25 +66,16 @@ export default function DashboardPage() {
         <Sidebar />
         <div className="flex-1 min-w-0">
           <TrialGate>
-          {userMode === 'ENTREPRISE' ? (
-            <EnterpriseDashboard
-              userName={userName}
-              companyInfo={companyInfo}
-              stats={stats}
-              docs={docs}
-              loading={loading}
-              onDelete={handleDelete}
-            />
-          ) : (
-            <ArtisanDashboard
-              userName={userName}
-              userPhone={userPhone}
-              stats={stats}
-              docs={docs}
-              loading={loading}
-              onDelete={handleDelete}
-            />
-          )}
+          <UnifiedDashboard
+            userName={userName}
+            userPhone={userPhone}
+            companyInfo={companyInfo}
+            stats={stats}
+            docs={docs}
+            loading={loading}
+            onDelete={handleDelete}
+            mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
+          />
         </TrialGate>
       </div>
     </div>

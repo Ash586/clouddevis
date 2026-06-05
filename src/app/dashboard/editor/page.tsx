@@ -3,12 +3,14 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
 import { useEditor } from '@/hooks/useEditor';
 import { formatCurrency } from '@/lib/calculations';
+import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -153,7 +155,23 @@ function EditorContent() {
     });
   }
 
-  const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const router = useRouter();
+
+  // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveDoc();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        handleDownload();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  });
 
   const handleDownload = async () => {
     await saveDoc();
@@ -174,234 +192,16 @@ function EditorContent() {
     }
     const catOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
-    function itemRow(item: typeof doc.items[0], idx: number): string {
-      return `<tr>
-        <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#94a3b8;font-weight:700;width:22px">${idx}</td>
-        <td style="padding:5px 6px;border-bottom:1px solid #e2e8f0;font-size:10px">${escHtml(item.designation)}</td>
-        <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:center;white-space:nowrap">${item.quantity}</td>
-        <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#64748b;white-space:nowrap">${unitLabels[item.unit]||item.unit}</td>
-        <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:right;white-space:nowrap">${item.unitPrice.toLocaleString('fr-DZ')}</td>
-        <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:right;font-weight:600;white-space:nowrap">${(item.quantity*item.unitPrice).toLocaleString('fr-DZ')} ${tc('currency')}</td>
-      </tr>`;
-    }
+    const html = generateDocumentHTML({
+      isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels,
+      grouped, uncategorized, catOrder, doc, results,
+      tc: (k: string) => tc(k),
+      tp: (k: string, vars?: Record<string, any>) => tp(k, vars as any),
+      te: (k: string) => te(k),
+      tu: (k: string) => tu(k),
+      customSections, currency: tc('currency'),
+    });
 
-    let idx = 0;
-    const tbody: string[] = [];
-    for (const item of uncategorized) { idx++; tbody.push(itemRow(item, idx)); }
-    for (const cat of catOrder) {
-      const items = grouped[cat]; if (!items) continue;
-      const label = catLabels[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
-      tbody.push(`<tr><td colspan="6" style="padding:10px 4px 3px;border:none"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#1e3a5f">` + label + `</div></td></tr>`);
-      for (const item of items) { idx++; tbody.push(itemRow(item, idx)); }
-    }
-
-    // Helper: single inline style blocks
-    const S = (sel: string, rules: string) => `${sel}{${rules}}`;
-    const css = `
-      ${S('@page','size:A4;margin:0')}
-      ${S('*','margin:0;padding:0;box-sizing:border-box')}
-      ${S('body','font-family:Helvetica,Arial,sans-serif;color:#1e293b;font-size:11px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact')}
-      ${S('.page','width:190mm;margin:0 auto;padding:45px 50px 30px;min-height:100vh;display:flex;flex-direction:column')}
-      ${S('.top-section','flex:1')}
-      ${S('.header','display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px')}
-      ${S('.header .brand h1','font-size:26px;font-weight:900;color:#1e3a5f;letter-spacing:-0.5px;margin:0;text-transform:uppercase')}
-      ${S('.header .brand .sub','font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:1px')}
-      ${S('.header .meta','text-align:right')}
-      ${S('.header .meta .num','font-size:18px;font-weight:900;color:#1e3a5f;margin-bottom:4px')}
-      ${S('.header .meta .line','font-size:10px;color:#64748b;margin:1px 0')}
-      ${S('.hr','height:2px;background:linear-gradient(to right,#1e3a5f,#e2e8f0);margin-bottom:24px;border:none')}
-      ${S('.info-grid','display:flex;gap:30px;margin-bottom:24px')}
-      ${S('.info-grid .col','flex:1')}
-      ${S('.info-grid .col .ttl','font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px')}
-      ${S('.info-grid .col .val','font-size:11px;color:#1e293b;line-height:1.5')}
-      ${S('.info-grid .col .val strong','font-size:12px')}
-      ${S('.info-grid .col .val .muted','font-size:10px;color:#64748b')}
-      ${S('.section-box','margin-bottom:18px;padding:12px 14px;border-radius:8px;max-width:420px')}
-      ${S('.section-box .ttl','font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px')}
-      ${S('.section-box p','font-size:10px;margin:1px 0;line-height:1.5')}
-      ${S('.section-box p .lb','font-weight:600;color:#475569')}
-      ${S('table.items','width:100%;border-collapse:collapse;margin:18px 0 20px')}
-      ${S('table.items thead th','padding:6px 4px;font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;background:#f8fafc;border-bottom:2px solid #1e3a5f')}
-      ${S('table.items thead th:first-child','text-align:center;width:22px')}
-      ${S('table.items thead th:nth-child(2)','text-align:left')}
-      ${S('table.items thead th:nth-child(3)','text-align:center;width:32px')}
-      ${S('table.items thead th:nth-child(4)','text-align:center;width:28px')}
-      ${S('table.items thead th:nth-child(5)','text-align:right;width:62px')}
-      ${S('table.items thead th:nth-child(6)','text-align:right;width:72px')}
-      ${S('.bottom-section','margin-top:auto;padding-top:20px;border-top:1px solid #e2e8f0')}
-      ${S('.bottom-section .inner','display:flex;justify-content:space-between;align-items:flex-start;gap:30px')}
-      ${S('.bottom-section .left','flex:1;max-width:320px;font-size:8px;color:#94a3b8;line-height:1.6')}
-      ${S('.bottom-section .left .card','padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #e2e8f0')}
-      ${S('.bottom-section .right','width:250px;flex-shrink:0')}
-      ${S('.totals-table','width:100%;font-size:10px')}
-      ${S('.totals-table td','padding:3px 0')}
-      ${S('.totals-table .lbl','color:#64748b')}
-      ${S('.totals-table .val','text-align:right;font-weight:600;color:#1e293b')}
-      ${S('.totals-table .ttr td','padding:4px 0 1px;font-size:8px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px')}
-      ${S('.totals-table .sep td','padding:0;height:1px;background:#e2e8f0')}
-      ${S('.totals-table .disc td.val','color:#ef4444')}
-      ${S('.totals-table .grand td','padding-top:8px;border-top:2px solid #1e3a5f')}
-      ${S('.totals-table .grand .lbl','font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase')}
-      ${S('.totals-table .grand .val','font-size:16px;font-weight:900;color:#1e3a5f')}
-      ${S('.totals-table .inwords','font-size:8px;font-style:italic;color:#94a3b8;text-align:right;padding-top:3px')}
-      ${S('.signature','margin-top:24px;padding-top:14px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-end')}
-      ${S('.signature .loc','font-size:9px;color:#94a3b8')}
-      ${S('.signature .stamp','text-align:right')}
-      ${S('.signature .stamp .lbl2','font-size:9px;color:#94a3b8;margin-bottom:3px')}
-      ${S('.signature .stamp .box','width:100px;height:48px;border:2px dashed #cbd5e1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#cbd5e1')}
-      ${S('.print-footer','text-align:center;font-size:7px;color:#cbd5e1;margin-top:24px;letter-spacing:0.5px')}
-      ${S('@media print','.page{padding:30px 40px 20px;box-shadow:none}')}
-    `;
-
-    const s = (v: string) => escHtml(v);
-    const fmt = (n: number) => n.toLocaleString('fr-DZ');
-
-    const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>` + docTypeLabel + ` - ` + s(doc.documentNumber) + `</title>
-<style>` + css + `</style></head><body>
-<div class="page">
-
-<div class="top-section">
-  <div class="header">
-    <div class="brand">
-      <h1>` + docTypeLabel + `</h1>
-      <div class="sub">${tc('appName')}</div>
-    </div>
-    <div class="meta">
-      ` + (sf('docNumber') ? `<div class="num">` + s(doc.documentNumber) + `</div>` : '') + `
-      ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + doc.date + `</div>` : '') + `
-      ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + doc.validUntil + `</div>` : '') + `
-      ` + (sf('orderRef') && doc.bcRef ? `<div class="line">${tp('orderRef')} ` + s(doc.bcRef) + `</div>` : '') + `
-    </div>
-  </div>
-  <div class="hr"></div>
-
-  <div class="info-grid">
-    <div class="col">
-      <div class="ttl">${tc('company')}</div>
-      <div class="val">
-        ` + (isEnt && doc.companyInfo ? `
-          <strong>` + s(doc.companyInfo.name) + `</strong><br>
-          ` + (doc.companyInfo.address ? `<span class="muted">` + s(doc.companyInfo.address) + `</span><br>` : '') + `
-          ` + (doc.companyInfo.taxIds.nif ? `<span class="muted">${te('client.companyNif')} : ` + s(doc.companyInfo.taxIds.nif) + `</span><br>` : '') + `
-          ` + (doc.companyInfo.taxIds.rc ? `<span class="muted">${te('client.companyRc')} : ` + s(doc.companyInfo.taxIds.rc) + `</span><br>` : '') + `
-          ` + (doc.companyInfo.taxIds.nis ? `<span class="muted">${te('client.companyNis')} : ` + s(doc.companyInfo.taxIds.nis) + `</span><br>` : '') + `
-          ` + (doc.companyInfo.taxIds.ai ? `<span class="muted">${te('client.companyAi')} : ` + s(doc.companyInfo.taxIds.ai) + `</span>` : '') + `
-        ` : doc.artisanInfo ? `
-          <strong>` + s(doc.artisanInfo.name) + `</strong><br>
-          ` + (doc.artisanInfo.address ? `<span class="muted">` + s(doc.artisanInfo.address) + `</span><br>` : '') + `
-          ` + (doc.artisanInfo.phone ? `<span class="muted">${tc('phone')} : ` + s(doc.artisanInfo.phone) + `</span>` : '') + `
-        ` : `<strong>CloudDevis</strong>`) + `
-      </div>
-    </div>
-    <div class="col">
-      <div class="ttl">${tc('client')}</div>
-      <div class="val">
-        ` + (sf('clientName') ? `<strong>` + s(doc.clientInfo.name) + `</strong><br>` : '') + `
-        ` + (sf('clientAddress') && doc.clientInfo.address ? `<span class="muted">` + s(doc.clientInfo.address) + `</span><br>` : '') + `
-        ` + (doc.clientInfo.nif ? `<span class="muted">${te('client.companyNif')} : ` + s(doc.clientInfo.nif) + `</span><br>` : '') + `
-        ` + (sf('clientPhone') && doc.clientInfo.phone ? `<span class="muted">` + s(doc.clientInfo.phone) + `</span><br>` : '') + `
-        ` + (sf('clientEmail') && doc.clientInfo.email ? `<span class="muted">` + s(doc.clientInfo.email) + `</span>` : '') + `
-      </div>
-    </div>
-  </div>
-
-  ` + (vb('chantier') && bv('chantierAddress','chantierType','chantierCondition','chantierSurface','chantierProtection') ? `
-  <div class="section-box" style="background:#fffbeb;border:1px solid #fde68a">
-    <div class="ttl" style="color:#d97706">${tp('chantier')}</div>
-    ` + (sf('chantierAddress') && doc.chantierAddress ? `<p><span class="lb">${tp('chantierAddress')}</span> ` + s(doc.chantierAddress) + `</p>` : '') + `
-    ` + (sf('chantierType') && doc.chantierType ? `<p><span class="lb">${tp('chantierType')}</span> ` + s(doc.chantierType) + `</p>` : '') + `
-    ` + (sf('chantierSurface') && doc.chantierSurface > 0 ? `<p><span class="lb">${tp('chantierSurface')}</span> ` + doc.chantierSurface + ` m²</p>` : '') + `
-    ` + (sf('chantierCondition') && doc.chantierEtat ? `<p><span class="lb">${tp('chantierCondition')}</span> ` + s(doc.chantierEtat) + `</p>` : '') + `
-    ` + (sf('chantierProtection') && doc.chantierProtection ? `<p><span class="lb">${tp('chantierProtection')}</span> ` + s(doc.chantierProtection) + `</p>` : '') + `
-  </div>` : '') + `
-
-  ` + (vb('materiaux') && bv('materiauxBrand','materiauxType','materiauxColor','materiauxQte') ? `
-  <div class="section-box" style="background:#f0f9ff;border:1px solid #bae6fd">
-    <div class="ttl" style="color:#0284c7">${tp('materiaux')}</div>
-    ` + (sf('materiauxBrand') && doc.materiauxMarque ? `<p><span class="lb">${tp('materiauxBrand')}</span> ` + s(doc.materiauxMarque) + `</p>` : '') + `
-    ` + (sf('materiauxType') && doc.materiauxType ? `<p><span class="lb">${tp('materiauxType')}</span> ` + s(doc.materiauxType) + `</p>` : '') + `
-    ` + (sf('materiauxColor') && doc.materiauxCouleur ? `<p><span class="lb">${tp('materiauxColor')}</span> ` + s(doc.materiauxCouleur) + `</p>` : '') + `
-    ` + (sf('materiauxQte') && doc.materiauxQte > 0 ? `<p><span class="lb">${tp('materiauxQuantity')}</span> ` + doc.materiauxQte + ` L / m²</p>` : '') + `
-  </div>` : '') + `
-
-  ` + (vb('table') && sf('itemsTable') && doc.items.length ? `
-  <table class="items">
-    <thead><tr>
-      <th>${tp('tableHash')}</th><th>${tp('tableDescription')}</th><th>${tp('tableQty')}</th><th>${tu('u')}</th><th>${tp('tableUnitPrice')}</th><th>${tp('tableTotalHT')}</th>
-    </tr></thead>
-    <tbody>` + tbody.join('') + `</tbody>
-  </table>` : '') + `
-</div>
-
-<div class="bottom-section">
-  <div class="inner">
-    <div class="left">
-      ` + (vb('garanties') && bv('garantieLabor','garantieMaterials','garantieNotes') ? `
-      <div class="card" style="background:#f0fdf4;border-color:#bbf7d0">
-        <strong style="font-size:9px;color:#15803d">${tp('garanties')}</strong><br>
-        ` + (sf('garantieLabor') && doc.garantieMO ? `<span style="color:#166534">${tp('garantiesMO')} ` + s(doc.garantieMO) + `</span><br>` : '') + `
-        ` + (sf('garantieMaterials') && doc.garantieMateriaux ? `<span style="color:#166534">${tp('garantiesMaterials')} ` + s(doc.garantieMateriaux) + `</span><br>` : '') + `
-        ` + (sf('garantieNotes') && doc.garantieNotes ? `<span style="color:#15803d;font-style:italic">` + s(doc.garantieNotes) + `</span>` : '') + `
-      </div>` : '') + `
-      ` + (vb('payment') && bv('paymentMethod','paymentDeposit','paymentConditions','paymentIban') ? `
-      <div class="card" style="background:#f8fafc">
-        ` + (sf('paymentMethod') && doc.paymentMode ? `<span style="color:#475569"><strong>${te('paiement.method')} :</strong> ` + (paymentLabels[doc.paymentMode] ?? doc.paymentMode) + `</span><br>` : '') + `
-        ` + (sf('paymentConditions') && doc.paymentDetails.terms ? `<span style="color:#475569"><strong>${tp('paymentLabel')}</strong> ` + s(doc.paymentDetails.terms) + `</span><br>` : '') + `
-        ` + (sf('paymentIban') && doc.paymentDetails.iban ? `<span style="color:#64748b"><strong>${tp('ibanLabel')}</strong> ` + s(doc.paymentDetails.iban) + `</span>` : '') + `
-      </div>` : '') + `
-      ` + (vb('legal') ? `
-      <div class="card" style="background:#f8fafc">
-        <span style="color:#475569">${tp('legalRecovery')}</span><br>
-        <span style="color:#64748b">${tp('legalRetention')}</span>
-      </div>` : '') + `
-      ` + customSections.map(cs => {
-        const sectionData = doc.customFields[cs.id];
-        const visibleFields = cs.fields.filter(f => sf(`custom_${cs.id}_${f.id}`));
-        const hasVisibleData = sectionData && visibleFields.some(f => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; });
-        if (vb(cs.id) && hasVisibleData) {
-          return `<div class="card" style="background:#f8fafc">
-            <strong style="font-size:9px;color:#475569">${ s(cs.label) }</strong><br>
-            ` + visibleFields.filter(f => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; }).map(f => `<span style="color:#64748b"><strong>${ s(f.label) } :</strong> ${ s(sectionData[f.id]) }</span><br>`).join('') + `
-          </div>`;
-        }
-        return '';
-      }).join('') + `
-    </div>
-
-    <div class="right">
-      <table class="totals-table">
-        <tr><td class="lbl">${tp('totalHT')}</td><td class="val">` + fmt(results.subTotalHT) + ` ${tc('currency')}</td></tr>
-        ` + (vb('remise') && bv('remiseType','remiseValue','remiseReason') && results.discountAmount > 0 ? `<tr class="disc"><td class="lbl">${tp('remise')}` + (doc.discount.reason ? ' (' + s(doc.discount.reason) + ')' : '') + `</td><td class="val">-` + fmt(results.discountAmount) + ` ${tc('currency')}</td></tr>` : '') + `
-        ` + (results.tvaRate > 0 ? `<tr class="ttr"><td colspan="2">${tp('vatLine', { rate: results.tvaRate })}</td></tr>
-        <tr><td class="lbl">${tp('taxTableBase')}</td><td class="val">` + fmt(results.subTotalHT) + ` ${tc('currency')}</td></tr>
-        <tr><td class="lbl">${tp('taxTableAmount')}</td><td class="val">` + fmt(results.tvaAmount) + ` ${tc('currency')}</td></tr>` : '') + `
-        ` + (results.timbreFiscal > 0 ? `<tr class="sep"><td colspan="2"></td></tr>
-        <tr><td class="lbl">${tp('stampDuty')}</td><td class="val">` + fmt(results.timbreFiscal) + ` ${tc('currency')}</td></tr>` : '') + `
-        ` + (results.acompte > 0 ? `<tr class="disc"><td class="lbl">${tp('depositPaid')}</td><td class="val">-` + fmt(results.acompte) + ` ${tc('currency')}</td></tr>` : '') + `
-        <tr class="grand"><td class="lbl">${tp('netToPay')}</td><td class="val">` + fmt(results.netAPayer) + ` ${tc('currency')}</td></tr>
-      </table>
-      <div class="inwords">` + results.totalInWords + `</div>
-    </div>
-  </div>
-
-  ` + (vb('signature') ? `
-  <div class="signature">
-    <div class="loc">${tp('signatureLine', { city: doc.companyInfo?.address?.split(',')[0] ?? '________', date: doc.date })}</div>
-    <div class="stamp">
-      <div class="lbl2">${tp('signatureLabel')}</div>
-      <div class="box">` + (doc.companyInfo?.signature ? `<img src="` + s(doc.companyInfo.signature) + `" style="max-width:100%;max-height:100%"/>` : tp('signatureStamp')) + `</div>
-    </div>
-  </div>` : '') + `
-
-  <div class="print-footer">${tp('footer')}</div>
-</div>
-
-</div>
-<script>
-window.onload=function(){setTimeout(function(){window.print();},300);};
-</script>
-</body></html>`;
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const w = window.open(url, '_blank');
@@ -552,7 +352,7 @@ window.onload=function(){setTimeout(function(){window.print();},300);};
                     {item.category && <span className="text-[8px] text-slate-400 uppercase">{CATEGORY_OPTIONS.find(c => c.value === item.category)?.label ?? item.category}</span>}
                   </div>
                 </div>
-                <button onClick={() => { if (confirm(tc('yesDelete'))) handleRemoveItem(item.id); }} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1">✕</button>
+                <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1">✕</button>
               </div>
               <div className="grid grid-cols-5 gap-1.5 text-[10px] text-slate-600">
                 <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
@@ -662,6 +462,9 @@ window.onload=function(){setTimeout(function(){window.print();},300);};
         {/* ─── EDITOR TOP BAR ─── */}
         <div className="no-print flex flex-wrap justify-between items-center py-1.5 px-2 sm:px-3 bg-white border-b sticky top-0 z-50 shadow-sm gap-1 sm:gap-2">
           <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
+            <button onClick={() => router.push('/dashboard')} className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition" title="Retour au tableau de bord">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            </button>
             <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider">{doc.documentNumber}</span>
             <div className="h-4 w-px bg-slate-200 hidden sm:block" />
             <span className="text-[10px] sm:text-[11px] font-bold text-slate-600">{doc.mode === 'entreprise' ? te('businessMode') : te('artisanMode')}</span>
@@ -755,7 +558,6 @@ window.onload=function(){setTimeout(function(){window.print();},300);};
                     customSections={customSections}
                     onEditSection={cs => { setEditingSection(cs); setShowSectionCreator(true); }}
                     onDeleteSection={async id => {
-                      if (!confirm('Supprimer cette section ?')) return;
                       await fetch(`/api/user/custom-sections?id=${id}`, { method: 'DELETE' });
                       setCustomSections(prev => prev.filter(c => c.id !== id));
                       setFieldPrefs(prev => { const { [id]: _, ...rest } = prev ?? {}; return rest; });

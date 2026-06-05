@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'clouddevis-dev-secret-key-change-in-production');
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 const PROTECTED_ROUTES = ['/dashboard', '/editor'];
 const PUBLIC_ROUTES = ['/auth/login', '/auth/register'];
@@ -31,12 +31,20 @@ export async function proxy(req: NextRequest) {
     res.cookies.set('NEXT_LOCALE', locale, { path: '/', maxAge: 365 * 24 * 60 * 60 });
   }
 
-  // Allow public assets and API routes
-  if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.startsWith('/static') || pathname === '/') {
+  // Allow public assets
+  if (pathname.startsWith('/_next') || pathname.startsWith('/static') || pathname === '/favicon.ico' || pathname === '/favicon.svg') {
     return res;
   }
 
   const token = req.cookies.get(COOKIE_NAME)?.value;
+
+  // API routes: require auth except public endpoints
+  if (pathname.startsWith('/api')) {
+    const PUBLIC_API = ['/api/auth/login', '/api/auth/register', '/api/auth/forgot-password', '/api/auth/reset-password'];
+    if (PUBLIC_API.includes(pathname)) return res;
+    if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    return res;
+  }
 
   const isProtected = PROTECTED_ROUTES.some(r => pathname.startsWith(r));
   const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
@@ -49,12 +57,14 @@ export async function proxy(req: NextRequest) {
       }
       return res;
     } catch {
-      // Token expired/invalid — treat as not logged in
+      // Token expired/invalid
     }
   }
 
-  if (isProtected) {
-    return NextResponse.redirect(new URL('/auth/login', req.url));
+  if (isProtected || (!isPublic && pathname !== '/')) {
+    const loginUrl = new URL('/auth/login', req.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return res;

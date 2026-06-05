@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
@@ -105,6 +106,20 @@ export default function RegisterPage() {
     }
   }
 
+  const getPasswordStrength = (pw: string): { score: number; label: string; color: string } => {
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    if (score <= 1) return { score, label: 'Faible', color: 'bg-red-500' };
+    if (score <= 2) return { score, label: 'Moyen', color: 'bg-amber-500' };
+    if (score <= 3) return { score, label: 'Bon', color: 'bg-blue-500' };
+    return { score, label: 'Fort', color: 'bg-emerald-500' };
+  };
+  const strength = getPasswordStrength(password);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
       <Card className="w-full max-w-sm p-6 sm:p-8">
@@ -126,10 +141,22 @@ export default function RegisterPage() {
           <Input label={t('emailLabel')} type="email" value={email}
             onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} required />
 
-          <Input label={t('passwordLabel')} type="password" value={password}
-            onChange={(e) => setPassword(e.target.value)} placeholder={t('min6Chars')} required minLength={6} />
+          <div>
+            <Input label={t('passwordLabel')} type="password" showPasswordToggle value={password}
+              onChange={(e) => setPassword(e.target.value)} placeholder={t('min6Chars')} required minLength={6} />
+            {password.length > 0 && (
+              <div className="mt-1.5 space-y-1">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className={cn('h-1 flex-1 rounded-full transition-all duration-300', i <= strength.score ? strength.color : 'bg-slate-200')} />
+                  ))}
+                </div>
+                <p className="text-[10px] font-medium text-slate-400">{strength.label}</p>
+              </div>
+            )}
+          </div>
 
-          <Input label={t('confirmPassword')} type="password" value={confirmPassword}
+          <Input label={t('confirmPassword')} type="password" showPasswordToggle value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={6} />
 
           <Select label={t('accountType')} value={mode}

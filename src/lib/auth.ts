@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'clouddevis-dev-secret-key-change-in-production');
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 const COOKIE_NAME = 'session';
 
 export interface SessionUser {
@@ -47,7 +47,7 @@ export async function createSession(user: { id: string; email: string; name: str
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge,
     path: '/',
   });
