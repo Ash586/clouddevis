@@ -39,9 +39,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <Card className="w-full max-w-sm p-8">
-        <div className="text-center mb-8">
-          <span className="text-3xl font-black text-blue-600 tracking-tight">CloudDevis</span>
+      <Card className="w-full max-w-sm p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <span className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">CloudDevis</span>
           <p className="text-sm text-slate-500 mt-2">{t('loginTitle')}</p>
         </div>
 

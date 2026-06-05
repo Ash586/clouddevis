@@ -107,9 +107,9 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <Card className="w-full max-w-sm p-8">
-        <div className="text-center mb-8">
-          <span className="text-3xl font-black text-blue-600 tracking-tight">CloudDevis</span>
+      <Card className="w-full max-w-sm p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <span className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">CloudDevis</span>
           <p className="text-sm text-slate-500 mt-2">{t('registerTitle')}</p>
         </div>
 
@@ -144,7 +144,7 @@ export default function RegisterPage() {
               <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">{t('companyInfo')}</p>
               <Input label={t('companyName')} value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)} placeholder={t('companyNamePlaceholder')} />
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Input label="RC" value={companyRc}
                   onChange={(e) => setCompanyRc(e.target.value)} placeholder="Ex: 00-00-0000000" />
                 <Input label="NIF" value={companyNif}
