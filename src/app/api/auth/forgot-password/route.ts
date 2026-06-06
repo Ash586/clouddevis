@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/rateLimit';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error('Forgot password error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }

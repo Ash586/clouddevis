@@ -12,6 +12,7 @@ import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { FieldSelector } from '@/components/editor/FieldSelector';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
+import { useToast } from '@/components/ui/toast';
 import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
@@ -22,6 +23,7 @@ function EditorContent() {
   const sp = useSearchParams();
   const modeParam = sp.get('mode') as UserMode | null;
   const docIdParam = sp.get('id');
+  const { showToast } = useToast();
   const {
     doc, setDoc, mode, setMode,
     addingItem, setAddingItem, newItem, setNewItem,
@@ -46,6 +48,7 @@ function EditorContent() {
   const [customSections, setCustomSections] = useState<CustomSectionDef[]>([]);
   const [showSectionCreator, setShowSectionCreator] = useState(false);
   const [editingSection, setEditingSection] = useState<CustomSectionDef | null>(null);
+  const [allExpanded, setAllExpanded] = useState<boolean | null>(null);
   const ALL_SECTIONS: string[] = [...DEFAULT_SECTION_ORDER, ...customSections.map(s => s.id)];
   const allFields = ALL_SECTIONS.flatMap(s => SECTION_FIELDS[s] ?? customSections.find(c => c.id === s)?.fields.map(f => f.id) ?? []);
 
@@ -132,6 +135,21 @@ function EditorContent() {
     return () => window.removeEventListener('keydown', handler);
   });
 
+  // Autosave every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (doc.items.length > 0 || doc.clientInfo.name) {
+        saveDoc().then(() => showToast(tc('save') + ' ✓', 'success')).catch(() => {});
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  });
+
+  const handleSave = async () => {
+    await saveDoc();
+    showToast(tc('save') + ' ✓', 'success');
+  };
+
   const handleDownload = async () => {
     await saveDoc();
     const isEnt = doc.mode === 'entreprise';
@@ -172,7 +190,7 @@ function EditorContent() {
 
   const renderSection = (id: SectionId): React.ReactNode => {
     const s = (blockId?: BlockId) => blockId ? { blockId, visible: isBlockVisible(blockId), onToggle: toggleBlock } : { visible: true, onToggle: () => {} };
-    const dragProps = { sectionOrder: doc.sectionOrder, moveSection };
+    const dragProps = { sectionOrder: doc.sectionOrder, moveSection, ...(allExpanded !== null ? { forceOpen: allExpanded, forceClose: !allExpanded } : {}) };
 
     switch (id) {
       case 'design':
@@ -421,13 +439,13 @@ function EditorContent() {
         {/* ─── EDITOR TOP BAR ─── */}
         <div className="no-print flex flex-wrap justify-between items-center py-1.5 px-2 sm:px-3 bg-white border-b sticky top-0 z-50 shadow-sm gap-1 sm:gap-2">
           <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
-            <button onClick={() => router.push('/dashboard')} className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition" title={te('backToDashboard') || 'Back'}>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider">{doc.documentNumber}</span>
-            <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-600">{doc.mode === 'entreprise' ? te('businessMode') : te('artisanMode')}</span>
-            <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+            {/* Breadcrumb */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400">
+              <button onClick={() => router.push('/dashboard')} className="hover:text-blue-600 transition font-medium">{tc('dashboard') || 'Dashboard'}</button>
+              <span>/</span>
+              <span className="text-slate-600 font-bold">{doc.documentType === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}</span>
+              {doc.documentNumber && <><span>/</span><span className="text-slate-500">{doc.documentNumber}</span></>}
+            </nav>
             <div className="flex gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
               {['facture', 'devis'].map((t) => (
                 <button key={t} onClick={() => updateDoc('documentType', t as any)}
@@ -442,6 +460,10 @@ function EditorContent() {
               <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
               <span className="hidden sm:inline">{te('customize')}</span>
             </button>}
+            <button onClick={() => setAllExpanded(prev => prev === true ? null : true)} className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-1.5 sm:px-2 py-1 rounded-lg transition" title={allExpanded === true ? te('collapseAll') || 'Collapse all' : te('expandAll') || 'Expand all'}>
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={allExpanded === true ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} /></svg>
+              <span className="hidden sm:inline">{allExpanded === true ? te('collapseAll') || 'Collapse' : te('expandAll') || 'Expand'}</span>
+            </button>
             {docIdParam && <span className="text-[9px] sm:text-[10px] text-green-600 font-medium bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full">{te('editMode')}</span>}
             <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving}>{saving ? te('saving') : tc('save')}</Button>
             <Button size="sm" onClick={handleDownload} disabled={saving}>{te('downloadPdf')}</Button>

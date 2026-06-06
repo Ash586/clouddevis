@@ -185,6 +185,9 @@
   },
   "dashboard": {
     "welcome": "Hello 👋",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
     "subtitle": "Here is your activity summary.",
     "newQuote": "New Quote",
     "businessMode": "Business Mode",
@@ -237,6 +240,8 @@
     "deselectAll": "Deselect all",
     "addCustomSection": "+ Add custom section",
     "backToDashboard": "Back to dashboard",
+    "collapseAll": "Collapse all",
+    "expandAll": "Expand all",
     "sectionCreatorLabel": "Section name",
     "sectionCreatorFieldLabel": "Field label",
     "sectionCreatorOptions": "One option per line",

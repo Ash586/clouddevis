@@ -185,6 +185,9 @@
   },
   "dashboard": {
     "welcome": "مرحباً 👋",
+    "goodMorning": "صباح الخير",
+    "goodAfternoon": "مساء الخير",
+    "goodEvening": "مساء الخير",
     "subtitle": "هذا ملخص نشاطك.",
     "newQuote": "تقدير جديد",
     "businessMode": "وضع الشركة",
@@ -237,6 +240,8 @@
     "deselectAll": "إلغاء التحديد",
     "addCustomSection": "+ إضافة قسم مخصص",
     "backToDashboard": "العودة إلى لوحة التحكم",
+    "collapseAll": "طي الكل",
+    "expandAll": "توسيع الكل",
     "sectionCreatorLabel": "اسم القسم",
     "sectionCreatorFieldLabel": "اسم الحقل",
     "sectionCreatorOptions": "خيار واحد في كل سطر",

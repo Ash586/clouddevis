@@ -185,6 +185,9 @@
   },
   "dashboard": {
     "welcome": "Bonjour 👋",
+    "goodMorning": "Bonjour",
+    "goodAfternoon": "Bon après-midi",
+    "goodEvening": "Bonsoir",
     "subtitle": "Voici le résumé de votre activité.",
     "newQuote": "Nouveau Devis",
     "businessMode": "Mode Entreprise",
@@ -237,6 +240,8 @@
     "deselectAll": "Tout désélectionner",
     "addCustomSection": "+ Ajouter une section personnalisée",
     "backToDashboard": "Retour au tableau de bord",
+    "collapseAll": "Tout réduire",
+    "expandAll": "Tout développer",
     "sectionCreatorLabel": "Nom de la section",
     "sectionCreatorFieldLabel": "Libellé du champ",
     "sectionCreatorOptions": "Une option par ligne",

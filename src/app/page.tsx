@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { DemoEditor } from '@/components/editor/DemoEditor';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const DemoEditor = lazy(() => import('@/components/editor/DemoEditor').then(m => ({ default: m.DemoEditor })));
 
 const DEMO_KEY = 'clouddevis_demo_date';
 
@@ -80,7 +82,9 @@ export default function HomePage() {
               <span className="text-[9px] text-slate-500">{t('editorBannerSubtitle')}</span>
             </div>
             <div className="px-6 py-4 flex-1 overflow-hidden">
-              <DemoEditor onDownload={handleDownload} />
+              <Suspense fallback={<div className="space-y-3"><Skeleton className="h-8 w-32" /><Skeleton className="h-64 w-full" /><Skeleton className="h-8 w-48" /></div>}>
+                <DemoEditor onDownload={handleDownload} />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -104,7 +108,9 @@ export default function HomePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPaywall(false)} />
           <div className="relative bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border animate-in">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🔒</div>
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            </div>
             <h3 className="text-2xl font-black text-slate-900">{t('paywallTitle')}</h3>
             <p className="text-slate-500 text-sm mt-2 mb-6">{t('paywallBody')}</p>
             <div className="space-y-3">

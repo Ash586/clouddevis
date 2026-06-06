@@ -66,6 +66,21 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
   const [searchQuery, setSearchQuery] = useState('');
   const tax = companyInfo?.taxIds;
 
+  const getTimeGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('goodMorning');
+    if (hour < 18) return t('goodAfternoon');
+    return t('goodEvening');
+  };
+
+  const DOC_TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+    DEVIS: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
+    FACTURE: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' },
+    PROFORMA: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
+    BC: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-200' },
+    BR: { bg: 'bg-teal-50', text: 'text-teal-600', border: 'border-teal-200' },
+  };
+
   const filteredDocs = docs.filter(doc => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -75,7 +90,7 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
   return (
     <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
       <div className="mb-4 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-black text-slate-900">{t('welcome')} {userName}</h1>
+        <h1 className="text-xl sm:text-2xl font-black text-slate-900">{getTimeGreeting()}, {userName}</h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
           {isEnt ? t('businessMode') : t('artisanMode')} — {t('subtitle')}
         </p>
@@ -165,7 +180,11 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
                     <tr key={doc.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition cursor-pointer"
                       onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
                       <td className="py-3 px-2 font-medium text-slate-800">{doc.number || '—'}</td>
-                      <td className="py-3 px-2 text-slate-500">{TYPE_LABELS[doc.type] || doc.type}</td>
+                      <td className="py-3 px-2 text-slate-500">
+                        <span className={`text-[10px] font-semibold px-2 py-1 rounded-md border ${DOC_TYPE_COLORS[doc.type]?.bg || 'bg-slate-50'} ${DOC_TYPE_COLORS[doc.type]?.text || 'text-slate-500'} ${DOC_TYPE_COLORS[doc.type]?.border || 'border-slate-200'}`}>
+                          {TYPE_LABELS[doc.type] || doc.type}
+                        </span>
+                      </td>
                       <td className="py-3 px-2 text-slate-700">{doc.client || '—'}</td>
                       <td className="py-3 px-2 text-right font-semibold text-slate-900">{doc.total} {tc('currency')}</td>
                       <td className="py-3 px-2 text-slate-400">{doc.date}</td>
@@ -195,7 +214,7 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500">{TYPE_LABELS[doc.type] || doc.type}</span>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${DOC_TYPE_COLORS[doc.type]?.bg || 'bg-slate-50'} ${DOC_TYPE_COLORS[doc.type]?.text || 'text-slate-500'} ${DOC_TYPE_COLORS[doc.type]?.border || 'border-slate-200'}`}>{TYPE_LABELS[doc.type] || doc.type}</span>
                     <span className="font-bold text-slate-900">{doc.total} {tc('currency')}</span>
                   </div>
                   <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
@@ -212,7 +231,7 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
       </Card>
 
       <Card className="mt-4 sm:mt-6 p-3 sm:p-4 bg-amber-50/50 border-amber-100">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mb-2">
           <div className="min-w-0">
             <p className="text-xs sm:text-sm font-semibold text-amber-800">{tc('freeTrial')}</p>
             <p className="text-[10px] sm:text-xs text-amber-600">{tc('trialDaysLeft', { days: String(stats.trialDaysRemaining) })}</p>
@@ -220,6 +239,9 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
           <Button size="sm" variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-100 shrink-0">
             {tc('upgradeToPro')}
           </Button>
+        </div>
+        <div className="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500" style={{ width: `${Math.max(5, Math.min(100, ((14 - stats.trialDaysRemaining) / 14) * 100))}%` }} />
         </div>
       </Card>
 

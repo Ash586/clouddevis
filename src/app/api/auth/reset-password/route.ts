@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, message: 'Mot de passe réinitialisé avec succès' });
   } catch (error) {
-    console.error('Reset password error:', error);
+    logger.error('Reset password error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }

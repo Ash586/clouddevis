@@ -22,10 +22,28 @@
   --color-danger: #ef4444;
 }
 
+/* Theming CSS variables */
+:root {
+  --cd-primary: 37 99 235;        /* blue-600 */
+  --cd-primary-hover: 29 78 216;  /* blue-700 */
+  --cd-surface: 248 250 252;      /* slate-50 */
+  --cd-surface-card: 255 255 255; /* white */
+  --cd-text: 15 23 42;            /* slate-900 */
+  --cd-text-secondary: 100 116 139; /* slate-500 */
+  --cd-border: 226 232 240;       /* slate-200 */
+  --cd-success: 16 185 129;       /* emerald-500 */
+  --cd-warning: 245 158 11;       /* amber-500 */
+  --cd-danger: 239 68 68;         /* red-500 */
+  --cd-radius: 0.75rem;
+  --cd-radius-lg: 1rem;
+}
+
 body {
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(var(--cd-surface));
+  color: rgb(var(--cd-text));
 }
 
 html {

@@ -125,8 +125,8 @@ function SidebarInner() {
         {/* Stats */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
           aria-current={isActive('/dashboard') ? 'page' : undefined}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
-            isActive('/dashboard') ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
           }`}>
           <LayoutDashboard size={16} strokeWidth={1.5} className="shrink-0" />
           {s('stats')}
@@ -136,8 +136,8 @@ function SidebarInner() {
         <div>
           <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
             aria-expanded={documentsOpen}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
-              documentsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+              documentsOpen ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
             }`}>
             <FileText size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('documents')}</span>
@@ -168,8 +168,8 @@ function SidebarInner() {
         <div>
           <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); }}
             aria-expanded={clientsOpen}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition ${
-              clientsOpen ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+              clientsOpen ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
             }`}>
             <Users size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('clients')}</span>

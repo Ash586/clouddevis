@@ -15,10 +15,14 @@ export interface SectionProps {
   moveSection: (id: SectionId, dir: 'up' | 'down') => void;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  forceOpen?: boolean;
+  forceClose?: boolean;
 }
 
-export function CollapsibleSection({ title, sectionId, blockId, visible, onToggle, sectionOrder, moveSection, children, defaultOpen = true }: SectionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+export function CollapsibleSection({ title, sectionId, blockId, visible, onToggle, sectionOrder, moveSection, children, defaultOpen = true, forceOpen, forceClose }: SectionProps) {
+  const [localOpen, setLocalOpen] = useState(defaultOpen);
+  const open = forceClose ? false : forceOpen ? true : localOpen;
+  const setOpen = (v: boolean) => { if (!forceOpen && !forceClose) setLocalOpen(v); };
   const te = useTranslations('editor');
   const idx = sectionOrder.indexOf(sectionId);
   const canUp = idx > 0;

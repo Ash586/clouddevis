@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createSession } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 const TOKEN_URLS: Record<string, string> = {
   google: 'https://oauth2.googleapis.com/token',
@@ -110,7 +111,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
 
     return NextResponse.redirect(new URL('/dashboard', _req.url));
   } catch (error) {
-    console.error('OAuth callback error:', error);
+    logger.error('OAuth callback error', { error: String(error) });
     return NextResponse.redirect(new URL('/auth/login?error=oauth_error', _req.url));
   }
 }

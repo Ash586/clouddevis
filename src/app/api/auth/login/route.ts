@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }
