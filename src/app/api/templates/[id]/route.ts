@@ -1,0 +1,64 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+  const { id } = await params;
+  const template = await prisma.template.findFirst({
+    where: { id, userId: session.userId },
+  });
+
+  if (!template) return NextResponse.json({ error: 'Modèle non trouvé' }, { status: 404 });
+
+  return NextResponse.json({
+    template: {
+      id: template.id, name: template.name, description: template.description,
+      documentType: template.documentType, mode: template.mode,
+      items: template.items, customFields: template.customFields,
+      settings: template.settings,
+      createdAt: template.createdAt.toISOString().split('T')[0],
+    },
+  });
+}
+
+export async function PUT(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+  const { id } = await params;
+  const template = await prisma.template.findFirst({ where: { id, userId: session.userId } });
+  if (!template) return NextResponse.json({ error: 'Modèle non trouvé' }, { status: 404 });
+
+  const body = await _req.json();
+  const { name, description, documentType, mode, items, customFields, settings } = body;
+
+  const updated = await prisma.template.update({
+    where: { id },
+    data: {
+      ...(name !== undefined && { name: name.trim() }),
+      ...(description !== undefined && { description: description?.trim() || null }),
+      ...(documentType !== undefined && { documentType: documentType.toUpperCase() }),
+      ...(mode !== undefined && { mode: mode.toUpperCase() }),
+      ...(items !== undefined && { items }),
+      ...(customFields !== undefined && { customFields }),
+      ...(settings !== undefined && { settings }),
+    },
+  });
+
+  return NextResponse.json({ id: updated.id, name: updated.name });
+}
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+  const { id } = await params;
+  const template = await prisma.template.findFirst({ where: { id, userId: session.userId } });
+  if (!template) return NextResponse.json({ error: 'Modèle non trouvé' }, { status: 404 });
+
+  await prisma.template.delete({ where: { id } });
+  return NextResponse.json({ success: true });
+}

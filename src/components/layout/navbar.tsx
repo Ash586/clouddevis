@@ -29,6 +29,7 @@ export function Navbar() {
 
   const links = loading ? null : user ? (
     <>
+      <a href="/pricing" className="hidden md:inline text-xs text-slate-400 hover:text-slate-600 font-medium">{t('pricing') || 'Tarifs'}</a>
       <Button variant="outline" size="sm" className={navBtnCls('bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 shadow-none')} onClick={() => { router.push('/dashboard'); setMobileOpen(false); }}>
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
         {t('dashboard')}
@@ -40,6 +41,7 @@ export function Navbar() {
     </>
   ) : (
     <>
+      <a href="/pricing" className="hidden md:inline text-sm text-slate-500 hover:text-slate-800 font-medium">{t('pricing') || 'Tarifs'}</a>
       <a href="/auth/login" onClick={() => setMobileOpen(false)} className="block md:inline text-sm text-slate-500 hover:text-slate-800 font-medium text-center md:text-left">{t('login')}</a>
       <Button size="sm" className={navBtnCls()} onClick={() => { router.push('/auth/register'); setMobileOpen(false); }}>{t('signup')}</Button>
     </>

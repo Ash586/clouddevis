@@ -57,6 +57,7 @@ model User {
   resetTokens       PasswordResetToken[]
   clients           Client[]
   documents         Document[]
+  templates         Template[]
   backups           Backup[]
 }
 
@@ -157,6 +158,23 @@ model Document {
   @@index([type])
   @@index([status])
   @@index([createdAt])
+}
+
+model Template {
+  id           String       @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  documentType DocumentType @default(DEVIS)
+  mode         UserMode     @default(ARTISAN)
+  items        Json         @default("[]")
+  customFields Json         @default("{}")
+  settings     Json         @default("{}")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 model Backup {

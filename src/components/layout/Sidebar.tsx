@@ -14,6 +14,9 @@ import {
   Bell,
   LogOut,
   Menu,
+  BarChart3,
+  FileStack,
+  CreditCard,
 } from 'lucide-react';
 
 const DOCUMENT_TYPES = [
@@ -122,7 +125,7 @@ function SidebarInner() {
 
       {/* Navigation */}
       <nav aria-label="Main navigation" className="flex-1 overflow-y-auto space-y-0.5">
-        {/* Stats */}
+        {/* Dashboard */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
           aria-current={isActive('/dashboard') ? 'page' : undefined}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
@@ -132,7 +135,7 @@ function SidebarInner() {
           {s('stats')}
         </button>
 
-        {/* Documents & Factures */}
+        {/* Documents */}
         <div>
           <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
             aria-expanded={documentsOpen}
@@ -144,8 +147,14 @@ function SidebarInner() {
             <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{docCount > 0 ? docCount : ''}</span>
             <ChevronDown size={14} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
           </button>
-          <div className={`overflow-hidden transition-all duration-200 ${documentsOpen ? 'max-h-72' : 'max-h-0'}`}>
+          <div className={`overflow-hidden transition-all duration-200 ${documentsOpen ? 'max-h-96' : 'max-h-0'}`}>
             <div className="ms-5 space-y-0.5 pt-0.5">
+              <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
+                className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition border-s-2 ${
+                  isActive('/dashboard/documents') ? 'bg-blue-50 text-blue-600 border-s-blue-600' : 'text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 border-s-transparent hover:border-s-blue-200'
+                }`}>
+                <span className="flex-1 text-start">{s('allDocuments') || 'Tous les documents'}</span>
+              </button>
               {DOCUMENT_TYPES.map((dt) => {
                 const count = typeBreakdown[TYPE_MAP[dt.id] ?? ''] ?? 0;
                 return (
@@ -166,26 +175,41 @@ function SidebarInner() {
 
         {/* Clients */}
         <div>
-          <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); }}
+          <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); router.push('/dashboard/clients'); setMobileOpen(false); }}
             aria-expanded={clientsOpen}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-              clientsOpen ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+              isActive('/dashboard/clients') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
             }`}>
             <Users size={16} strokeWidth={1.5} className="shrink-0" />
             <span className="flex-1 text-start">{s('clients')}</span>
             <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{clientCount > 0 ? clientCount : ''}</span>
-            <ChevronDown size={14} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${clientsOpen ? 'rotate-180' : ''}`} />
           </button>
-          <div className={`overflow-hidden transition-all duration-200 ${clientsOpen ? 'max-h-20' : 'max-h-0'}`}>
-            <div className="ms-5 space-y-0.5 pt-0.5">
-              <button onClick={() => router.push('/dashboard/editor')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 transition border-s-2 border-transparent hover:border-s-blue-200 text-start">
-                <Plus size={14} strokeWidth={1.5} />
-                {s('newDocument')}
-              </button>
-            </div>
-          </div>
         </div>
+
+        {/* Templates */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/templates'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/templates') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <FileStack size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('templates') || 'Modèles'}
+        </button>
+
+        {/* Reports */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/reports'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/reports') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <BarChart3 size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('reports') || 'Rapports'}
+        </button>
+
+        {/* Pricing */}
+        <button onClick={() => { window.open('/pricing', '_blank'); setMobileOpen(false); }}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent">
+          <CreditCard size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('pricing') || 'Tarifs'}
+        </button>
       </nav>
     </>
   );
