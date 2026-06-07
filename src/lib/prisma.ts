@@ -6,7 +6,11 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefi
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error('DATABASE_URL is not set');
-  const adapter = new PrismaPg({ connectionString });
+  // Enable SSL in production for hosted PostgreSQL providers (Neon, Supabase, etc.)
+  const adapter = new PrismaPg({
+    connectionString,
+    ...(process.env.NODE_ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {}),
+  });
   return new PrismaClient({ adapter });
 }
 
