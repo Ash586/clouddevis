@@ -123,7 +123,7 @@ export async function GET(req: Request) {
       where: { timestamp: { gte: startDate } },
       select: { sessionId: true },
     });
-    const uniqueSessionCount = new Set(uniqueSessions.map(s => s.sessionId).filter(Boolean)).size;
+    const uniqueSessionCount = new Set(uniqueSessions.map((s: { sessionId: string | null }) => s.sessionId).filter(Boolean) as string[]).size;
 
     // Paid users in period
     const paidUsersInPeriod = await prisma.user.count({
@@ -136,19 +136,19 @@ export async function GET(req: Request) {
     return NextResponse.json({
       userGrowth: Object.entries(dailyUsers).map(([date, data]) => ({ date, ...data })),
       docTrend: Object.entries(dailyDocs).map(([date, data]) => ({ date, ...data })),
-      countryBreakdown: countryBreakdown.map(c => ({ country: c.country, count: c._count })),
-      topUsers: topUsers.map(u => ({
+      countryBreakdown: countryBreakdown.map((c: { country: string; _count: number }) => ({ country: c.country, count: c._count })),
+      topUsers: topUsers.map((u: { id: string; name: string; email: string; _count: { documents: number } }) => ({
         id: u.id, name: u.name, email: u.email,
         docCount: u._count.documents,
       })),
       systemMetrics: Object.entries(metricsByDate).map(([date, data]) => ({ date, ...data })),
-      docStatusBreakdown: docStatusBreakdown.map(d => ({ status: d.status, count: d._count })),
+      docStatusBreakdown: docStatusBreakdown.map((d: { status: string; _count: number }) => ({ status: d.status, count: d._count })),
       visitorStats: {
         totalPageViews: visitorStats._count.id,
         uniqueSessions: uniqueSessionCount,
         avgPageViewsPerSession: uniqueSessionCount > 0 ? Math.round(visitorStats._count.id / uniqueSessionCount) : 0,
       },
-      topPages: topPages.map(p => ({ path: p.path, count: p._count.id })),
+      topPages: topPages.map((p: { path: string; _count: { id: number } }) => ({ path: p.path, count: p._count.id })),
       conversion: {
         totalUsersInPeriod: conversionData._count.id,
         paidUsersInPeriod,
