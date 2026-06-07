@@ -68,6 +68,7 @@ export async function proxy(req: NextRequest) {
     } catch {
       return NextResponse.redirect(new URL('/admin/login', req.url));
     }
+    return res;
   }
 
   const token = req.cookies.get(COOKIE_NAME)?.value;
