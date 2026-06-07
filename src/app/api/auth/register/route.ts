@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
 
-    const { name, email, password, mode, sector, country, language, companyInfo } = body;
+    const { name, email, password, mode, sector, country, language, companyInfo, ref } = body;
 
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     const rateCheck = checkRateLimit(`register:${ip}`, 3, 60000);
@@ -42,6 +42,19 @@ export async function POST(req: Request) {
         settings: { defaultTaxRegime: 'tva_19', defaultDocType: 'devis' },
       },
     });
+
+    if (ref) {
+      const partner = await prisma.partner.findUnique({ where: { code: ref.toUpperCase() } });
+      if (partner && partner.status === 'ACTIVE') {
+        await prisma.referral.create({
+          data: {
+            partnerId: partner.id,
+            referredUserId: user.id,
+            status: 'PENDING',
+          },
+        });
+      }
+    }
 
     await createSession({
       id: user.id,

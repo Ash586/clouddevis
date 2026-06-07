@@ -12,17 +12,19 @@ import {
   Activity,
   Settings,
   LogOut,
-  ChevronLeft,
+  Handshake,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { key: 'dashboard', href: '/admin', icon: LayoutDashboard },
   { key: 'users', href: '/admin/users', icon: Users },
+  { key: 'partners', href: '/admin/partners', icon: Handshake },
   { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
   { key: 'subscriptions', href: '/admin/subscriptions', icon: CreditCard },
   { key: 'reports', href: '/admin/reports', icon: FileText },
   { key: 'logs', href: '/admin/logs', icon: ScrollText },
   { key: 'system', href: '/admin/system', icon: Activity },
+  { key: 'settings', href: '/admin/settings', icon: Settings },
 ];
 
 export function AdminSidebar() {

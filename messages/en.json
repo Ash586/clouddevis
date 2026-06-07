@@ -760,6 +760,8 @@
       "reports": "Reports",
       "logs": "Logs",
       "system": "System",
+      "partners": "Partners",
+      "settings": "Settings",
       "logout": "Logout"
     },
     "stats": {

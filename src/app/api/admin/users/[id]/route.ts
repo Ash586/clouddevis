@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { handleReferralConversion } from '@/lib/partner';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -46,6 +47,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (mode) updateData.mode = mode;
 
     const updated = await prisma.user.update({ where: { id }, data: updateData });
+
+    if (subscriptionStatus && subscriptionStatus !== user.subscriptionStatus) {
+      await handleReferralConversion(id, subscriptionStatus);
+    }
 
     // Log the activity
     await prisma.activityLog.create({

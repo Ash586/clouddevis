@@ -67,6 +67,8 @@ model User {
   teamMembers       TeamMember[]
   receivedShares    DocumentShare[]     @relation("SharedWithUser")
   recurringInvoices RecurringInvoice[]
+  partner           Partner?
+  referrals         Referral[]          @relation("ReferredUser")
 }
 
 model Account {
@@ -211,19 +213,167 @@ enum AdminRole {
 }
 
 model Admin {
-  id              String    @id @default(cuid())
-  email           String    @unique
+  id              String          @id @default(cuid())
+  email           String          @unique
   password        String
-  name            String    @default("Admin")
-  role            AdminRole @default(ADMIN)
-  permissions     String[]  @default([])
+  name            String          @default("Admin")
+  role            AdminRole       @default(ADMIN)
+  permissions     String[]        @default([])
+  twoFactorSecret String?
+  twoFactorEnabled Boolean        @default(false)
   lastLogin       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   activityLogs    ActivityLog[]
+  backupLogs      BackupLog[]
 
   @@index([email])
+}
+
+model BackupLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  type       String   @default("auto")
+  status     String   @default("pending")
+  size       Int?
+  fileUrl    String?
+  notes      String?
+  startedAt  DateTime @default(now())
+  completedAt DateTime?
+
+  admin      Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([startedAt])
+  @@index([status])
+}
+
+model Analytics {
+  id             String   @id @default(cuid())
+  date           DateTime @default(now())
+  country        String   @default("unknown")
+  visitors       Int      @default(0)
+  sessions       Int      @default(0)
+  pageViews      Int      @default(0)
+  bounceRate     Float    @default(0)
+  avgSessionTime Int      @default(0)
+
+  @@index([date])
+  @@index([country])
+}
+
+enum PartnerTier {
+  AFFILIATE
+  SUPER_AFFILIATE
+}
+
+enum PartnerStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum ReferralStatus {
+  PENDING
+  CONVERTED
+  EXPIRED
+}
+
+enum CommissionType {
+  DIRECT
+  OVERRIDE
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Partner {
+  id            String          @id @default(cuid())
+  userId        String          @unique
+  code          String          @unique
+  tier          PartnerTier     @default(AFFILIATE)
+  parentId      String?
+  status        PartnerStatus   @default(PENDING)
+  stats         Json            @default("{}")
+  appliedAt     DateTime        @default(now())
+  approvedAt    DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent        Partner?        @relation("PartnerHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children      Partner[]       @relation("PartnerHierarchy")
+  referrals     Referral[]
+  commissions   Commission[]
+  payouts       Payout[]
+  courses       PartnerCourse[]
+
+  @@index([code])
+  @@index([status])
+  @@index([tier])
+  @@index([parentId])
+}
+
+model Referral {
+  id              String          @id @default(cuid())
+  partnerId       String
+  referredUserId  String          @unique
+  status          ReferralStatus  @default(PENDING)
+  convertedAt     DateTime?
+
+  partner         Partner         @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  referredUser    User            @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([status])
+}
+
+model Commission {
+  id              String          @id @default(cuid())
+  partnerId       String
+  amount          Float
+  type            CommissionType  @default(DIRECT)
+  subscriptionId  String?
+  status          String          @default("PENDING")
+  paidAt          DateTime?
+  createdAt       DateTime        @default(now())
+
+  partner         Partner         @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Payout {
+  id              String          @id @default(cuid())
+  partnerId       String
+  totalAmount     Float
+  status          PayoutStatus    @default(PENDING)
+  requestedAt     DateTime        @default(now())
+  paidAt          DateTime?
+
+  partner         Partner         @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([status])
+}
+
+model PartnerCourse {
+  id          String    @id @default(cuid())
+  partnerId   String
+  moduleId    String
+  completedAt DateTime?
+  score       Int?
+
+  partner     Partner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([partnerId, moduleId])
+  @@index([partnerId])
 }
 
 model ActivityLog {
