@@ -83,6 +83,9 @@
     "allDocuments": "جميع المستندات",
     "templates": "القوالب",
     "reports": "التقارير",
+    "team": "الفريق",
+    "shared": "المشتركة",
+    "recurring": "الدورية",
     "pricing": "الأسعار",
     "clientsMy": "عملائي",
     "clientsAdd": "إضافة عميل",
@@ -838,5 +841,73 @@
     "markAllRead": "تحديد الكل كمقروء",
     "markRead": "تحديد كمقروء",
     "delete": "حذف"
+  },
+  "teams": {
+    "title": "الفرق",
+    "subtitle": "تعاون مع فريقك",
+    "createTeam": "إنشاء فريق",
+    "createNew": "فريق جديد",
+    "teamNamePlaceholder": "اسم الفريق...",
+    "noTeams": "أنت لست في أي فريق. أنشئ واحداً!",
+    "members": "أعضاء",
+    "createdBy": "بواسطة",
+    "documents": "مستندات",
+    "inviteMember": "دعوة عضو",
+    "inviteEmailPlaceholder": "البريد الإلكتروني...",
+    "sendInvite": "إرسال الدعوة",
+    "memberName": "الاسم",
+    "memberEmail": "البريد",
+    "memberRole": "الدور",
+    "roleMember": "عضو",
+    "roleAdmin": "مدير",
+    "pendingInvites": "الدعوات المعلقة",
+    "pending": "معلقة",
+    "backToTeams": "العودة إلى الفرق",
+    "teamInfo": "{members} أعضاء • {docs} مستندات"
+  },
+  "shared": {
+    "title": "المشاركة معي",
+    "empty": "لا توجد مستندات مشاركة معك",
+    "filter": {
+      "all": "الكل",
+      "view": "عرض فقط",
+      "edit": "تعديل"
+    },
+    "table": {
+      "number": "الرقم",
+      "type": "النوع",
+      "sharedBy": "مشارك من",
+      "total": "المجموع",
+      "permission": "الصلاحية",
+      "date": "التاريخ"
+    }
+  },
+  "recurring": {
+    "title": "الفواتير الدورية",
+    "subtitle": "أتمتة إنشاء مستنداتك",
+    "createNew": "جديد",
+    "createSchedule": "إنشاء جدولة",
+    "empty": "لا توجد جداول دورية",
+    "active": "نشط",
+    "paused": "متوقف",
+    "pause": "إيقاف",
+    "resume": "استئناف",
+    "nextGen": "التالي:",
+    "lastGen": "السابق:",
+    "eachWeek": "كل أسبوع",
+    "eachMonth": "كل شهر",
+    "eachQuarter": "كل ربع سنة",
+    "eachYear": "كل سنة",
+    "form": {
+      "namePlaceholder": "اسم الجدولة...",
+      "nextDate": "تاريخ الإنشاء الأول"
+    },
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "frequency": "التكرار",
+      "nextDate": "التاريخ القادم",
+      "active": "الحالة"
+    }
   }
 }

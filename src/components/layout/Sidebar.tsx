@@ -17,6 +17,9 @@ import {
   BarChart3,
   FileStack,
   CreditCard,
+  UsersRound,
+  Share2,
+  RefreshCw,
 } from 'lucide-react';
 
 const DOCUMENT_TYPES = [
@@ -203,6 +206,33 @@ function SidebarInner() {
           }`}>
           <BarChart3 size={16} strokeWidth={1.5} className="shrink-0" />
           {s('reports') || 'Rapports'}
+        </button>
+
+        {/* Team */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/team'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/team') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <UsersRound size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('team') || 'Équipe'}
+        </button>
+
+        {/* Shared */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/shared'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/shared') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <Share2 size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('shared') || 'Partagés'}
+        </button>
+
+        {/* Recurring */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/recurring'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/recurring') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <RefreshCw size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('recurring') || 'Récurrents'}
         </button>
 
         {/* Pricing */}

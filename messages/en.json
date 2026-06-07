@@ -83,6 +83,9 @@
     "allDocuments": "All documents",
     "templates": "Templates",
     "reports": "Reports",
+    "team": "Team",
+    "shared": "Shared",
+    "recurring": "Recurring",
     "pricing": "Pricing",
     "clientsMy": "My clients",
     "clientsAdd": "Add client",
@@ -838,5 +841,73 @@
     "markAllRead": "Mark all read",
     "markRead": "Mark as read",
     "delete": "Delete notification"
+  },
+  "teams": {
+    "title": "Teams",
+    "subtitle": "Collaborate with your team members",
+    "createTeam": "Create Team",
+    "createNew": "Create New Team",
+    "teamNamePlaceholder": "Enter team name...",
+    "noTeams": "You're not in any team yet. Create one!",
+    "members": "members",
+    "createdBy": "by",
+    "documents": "documents",
+    "inviteMember": "Invite Member",
+    "inviteEmailPlaceholder": "Enter email address...",
+    "sendInvite": "Send Invite",
+    "memberName": "Name",
+    "memberEmail": "Email",
+    "memberRole": "Role",
+    "roleMember": "Member",
+    "roleAdmin": "Admin",
+    "pendingInvites": "Pending Invites",
+    "pending": "Pending",
+    "backToTeams": "Back to teams",
+    "teamInfo": "{members} members • {docs} documents"
+  },
+  "shared": {
+    "title": "Shared with Me",
+    "empty": "No documents shared with you yet",
+    "filter": {
+      "all": "All",
+      "view": "View only",
+      "edit": "Can edit"
+    },
+    "table": {
+      "number": "Number",
+      "type": "Type",
+      "sharedBy": "Shared by",
+      "total": "Total",
+      "permission": "Access",
+      "date": "Date"
+    }
+  },
+  "recurring": {
+    "title": "Recurring Invoices",
+    "subtitle": "Automate your invoice generation",
+    "createNew": "New Schedule",
+    "createSchedule": "Create Schedule",
+    "empty": "No recurring schedules yet",
+    "active": "Active",
+    "paused": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "nextGen": "Next:",
+    "lastGen": "Last:",
+    "eachWeek": "Every week",
+    "eachMonth": "Every month",
+    "eachQuarter": "Every quarter",
+    "eachYear": "Every year",
+    "form": {
+      "namePlaceholder": "Schedule name...",
+      "nextDate": "First generation date"
+    },
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "frequency": "Frequency",
+      "nextDate": "Next Date",
+      "active": "Status"
+    }
   }
 }

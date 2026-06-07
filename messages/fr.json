@@ -83,6 +83,9 @@
     "allDocuments": "Tous les documents",
     "templates": "Modèles",
     "reports": "Rapports",
+    "team": "Équipe",
+    "shared": "Partagés",
+    "recurring": "Récurrents",
     "pricing": "Tarifs",
     "clientsMy": "Mes clients",
     "clientsAdd": "Ajouter un client",
@@ -838,5 +841,73 @@
     "markAllRead": "Tout marquer lu",
     "markRead": "Marquer comme lu",
     "delete": "Supprimer"
+  },
+  "teams": {
+    "title": "Équipes",
+    "subtitle": "Collaborez avec votre équipe",
+    "createTeam": "Créer une équipe",
+    "createNew": "Nouvelle équipe",
+    "teamNamePlaceholder": "Nom de l'équipe...",
+    "noTeams": "Vous n'êtes dans aucune équipe. Créez-en une !",
+    "members": "membres",
+    "createdBy": "par",
+    "documents": "documents",
+    "inviteMember": "Inviter un membre",
+    "inviteEmailPlaceholder": "Adresse email...",
+    "sendInvite": "Envoyer l'invitation",
+    "memberName": "Nom",
+    "memberEmail": "Email",
+    "memberRole": "Rôle",
+    "roleMember": "Membre",
+    "roleAdmin": "Admin",
+    "pendingInvites": "Invitations en attente",
+    "pending": "En attente",
+    "backToTeams": "Retour aux équipes",
+    "teamInfo": "{members} membres • {docs} documents"
+  },
+  "shared": {
+    "title": "Partagés avec moi",
+    "empty": "Aucun document partagé avec vous",
+    "filter": {
+      "all": "Tous",
+      "view": "Lecture seule",
+      "edit": "Modification"
+    },
+    "table": {
+      "number": "N°",
+      "type": "Type",
+      "sharedBy": "Partagé par",
+      "total": "Total",
+      "permission": "Accès",
+      "date": "Date"
+    }
+  },
+  "recurring": {
+    "title": "Factures récurrentes",
+    "subtitle": "Automatisez la génération de vos documents",
+    "createNew": "Nouveau",
+    "createSchedule": "Créer un échéancier",
+    "empty": "Aucun échéancier récurrent",
+    "active": "Actif",
+    "paused": "En pause",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "nextGen": "Prochaine :",
+    "lastGen": "Dernière :",
+    "eachWeek": "Chaque semaine",
+    "eachMonth": "Chaque mois",
+    "eachQuarter": "Chaque trimestre",
+    "eachYear": "Chaque année",
+    "form": {
+      "namePlaceholder": "Nom de l'échéancier...",
+      "nextDate": "Date de première génération"
+    },
+    "table": {
+      "name": "Nom",
+      "type": "Type",
+      "frequency": "Fréquence",
+      "nextDate": "Prochaine date",
+      "active": "Statut"
+    }
   }
 }
