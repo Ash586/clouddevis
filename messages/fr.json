@@ -792,6 +792,43 @@
       "templates": "Templates",
       "admins": "Admins",
       "memoryDetail": "Détail mémoire"
+    },
+    "analytics": {
+      "newUsers": "Nouveaux utilisateurs",
+      "newDocs": "Nouveaux documents",
+      "revenue": "Revenu (DA)",
+      "avgDaily": "Moy. docs/jour",
+      "userGrowth": "Croissance des utilisateurs",
+      "docTrend": "Tendance des documents",
+      "countries": "Utilisateurs par pays",
+      "docStatus": "Statut des documents",
+      "topUsers": "Meilleurs utilisateurs",
+      "noCountryData": "Aucune donnée de pays disponible",
+      "period": {
+        "7d": "7 Jours",
+        "30d": "30 Jours",
+        "90d": "90 Jours",
+        "year": "Année"
+      }
+    },
+    "subscriptions": {
+      "expires": "Expire le",
+      "total": "Total utilisateurs",
+      "active": "Abonnements actifs"
+    },
+    "reports": {
+      "totalRevenue": "Revenu total",
+      "totalDocs": "Documents totaux",
+      "totalTva": "TVA totale",
+      "newUsers": "Nouveaux utilisateurs",
+      "userGrowth": "Croissance mensuelle",
+      "docByType": "Documents par type",
+      "subBreakdown": "Répartition des abonnements",
+      "period": {
+        "month": "Mois",
+        "quarter": "Trimestre",
+        "year": "Année"
+      }
     }
   }
 }

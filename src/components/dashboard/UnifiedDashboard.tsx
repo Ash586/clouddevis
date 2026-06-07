@@ -39,17 +39,19 @@ function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () 
   const tc = useTranslations('common');
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl p-6 w-80 max-w-[90%] animate-in" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
+      <div className="relative bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl p-6 w-full sm:w-80 sm:max-w-[90%] animate-in sm:mx-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-center sm:hidden pt-1 pb-2"><div className="w-10 h-1 rounded-full bg-slate-300" /></div>
         <div className="text-center">
           <div className="text-3xl mb-3">
             <svg className="w-10 h-10 text-red-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
           </div>
           <h3 className="text-sm font-bold text-slate-900 mb-2">{tc('deleteModal.title')}</h3>
           <p className="text-xs text-slate-500 mb-5">{tc('deleteModal.description')}</p>
-          <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 py-2 bg-slate-100 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-200 transition">{tc('deleteModal.cancel')}</button>
-            <button onClick={() => { onConfirm(); onClose(); }} className="flex-1 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition">{tc('deleteModal.confirm')}</button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button onClick={onClose} className="flex-1 py-3 sm:py-2.5 bg-slate-100 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-200 transition min-h-[44px] order-2 sm:order-1">{tc('deleteModal.cancel')}</button>
+            <button onClick={() => { onConfirm(); onClose(); }} className="flex-1 py-3 sm:py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition min-h-[44px] order-1 sm:order-2">{tc('deleteModal.confirm')}</button>
           </div>
         </div>
       </div>
@@ -111,15 +113,16 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
       </div>
 
       <div className="flex gap-3 mb-4 sm:mb-8">
-        <Button size="md" className="sm:hidden" onClick={() => router.push(`/dashboard/editor?mode=${isEnt ? 'entreprise' : 'artisan'}`)}>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-          {t('newQuote')}
-        </Button>
-        <Button size="lg" className="hidden sm:inline-flex" onClick={() => router.push(`/dashboard/editor?mode=${isEnt ? 'entreprise' : 'artisan'}`)}>
+        <Button size="md" className="hidden sm:inline-flex" onClick={() => router.push(`/dashboard/editor?mode=${isEnt ? 'entreprise' : 'artisan'}`)}>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           {t('newQuote')}
         </Button>
       </div>
+      {/* Floating Action Button for mobile */}
+      <button onClick={() => router.push(`/dashboard/editor?mode=${isEnt ? 'entreprise' : 'artisan'}`)}
+        className="fixed sm:hidden bottom-6 right-6 z-40 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 active:bg-blue-800 transition active:scale-95">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+      </button>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-8">
         <Card className="p-3 sm:p-4">
@@ -206,24 +209,26 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
 
             <div className="md:hidden space-y-2">
               {filteredDocs.map((doc) => (
-                <div key={doc.id} className="bg-slate-50 rounded-xl p-3 cursor-pointer active:bg-slate-100 transition"
+                <div key={doc.id} className="bg-slate-50 rounded-xl p-3 cursor-pointer active:bg-slate-100 transition min-h-[72px]"
                   onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-800">{doc.number || '—'}</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-bold text-slate-800">{doc.number || '—'}</span>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${doc.status === 'DRAFT' ? 'bg-slate-200 text-slate-500' : doc.status === 'DELIVERED' ? 'bg-green-100 text-green-600' : doc.status === 'ACCEPTED' ? 'bg-blue-100 text-blue-600' : doc.status === 'PROGRESS' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
                       {tc(STATUS_LABELS[doc.status] || 'draft')}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${DOC_TYPE_COLORS[doc.type]?.bg || 'bg-slate-50'} ${DOC_TYPE_COLORS[doc.type]?.text || 'text-slate-500'} ${DOC_TYPE_COLORS[doc.type]?.border || 'border-slate-200'}`}>{TYPE_LABELS[doc.type] || doc.type}</span>
-                    <span className="font-bold text-slate-900">{doc.total} {tc('currency')}</span>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-md border ${DOC_TYPE_COLORS[doc.type]?.bg || 'bg-slate-50'} ${DOC_TYPE_COLORS[doc.type]?.text || 'text-slate-500'} ${DOC_TYPE_COLORS[doc.type]?.border || 'border-slate-200'}`}>{TYPE_LABELS[doc.type] || doc.type}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900">{doc.total} {tc('currency')}</span>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
+                        className="text-red-400 hover:text-red-600 text-xs font-bold min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-red-50 transition" title={tc('delete')}>✕</button>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-                    <span>{doc.client || '—'}</span>
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1.5">
+                    <span className="truncate max-w-[50%]">{doc.client || '—'}</span>
                     <span>{doc.date}</span>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
-                    className="text-red-400 hover:text-red-600 text-[10px] font-bold mt-1">{tc('delete')}</button>
                 </div>
               ))}
             </div>

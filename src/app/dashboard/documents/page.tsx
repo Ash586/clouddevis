@@ -324,7 +324,7 @@ export default function DocumentsPage() {
                 ) : docs.length === 0 ? (
                   <Card className="py-8 text-center text-slate-400">{t('noDocs')}</Card>
                 ) : docs.map(doc => (
-                  <Card key={doc.id} className="space-y-3">
+                  <Card key={doc.id} className="space-y-3 p-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="font-bold text-slate-900">{doc.number}</p>
@@ -343,13 +343,13 @@ export default function DocumentsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-400">{doc.date}</span>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                        <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
-                        <button onClick={() => handleDuplicate(doc.id)} className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition">
+                        <button onClick={() => handleDuplicate(doc.id)} className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
-                        <button onClick={() => setDeleteTarget(doc)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                        <button onClick={() => setDeleteTarget(doc)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>

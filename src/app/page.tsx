@@ -91,13 +91,14 @@ export default function HomePage() {
       )}
 
       {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowSuccess(false)} />
-          <div className="relative bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border animate-in">
+          <div className="relative bg-white sm:rounded-3xl rounded-t-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border animate-in sm:mx-4">
+            <div className="flex justify-center sm:hidden pt-1 pb-2"><div className="w-10 h-1 rounded-full bg-slate-300" /></div>
             <div className="w-14 h-14 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">✓</div>
-            <h3 className="text-2xl font-black text-slate-900">{t('successTitle')}</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900">{t('successTitle')}</h3>
             <p className="text-slate-500 text-sm mt-2 mb-6">{t('successBody')}</p>
-            <Button variant="outline" className="w-full" onClick={() => setShowSuccess(false)}>
+            <Button variant="outline" className="w-full min-h-[44px]" onClick={() => setShowSuccess(false)}>
                 {t('successContinue')}
               </Button>
           </div>
@@ -105,19 +106,20 @@ export default function HomePage() {
       )}
 
       {showPaywall && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPaywall(false)} />
-          <div className="relative bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border animate-in">
+          <div className="relative bg-white sm:rounded-3xl rounded-t-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border animate-in sm:mx-4">
+            <div className="flex justify-center sm:hidden pt-1 pb-2"><div className="w-10 h-1 rounded-full bg-slate-300" /></div>
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
             </div>
-            <h3 className="text-2xl font-black text-slate-900">{t('paywallTitle')}</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900">{t('paywallTitle')}</h3>
             <p className="text-slate-500 text-sm mt-2 mb-6">{t('paywallBody')}</p>
             <div className="space-y-3">
-              <Button className="w-full" onClick={() => { setShowPaywall(false); router.push('/auth/register'); }}>
+              <Button className="w-full min-h-[44px]" onClick={() => { setShowPaywall(false); router.push('/auth/register'); }}>
                 {t('paywallCTA')}
               </Button>
-              <Button variant="ghost" className="w-full" onClick={() => setShowPaywall(false)}>
+              <Button variant="ghost" className="w-full min-h-[44px]" onClick={() => setShowPaywall(false)}>
                 {t('paywallLater')}
               </Button>
             </div>

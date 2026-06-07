@@ -303,38 +303,38 @@ function EditorContent() {
       case 'prestations':
         return !hiddenFields.has('itemsTable') ? <CollapsibleSection title={te('sections.prestations')} sectionId="prestations" {...dragProps} {...s('table')}>
           {addingItem && <div className="bg-slate-50 p-2 rounded-xl border space-y-1.5">
-            <input type="text" placeholder={te('prestations.description')} className="w-full bg-white border p-1.5 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-blue-500" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
+            <input type="text" placeholder={te('prestations.description')} className="w-full bg-white border p-1.5 sm:p-2 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-blue-500" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
             <div className="grid grid-cols-5 gap-1.5 items-end">
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.qty')}</label>
-                <input type="number" className="w-full border p-1.5 rounded-lg text-[11px] bg-white text-center outline-none focus:ring-2 focus:ring-blue-500" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-white text-center outline-none focus:ring-2 focus:ring-blue-500" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.unitPrice')}</label>
-                <input type="number" className="w-full border p-1.5 rounded-lg text-[11px] bg-white text-right outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-white text-right outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.unit')}</label>
-                <select className="w-full border p-1.5 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as any }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as any }))}>
                   {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}</select></div>
               <div><label className="block text-[9px] font-bold text-slate-400">{te('prestations.category')}</label>
-                <select className="w-full border p-1.5 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-white outline-none focus:ring-2 focus:ring-blue-500" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
                   <option value="">{te('prestations.noCategory')}</option>
                   {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
               <div className="flex justify-center gap-1">
-                <button onClick={handleAddItem} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-green-700">✓</button>
-                <button onClick={() => setAddingItem(false)} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-red-600">✕</button></div>
+                <button onClick={handleAddItem} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-green-700 disabled:opacity-50">✓</button>
+                <button onClick={() => setAddingItem(false)} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-red-600">✕</button></div>
             </div>
           </div>}
           {doc.items.map((item, idx) => (
-            <div key={item.id} className="bg-slate-50 p-2 rounded-xl border space-y-1.5">
+            <div key={item.id} className="bg-slate-50 p-2 sm:p-3 rounded-xl border space-y-1.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 flex-1 min-w-0">
                   <div className="flex flex-col gap-0.5">
-                    <button onClick={() => { if (idx > 0) moveItem(idx, idx - 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 leading-none p-0.5">▲</button>
-                    <button onClick={() => { if (idx < doc.items.length - 1) moveItem(idx, idx + 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 leading-none p-0.5">▼</button>
+                    <button onClick={() => { if (idx > 0) moveItem(idx, idx - 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 p-1 min-w-[28px] flex justify-center">▲</button>
+                    <button onClick={() => { if (idx < doc.items.length - 1) moveItem(idx, idx + 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 p-1 min-w-[28px] flex justify-center">▼</button>
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="text-[11px] font-medium text-slate-800 truncate block">{item.designation}</span>
                     {item.category && <span className="text-[8px] text-slate-400 uppercase">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? 'preview.categories.none')}</span>}
                   </div>
                 </div>
-                <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1">✕</button>
+                <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1 min-h-[36px] min-w-[36px] flex items-center justify-center">✕</button>
               </div>
               <div className="grid grid-cols-5 gap-1.5 text-[10px] text-slate-600">
                 <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
@@ -345,7 +345,7 @@ function EditorContent() {
               </div>
             </div>
           ))}
-          {!addingItem && <button onClick={startNewItem} className="w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[11px]">{te('prestations.addLine')}</button>}
+          {!addingItem && <button onClick={startNewItem} className="w-full py-3 sm:py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>}
         </CollapsibleSection> : null;
 
       case 'remise':
@@ -442,36 +442,35 @@ function EditorContent() {
       <TrialGate>
       <div className="min-h-screen bg-slate-100 text-slate-900 font-sans print:bg-white">
         {/* ─── EDITOR TOP BAR ─── */}
-        <div className="no-print flex flex-wrap justify-between items-center py-1.5 px-2 sm:px-3 bg-white border-b sticky top-0 z-50 shadow-sm gap-1 sm:gap-2">
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
+        <div className="no-print flex flex-wrap items-center py-1.5 px-2 sm:px-3 bg-white border-b sticky top-0 z-50 shadow-sm gap-1">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap flex-1 min-w-0">
             {/* Breadcrumb */}
             <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-400">
               <button onClick={() => router.push('/dashboard')} className="hover:text-blue-600 transition font-medium">{tc('dashboard') || 'Dashboard'}</button>
               <span>/</span>
-              <span className="text-slate-600 font-bold">{doc.documentType === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}</span>
-              {doc.documentNumber && <><span>/</span><span className="text-slate-500">{doc.documentNumber}</span></>}
+              <span className="text-slate-600 font-bold truncate max-w-[80px] sm:max-w-none">{doc.documentType === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}</span>
             </nav>
             <div className="flex gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
               {['facture', 'devis'].map((t) => (
                 <button key={t} onClick={() => updateDoc('documentType', t as any)}
-                  className={cn('px-2 sm:px-3 py-1 text-[9px] sm:text-[11px] font-black rounded-md uppercase tracking-wider transition-all duration-200', doc.documentType === t ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800')}>
+                  className={cn('px-2 sm:px-3 py-1.5 text-[9px] sm:text-[11px] font-black rounded-md uppercase tracking-wider transition-all duration-200 min-w-[44px]', doc.documentType === t ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800')}>
                   {t === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}
                 </button>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {!docIdParam && <button onClick={() => setShowCustomizer(true)} className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 px-1.5 sm:px-2 py-1 rounded-lg transition">
-              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            {!docIdParam && <button onClick={() => setShowCustomizer(true)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 w-8 h-8 sm:w-auto sm:px-2 rounded-lg transition" title={te('customize')}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
               <span className="hidden sm:inline">{te('customize')}</span>
             </button>}
-            <button onClick={() => setAllExpanded(prev => prev === true ? null : true)} className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-1.5 sm:px-2 py-1 rounded-lg transition" title={allExpanded === true ? te('collapseAll') || 'Collapse all' : te('expandAll') || 'Expand all'}>
-              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={allExpanded === true ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} /></svg>
+            <button onClick={() => setAllExpanded(prev => prev === true ? null : true)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 w-8 h-8 sm:w-auto sm:px-2 rounded-lg transition" title={allExpanded === true ? te('collapseAll') || 'Collapse all' : te('expandAll') || 'Expand all'}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={allExpanded === true ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} /></svg>
               <span className="hidden sm:inline">{allExpanded === true ? te('collapseAll') || 'Collapse' : te('expandAll') || 'Expand'}</span>
             </button>
-            {docIdParam && <span className="text-[9px] sm:text-[10px] text-green-600 font-medium bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full">{te('editMode')}</span>}
-            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving}>{saving ? te('saving') : tc('save')}</Button>
-            <Button size="sm" onClick={handleDownload} disabled={saving}>{te('downloadPdf')}</Button>
+            {docIdParam && <span className="text-[9px] sm:text-[10px] text-green-600 font-medium bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full hidden sm:inline">{te('editMode')}</span>}
+            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">{saving ? te('saving') : tc('save')}</Button>
+            <Button size="sm" onClick={handleDownload} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">{te('downloadPdf')}</Button>
           </div>
         </div>
 
