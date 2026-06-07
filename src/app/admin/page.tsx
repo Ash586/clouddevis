@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import {
   Users, FileText, Coins, Eye, CreditCard, Hourglass, AlertTriangle,
-  TrendingUp, TrendingDown, ArrowUpRight,
+  TrendingUp, TrendingDown,
 } from 'lucide-react';
 
 interface DashboardData {
@@ -20,97 +20,115 @@ interface DashboardData {
     activeBasicUsers: number;
     activeProUsers: number;
   };
-  docTypeBreakdown: { type: string; count: number }[];
   recentUsers: { id: string; name: string; email: string; country: string; subscription: string; mode: string; createdAt: string }[];
-  visitors?: { totalPageViews: number; uniqueSessions: number; countryBreakdown: { country: string; count: number }[] };
-  activityLogs?: { action: string; entity: string; details: string; adminName: string; userName: string; createdAt: string; ipAddress: string }[];
+}
+
+interface AnalyticsData {
+  countryBreakdown: { country: string; count: number }[];
+  visitorStats: { totalPageViews: number; uniqueSessions: number };
+}
+
+interface LogsData {
+  logs: { action: string; entity: string; details: string; adminName: string; userName: string; createdAt: string; ipAddress: string }[];
+}
+
+interface SystemData {
+  counts: { users: number; documents: number; clients: number; admins: number };
+  activity: { errorCount: number; loginCount: number };
 }
 
 export default function AdminDashboardPage() {
   const t = useTranslations('admin');
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [dashData, setDashData] = useState<DashboardData | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [logsData, setLogsData] = useState<LogsData | null>(null);
+  const [systemData, setSystemData] = useState<SystemData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/admin/dashboard').then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch('/api/admin/analytics').then(r => r.ok ? r.json() : null).catch(() => null),
-      fetch('/api/admin/logs?limit=5').then(r => r.ok ? r.json() : null).catch(() => null),
-    ])
-      .then(([dashboard, analytics, logs]) => {
-        setData({
-          ...dashboard,
-          visitors: analytics?.visitorStats ? {
-            totalPageViews: analytics.visitorStats.totalPageViews,
-            uniqueSessions: analytics.visitorStats.uniqueSessions,
-            countryBreakdown: analytics.countryBreakdown || [],
-          } : undefined,
-          activityLogs: logs?.logs || [],
-        });
-      })
+    fetch('/api/admin/dashboard')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setDashData(d))
+      .catch(() => {});
+
+    fetch('/api/admin/analytics')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setAnalyticsData(d))
+      .catch(() => {});
+
+    fetch('/api/admin/logs?limit=5')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setLogsData(d))
+      .catch(() => {});
+
+    fetch('/api/admin/system')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setSystemData(d))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
 
-  if (!data) return <div className="text-center py-20 text-slate-400">{t('error')}</div>;
+  if (!dashData) return <div className="text-center py-20 text-slate-400">{t('error')}</div>;
 
-  const totalActive = data.stats.activeBasicUsers + data.stats.activeProUsers;
-  const totalSubs = totalActive + data.stats.activeTrialUsers;
+  const { stats, recentUsers } = dashData;
+  const totalActive = stats.activeBasicUsers + stats.activeProUsers;
+  const totalSubs = totalActive + stats.activeTrialUsers;
   const conversionRate = totalSubs > 0 ? Math.round((totalActive / totalSubs) * 100) : 0;
+  const errorCount = systemData?.activity?.errorCount ?? 0;
 
   const mainKpis = [
     {
       label: 'Utilisateurs',
-      value: data.stats.totalUsers.toLocaleString(),
-      sub: `+${data.stats.newUsersThisMonth} ce mois`,
+      value: stats.totalUsers.toLocaleString(),
+      sub: `+${stats.newUsersThisMonth} ce mois`,
       icon: Users,
-      trend: 'up',
+      trend: 'up' as const,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
     },
     {
       label: 'Documents',
-      value: data.stats.totalDocs.toLocaleString(),
-      sub: `+${data.stats.docsThisMonth} ce mois`,
+      value: stats.totalDocs.toLocaleString(),
+      sub: `+${stats.docsThisMonth} ce mois`,
       icon: FileText,
-      trend: 'up',
+      trend: 'up' as const,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
     },
     {
-      label: 'Revenus',
-      value: `${(data.stats.activeProUsers * 2000 + data.stats.activeBasicUsers * 1000).toLocaleString()} DA`,
-      sub: 'MRR estimé',
+      label: 'Revenus (MRR)',
+      value: `${(stats.activeProUsers * 2000 + stats.activeBasicUsers * 1000).toLocaleString()} DA`,
+      sub: `${conversionRate}% taux conversion`,
       icon: Coins,
-      trend: 'up',
+      trend: 'up' as const,
       color: 'text-amber-600',
       bg: 'bg-amber-50',
     },
     {
       label: 'Visiteurs',
-      value: data.visitors?.totalPageViews?.toLocaleString() || '0',
-      sub: `${data.visitors?.uniqueSessions || 0} sessions`,
+      value: (analyticsData?.visitorStats?.totalPageViews ?? 0).toLocaleString(),
+      sub: `${analyticsData?.visitorStats?.uniqueSessions ?? 0} sessions`,
       icon: Eye,
-      trend: data.visitors && data.visitors.totalPageViews > 0 ? 'stable' : 'down',
+      trend: 'stable',
       color: 'text-purple-600',
       bg: 'bg-purple-50',
     },
-  ];
+  ] as { label: string; value: string; sub: string; icon: typeof Users; trend: 'up' | 'down' | 'stable'; color: string; bg: string }[];
 
   const subKpis = [
     {
       label: 'Abonnements actifs',
       value: totalActive.toLocaleString(),
-      sub: `${conversionRate}% taux conv.`,
+      sub: `${stats.activeProUsers} Pro · ${stats.activeBasicUsers} Basic`,
       icon: CreditCard,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
     },
     {
       label: 'En période d\'essai',
-      value: data.stats.activeTrialUsers.toLocaleString(),
+      value: stats.activeTrialUsers.toLocaleString(),
       sub: '14 jours moy.',
       icon: Hourglass,
       color: 'text-amber-600',
@@ -118,15 +136,15 @@ export default function AdminDashboardPage() {
     },
     {
       label: 'Erreurs système',
-      value: '0',
-      sub: 'Aucune erreur',
+      value: String(errorCount),
+      sub: errorCount === 0 ? 'Aucune erreur' : `${errorCount} à investiguer`,
       icon: AlertTriangle,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
+      color: errorCount > 0 ? 'text-red-600' : 'text-emerald-600',
+      bg: errorCount > 0 ? 'bg-red-50' : 'bg-emerald-50',
     },
   ];
 
-  const countryData = data.visitors?.countryBreakdown || [];
+  const countryData = analyticsData?.countryBreakdown || [];
   const totalCountryViews = countryData.reduce((sum, c) => sum + c.count, 0) || 1;
 
   const countryColors: Record<string, string> = {
@@ -181,9 +199,7 @@ export default function AdminDashboardPage() {
 
       {/* Geographic Distribution */}
       <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-          🌍 Distribution géographique des visiteurs
-        </h2>
+        <h2 className="text-sm font-bold text-slate-900 mb-4">🌍 Distribution géographique des visiteurs</h2>
         {countryData.length > 0 ? (
           <div className="space-y-3">
             {countryData.slice(0, 6).map(c => {
@@ -207,11 +223,9 @@ export default function AdminDashboardPage() {
 
       {/* Recent Users */}
       <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-          👥 Utilisateurs récents
-        </h2>
+        <h2 className="text-sm font-bold text-slate-900 mb-4">👥 Utilisateurs récents</h2>
         <div className="space-y-1">
-          {data.recentUsers.slice(0, 5).map(u => {
+          {recentUsers.slice(0, 5).map(u => {
             const initials = u.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const avatarColors = ['bg-blue-100 text-blue-600', 'bg-emerald-100 text-emerald-600', 'bg-amber-100 text-amber-600', 'bg-purple-100 text-purple-600', 'bg-red-100 text-red-600'];
             const colorIdx = u.name.charCodeAt(0) % avatarColors.length;
@@ -243,14 +257,11 @@ export default function AdminDashboardPage() {
 
       {/* System Activity */}
       <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-          📋 Activité système récente
-        </h2>
-        {data.activityLogs && data.activityLogs.length > 0 ? (
+        <h2 className="text-sm font-bold text-slate-900 mb-4">📋 Activité système récente</h2>
+        {logsData && logsData.logs.length > 0 ? (
           <div className="space-y-1">
-            {data.activityLogs.map((log, i) => {
+            {logsData.logs.map((log, i) => {
               const dotColor = logColors[log.action] || 'bg-slate-400';
-              const details = log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : '';
               const actor = log.adminName || log.userName || 'Système';
               return (
                 <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
@@ -258,10 +269,12 @@ export default function AdminDashboardPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-slate-600">
                       <span className="font-semibold">{log.action}</span> sur <span className="font-semibold">{log.entity}</span>
-                      {log.ipAddress && <span className="text-slate-400 ml-1">({log.ipAddress})</span>}
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">{actor}</p>
                   </div>
+                  <span className="text-xs text-slate-400 flex-shrink-0">
+                    {new Date(log.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
               );
             })}
