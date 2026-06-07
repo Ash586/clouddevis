@@ -2,8 +2,15 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'clouddevis-dev-secret-key-change-in-production');
 const COOKIE_NAME = 'session';
+
+/** Lazy getter for JWT secret – only throws when actually used (safe at build time). */
+function getSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 
 export interface SessionUser {
   userId: string;
@@ -41,13 +48,13 @@ export async function createSession(user: { id: string; email: string; name: str
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(expiry)
     .setIssuedAt()
-    .sign(SECRET);
+    .sign(getSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge,
     path: '/',
   });
@@ -61,7 +68,7 @@ export async function getSession(): Promise<SessionUser | null> {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return {
       userId: payload.userId as string,
       email: payload.email as string,
@@ -80,4 +87,30 @@ export async function getSession(): Promise<SessionUser | null> {
 export async function clearSession() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
+}
+
+/** Get session and verify user is not suspended. Returns null if suspended. */
+export async function getActiveSession(): Promise<SessionUser | null> {
+  const session = await getSession();
+  if (!session) return null;
+
+  // Dynamic import to avoid edge-compat issues in proxy context
+  const { prisma } = await import('@/lib/prisma');
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { suspended: true },
+  });
+
+  if (user?.suspended) return null;
+  return session;
+}
+
+/** Check if a user is suspended by ID */
+export async function isUserSuspended(userId: string): Promise<boolean> {
+  const { prisma } = await import('@/lib/prisma');
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { suspended: true },
+  });
+  return user?.suspended ?? false;
 }

@@ -31,22 +31,20 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
-
-# nested remnants
-clouddevis/
-
-# generated guides
-git-guide.html
-
-# server logs
-server.log
+.env
+.env.local
+.env.development
+.env.production
 
 # vercel
 .vercel
+
+# logs
+server.log
+*.log
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+.env.vercel

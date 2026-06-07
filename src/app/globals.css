@@ -17,26 +17,70 @@
   --color-slate-700: #334155;
   --color-slate-800: #1e293b;
   --color-slate-900: #0f172a;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+}
+
+/* Theming CSS variables */
+:root {
+  --cd-primary: 37 99 235;        /* blue-600 */
+  --cd-primary-hover: 29 78 216;  /* blue-700 */
+  --cd-surface: 248 250 252;      /* slate-50 */
+  --cd-surface-card: 255 255 255; /* white */
+  --cd-text: 15 23 42;            /* slate-900 */
+  --cd-text-secondary: 100 116 139; /* slate-500 */
+  --cd-border: 226 232 240;       /* slate-200 */
+  --cd-success: 16 185 129;       /* emerald-500 */
+  --cd-warning: 245 158 11;       /* amber-500 */
+  --cd-danger: 239 68 68;         /* red-500 */
+  --cd-radius: 0.75rem;
+  --cd-radius-lg: 1rem;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(var(--cd-surface));
+  color: rgb(var(--cd-text));
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @keyframes fade-in {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@starting-style {
+  @keyframes fade-in { from { opacity: 0; transform: scale(0.95); } }
+  @keyframes slide-in { from { opacity: 0; transform: translateY(-8px); } }
+}
 .animate-in {
   animation: fade-in 0.2s ease-out;
 }
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
 
-/* Print styles for document preview */
+/* Print styles */
 @media print {
   .no-print { display: none !important; }
   body { background: white !important; }
+  nav, aside, .no-print { display: none !important; }
   .preview-container {
     box-shadow: none !important;
     border: none !important;
@@ -52,7 +96,6 @@ body {
   }
 }
 
-/* Force consistent A4 text rendering */
 .preview-container {
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;

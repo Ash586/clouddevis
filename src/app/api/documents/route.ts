@@ -1,83 +1,123 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { calculateDocument } from '@/lib/calculations';
+import { logger } from '@/lib/logger';
 
-const DOC_TYPE_MAP: Record<string, string> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
+export async function GET(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
 
-export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get('search') || '';
+    const type = searchParams.get('type') || '';
+    const status = searchParams.get('status') || '';
+    const from = searchParams.get('from') || '';
+    const to = searchParams.get('to') || '';
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20')));
+    const skip = (page - 1) * limit;
+
+    const where: Record<string, unknown> = { userId: session.userId };
+    if (search) {
+      where.OR = [
+        { number: { contains: search, mode: 'insensitive' } },
+        { notes: { contains: search, mode: 'insensitive' } },
+        { client: { name: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+    if (type) {
+      const validTypes = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE'];
+      const upperType = type.toUpperCase();
+      if (validTypes.includes(upperType)) where.type = upperType;
+    }
+    if (status) {
+      const validStatuses = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
+      const upperStatus = status.toUpperCase();
+      if (validStatuses.includes(upperStatus)) where.status = upperStatus;
+    }
+    if (from || to) {
+      const dateFilter: Record<string, Date> = {};
+      if (from && !isNaN(new Date(from).getTime())) dateFilter.gte = new Date(from);
+      if (to && !isNaN(new Date(to).getTime())) dateFilter.lte = new Date(to + 'T23:59:59');
+      if (Object.keys(dateFilter).length > 0) where.createdAt = dateFilter;
+    }
+
+    const [docs, total, statusGroup, typeGroup] = await Promise.all([
+      prisma.document.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: { client: { select: { name: true } } },
+      }),
+      prisma.document.count({ where }),
+      prisma.document.groupBy({
+        by: ['status'],
+        where: { userId: session.userId },
+        _count: { status: true },
+      }),
+      prisma.document.groupBy({
+        by: ['type'],
+        where: { userId: session.userId },
+        _count: { type: true },
+        _sum: { totalTTC: true },
+      }),
+    ]);
+
+    const statusBreakdown: Record<string, number> = {};
+    for (const row of statusGroup) statusBreakdown[row.status] = row._count.status;
+
+    const typeBreakdown: Record<string, { count: number; total: number }> = {};
+    for (const row of typeGroup) {
+      typeBreakdown[row.type] = { count: row._count.type, total: row._sum.totalTTC || 0 };
+    }
+
+    return NextResponse.json({
+      documents: docs.map(d => ({
+        id: d.id, number: d.number, type: d.type, status: d.status,
+        client: d.client?.name || '',
+        total: d.totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        date: d.date.toISOString().split('T')[0],
+        createdAt: d.createdAt.toISOString().split('T')[0],
+      })),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      statusBreakdown,
+      typeBreakdown,
+    });
+  } catch (error) {
+    logger.error('GET /api/documents error', { error: String(error) });
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
-
-  const docs = await prisma.document.findMany({
-    where: { userId: session.userId },
-    orderBy: { createdAt: 'desc' },
-    take: 20,
-    include: { client: { select: { name: true } } },
-  });
-
-  const mapped = docs.map((d: { id: string; number: string; type: string; client: { name: string } | null; totalTTC: number; date: Date; status: string }) => ({
-    id: d.id,
-    number: d.number,
-    type: d.type,
-    client: d.client?.name || '',
-    total: d.totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    date: d.date.toISOString().split('T')[0],
-    status: d.status,
-  }));
-
-  return NextResponse.json({ documents: mapped });
 }
 
-export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+const VALID_STATUSES = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
+
+export async function PATCH(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+    const body = await req.json();
+    const { id, status } = body;
+    if (!id || !status) return NextResponse.json({ error: 'id and status required' }, { status: 400 });
+
+    const upperStatus = String(status).toUpperCase();
+    if (!VALID_STATUSES.includes(upperStatus)) {
+      return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
+    }
+
+    const doc = await prisma.document.findFirst({ where: { id, userId: session.userId } });
+    if (!doc) return NextResponse.json({ error: 'Document non trouvé' }, { status: 404 });
+
+    const updated = await prisma.document.update({
+      where: { id },
+      data: { status: upperStatus as 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' },
+    });
+
+    return NextResponse.json({ id: updated.id, status: updated.status });
+  } catch (error) {
+    logger.error('PATCH /api/documents error', { error: String(error) });
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
-
-  const body = await req.json();
-  const doc = body as Record<string, any>;
-
-  const items = (doc.items || []).map((i: any) => ({
-    id: i.id,
-    designation: i.designation,
-    quantity: i.quantity,
-    unit: i.unit,
-    unitPrice: i.unitPrice,
-    category: i.category || null,
-  }));
-
-  const result = calculateDocument({
-    items,
-    tvaRate: doc.tvaRate || 0,
-    discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
-    stampDuty: doc.stampDuty || { rate: 1, minAmount: 5, maxAmount: 2500 },
-    paymentMode: doc.paymentMode || 'cheque',
-    acompte: doc.acompte || 0,
-  } as unknown as import('@/types').DocumentState);
-
-  const created = await prisma.document.create({
-    data: {
-      userId: session.userId,
-      type: (DOC_TYPE_MAP[doc.documentType] || 'DEVIS') as any,
-      status: 'DRAFT' as any,
-      number: doc.documentNumber || '',
-      date: doc.date ? new Date(doc.date) : new Date(),
-      mode: (doc.mode?.toUpperCase?.() || 'ARTISAN') as any,
-      paymentMode: doc.paymentMode || 'cheque',
-      items: JSON.stringify(items),
-      customFields: JSON.stringify(doc.customFields || {}),
-      subTotalHT: result.subTotalHT,
-      tvaAmount: result.tvaAmount,
-      timbreFiscal: result.timbreFiscal,
-      totalTTC: result.totalTTC,
-      acompte: doc.acompte || 0,
-      netAPayer: result.netAPayer,
-      totalInWords: result.totalInWords,
-      notes: doc.notes || null,
-    },
-  });
-  return NextResponse.json({ id: created.id, number: created.number }, { status: 201 });
 }

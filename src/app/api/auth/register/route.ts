@@ -1,21 +1,24 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, createSession } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rateLimit';
+import { validateAuthInput } from '@/lib/validation';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, mode, sector, country, language, companyInfo } = await req.json();
-
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
+    const body = await req.json();
+    const validation = validateAuthInput(body, 'register');
+    if (!validation.valid) {
+      return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
 
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      return NextResponse.json({ error: 'Email invalide' }, { status: 400 });
-    }
+    const { name, email, password, mode, sector, country, language, companyInfo } = body;
 
-    if (password.length < 6) {
-      return NextResponse.json({ error: 'Mot de passe trop court (min 6 caractères)' }, { status: 400 });
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateCheck = checkRateLimit(`register:${ip}`, 3, 60000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -34,8 +37,9 @@ export async function POST(req: Request) {
         country: country || 'algeria',
         language: language || 'fr',
         subscriptionStatus: 'TRIAL',
+        trialStartAt: new Date(),
         companyInfo: companyInfo || undefined,
-        settings: { defaultTaxRegime: mode === 'artisan' ? 'tva_0' : 'tva_19', defaultDocType: 'devis' },
+        settings: { defaultTaxRegime: 'tva_19', defaultDocType: 'devis' },
       },
     });
 
@@ -43,7 +47,7 @@ export async function POST(req: Request) {
       id: user.id,
       email: user.email,
       name: user.name,
-      mode: user.mode.toLowerCase(),
+      mode: user.mode?.toLowerCase() || 'artisan',
       sector: user.sector,
       country: user.country,
       language: user.language,
@@ -52,7 +56,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
-    console.error('Register error:', error);
+    logger.error('Register error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }

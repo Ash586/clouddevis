@@ -43,8 +43,8 @@ function ResetForm() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-        <Card className="w-full max-w-sm p-8 text-center">
-          <div className="text-5xl mb-4">🔗</div>
+        <Card className="w-full max-w-sm p-6 sm:p-8 text-center">
+          <div className="text-4xl sm:text-5xl mb-4">🔗</div>
           <h1 className="text-lg font-bold text-slate-800 mb-2">{t('resetInvalid')}</h1>
           <p className="text-sm text-slate-500">{t('resetInvalidDesc')}</p>
           <a href="/auth/forgot-password" className="block text-xs text-blue-600 font-semibold mt-6 hover:underline">
@@ -58,8 +58,8 @@ function ResetForm() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-        <Card className="w-full max-w-sm p-8 text-center">
-          <div className="text-5xl mb-4">✅</div>
+        <Card className="w-full max-w-sm p-6 sm:p-8 text-center">
+          <div className="text-4xl sm:text-5xl mb-4">✅</div>
           <h1 className="text-lg font-bold text-slate-800 mb-2">{t('resetSuccess')}</h1>
           <p className="text-sm text-slate-500">{t('resetRedirect')}</p>
         </Card>
@@ -69,9 +69,9 @@ function ResetForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <Card className="w-full max-w-sm p-8">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🔐</div>
+      <Card className="w-full max-w-sm p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="text-4xl sm:text-5xl mb-4">🔐</div>
           <h1 className="text-lg font-bold text-slate-800">{t('resetTitle')}</h1>
           <p className="text-sm text-slate-500 mt-1">{t('resetSubtitle')}</p>
         </div>
@@ -87,7 +87,7 @@ function ResetForm() {
           <Input label={t('confirmPassword')} type="password" value={confirm}
             onChange={(e) => setConfirm(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={6} />
 
-          <Button className="w-full" type="submit">{t('resetButton')}</Button>
+          <Button className="w-full py-2 sm:py-2.5" type="submit">{t('resetButton')}</Button>
         </form>
       </Card>
     </div>

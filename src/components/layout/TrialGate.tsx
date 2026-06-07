@@ -1,24 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Modal } from '@/components/ui/modal';
+import { useUser } from '@/hooks/useUser';
 
 export function TrialGate({ children }: { children: React.ReactNode }) {
   const t = useTranslations('trial');
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useUser();
   const [showUpgrade, setShowUpgrade] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => setUser(data?.user ?? null))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) return null;
 
@@ -34,11 +26,16 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
     <>
       {isTrialActive ? (
         <div>
-          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center">
-            <span className="text-xs font-medium text-amber-700">
-              {t('trialBanner')}&ensp;
-              <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{t('subscribe')}</button>
-            </span>
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2">
+            <div className="max-w-4xl mx-auto flex items-center gap-3">
+              <span className="text-xs font-medium text-amber-700">
+                {t('trialBanner')}&ensp;
+                <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{t('subscribe')}</button>
+              </span>
+              <div className="flex-1 h-1.5 bg-amber-100 rounded-full overflow-hidden max-w-[120px]">
+                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style={{ width: '50%' }} />
+              </div>
+            </div>
           </div>
           {children}
         </div>

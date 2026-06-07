@@ -47,6 +47,8 @@ model User {
   subscriptionStatus SubscriptionStatus @default(TRIAL)
   trialStartAt      DateTime?
   subscriptionEndAt DateTime?
+  suspended         Boolean          @default(false)
+  suspendedAt       DateTime?
   companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature }
   settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
   createdAt         DateTime           @default(now())
@@ -57,7 +59,14 @@ model User {
   resetTokens       PasswordResetToken[]
   clients           Client[]
   documents         Document[]
+  templates         Template[]
   backups           Backup[]
+  activityLogs      ActivityLog[]
+  notifications     Notification[]
+  ownedTeams        Team[]              @relation("TeamOwner")
+  teamMembers       TeamMember[]
+  receivedShares    DocumentShare[]     @relation("SharedWithUser")
+  recurringInvoices RecurringInvoice[]
 }
 
 model Account {
@@ -72,6 +81,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -80,6 +90,7 @@ model Session {
   expiresAt DateTime
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 model PasswordResetToken {
@@ -91,6 +102,8 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Client {
@@ -111,6 +124,8 @@ model Client {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents Document[]
+  @@index([userId])
+  @@index([name])
 }
 
 model Document {
@@ -142,21 +157,255 @@ model Document {
   signature     String?
   bcRef         String?        // Lien vers Bon de Commande
   brRef         String?        // Lien vers Bon de Réception
+  teamId        String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   client        Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  team          Team?          @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  shares        DocumentShare[]
+  @@index([userId])
+  @@index([clientId])
+  @@index([type])
+  @@index([status])
+  @@index([number])
+  @@index([createdAt])
+}
+
+model Template {
+  id           String       @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  documentType DocumentType @default(DEVIS)
+  mode         UserMode     @default(ARTISAN)
+  items        Json         @default("[]")
+  customFields Json         @default("{}")
+  settings     Json         @default("{}")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }
 
 model Backup {
   id        String   @id @default(cuid())
   userId    String
-  type      String   @default("auto") // auto / manual
+  type      String   @default("auto")
   fileUrl   String?
   size      Int?
   status    String   @default("pending")
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum AdminRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+model Admin {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String    @default("Admin")
+  role            AdminRole @default(ADMIN)
+  permissions     String[]  @default([])
+  lastLogin       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  activityLogs    ActivityLog[]
+
+  @@index([email])
+}
+
+model ActivityLog {
+  id              String   @id @default(cuid())
+  adminId         String?
+  userId          String?
+  action          String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity          String   // USER, DOCUMENT, SUBSCRIPTION, SYSTEM
+  entityId        String?
+  details         Json?
+  ipAddress       String?
+  createdAt       DateTime @default(now())
+
+  admin           Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([adminId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model SystemMetric {
+  id              String   @id @default(cuid())
+  timestamp       DateTime @default(now())
+  totalUsers      Int      @default(0)
+  activeUsers     Int      @default(0)
+  totalDocuments  Int      @default(0)
+  totalRevenue    Float    @default(0)
+  dbSize          Float    @default(0)
+  uptime          Int      @default(0)
+
+  @@index([timestamp])
+}
+
+enum TeamMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ERROR
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType @default(INFO)
+  title     String
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  country   String   @default("unknown")
+  locale    String   @default("fr")
+  sessionId String?
+  userId    String?
+  timestamp DateTime @default(now())
+
+  @@index([path])
+  @@index([timestamp])
+  @@index([country])
+  @@index([sessionId])
+}
+
+model Team {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  ownerId   String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  owner     User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+  invites   TeamInvite[]
+  documents Document[]
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model TeamMember {
+  id        String         @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamMemberRole @default(MEMBER)
+  createdAt DateTime       @default(now())
+
+  team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model TeamInvite {
+  id        String       @id @default(cuid())
+  teamId    String
+  email     String
+  token     String       @unique
+  role      TeamMemberRole @default(MEMBER)
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  expiresAt DateTime
+
+  team      Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([email])
+  @@index([token])
+}
+
+model DocumentShare {
+  id              String           @id @default(cuid())
+  documentId      String
+  sharedWithId    String
+  permission      SharePermission  @default(VIEW)
+  createdAt       DateTime         @default(now())
+
+  document        Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  sharedWith      User             @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, sharedWithId])
+  @@index([documentId])
+  @@index([sharedWithId])
+}
+
+model RecurringInvoice {
+  id            String              @id @default(cuid())
+  userId        String
+  name          String
+  documentType  DocumentType        @default(DEVIS)
+  frequency     RecurringFrequency  @default(MONTHLY)
+  nextDate      DateTime
+  lastGenerated DateTime?
+  active        Boolean             @default(true)
+  template      Json                @default("{}")   // { items, clientInfo, ... }
+  settings      Json                @default("{}")   // { emailOnGenerate, autoSend, ... }
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([nextDate])
+  @@index([active])
 }

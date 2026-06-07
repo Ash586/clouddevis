@@ -1,3 +1,3 @@
 @echo off
-cd /d "X:\clouddevis"
-npx next dev --hostname 0.0.0.0 > "X:\clouddevis\server.log" 2>&1
+cd /d "C:\Users\Chahine\Documents\cd"
+npx next dev --hostname 0.0.0.0 > "C:\Users\Chahine\Documents\cd\server.log" 2>&1
