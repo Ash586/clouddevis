@@ -13,10 +13,6 @@ interface User {
   suspended: boolean;
 }
 
-interface SuspendedUser extends User {
-  suspended: true;
-}
-
 export default function AdminUsersPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
@@ -105,7 +101,7 @@ export default function AdminUsersPage() {
           </button>
           {row.suspended ? (
             <button
-              onClick={() => { setActionUser(row as User); setActionType('unsuspend'); }}
+              onClick={() => { setActionUser({ id: String(row.id), name: String(row.name), email: String(row.email), country: String(row.country), mode: String(row.mode), subscription: String(row.subscription), docCount: Number(row.docCount), clientCount: Number(row.clientCount), createdAt: String(row.createdAt), suspended: true }); setActionType('unsuspend'); }}
               className="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition"
               title={t('users.unsuspend')}
             >
@@ -113,7 +109,7 @@ export default function AdminUsersPage() {
             </button>
           ) : (
             <button
-              onClick={() => { setActionUser(row as User); setActionType('suspend'); }}
+              onClick={() => { setActionUser({ id: String(row.id), name: String(row.name), email: String(row.email), country: String(row.country), mode: String(row.mode), subscription: String(row.subscription), docCount: Number(row.docCount), clientCount: Number(row.clientCount), createdAt: String(row.createdAt), suspended: false }); setActionType('suspend'); }}
               className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition"
               title={t('users.suspend')}
             >

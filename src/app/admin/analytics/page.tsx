@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { MobileTable } from '@/components/mobile/MobileTable';
 import {
   TrendingUp, Users, FileText, Globe,
-  BarChart3, PieChart, Activity,
+  BarChart3, Activity, Eye, MousePointerClick,
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -16,6 +16,9 @@ interface AnalyticsData {
   topUsers: { id: string; name: string; email: string; docCount: number }[];
   systemMetrics: { date: string; users: number; docs: number; revenue: number }[];
   docStatusBreakdown: { status: string; count: number }[];
+  visitorStats: { totalPageViews: number; uniqueSessions: number; avgPageViewsPerSession: number };
+  topPages: { path: string; count: number }[];
+  conversion: { totalUsersInPeriod: number; paidUsersInPeriod: number; conversionRate: number };
   period: string;
 }
 
@@ -47,12 +50,12 @@ export default function AdminAnalyticsPage() {
   const totalUsersGrowth = data.userGrowth.reduce((s, d) => s + d.count, 0);
   const totalDocsCreated = data.docTrend.reduce((s, d) => s + d.count, 0);
   const totalRevenue = data.docTrend.reduce((s, d) => s + d.revenue, 0);
-  const avgDailyUsers = data.userGrowth.length ? Math.round(totalUsersGrowth / data.userGrowth.length) : 0;
   const avgDailyDocs = data.docTrend.length ? Math.round(totalDocsCreated / data.docTrend.length) : 0;
 
   const maxUserCount = Math.max(...data.userGrowth.map(d => d.count), 1);
   const maxDocCount = Math.max(...data.docTrend.map(d => d.count), 1);
   const maxCountryCount = Math.max(...data.countryBreakdown.map(c => c.count), 1);
+  const maxPageCount = Math.max(...data.topPages.map(p => p.count), 1);
 
   const statusColors: Record<string, string> = {
     DRAFT: 'bg-amber-50 text-amber-600',
@@ -105,6 +108,30 @@ export default function AdminAnalyticsPage() {
         </Card>
       </div>
 
+      {/* Visitor Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+        <Card className="p-4">
+          <div className="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center mb-3"><Eye className="w-5 h-5 text-cyan-600" /></div>
+          <p className="text-2xl font-black text-slate-900">{data.visitorStats.totalPageViews.toLocaleString()}</p>
+          <p className="text-xs text-slate-400 font-semibold mt-1">Page Views</p>
+        </Card>
+        <Card className="p-4">
+          <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-3"><MousePointerClick className="w-5 h-5 text-indigo-600" /></div>
+          <p className="text-2xl font-black text-slate-900">{data.visitorStats.uniqueSessions.toLocaleString()}</p>
+          <p className="text-xs text-slate-400 font-semibold mt-1">Sessions uniques</p>
+        </Card>
+        <Card className="p-4">
+          <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center mb-3"><MousePointerClick className="w-5 h-5 text-rose-600" /></div>
+          <p className="text-2xl font-black text-slate-900">{data.visitorStats.avgPageViewsPerSession}</p>
+          <p className="text-xs text-slate-400 font-semibold mt-1">Pages / session</p>
+        </Card>
+        <Card className="p-4">
+          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-3"><TrendingUp className="w-5 h-5 text-emerald-600" /></div>
+          <p className="text-2xl font-black text-slate-900">{data.conversion.conversionRate}%</p>
+          <p className="text-xs text-slate-400 font-semibold mt-1">Taux de conversion</p>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* User Growth Chart */}
         <Card className="p-5">
@@ -149,8 +176,8 @@ export default function AdminAnalyticsPage() {
         </Card>
       </div>
 
-      {/* Country Breakdown & Doc Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Country Breakdown & Doc Status */}
         <Card className="p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.countries')}</h2>
           <div className="space-y-3">
@@ -174,6 +201,7 @@ export default function AdminAnalyticsPage() {
           </div>
         </Card>
 
+        {/* Doc Status */}
         <Card className="p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.docStatus')}</h2>
           <div className="space-y-3">
@@ -199,6 +227,50 @@ export default function AdminAnalyticsPage() {
           </div>
         </Card>
       </div>
+
+      {/* Top Pages */}
+      <Card className="p-5">
+        <h2 className="text-sm font-bold text-slate-900 mb-4">Pages les plus visitées</h2>
+        {data.topPages.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-4">Aucune donnée</p>
+        ) : (
+          <div className="space-y-2">
+            {data.topPages.map(p => {
+              const pct = maxPageCount > 0 ? (p.count / maxPageCount) * 100 : 0;
+              return (
+                <div key={p.path}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-semibold text-slate-700 font-mono text-xs">{p.path}</span>
+                    <span className="text-slate-400">{p.count}</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      {/* Conversion */}
+      <Card className="p-5">
+        <h2 className="text-sm font-bold text-slate-900 mb-4">Conversion</h2>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-black text-slate-900">{data.conversion.totalUsersInPeriod}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-1">Nouveaux utilisateurs</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black text-emerald-600">{data.conversion.paidUsersInPeriod}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-1">Payants</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black text-blue-600">{data.conversion.conversionRate}%</p>
+            <p className="text-xs text-slate-400 font-semibold mt-1">Taux de conversion</p>
+          </div>
+        </div>
+      </Card>
 
       {/* Top Users */}
       <Card className="p-5">

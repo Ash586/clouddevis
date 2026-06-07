@@ -25,6 +25,9 @@ export async function GET(req: Request) {
       topUsers,
       systemMetrics,
       docStatusBreakdown,
+      visitorStats,
+      topPages,
+      conversionData,
     ] = await Promise.all([
       // Users created per day
       prisma.user.findMany({
@@ -67,6 +70,24 @@ export async function GET(req: Request) {
         where: { createdAt: { gte: startDate } },
         _count: true,
       }),
+      // Visitor stats
+      prisma.pageView.aggregate({
+        where: { timestamp: { gte: startDate } },
+        _count: { id: true },
+      }),
+      // Top pages
+      prisma.pageView.groupBy({
+        by: ['path'],
+        where: { timestamp: { gte: startDate } },
+        _count: { id: true },
+        orderBy: { _count: { id: 'desc' } },
+        take: 10,
+      }),
+      // Conversion data (total users vs paid users)
+      prisma.user.aggregate({
+        where: { createdAt: { gte: startDate } },
+        _count: { id: true },
+      }),
     ]);
 
     // Aggregate daily user growth
@@ -97,6 +118,21 @@ export async function GET(req: Request) {
       }
     }
 
+    // Unique sessions
+    const uniqueSessions = await prisma.pageView.findMany({
+      where: { timestamp: { gte: startDate } },
+      select: { sessionId: true },
+    });
+    const uniqueSessionCount = new Set(uniqueSessions.map(s => s.sessionId).filter(Boolean)).size;
+
+    // Paid users in period
+    const paidUsersInPeriod = await prisma.user.count({
+      where: {
+        createdAt: { gte: startDate },
+        subscriptionStatus: { in: ['BASIC', 'PRO'] },
+      },
+    });
+
     return NextResponse.json({
       userGrowth: Object.entries(dailyUsers).map(([date, data]) => ({ date, ...data })),
       docTrend: Object.entries(dailyDocs).map(([date, data]) => ({ date, ...data })),
@@ -107,6 +143,17 @@ export async function GET(req: Request) {
       })),
       systemMetrics: Object.entries(metricsByDate).map(([date, data]) => ({ date, ...data })),
       docStatusBreakdown: docStatusBreakdown.map(d => ({ status: d.status, count: d._count })),
+      visitorStats: {
+        totalPageViews: visitorStats._count.id,
+        uniqueSessions: uniqueSessionCount,
+        avgPageViewsPerSession: uniqueSessionCount > 0 ? Math.round(visitorStats._count.id / uniqueSessionCount) : 0,
+      },
+      topPages: topPages.map(p => ({ path: p.path, count: p._count.id })),
+      conversion: {
+        totalUsersInPeriod: conversionData._count.id,
+        paidUsersInPeriod,
+        conversionRate: conversionData._count.id > 0 ? Math.round((paidUsersInPeriod / conversionData._count.id) * 100) : 0,
+      },
       period,
     });
   } catch (error) {
