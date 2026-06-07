@@ -2,11 +2,15 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 const COOKIE_NAME = 'session';
+
+/** Lazy getter for JWT secret – only throws when actually used (safe at build time). */
+function getSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 
 export interface SessionUser {
   userId: string;
@@ -44,7 +48,7 @@ export async function createSession(user: { id: string; email: string; name: str
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(expiry)
     .setIssuedAt()
-    .sign(SECRET);
+    .sign(getSecret());
 
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
@@ -64,7 +68,7 @@ export async function getSession(): Promise<SessionUser | null> {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     return {
       userId: payload.userId as string,
       email: payload.email as string,
