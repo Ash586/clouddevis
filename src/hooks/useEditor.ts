@@ -235,7 +235,7 @@ export function useEditor(initialMode?: UserMode, initialDocId?: string) {
       const method = docId ? 'PUT' : 'POST';
       const url = docId ? `/api/documents/${docId}` : '/api/documents';
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) });
-      if (!res.ok) throw new Error('Save failed');
+      if (!res.ok) { const body = await res.text(); throw new Error(`Save failed (${res.status}): ${body}`); }
       const data = await res.json();
       setDocId(data.id);
       localStorage.removeItem(LS_KEY);
