@@ -25,6 +25,7 @@ function isPublicApiPath(pathname: string): boolean {
     pathname === '/api/auth/forgot-password' ||
     pathname === '/api/auth/reset-password' ||
     pathname === '/api/admin/auth/login' ||
+    pathname === '/api/setup-admin' ||
     pathname.startsWith('/api/auth/oauth')
   );
 }
