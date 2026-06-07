@@ -2,6 +2,7 @@
   "common": {
     "appName": "CloudDevis",
     "loading": "Loading…",
+    "loadingEditor": "Loading editor…",
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -27,7 +28,7 @@
     "draft": "Draft",
     "delivered": "Delivered",
     "accepted": "Accepted",
-    "progress": "In Progress",
+    "progress": "In progress",
     "viewAll": "View all",
     "daysLeft": "Days left",
     "freeTrial": "Free trial period",
@@ -35,7 +36,27 @@
     "trialDaysLeft": "You have {days} trial days left. After this period, only document names and numbers will be visible.",
     "currency": "DA",
     "yesDelete": "Delete?",
-    "search": "Search…"
+    "search": "Search…",
+    "user": "User",
+    "retry": "Retry",
+    "unexpectedError": "An error occurred",
+    "errorDescription": "Please try again or contact us if the problem persists.",
+    "passwordStrength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "deleteModal": {
+      "title": "Delete this document?",
+      "description": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "footer": {
+      "allRightsReserved": "All rights reserved.",
+      "algerianCompliance": "Compliant with Algerian standards"
+    }
   },
   "navbar": {
     "dashboard": "Dashboard",

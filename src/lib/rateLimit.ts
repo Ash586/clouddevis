@@ -1,5 +1,15 @@
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 
+// Cleanup expired entries every 5 minutes to prevent memory leaks
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of rateMap) {
+      if (now > entry.resetAt) rateMap.delete(key);
+    }
+  }, 5 * 60 * 1000);
+}
+
 export function checkRateLimit(key: string, maxAttempts = 5, windowMs = 60000): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const entry = rateMap.get(key);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -119,32 +119,6 @@ function EditorContent() {
 
   const router = useRouter();
 
-  // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        saveDoc();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-        e.preventDefault();
-        handleDownload();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  });
-
-  // Autosave every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (doc.items.length > 0 || doc.clientInfo.name) {
-        saveDoc().then(() => showToast(tc('save') + ' ✓', 'success')).catch(() => {});
-      }
-    }, 30000);
-    return () => clearInterval(interval);
-  });
-
   const handleSave = async () => {
     await saveDoc();
     showToast(tc('save') + ' ✓', 'success');
@@ -185,6 +159,37 @@ function EditorContent() {
     if (!w) { window.print(); return; }
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   };
+
+  // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download
+  const saveDocRef = useRef(saveDoc);
+  const handleDownloadRef = useRef(handleDownload);
+  saveDocRef.current = saveDoc;
+  handleDownloadRef.current = handleDownload;
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveDocRef.current();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        handleDownloadRef.current();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  // Autosave every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (doc.items.length > 0 || doc.clientInfo.name) {
+        saveDoc().then(() => showToast(tc('save') + ' ✓', 'success')).catch(() => {});
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [doc.items.length, doc.clientInfo.name, saveDoc, showToast, tc]);
 
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 

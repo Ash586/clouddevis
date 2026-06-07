@@ -33,7 +33,7 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
                 <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{t('subscribe')}</button>
               </span>
               <div className="flex-1 h-1.5 bg-amber-100 rounded-full overflow-hidden max-w-[120px]">
-                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style={{ width: `${Math.max(5, ((14 - (user.daysRemaining ?? 14)) / 14) * 100)}%` }} />
+                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full" style={{ width: '50%' }} />
               </div>
             </div>
           </div>

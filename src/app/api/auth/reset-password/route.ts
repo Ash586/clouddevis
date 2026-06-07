@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const rateCheck = checkRateLimit(`reset:${ip}`, 10, 60000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
+    }
+
     const { token, password } = await req.json();
 
     if (!token || !password) {

@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
+  const tc = useTranslations('common');
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -113,10 +114,10 @@ export default function RegisterPage() {
     if (/[A-Z]/.test(pw)) score++;
     if (/[0-9]/.test(pw)) score++;
     if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 1) return { score, label: 'Faible', color: 'bg-red-500' };
-    if (score <= 2) return { score, label: 'Moyen', color: 'bg-amber-500' };
-    if (score <= 3) return { score, label: 'Bon', color: 'bg-blue-500' };
-    return { score, label: 'Fort', color: 'bg-emerald-500' };
+    if (score <= 1) return { score, label: tc('passwordStrength.weak'), color: 'bg-red-500' };
+    if (score <= 2) return { score, label: tc('passwordStrength.fair'), color: 'bg-amber-500' };
+    if (score <= 3) return { score, label: tc('passwordStrength.good'), color: 'bg-blue-500' };
+    return { score, label: tc('passwordStrength.strong'), color: 'bg-emerald-500' };
   };
   const strength = getPasswordStrength(password);
 

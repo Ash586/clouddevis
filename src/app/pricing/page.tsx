@@ -51,6 +51,7 @@ function FeatureCell({ value }: { value: boolean | string }) {
 
 export default function PricingPage() {
   const t = useTranslations('pricing');
+  const tc = useTranslations('common');
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -219,10 +220,10 @@ export default function PricingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <span className="text-lg font-black text-blue-600 tracking-tight">CloudDevis</span>
-              <p className="text-xs text-slate-400 mt-1">&copy; {new Date().getFullYear()} CloudDevis. All rights reserved.</p>
+              <p className="text-xs text-slate-400 mt-1">&copy; {new Date().getFullYear()} CloudDevis. {tc('footer.allRightsReserved')}</p>
             </div>
             <div className="flex gap-6 text-xs text-slate-400">
-              <span>Conforme aux normes alg&eacute;riennes</span>
+              <span>{tc('footer.algerianCompliance')}</span>
             </div>
           </div>
         </div>

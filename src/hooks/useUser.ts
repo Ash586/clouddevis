@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+interface CompanyInfo {
+  name?: string;
+  address?: string;
+  capital?: string;
+  taxIds?: { nif?: string; nis?: string; rc?: string; ai?: string };
+}
+
 interface User {
   id: string;
   email: string;
@@ -10,8 +17,7 @@ interface User {
   phone?: string;
   subscriptionStatus?: string;
   trialStartAt?: string;
-  companyInfo?: any;
-  [key: string]: any;
+  companyInfo?: CompanyInfo;
 }
 
 interface UseUserReturn {

@@ -31,6 +31,7 @@ const DOCUMENT_TYPES = [
 function SidebarInner() {
   const t = useTranslations('navbar');
   const s = useTranslations('sidebar');
+  const tc = useTranslations('common');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -79,7 +80,7 @@ function SidebarInner() {
     router.push(`/dashboard/editor?type=${type}`);
   }
 
-  const userName = user?.name || 'مستخدم';
+  const userName = user?.name || tc('user');
   const userInitial = userName.charAt(0);
 
   const sidebarContent = (inDrawer = false) => (

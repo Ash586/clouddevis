@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       id: user.id,
       email: user.email,
       name: user.name,
-      mode: user.mode.toLowerCase(),
+      mode: user.mode?.toLowerCase() || 'artisan',
       sector: user.sector,
       country: user.country,
       language: user.language,

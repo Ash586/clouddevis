@@ -2,6 +2,7 @@
   "common": {
     "appName": "CloudDevis",
     "loading": "Chargement…",
+    "loadingEditor": "Chargement de l'éditeur…",
     "save": "Enregistrer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
@@ -35,7 +36,27 @@
     "trialDaysLeft": "Il vous reste {days} jours d'essai. Après cette période, seuls les noms et numéros de documents seront visibles.",
     "currency": "DA",
     "yesDelete": "Supprimer ?",
-    "search": "Rechercher…"
+    "search": "Rechercher…",
+    "user": "Utilisateur",
+    "retry": "Réessayer",
+    "unexpectedError": "Une erreur est survenue",
+    "errorDescription": "Veuillez réessayer ou nous contacter si le problème persiste.",
+    "passwordStrength": {
+      "weak": "Faible",
+      "fair": "Moyen",
+      "good": "Bon",
+      "strong": "Fort"
+    },
+    "deleteModal": {
+      "title": "Supprimer ce document ?",
+      "description": "Cette action est irréversible.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    },
+    "footer": {
+      "allRightsReserved": "Tous droits réservés.",
+      "algerianCompliance": "Conforme aux normes algériennes"
+    }
   },
   "navbar": {
     "dashboard": "Tableau de bord",

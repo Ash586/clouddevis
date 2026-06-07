@@ -49,7 +49,7 @@ export function LanguageProvider({ children, initialLang }: { children: ReactNod
     if (cookieLang && cookieLang !== lang) {
       setLangState(cookieLang);
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     document.documentElement.lang = lang;

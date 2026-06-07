@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "CloudDevis",
-    "loading": "جارٍ التحميل…",
+    "loading": "جاري التحميل…",
+    "loadingEditor": "جاري تحميل المحرر…",
     "save": "حفظ",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
@@ -30,12 +31,32 @@
     "progress": "قيد التنفيذ",
     "viewAll": "عرض الكل",
     "daysLeft": "الأيام المتبقية",
-    "freeTrial": "الفترة التجريبية المجانية",
+    "freeTrial": "فترة التجربة المجانية",
     "upgradeToPro": "الترقية إلى Pro",
-    "trialDaysLeft": "تبقى لك {days} أيام تجريبية. بعد هذه الفترة، ستظهر أسماء وأرقام المستندات فقط.",
+    "trialDaysLeft": "متبقي {days} يوم من التجربة. بعد هذه الفترة، لن تظهر سوى أسماء وأرقام الوثائق.",
     "currency": "دج",
     "yesDelete": "حذف؟",
-    "search": "بحث…"
+    "search": "بحث…",
+    "user": "مستخدم",
+    "retry": "إعادة المحاولة",
+    "unexpectedError": "حدث خطأ",
+    "errorDescription": "يرجى المحاولة مرة أخرى أو التواصل معنا إذا استمرت المشكلة.",
+    "passwordStrength": {
+      "weak": "ضعيف",
+      "fair": "متوسط",
+      "good": "جيد",
+      "strong": "قوي"
+    },
+    "deleteModal": {
+      "title": "حذف هذه الوثيقة؟",
+      "description": "لا يمكن التراجع عن هذا الإجراء.",
+      "cancel": "إلغاء",
+      "confirm": "حذف"
+    },
+    "footer": {
+      "allRightsReserved": "جميع الحقوق محفوظة.",
+      "algerianCompliance": "متوافق مع المعايير الجزائرية"
+    }
   },
   "navbar": {
     "dashboard": "لوحة التحكم",
