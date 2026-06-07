@@ -742,5 +742,56 @@
     "tokenUsed": "Token déjà utilisé",
     "tokenExpired": "Token expiré",
     "resetSuccess": "Mot de passe réinitialisé avec succès"
+  },
+  "admin": {
+    "title": "Administration CloudDevis",
+    "error": "Une erreur est survenue",
+    "noUsers": "Aucun utilisateur trouvé",
+    "noLogs": "Aucun log trouvé",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "users": "Utilisateurs",
+      "analytics": "Analytique",
+      "subscriptions": "Abonnements",
+      "reports": "Rapports",
+      "logs": "Journaux",
+      "system": "Système",
+      "logout": "Déconnexion"
+    },
+    "stats": {
+      "totalUsers": "Total utilisateurs",
+      "totalDocs": "Total documents",
+      "totalClients": "Total clients",
+      "newThisMonth": "Nouveaux ce mois",
+      "subscriptions": "Abonnements actifs",
+      "docTypes": "Documents par type",
+      "recentUsers": "Utilisateurs récents"
+    },
+    "table": {
+      "name": "Nom",
+      "email": "Email",
+      "country": "Pays",
+      "subscription": "Abonnement",
+      "docs": "Documents",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "filter": {
+      "all": "Tous",
+      "allStatus": "Tous les statuts"
+    },
+    "system": {
+      "status": "Statut",
+      "uptime": "Uptime",
+      "memory": "Mémoire",
+      "nodeVersion": "Node.js",
+      "dbCounts": "Compteurs base de données",
+      "users": "Utilisateurs",
+      "documents": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "admins": "Admins",
+      "memoryDetail": "Détail mémoire"
+    }
   }
 }

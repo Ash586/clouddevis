@@ -742,5 +742,56 @@
     "tokenUsed": "Token already used",
     "tokenExpired": "Token expired",
     "resetSuccess": "Password reset successfully"
+  },
+  "admin": {
+    "title": "CloudDevis Administration",
+    "error": "An error occurred",
+    "noUsers": "No users found",
+    "noLogs": "No logs found",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "analytics": "Analytics",
+      "subscriptions": "Subscriptions",
+      "reports": "Reports",
+      "logs": "Logs",
+      "system": "System",
+      "logout": "Logout"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalDocs": "Total Documents",
+      "totalClients": "Total Clients",
+      "newThisMonth": "New This Month",
+      "subscriptions": "Active Subscriptions",
+      "docTypes": "Documents by Type",
+      "recentUsers": "Recent Users"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "country": "Country",
+      "subscription": "Subscription",
+      "docs": "Docs",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "filter": {
+      "all": "All",
+      "allStatus": "All statuses"
+    },
+    "system": {
+      "status": "Status",
+      "uptime": "Uptime",
+      "memory": "Memory",
+      "nodeVersion": "Node.js",
+      "dbCounts": "Database Counts",
+      "users": "Users",
+      "documents": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "admins": "Admins",
+      "memoryDetail": "Memory Detail"
+    }
   }
 }

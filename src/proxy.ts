@@ -3,10 +3,12 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+const ADMIN_SECRET = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET);
 
 const PROTECTED_ROUTES = ['/dashboard', '/editor'];
 const PUBLIC_ROUTES = ['/auth/login', '/auth/register'];
 const COOKIE_NAME = 'session';
+const ADMIN_COOKIE = 'admin_session';
 
 const LOCALES = ['fr', 'ar', 'en'] as const;
 const DEFAULT_LOCALE = 'fr';
@@ -34,6 +36,19 @@ export async function proxy(req: NextRequest) {
   // Allow public assets
   if (pathname.startsWith('/_next') || pathname.startsWith('/static') || pathname === '/favicon.ico' || pathname === '/favicon.svg') {
     return res;
+  }
+
+  // Admin route protection
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const adminToken = req.cookies.get(ADMIN_COOKIE)?.value;
+    if (!adminToken) {
+      return NextResponse.redirect(new URL('/admin/login', req.url));
+    }
+    try {
+      await jwtVerify(adminToken, ADMIN_SECRET);
+    } catch {
+      return NextResponse.redirect(new URL('/admin/login', req.url));
+    }
   }
 
   const token = req.cookies.get(COOKIE_NAME)?.value;

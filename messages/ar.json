@@ -742,5 +742,56 @@
     "tokenUsed": "الرمز مستخدم بالفعل",
     "tokenExpired": "الرمز منتهي الصلاحية",
     "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح"
+  },
+  "admin": {
+    "title": "إدارة CloudDevis",
+    "error": "حدث خطأ",
+    "noUsers": "لم يتم العثور على مستخدمين",
+    "noLogs": "لم يتم العثور على سجلات",
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "users": "المستخدمون",
+      "analytics": "التحليلات",
+      "subscriptions": "الاشتراكات",
+      "reports": "التقارير",
+      "logs": "السجلات",
+      "system": "النظام",
+      "logout": "تسجيل الخروج"
+    },
+    "stats": {
+      "totalUsers": "إجمالي المستخدمين",
+      "totalDocs": "إجمالي الوثائق",
+      "totalClients": "إجمالي العملاء",
+      "newThisMonth": "جدد هذا الشهر",
+      "subscriptions": "الاشتراكات النشطة",
+      "docTypes": "الوثائق حسب النوع",
+      "recentUsers": "المستخدمون האחרונים"
+    },
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "country": "الدولة",
+      "subscription": "الاشتراك",
+      "docs": "الوثائق",
+      "date": "التاريخ",
+      "actions": "الإجراءات"
+    },
+    "filter": {
+      "all": "الكل",
+      "allStatus": "جميع الحالات"
+    },
+    "system": {
+      "status": "الحالة",
+      "uptime": "وقت التشغيل",
+      "memory": "الذاكرة",
+      "nodeVersion": "Node.js",
+      "dbCounts": "عدادات قاعدة البيانات",
+      "users": "المستخدمون",
+      "documents": "الوثائق",
+      "clients": "العملاء",
+      "templates": "القوالب",
+      "admins": "المسؤولون",
+      "memoryDetail": "تفاصيل الذاكرة"
+    }
   }
 }

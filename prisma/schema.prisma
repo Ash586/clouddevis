@@ -59,6 +59,7 @@ model User {
   documents         Document[]
   templates         Template[]
   backups           Backup[]
+  activityLogs      ActivityLog[]
 }
 
 model Account {
@@ -191,4 +192,58 @@ model Backup {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
   @@index([createdAt])
+}
+
+enum AdminRole {
+  VIEWER
+  EDITOR
+  ADMIN
+}
+
+model Admin {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String    @default("Admin")
+  role            AdminRole @default(ADMIN)
+  lastLogin       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  activityLogs    ActivityLog[]
+
+  @@index([email])
+}
+
+model ActivityLog {
+  id              String   @id @default(cuid())
+  adminId         String?
+  userId          String?
+  action          String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity          String   // USER, DOCUMENT, SUBSCRIPTION, SYSTEM
+  entityId        String?
+  details         Json?
+  ipAddress       String?
+  createdAt       DateTime @default(now())
+
+  admin           Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([adminId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model SystemMetric {
+  id              String   @id @default(cuid())
+  timestamp       DateTime @default(now())
+  totalUsers      Int      @default(0)
+  activeUsers     Int      @default(0)
+  totalDocuments  Int      @default(0)
+  totalRevenue    Float    @default(0)
+  dbSize          Float    @default(0)
+  uptime          Int      @default(0)
+
+  @@index([timestamp])
 }
