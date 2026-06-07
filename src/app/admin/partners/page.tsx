@@ -25,16 +25,16 @@ export default function AdminPartnersPage() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: '20' });
     if (statusFilter) params.set('status', statusFilter);
-    Promise.all([
-      fetch(`/api/admin/partners?${params}`).then(r => r.json()),
-      fetch('/api/admin/commissions/overview').then(r => r.json()),
-    ])
-      .then(([partnersData, overviewData]) => {
-        setData(partnersData);
-        setOverview(overviewData);
-      })
-      .catch(() => {})
+    fetch(`/api/admin/partners?${params}`)
+      .then(r => r.ok ? r.json() : { partners: [], pagination: { page: 1, totalPages: 0, total: 0 } })
+      .then(d => setData(d))
+      .catch(() => { setData({ partners: [], pagination: { page: 1, totalPages: 0, total: 0 } }); })
       .finally(() => setLoading(false));
+
+    fetch('/api/admin/commissions/overview')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setOverview(d); })
+      .catch(() => {});
   }, [page, statusFilter]);
 
   useEffect(() => { fetchPartners(); }, [fetchPartners]);

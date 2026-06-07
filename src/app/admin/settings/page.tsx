@@ -15,7 +15,7 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     fetch('/api/admin/auth/me')
       .then(r => r.ok ? r.json() : null)
-      .then(d => setAdmin(d.admin))
+      .then(d => { if (d) setAdmin(d.admin); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

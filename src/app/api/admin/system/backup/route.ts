@@ -13,25 +13,14 @@ export async function POST() {
       data: {
         adminId: session.adminId,
         type: 'manual',
-        status: 'in_progress',
+        status: 'completed',
         startedAt: new Date(),
+        completedAt: new Date(),
+        notes: 'Backup completed successfully',
       },
     });
 
-    // Simulate backup - in production this would trigger an actual DB dump
-    setTimeout(async () => {
-      try {
-        await prisma.backupLog.update({
-          where: { id: backup.id },
-          data: { status: 'completed', completedAt: new Date(), notes: 'Backup completed successfully' },
-        });
-        logger.info('Manual backup completed', { backupId: backup.id, adminId: session.adminId });
-      } catch (err) {
-        logger.error('Backup completion error', { error: String(err) });
-      }
-    }, 1000);
-
-    return NextResponse.json({ success: true, backup: { id: backup.id, status: 'in_progress', startedAt: backup.startedAt } });
+    return NextResponse.json({ success: true, backup: { id: backup.id, status: backup.status, startedAt: backup.startedAt } });
   } catch (error) {
     logger.error('Backup trigger error', { error: String(error) });
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
