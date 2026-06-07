@@ -84,3 +84,29 @@ export async function clearSession() {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
 }
+
+/** Get session and verify user is not suspended. Returns null if suspended. */
+export async function getActiveSession(): Promise<SessionUser | null> {
+  const session = await getSession();
+  if (!session) return null;
+
+  // Dynamic import to avoid edge-compat issues in proxy context
+  const { prisma } = await import('@/lib/prisma');
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { suspended: true },
+  });
+
+  if (user?.suspended) return null;
+  return session;
+}
+
+/** Check if a user is suspended by ID */
+export async function isUserSuspended(userId: string): Promise<boolean> {
+  const { prisma } = await import('@/lib/prisma');
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { suspended: true },
+  });
+  return user?.suspended ?? false;
+}

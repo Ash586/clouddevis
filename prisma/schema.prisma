@@ -47,6 +47,8 @@ model User {
   subscriptionStatus SubscriptionStatus @default(TRIAL)
   trialStartAt      DateTime?
   subscriptionEndAt DateTime?
+  suspended         Boolean          @default(false)
+  suspendedAt       DateTime?
   companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature }
   settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
   createdAt         DateTime           @default(now())
@@ -214,6 +216,7 @@ model Admin {
   password        String
   name            String    @default("Admin")
   role            AdminRole @default(ADMIN)
+  permissions     String[]  @default([])
   lastLogin       DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt

@@ -13,7 +13,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       where: { id },
       select: {
         id: true, name: true, email: true, country: true, mode: true, sector: true,
-        subscriptionStatus: true, trialStartAt: true, subscriptionEndAt: true, createdAt: true,
+        subscriptionStatus: true, trialStartAt: true, subscriptionEndAt: true,
+        suspended: true, suspendedAt: true,
+        createdAt: true,
         _count: { select: { documents: true, clients: true, templates: true } },
       },
     });

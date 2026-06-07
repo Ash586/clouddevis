@@ -754,6 +754,7 @@
     "nav": {
       "dashboard": "لوحة التحكم",
       "users": "المستخدمون",
+      "userDetail": "تفاصيل المستخدم",
       "analytics": "التحليلات",
       "subscriptions": "الاشتراكات",
       "reports": "التقارير",
@@ -817,7 +818,14 @@
     "subscriptions": {
       "expires": "ينتهي في",
       "total": "إجمالي المستخدمين",
-      "active": "الاشتراكات النشطة"
+      "active": "الاشتراكات النشطة",
+      "detail": "تفاصيل الاشتراك",
+      "changePlan": "تغيير الباقة",
+      "planChanged": "تم تغيير الباقة بنجاح",
+      "endDate": "تاريخ الانتهاء",
+      "trialEnd": "نهاية النسخة التجريبية",
+      "status": "الحالة",
+      "noChange": "لا تغيير"
     },
     "reports": {
       "totalRevenue": "إجمالي الإيرادات",
@@ -832,6 +840,58 @@
         "quarter": "ربع سنة",
         "year": "سنة"
       }
+    },
+    "users": {
+      "detail": "تفاصيل المستخدم",
+      "totalUsers": "إجمالي المستخدمين",
+      "activeUsers": "المستخدمون النشطون",
+      "suspendedUsers": "معلقون",
+      "suspend": "تعليق",
+      "unsuspend": "إعادة التنشيط",
+      "suspendConfirm": "هل أنت متأكد من تعليق هذا المستخدم؟",
+      "unsuspendConfirm": "إعادة تنشيط وصول هذا المستخدم؟",
+      "suspended": "معلق",
+      "active": "نشط",
+      "suspendedAt": "معلق منذ",
+      "role": "الدور",
+      "subscription": "الاشتراك",
+      "docs": "الوثائق",
+      "clients": "العملاء",
+      "templates": "القوالب",
+      "lastActivity": "آخر نشاط",
+      "noSuspended": "لا يوجد مستخدمون معلقون",
+      "suspendSuccess": "تم تعليق المستخدم بنجاح",
+      "unsuspendSuccess": "تم إعادة تنشيط المستخدم بنجاح"
+    },
+    "system": {
+      "status": "الحالة",
+      "uptime": "وقت التشغيل",
+      "memory": "الذاكرة",
+      "nodeVersion": "Node.js",
+      "dbCounts": "عدادات قاعدة البيانات",
+      "users": "المستخدمون",
+      "documents": "الوثائق",
+      "clients": "العملاء",
+      "templates": "القوالب",
+      "admins": "المسؤولون",
+      "memoryDetail": "تفاصيل الذاكرة",
+      "healthy": "سليم",
+      "degraded": "متدهور",
+      "down": "معطل",
+      "lastBackup": "آخر نسخة احتياطية",
+      "noBackup": "لا توجد نسخة احتياطية",
+      "dbSize": "حجم قاعدة البيانات",
+      "requests": "طلب/ثانية"
+    },
+    "export": {
+      "title": "تصدير البيانات",
+      "format": "صيغة التصدير",
+      "csv": "CSV",
+      "xls": "Excel (XLS)",
+      "exportBtn": "تصدير",
+      "exporting": "جاري التصدير...",
+      "success": "تم التصدير بنجاح",
+      "selectPeriod": "اختر الفترة"
     }
   },
   "notifications": {

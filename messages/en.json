@@ -754,6 +754,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "users": "Users",
+      "userDetail": "User Details",
       "analytics": "Analytics",
       "subscriptions": "Subscriptions",
       "reports": "Reports",
@@ -817,7 +818,14 @@
     "subscriptions": {
       "expires": "Expires",
       "total": "Total Users",
-      "active": "Active Subscriptions"
+      "active": "Active Subscriptions",
+      "detail": "Subscription Details",
+      "changePlan": "Change Plan",
+      "planChanged": "Plan changed successfully",
+      "endDate": "End Date",
+      "trialEnd": "Trial End",
+      "status": "Status",
+      "noChange": "No change"
     },
     "reports": {
       "totalRevenue": "Total Revenue",
@@ -832,6 +840,58 @@
         "quarter": "Quarter",
         "year": "Year"
       }
+    },
+    "users": {
+      "detail": "User Details",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "suspendedUsers": "Suspended",
+      "suspend": "Suspend",
+      "unsuspend": "Reactivate",
+      "suspendConfirm": "Are you sure you want to suspend this user?",
+      "unsuspendConfirm": "Reactivate this user's access?",
+      "suspended": "Suspended",
+      "active": "Active",
+      "suspendedAt": "Suspended At",
+      "role": "Role",
+      "subscription": "Subscription",
+      "docs": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "lastActivity": "Last Activity",
+      "noSuspended": "No suspended users",
+      "suspendSuccess": "User suspended successfully",
+      "unsuspendSuccess": "User reactivated successfully"
+    },
+    "system": {
+      "status": "Status",
+      "uptime": "Uptime",
+      "memory": "Memory",
+      "nodeVersion": "Node.js",
+      "dbCounts": "Database Counts",
+      "users": "Users",
+      "documents": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "admins": "Admins",
+      "memoryDetail": "Memory Detail",
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "down": "Down",
+      "lastBackup": "Last Backup",
+      "noBackup": "No backup",
+      "dbSize": "DB Size",
+      "requests": "Requests/s"
+    },
+    "export": {
+      "title": "Export Data",
+      "format": "Export Format",
+      "csv": "CSV",
+      "xls": "Excel (XLS)",
+      "exportBtn": "Export",
+      "exporting": "Exporting...",
+      "success": "Export successful",
+      "selectPeriod": "Select Period"
     }
   },
   "notifications": {

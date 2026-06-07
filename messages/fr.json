@@ -754,6 +754,7 @@
     "nav": {
       "dashboard": "Tableau de bord",
       "users": "Utilisateurs",
+      "userDetail": "Détails utilisateur",
       "analytics": "Analytique",
       "subscriptions": "Abonnements",
       "reports": "Rapports",
@@ -817,7 +818,14 @@
     "subscriptions": {
       "expires": "Expire le",
       "total": "Total utilisateurs",
-      "active": "Abonnements actifs"
+      "active": "Abonnements actifs",
+      "detail": "Détails de l'abonnement",
+      "changePlan": "Changer de formule",
+      "planChanged": "Formule modifiée avec succès",
+      "endDate": "Date de fin",
+      "trialEnd": "Fin d'essai",
+      "status": "Statut",
+      "noChange": "Aucune modification"
     },
     "reports": {
       "totalRevenue": "Revenu total",
@@ -832,6 +840,58 @@
         "quarter": "Trimestre",
         "year": "Année"
       }
+    },
+    "users": {
+      "detail": "Détails de l'utilisateur",
+      "totalUsers": "Total utilisateurs",
+      "activeUsers": "Utilisateurs actifs",
+      "suspendedUsers": "Suspendus",
+      "suspend": "Suspendre",
+      "unsuspend": "Réactiver",
+      "suspendConfirm": "Êtes-vous sûr de vouloir suspendre cet utilisateur ?",
+      "unsuspendConfirm": "Réactiver l'accès de cet utilisateur ?",
+      "suspended": "Suspendu",
+      "active": "Actif",
+      "suspendedAt": "Suspendu le",
+      "role": "Rôle",
+      "subscription": "Abonnement",
+      "docs": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "lastActivity": "Dernière activité",
+      "noSuspended": "Aucun utilisateur suspendu",
+      "suspendSuccess": "Utilisateur suspendu avec succès",
+      "unsuspendSuccess": "Utilisateur réactivé avec succès"
+    },
+    "system": {
+      "status": "Statut",
+      "uptime": "Uptime",
+      "memory": "Mémoire",
+      "nodeVersion": "Node.js",
+      "dbCounts": "Compteurs base de données",
+      "users": "Utilisateurs",
+      "documents": "Documents",
+      "clients": "Clients",
+      "templates": "Templates",
+      "admins": "Admins",
+      "memoryDetail": "Détail mémoire",
+      "healthy": "En bonne santé",
+      "degraded": "Dégradé",
+      "down": "Hors ligne",
+      "lastBackup": "Dernière sauvegarde",
+      "noBackup": "Aucune sauvegarde",
+      "dbSize": "Taille de la DB",
+      "requests": "Requêtes/s"
+    },
+    "export": {
+      "title": "Exporter les données",
+      "format": "Format d'export",
+      "csv": "CSV",
+      "xls": "Excel (XLS)",
+      "exportBtn": "Exporter",
+      "exporting": "Exportation en cours...",
+      "success": "Export réussi",
+      "selectPeriod": "Sélectionner la période"
     }
   },
   "notifications": {
