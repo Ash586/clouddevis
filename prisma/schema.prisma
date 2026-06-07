@@ -60,6 +60,7 @@ model User {
   templates         Template[]
   backups           Backup[]
   activityLogs      ActivityLog[]
+  notifications     Notification[]
 }
 
 model Account {
@@ -246,4 +247,45 @@ model SystemMetric {
   uptime          Int      @default(0)
 
   @@index([timestamp])
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ERROR
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType @default(INFO)
+  title     String
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  country   String   @default("unknown")
+  locale    String   @default("fr")
+  sessionId String?
+  userId    String?
+  timestamp DateTime @default(now())
+
+  @@index([path])
+  @@index([timestamp])
+  @@index([country])
+  @@index([sessionId])
 }

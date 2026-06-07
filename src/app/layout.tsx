@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import './rtl.css';
 import { I18nClientProvider } from '@/contexts/I18nClientProvider';
+import { PageViewTracker } from '@/components/tracking/PageViewTracker';
 import { cookies } from 'next/headers';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
@@ -38,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
       <body className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col">
-        <I18nClientProvider initialLocale={locale}>{children}</I18nClientProvider>
+        <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
       </body>
     </html>
   );

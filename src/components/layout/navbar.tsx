@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/hooks/useUser';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 const FLAGS: Record<string, string> = { fr: '🇫🇷', ar: '🇩🇿', en: '🇬🇧' };
 const LANGS = ['fr', 'ar', 'en'] as const;
@@ -65,6 +66,7 @@ export function Navbar() {
           ))}
 
           <div className="hidden md:flex items-center gap-2">
+            {user && <NotificationBell />}
             {links}
           </div>
 

@@ -830,5 +830,13 @@
         "year": "Year"
       }
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "Toggle notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark as read",
+    "delete": "Delete notification"
   }
 }
