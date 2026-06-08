@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 const PROVIDERS: Record<string, { authUrl: string; params: Record<string, string> }> = {
   google: {
@@ -22,6 +23,9 @@ const PROVIDERS: Record<string, { authUrl: string; params: Record<string, string
   },
 };
 
+const STATE_COOKIE_NAME = 'oauth_state';
+const STATE_COOKIE_MAX_AGE = 10 * 60; // 10 minutes
+
 export async function GET(_req: Request, { params }: { params: Promise<{ provider: string }> }) {
   const { provider } = await params;
   const config = PROVIDERS[provider];
@@ -38,8 +42,22 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
     );
   }
 
+  // Generate CSRF state token
+  const state = crypto.randomBytes(16).toString('hex');
+
   const url = new URL(config.authUrl);
   Object.entries(config.params).forEach(([k, v]) => url.searchParams.set(k, v));
+  url.searchParams.set('state', state);
 
-  return NextResponse.redirect(url.toString());
+  // Store state in httpOnly cookie
+  const response = NextResponse.redirect(url.toString());
+  response.cookies.set(STATE_COOKIE_NAME, state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: STATE_COOKIE_MAX_AGE,
+    path: '/api/auth/oauth/callback',
+  });
+
+  return response;
 }

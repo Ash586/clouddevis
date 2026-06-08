@@ -2,16 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Select } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 
 export default function RegisterPage() {
-  const t = useTranslations('auth');
-  const tc = useTranslations('common');
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,7 +12,7 @@ export default function RegisterPage() {
   const [mode, setMode] = useState<'artisan' | 'entreprise'>('artisan');
   const [sector, setSector] = useState('btp');
   const [country, setCountry] = useState('dz');
-  const [language, setLanguage] = useState('fr');
+  const [showPw, setShowPw] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [companyRc, setCompanyRc] = useState('');
   const [companyNif, setCompanyNif] = useState('');
@@ -30,66 +22,37 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const SECTOR_OPTIONS = [
-    { value: 'btp', label: `🏗️ ${t('sectors.btp')}` },
-    { value: 'moving', label: `🚛 ${t('sectors.moving')}` },
-    { value: 'cleaning', label: `🧹 ${t('sectors.cleaning')}` },
-    { value: 'hotel', label: `🏨 ${t('sectors.hotel')}` },
-    { value: 'auto', label: `🔧 ${t('sectors.auto')}` },
-    { value: 'health', label: `🏥 ${t('sectors.health')}` },
-    { value: 'training', label: `📚 ${t('sectors.training')}` },
-    { value: 'realestate', label: `🏠 ${t('sectors.realestate')}` },
-    { value: 'transport', label: `🚌 ${t('sectors.transport')}` },
-    { value: 'craft', label: `🎨 ${t('sectors.craft')}` },
-    { value: 'agriculture', label: `🌾 ${t('sectors.agriculture')}` },
-    { value: 'liberal', label: `⚖️ ${t('sectors.liberal')}` },
-    { value: 'it', label: `💻 ${t('sectors.it')}` },
-  ];
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14,
+    background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)',
+    color: '#e8ebf0', outline: 'none', boxSizing: 'border-box',
+  };
+  const selectStyle: React.CSSProperties = { ...inputStyle, cursor: 'pointer' };
+  const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: '#656a73', display: 'block', marginBottom: 5 };
 
-  const COUNTRY_OPTIONS = [
-    { value: 'dz', label: `🇩🇿 ${t('countries.dz')}` },
-    { value: 'tn', label: `🇹🇳 ${t('countries.tn')}` },
-    { value: 'ma', label: `🇲🇦 ${t('countries.ma')}` },
-    { value: 'fr', label: `🇫🇷 ${t('countries.fr')}` },
-  ];
-
-  const LANGUAGE_OPTIONS = [
-    { value: 'fr', label: t('languageOptions.fr') },
-    { value: 'ar', label: t('languageOptions.ar') },
-    { value: 'en', label: t('languageOptions.en') },
+  const sectors = [
+    { value: 'btp', label: '🏗️ BTP' }, { value: 'moving', label: '🚛 Déménagement' },
+    { value: 'cleaning', label: '🧹 Nettoyage' }, { value: 'hotel', label: '🏨 Hôtellerie' },
+    { value: 'auto', label: '🔧 Automobile' }, { value: 'health', label: '🏥 Santé' },
+    { value: 'training', label: '📚 Formation' }, { value: 'realestate', label: '🏠 Immobilier' },
+    { value: 'transport', label: '🚌 Transport' }, { value: 'craft', label: '🎨 Artisanat' },
+    { value: 'agriculture', label: '🌾 Agriculture' }, { value: 'liberal', label: '⚖️ Libéral' },
+    { value: 'it', label: '💻 Informatique' },
   ];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-
-    if (!name.trim() || !email.trim() || !password) {
-      setError(t('errors.fillAllFields'));
-      return;
-    }
-
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      setError(t('errors.invalidEmail'));
-      return;
-    }
-
-    if (password.length < 6) {
-      setError(t('errors.passwordTooShort'));
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError(t('errors.passwordsNoMatch'));
-      return;
-    }
-
+    if (!name.trim() || !email.trim() || !password) { setError('Veuillez remplir tous les champs'); return; }
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { setError('Email invalide'); return; }
+    if (password.length < 6) { setError('Mot de passe trop court (min 6 caractères)'); return; }
+    if (password !== confirmPassword) { setError('Les mots de passe ne correspondent pas'); return; }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: name.trim(), email: email.trim(), password, mode, sector, country, language,
+          name: name.trim(), email: email.trim(), password, mode, sector, country, language: 'fr',
           companyInfo: mode === 'entreprise' ? {
             name: companyName.trim() || name.trim(),
             taxIds: { rc: companyRc.trim(), nif: companyNif.trim(), nis: companyNis.trim(), ai: companyAi.trim() },
@@ -98,122 +61,148 @@ export default function RegisterPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || t('errors.registerFailed')); return; }
+      if (!res.ok) { setError(data.error || 'Échec d\'inscription'); return; }
       router.push('/dashboard');
-    } catch {
-      setError(t('errors.networkError'));
-    } finally {
-      setLoading(false);
-    }
+    } catch { setError('Erreur réseau');
+    } finally { setLoading(false); }
   }
 
-  const getPasswordStrength = (pw: string): { score: number; label: string; color: string } => {
-    let score = 0;
-    if (pw.length >= 6) score++;
-    if (pw.length >= 8) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 1) return { score, label: tc('passwordStrength.weak'), color: 'bg-red-500' };
-    if (score <= 2) return { score, label: tc('passwordStrength.fair'), color: 'bg-amber-500' };
-    if (score <= 3) return { score, label: tc('passwordStrength.good'), color: 'bg-blue-500' };
-    return { score, label: tc('passwordStrength.strong'), color: 'bg-emerald-500' };
+  const strength = (pw: string) => {
+    let s = 0;
+    if (pw.length >= 6) s++;
+    if (pw.length >= 8) s++;
+    if (/[A-Z]/.test(pw)) s++;
+    if (/[0-9]/.test(pw)) s++;
+    if (/[^A-Za-z0-9]/.test(pw)) s++;
+    const colors = ['#282c38', '#f87171', '#fbbf24', '#4a9eff', '#4ade80'];
+    const labels = ['', 'Faible', 'Moyen', 'Bon', 'Fort'];
+    return { score: s, color: colors[s] || colors[0], label: labels[s] || '' };
   };
-  const strength = getPasswordStrength(password);
+  const pwStr = strength(password);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50">
-      <Card className="w-full max-w-sm p-6 sm:p-8">
-        <div className="text-center mb-6 sm:mb-8">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-          </div>
-          <span className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tight">CloudDevis</span>
-          <p className="text-sm text-slate-500 mt-2">{t('registerTitle')}</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: '#0b0d12' }}>
+      <div style={{ width: '100%', maxWidth: 420, background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '24px 22px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ width: 44, height: 44, background: '#1d202a', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 18, fontWeight: 800, color: '#e8ebf0' }}>CD</div>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>CloudDevis</h1>
+          <p style={{ fontSize: 13, color: '#656a73', marginTop: 4 }}>Créez votre compte</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3 text-center font-medium">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div style={{ background: 'rgba(248,113,113,0.10)', color: '#f87171', fontSize: 13, borderRadius: 8, padding: '10px 14px', textAlign: 'center', fontWeight: 600, marginBottom: 16 }}>
+            {error}
+          </div>
+        )}
 
-          <Input label={t('fullNameLabel')} value={name}
-            onChange={(e) => setName(e.target.value)} placeholder={t('fullNamePlaceholder')} required />
-
-          <Input label={t('emailLabel')} type="email" value={email}
-            onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} required />
-
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <Input label={t('passwordLabel')} type="password" showPasswordToggle value={password}
-              onChange={(e) => setPassword(e.target.value)} placeholder={t('min6Chars')} required minLength={6} />
+            <label style={labelStyle}>Nom complet</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Votre nom" required style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Mot de passe</label>
+            <div style={{ position: 'relative' }}>
+              <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 caractères" required minLength={6} style={inputStyle} />
+              <button type="button" onClick={() => setShowPw(!showPw)}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#656a73', fontSize: 13 }}>
+                {showPw ? '🙈' : '👁️'}
+              </button>
+            </div>
             {password.length > 0 && (
-              <div className="mt-1.5 space-y-1">
-                <div className="flex gap-1">
+              <div style={{ marginTop: 6 }}>
+                <div style={{ display: 'flex', gap: 4, marginBottom: 2 }}>
                   {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} className={cn('h-1 flex-1 rounded-full transition-all duration-300', i <= strength.score ? strength.color : 'bg-slate-200')} />
+                    <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= pwStr.score ? pwStr.color : '#282c38', transition: 'background 0.3s' }} />
                   ))}
                 </div>
-                <p className="text-[10px] font-medium text-slate-400">{strength.label}</p>
+                <p style={{ fontSize: 10, fontWeight: 600, color: pwStr.color, margin: 0 }}>{pwStr.label}</p>
               </div>
             )}
           </div>
+          <div>
+            <label style={labelStyle}>Confirmer le mot de passe</label>
+            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={6} style={inputStyle} />
+          </div>
 
-          <Input label={t('confirmPassword')} type="password" showPasswordToggle value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={6} />
-
-          <Select label={t('accountType')} value={mode}
-            onChange={(e) => setMode(e.target.value as any)}
-            options={[
-              { value: 'artisan', label: `👤 ${t('artisanOption')}` },
-              { value: 'entreprise', label: `🏢 ${t('companyOption')}` },
-            ]} />
+          <div>
+            <label style={labelStyle}>Type de compte</label>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['artisan', 'entreprise'].map(m => (
+                <button key={m} type="button" onClick={() => setMode(m as typeof mode)}
+                  style={{
+                    flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    border: '0.5px solid rgba(255,255,255,0.08)', cursor: 'pointer',
+                    background: mode === m ? '#1d202a' : 'transparent',
+                    color: mode === m ? '#e8ebf0' : '#656a73',
+                  }}>
+                  {m === 'artisan' ? '👤 Artisan' : '🏢 Entreprise'}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {mode === 'entreprise' && (
-            <div className="space-y-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">{t('companyInfo')}</p>
-              <Input label={t('companyName')} value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)} placeholder={t('companyNamePlaceholder')} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Input label="RC" value={companyRc}
-                  onChange={(e) => setCompanyRc(e.target.value)} placeholder="Ex: 00-00-0000000" />
-                <Input label="NIF" value={companyNif}
-                  onChange={(e) => setCompanyNif(e.target.value)} placeholder="Ex: 000000000000000" />
-                <Input label="NIS" value={companyNis}
-                  onChange={(e) => setCompanyNis(e.target.value)} placeholder="Ex: 000000000000000" />
-                <Input label="AI" value={companyAi}
-                  onChange={(e) => setCompanyAi(e.target.value)} placeholder="Ex: 000000000000000" />
+            <div style={{ background: '#1d202a', borderRadius: 8, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#656a73', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Informations entreprise</p>
+              <div>
+                <label style={labelStyle}>Raison sociale</label>
+                <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Nom de l'entreprise" style={inputStyle} />
               </div>
-              <Input label={t('companyCapital')} value={companyCapital}
-                onChange={(e) => setCompanyCapital(e.target.value)} placeholder="Ex: 1 000 000" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div><label style={labelStyle}>RC</label><input type="text" value={companyRc} onChange={e => setCompanyRc(e.target.value)} placeholder="00-00-0000000" style={inputStyle} /></div>
+                <div><label style={labelStyle}>NIF</label><input type="text" value={companyNif} onChange={e => setCompanyNif(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
+                <div><label style={labelStyle}>NIS</label><input type="text" value={companyNis} onChange={e => setCompanyNis(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
+                <div><label style={labelStyle}>AI</label><input type="text" value={companyAi} onChange={e => setCompanyAi(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
+              </div>
+              <div>
+                <label style={labelStyle}>Capital</label>
+                <input type="text" value={companyCapital} onChange={e => setCompanyCapital(e.target.value)} placeholder="1 000 000" style={inputStyle} />
+              </div>
             </div>
           )}
 
-          <Select label={t('sectorLabel')} value={sector}
-            onChange={(e) => setSector(e.target.value)} options={SECTOR_OPTIONS} />
+          <div>
+            <label style={labelStyle}>Secteur d'activité</label>
+            <select value={sector} onChange={e => setSector(e.target.value)} style={selectStyle}>
+              {sectors.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
 
-          <Select label={t('countryLabel')} value={country}
-            onChange={(e) => setCountry(e.target.value)} options={COUNTRY_OPTIONS} />
+          <div>
+            <label style={labelStyle}>Pays</label>
+            <select value={country} onChange={e => setCountry(e.target.value)} style={selectStyle}>
+              <option value="dz">🇩🇿 Algérie</option>
+              <option value="tn">🇹🇳 Tunisie</option>
+              <option value="ma">🇲🇦 Maroc</option>
+              <option value="fr">🇫🇷 France</option>
+            </select>
+          </div>
 
-          <Select label={t('languageLabel')} value={language}
-            onChange={(e) => setLanguage(e.target.value)} options={LANGUAGE_OPTIONS} />
-
-          <Button className="w-full py-2 sm:py-2.5" type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}
+            style={{
+              width: '100%', padding: '11px 0', borderRadius: 8, fontSize: 14, fontWeight: 700,
+              border: '0.5px solid rgba(255,255,255,0.08)', cursor: loading ? 'default' : 'pointer',
+              background: '#1d202a', color: '#e8ebf0', opacity: loading ? 0.5 : 1, marginTop: 4,
+            }}>
             {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                {t('registerLoading')}
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <span style={{ width: 16, height: 16, border: '2px solid #e8ebf0', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', display: 'inline-block' }} />
+                Inscription...
               </span>
-            ) : t('registerButton')}
-          </Button>
+            ) : 'Créer mon compte'}
+          </button>
         </form>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
-          {t('alreadyAccount')}{' '}
-          <a href="/auth/login" className="text-blue-600 font-semibold hover:underline">{t('loginLink')}</a>
+        <p style={{ textAlign: 'center', fontSize: 12, color: '#656a73', marginTop: 16 }}>
+          Déjà un compte ?{' '}
+          <a href="/auth/login" style={{ color: '#a1a5ad', fontWeight: 600, textDecoration: 'none' }}>Se connecter</a>
         </p>
-      </Card>
+      </div>
     </div>
   );
 }

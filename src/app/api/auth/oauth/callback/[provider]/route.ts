@@ -22,7 +22,8 @@ const USER_URLS: Record<ValidProvider, { url: string; emailUrl?: string; parser:
     emailUrl: 'https://api.github.com/user/emails',
     parser: (data, emails) => {
       const primary = emails?.find((e) => e.primary && e.verified);
-      return { id: String(data.id), email: String(primary?.email || `${data.id}@github.local`), name: String(data.name || data.login) };
+      const email = primary?.email || data.email;
+      return { id: String(data.id), email: email ? String(email) : `gh-${data.id}@auth.local`, name: String(data.name || data.login) };
     },
   },
 };
@@ -37,15 +38,23 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
 
   const { searchParams } = new URL(_req.url);
   const code = searchParams.get('code');
-  const state = searchParams.get('state');
+  const callbackState = searchParams.get('state');
 
   if (!code) {
     return NextResponse.redirect(new URL('/auth/login?error=oauth_canceled', _req.url));
   }
 
-  // CSRF state validation
-  const expectedState = searchParams.get('state');
-  if (!expectedState) {
+  // CSRF state validation: compare against stored cookie
+  const cookieHeader = _req.headers.get('cookie') || '';
+  const cookies = Object.fromEntries(
+    cookieHeader.split(';').filter(Boolean).map(c => {
+      const [k, ...v] = c.trim().split('=');
+      return [k, v.join('=')];
+    })
+  );
+  const storedState = cookies['oauth_state'];
+
+  if (!callbackState || !storedState || callbackState !== storedState) {
     return NextResponse.redirect(new URL('/auth/login?error=oauth_invalid_state', _req.url));
   }
 
@@ -60,7 +69,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
         client_secret: provider === 'google' ? process.env.GOOGLE_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET,
         redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth/callback/${provider}`,
         grant_type: 'authorization_code',
-        state,
+        state: callbackState,
       }),
     });
     const tokenData = await tokenRes.json();
@@ -133,7 +142,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
       subscriptionStatus: user.subscriptionStatus,
     });
 
-    return NextResponse.redirect(new URL('/dashboard', _req.url));
+    const redirect = NextResponse.redirect(new URL('/dashboard', _req.url));
+    redirect.cookies.delete('oauth_state');
+    return redirect;
   } catch (error) {
     logger.error('OAuth callback error', { error: String(error) });
     return NextResponse.redirect(new URL('/auth/login?error=oauth_error', _req.url));

@@ -47,7 +47,6 @@ export async function POST(req: Request) {
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' ') : '';
     logger.error('Login error', { message: msg, stack });
-    console.error('[LOGIN_DEBUG]', msg, stack);
-    return NextResponse.json({ error: 'Erreur interne', debug: msg }, { status: 500 });
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }
