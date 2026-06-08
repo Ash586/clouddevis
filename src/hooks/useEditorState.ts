@@ -68,6 +68,7 @@ export function createEmptyDoc(mode: UserMode): DocumentState {
     garantieNotes: '',
     sectionOrder: [...DEFAULT_SECTION_ORDER],
     customFields: {},
+    logoPosition: 'right',
   };
 }
 

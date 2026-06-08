@@ -16,9 +16,20 @@ export function PreviewHeader({ doc, sf, bv, vb, t }: HeaderProps) {
 
   if (!vb('header') || !bv('docNumber','issueDate','validUntil','orderRef')) return null;
 
+  const logoUrl: string | undefined = isEnt ? doc.companyInfo?.logo : undefined;
+  const logoPos = doc.logoPosition ?? 'right';
+  const showLogoLeft = !!(logoUrl && logoPos === 'left');
+  const showLogoRight = !!(logoUrl && logoPos === 'right');
+
+  function LogoImg({ url }: { url: string }) {
+    return <img src={url} alt="Logo" className="max-w-[120px] max-h-[60px] object-contain" />;
+  }
+
   return (
     <div className="flex justify-between items-start mb-8">
-      <div className="flex items-start gap-4">
+      {/* LEFT SIDE: doc type + number + dates */}
+      <div className={`flex items-start gap-4 ${showLogoRight ? 'max-w-[50%]' : ''}`}>
+        {showLogoLeft && <LogoImg url={logoUrl!} />}
         <div>
           <h1 className="text-[28px] font-black text-slate-800 tracking-tight uppercase leading-none mb-2">{docTypeLabel}</h1>
           <div className="text-[10px] text-slate-500 font-semibold space-y-0.5">
@@ -29,7 +40,9 @@ export function PreviewHeader({ doc, sf, bv, vb, t }: HeaderProps) {
           </div>
         </div>
       </div>
-      <div className="text-right max-w-[260px]">
+      {/* RIGHT SIDE: company info + logo */}
+      <div className={`text-right max-w-[260px] ${showLogoLeft ? 'max-w-[50%]' : ''}`}>
+        {showLogoRight && <div className="flex justify-end mb-2"><LogoImg url={logoUrl!} /></div>}
         {isEnt && doc.companyInfo ? (
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
             <h2 className="text-sm font-black text-slate-800 mb-1">{doc.companyInfo.name}</h2>

@@ -211,12 +211,52 @@ function EditorContent() {
     switch (id) {
       case 'design':
         return <CollapsibleSection title={te('sections.design')} sectionId="design" {...dragProps} {...s()}>
-          {!hiddenFields.has('logo') && <div className="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-            <div className="w-14 h-14 bg-white border rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"><span className="text-[9px] text-slate-400">Logo</span></div>
-            <div className="flex-1">
-              <input type="file" accept="image/*"
-                className="text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+          {!hiddenFields.has('logo') && <div className="space-y-2">
+            <div className="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+              <div className="w-14 h-14 bg-white border rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                {doc.companyInfo?.logo ? (
+                  <img src={doc.companyInfo.logo} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-[9px] text-slate-400">Logo</span>
+                )}
+              </div>
+              <div className="flex-1 flex flex-wrap items-center gap-1">
+                <input type="file" accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 500 * 1024) { showToast('Logo max 500 Ko', 'error'); return; }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const dataUrl = ev.target?.result as string;
+                      updateCompanyInfo({ logo: dataUrl });
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                  className="text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                {doc.companyInfo?.logo && (
+                  <button onClick={() => updateCompanyInfo({ logo: '' })}
+                    className="text-[10px] text-red-500 font-semibold hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition">
+                    {te('removeLogo') || '✕ Supprimer'}
+                  </button>
+                )}
+              </div>
             </div>
+            {!hiddenFields.has('logoPosition') && doc.companyInfo?.logo && (
+              <div className="flex items-center gap-3 px-1">
+                <span className="text-[10px] font-bold text-slate-500">{te('logoPosition') || 'Position'}</span>
+                <div className="flex bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+                  <button onClick={() => updateDoc('logoPosition', 'left')}
+                    className={`px-3 py-1.5 text-[10px] font-bold rounded-md transition ${doc.logoPosition === 'left' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                    {te('logoLeft') || 'Gauche'}
+                  </button>
+                  <button onClick={() => updateDoc('logoPosition', 'right')}
+                    className={`px-3 py-1.5 text-[10px] font-bold rounded-md transition ${doc.logoPosition === 'right' || !doc.logoPosition ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                    {te('logoRight') || 'Droite'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>}
         </CollapsibleSection>;
 

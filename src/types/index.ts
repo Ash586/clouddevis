@@ -163,10 +163,11 @@ export interface DocumentState {
   garantieNotes: string;
   sectionOrder: string[];
   customFields: Record<string, Record<string, any>>;
+  logoPosition?: 'left' | 'right';
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
-  design: ['logo'],
+  design: ['logo', 'logoPosition'],
   general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
   mode: ['businessMode'],
   client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone', 'clientEmail'],

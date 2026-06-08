@@ -42,8 +42,12 @@ export function generateDocumentHTML(params: {
     ${S('.page','width:190mm;margin:0 auto;padding:45px 50px 30px;min-height:100vh;display:flex;flex-direction:column')}
     ${S('.top-section','flex:1')}
     ${S('.header','display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px')}
+    ${S('.header .brand','display:flex;align-items:flex-start;gap:12px')}
+    ${S('.header .brand .logo','max-width:120px;max-height:60px;object-fit:contain')}
     ${S('.header .brand h1','font-size:26px;font-weight:900;color:#1e3a5f;letter-spacing:-0.5px;margin:0;text-transform:uppercase')}
     ${S('.header .brand .sub','font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:1px')}
+    ${S('.header .meta-logo','text-align:right;margin-bottom:6px')}
+    ${S('.header .meta-logo img','max-width:120px;max-height:60px;object-fit:contain')}
     ${S('.header .meta','text-align:right')}
     ${S('.header .meta .num','font-size:18px;font-weight:900;color:#1e3a5f;margin-bottom:4px')}
     ${S('.header .meta .line','font-size:10px;color:#64748b;margin:1px 0')}
@@ -93,6 +97,8 @@ export function generateDocumentHTML(params: {
 
   const s = (v: string) => escHtml(v);
   const fmt = (n: number) => n.toLocaleString('fr-DZ');
+  const logoUrl = isEnt && doc.companyInfo?.logo ? doc.companyInfo.logo : null;
+  const logoPos = doc.logoPosition ?? 'right';
 
   let idx = 0;
   const tbody: string[] = [];
@@ -112,14 +118,20 @@ export function generateDocumentHTML(params: {
 <div class="top-section">
   <div class="header">
     <div class="brand">
-      <h1>` + docTypeLabel + `</h1>
-      <div class="sub">${tc('appName')}</div>
+      ` + (logoUrl && logoPos === 'left' ? `<img class="logo" src="` + s(logoUrl) + `" alt="Logo" />` : '') + `
+      <div>
+        <h1>` + docTypeLabel + `</h1>
+        <div class="sub">${tc('appName')}</div>
+      </div>
     </div>
-    <div class="meta">
-      ` + (sf('docNumber') ? `<div class="num">` + s(doc.documentNumber) + `</div>` : '') + `
-      ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + doc.date + `</div>` : '') + `
-      ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + doc.validUntil + `</div>` : '') + `
-      ` + (sf('orderRef') && doc.bcRef ? `<div class="line">${tp('orderRef')} ` + s(doc.bcRef) + `</div>` : '') + `
+    <div>
+      ` + (logoUrl && logoPos === 'right' ? `<div class="meta-logo"><img src="` + s(logoUrl) + `" alt="Logo" /></div>` : '') + `
+      <div class="meta">
+        ` + (sf('docNumber') ? `<div class="num">` + s(doc.documentNumber) + `</div>` : '') + `
+        ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + doc.date + `</div>` : '') + `
+        ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + doc.validUntil + `</div>` : '') + `
+        ` + (sf('orderRef') && doc.bcRef ? `<div class="line">${tp('orderRef')} ` + s(doc.bcRef) + `</div>` : '') + `
+      </div>
     </div>
   </div>
   <div class="hr"></div>
