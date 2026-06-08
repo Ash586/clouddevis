@@ -108,7 +108,7 @@ function SidebarInner() {
         {userDropdownOpen && (
           <>
             <div className="absolute top-full start-0 end-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/90 rounded-lg shadow-xl overflow-hidden z-20 animate-in">
-              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
+              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
