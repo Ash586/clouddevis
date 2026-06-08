@@ -60,6 +60,8 @@
 .admin-content :where(.text-emerald-600) { color: var(--green) !important; }
 .admin-content :where(.text-blue-600) { color: var(--text) !important; }
 .admin-content :where(.text-blue-700) { color: var(--text) !important; }
+.admin-content :where(.text-indigo-600) { color: var(--text) !important; }
+.admin-content :where(.text-cyan-600) { color: var(--text) !important; }
 .admin-content :where(select), .admin-content :where(option) { color: var(--text) !important; }
 .admin-content :where(.text-amber-500) { color: var(--amber) !important; }
 .admin-content :where(.text-amber-600) { color: var(--amber) !important; }
