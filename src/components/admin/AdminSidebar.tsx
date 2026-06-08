@@ -7,83 +7,113 @@ import {
   Users,
   BarChart3,
   CreditCard,
+  Handshake,
   FileText,
-  ScrollText,
   Activity,
   Settings,
-  LogOut,
-  ChevronLeft,
 } from 'lucide-react';
 
-const NAV_ITEMS = [
+interface NavItemConfig {
+  key: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: 'pending' | number;
+}
+
+const NAV_ITEMS: NavItemConfig[] = [
   { key: 'dashboard', href: '/admin', icon: LayoutDashboard },
   { key: 'users', href: '/admin/users', icon: Users },
   { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
   { key: 'subscriptions', href: '/admin/subscriptions', icon: CreditCard },
+  { key: 'partners', href: '/admin/partners', icon: Handshake },
   { key: 'reports', href: '/admin/reports', icon: FileText },
-  { key: 'logs', href: '/admin/logs', icon: ScrollText },
-  { key: 'system', href: '/admin/system', icon: Activity },
+  { key: 'logs', href: '/admin/logs', icon: Activity },
+  { key: 'settings', href: '/admin/settings', icon: Settings },
 ];
+
+function NavItem({ item, pathname, router, t }: {
+  item: NavItemConfig;
+  pathname: string;
+  router: ReturnType<typeof useRouter>;
+  t: (key: string) => string;
+}) {
+  const Icon = item.icon;
+  const isActive = item.href === '/admin'
+    ? pathname === '/admin'
+    : pathname.startsWith(item.href);
+
+  return (
+    <button
+      onClick={() => router.push(item.href)}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '7px 10px',
+        borderRadius: 7,
+        fontSize: 13,
+        fontWeight: 500,
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'all 0.15s',
+        background: isActive ? '#222220' : 'transparent',
+        color: isActive ? '#e8e6de' : '#9c9a90',
+        borderWidth: isActive ? 0.5 : 0,
+        borderStyle: 'solid',
+        borderColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+      }}
+      onMouseEnter={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+          e.currentTarget.style.color = '#e8e6de';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = '#9c9a90';
+        }
+      }}
+    >
+      <Icon size={15} />
+      <span style={{ flex: 1, textAlign: 'left' }}>{t(`nav.${item.key}`)}</span>
+    </button>
+  );
+}
 
 export function AdminSidebar() {
   const t = useTranslations('admin');
   const pathname = usePathname();
   const router = useRouter();
 
-  const isActive = (href: string) => {
-    if (href === '/admin') return pathname === '/admin';
-    return pathname.startsWith(href);
-  };
-
-  async function handleLogout() {
-    await fetch('/api/admin/auth/logout', { method: 'POST' });
-    router.push('/admin/login');
-  }
-
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-white min-h-screen">
-      <div className="p-5 border-b border-slate-700/50">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-            <span className="text-white font-black text-sm">CD</span>
-          </div>
-          <div>
-            <span className="text-lg font-black tracking-tight">CloudDevis</span>
-            <p className="text-[10px] text-slate-400 font-semibold">Admin Panel</p>
-          </div>
+    <aside
+      style={{
+        width: 200,
+        flexShrink: 0,
+        borderRight: '0.5px solid rgba(255,255,255,0.06)',
+        background: '#181816',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ padding: '18px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#e8e6de', letterSpacing: '-0.3px' }}>
+            ☁️ CloudDevis
+          </span>
+          <span style={{ fontSize: 10, color: '#5c5a54', fontWeight: 500 }}>
+            Admin
+          </span>
         </div>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1">
-        {NAV_ITEMS.map(item => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
-          return (
-            <button
-              key={item.href}
-              onClick={() => router.push(item.href)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
-                active
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`}
-            >
-              <Icon className="w-4.5 h-4.5" />
-              {t(`nav.${item.key}`)}
-            </button>
-          );
-        })}
+      <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {NAV_ITEMS.map(item => (
+          <NavItem key={item.href} item={item} pathname={pathname} router={router} t={t} />
+        ))}
       </nav>
-
-      <div className="p-3 border-t border-slate-700/50">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-red-400 transition"
-        >
-          <LogOut className="w-4.5 h-4.5" />
-          {t('nav.logout')}
-        </button>
-      </div>
     </aside>
   );
 }
