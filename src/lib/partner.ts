@@ -1,0 +1,81 @@
+import { prisma } from '@/lib/prisma';
+import { randomBytes } from 'crypto';
+
+export async function generateReferralCode(userId: string): Promise<string> {
+  const prefix = 'CD';
+  let code: string;
+  let exists = true;
+
+  while (exists) {
+    const suffix = randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
+    code = `${prefix}${suffix}`;
+    exists = !!(await prisma.partner.findUnique({ where: { code } }));
+  }
+
+  return code!;
+}
+
+export async function calculateCommission(subscriptionPrice: number, partnerTier: string): Promise<{ direct: number; override: number }> {
+  const directRate = 0.20;
+  const overrideRate = 0.05;
+
+  const direct = Math.round(subscriptionPrice * directRate);
+  const override = partnerTier === 'SUPER_AFFILIATE' ? Math.round(subscriptionPrice * overrideRate) : 0;
+
+  return { direct, override };
+}
+
+export async function getPartnerReferralUrl(code: string): Promise<string> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+  return `${baseUrl}/auth/register?ref=${code}`;
+}
+
+const SUBSCRIPTION_PRICES: Record<string, number> = {
+  TRIAL: 0,
+  FREE: 0,
+  BASIC: 1000,
+  PRO: 2000,
+};
+
+export async function handleReferralConversion(userId: string, newStatus: string): Promise<void> {
+  if (!['BASIC', 'PRO'].includes(newStatus)) return;
+
+  const referral = await prisma.referral.findUnique({
+    where: { referredUserId: userId },
+    include: { partner: { select: { id: true, tier: true, parentId: true } } },
+  });
+
+  if (!referral || referral.status === 'CONVERTED') return;
+
+  const price = SUBSCRIPTION_PRICES[newStatus] || 0;
+  if (price <= 0) return;
+
+  const commission = await calculateCommission(price, referral.partner.tier);
+
+  await prisma.$transaction([
+    prisma.referral.update({
+      where: { id: referral.id },
+      data: { status: 'CONVERTED', convertedAt: new Date() },
+    }),
+    prisma.commission.create({
+      data: {
+        partnerId: referral.partner.id,
+        amount: commission.direct,
+        type: 'DIRECT',
+        status: 'PENDING',
+      },
+    }),
+    ...(commission.override > 0 && referral.partner.parentId
+      ? [
+          prisma.commission.create({
+            data: {
+              partnerId: referral.partner.parentId,
+              amount: commission.override,
+              type: 'OVERRIDE',
+              status: 'PENDING',
+            },
+          }),
+        ]
+      : []),
+  ]);
+}

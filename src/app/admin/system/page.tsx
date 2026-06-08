@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import {
   Activity, Server, Database, HardDrive, Cpu, Globe,
   Users, FileText, AlertTriangle, LogIn, BarChart3, Eye,
+  Shield, Loader2, CheckCircle,
 } from 'lucide-react';
 
 interface SystemData {
@@ -28,6 +29,9 @@ export default function AdminSystemPage() {
   const t = useTranslations('admin');
   const [data, setData] = useState<SystemData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [backups, setBackups] = useState<{ id: string; type: string; status: string; startedAt: string; completedAt: string | null }[]>([]);
+  const [showBackups, setShowBackups] = useState(false);
 
   useEffect(() => {
     fetch('/api/admin/system')
@@ -46,6 +50,30 @@ export default function AdminSystemPage() {
     const m = Math.floor((seconds % 3600) / 60);
     return `${d}d ${h}h ${m}m`;
   };
+
+  const handleBackup = async () => {
+    setBackupLoading(true);
+    try {
+      const res = await fetch('/api/admin/system/backup', { method: 'POST' });
+      if (res.ok) {
+        setShowBackups(true);
+        fetchBackups();
+      }
+    } catch {}
+    setBackupLoading(false);
+  };
+
+  const fetchBackups = async () => {
+    try {
+      const res = await fetch('/api/admin/system/backup');
+      if (res.ok) {
+        const d = await res.json();
+        setBackups(d.backups);
+      }
+    } catch {}
+  };
+
+  useEffect(() => { if (showBackups) fetchBackups(); }, [showBackups]);
 
   const metrics = [
     { label: t('system.status'), value: t('system.healthy'), icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -213,6 +241,35 @@ export default function AdminSystemPage() {
           <span className="text-slate-400">Platforme</span>
           <span className="font-semibold text-slate-800">{data.platform}</span>
         </div>
+      </Card>
+
+      {/* Backup */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2"><Shield className="w-4 h-4" />Sauvegardes</h2>
+          <button
+            onClick={handleBackup}
+            disabled={backupLoading}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
+          >
+            {backupLoading && <Loader2 className="w-3 h-3 animate-spin" />}
+            Effectuer une sauvegarde
+          </button>
+        </div>
+        {showBackups && backups.length > 0 && (
+          <div className="space-y-2">
+            {backups.map(b => (
+              <div key={b.id} className="flex items-center justify-between py-2 border-b last:border-0 text-sm">
+                <div className="flex items-center gap-2">
+                  {b.status === 'completed' ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />}
+                  <span className="font-semibold">{b.type}</span>
+                </div>
+                <span className="text-xs text-slate-400">{new Date(b.startedAt).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {!showBackups && <p className="text-xs text-slate-400">Aucune sauvegarde récente. Cliquez pour effectuer une sauvegarde manuelle.</p>}
       </Card>
     </div>
   );

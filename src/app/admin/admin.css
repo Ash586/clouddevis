@@ -38,3 +38,38 @@
 .admin-body .mono {
   font-family: 'IBM Plex Mono', monospace;
 }
+
+/* ── Dark theme overrides for page.tsx ── */
+
+.admin-content :where(.bg-white) { background: var(--bg2) !important; }
+.admin-content :where(.bg-slate-50) { background: var(--bg3) !important; }
+.admin-content :where(.bg-slate-100) { background: var(--bg4) !important; }
+.admin-content :where(.border-slate-200) { border-color: var(--border) !important; }
+.admin-content :where(.border-slate-100) { border-color: var(--border2) !important; }
+.admin-content :where(.border-emerald-100) { border-color: var(--green-bdr) !important; }
+.admin-content :where(.border-blue-100) { border-color: var(--blue-bdr) !important; }
+.admin-content :where(.border-amber-100) { border-color: var(--amber-bdr) !important; }
+.admin-content :where(.text-slate-900) { color: var(--text) !important; }
+.admin-content :where(.text-slate-800) { color: var(--text) !important; }
+.admin-content :where(.text-slate-700) { color: var(--text) !important; }
+.admin-content :where(.text-slate-600) { color: var(--text2) !important; }
+.admin-content :where(.text-slate-500) { color: var(--text2) !important; }
+.admin-content :where(.text-slate-400) { color: var(--text3) !important; }
+.admin-content :where(.text-emerald-500) { color: var(--green) !important; }
+.admin-content :where(.text-emerald-600) { color: var(--green) !important; }
+.admin-content :where(.text-blue-600) { color: var(--blue) !important; }
+.admin-content :where(.text-amber-500) { color: var(--amber) !important; }
+.admin-content :where(.text-amber-600) { color: var(--amber) !important; }
+.admin-content :where(.text-red-600) { color: var(--red) !important; }
+.admin-content :where(.bg-emerald-50) { background: var(--green-bg) !important; }
+.admin-content :where(.bg-blue-50) { background: var(--blue-bg) !important; }
+.admin-content :where(.bg-amber-50) { background: var(--amber-bg) !important; }
+.admin-content :where(.bg-red-50) { background: var(--red-bg) !important; }
+.admin-content :where(.rounded-2xl) { border-radius: var(--r) !important; }
+.admin-content :where(.rounded-xl) { border-radius: var(--rsm) !important; }
+.admin-content :where(.font-mono) { font-family: 'IBM Plex Mono', monospace !important; }
+.admin-content :where(.border-b) { border-bottom-color: var(--border2) !important; }
+.admin-content .bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
+.admin-content .flex.gap-1.bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
+.admin-content .bg-slate-100.text-slate-900 { background: var(--bg3) !important; color: var(--text) !important; }
+.admin-content .bg-slate-50.rounded-xl { background: var(--bg3) !important; }

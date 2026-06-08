@@ -53,7 +53,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       <main style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <AdminNavbar onMenuToggle={toggleMenu} menuOpen={menuOpen} />
-        <div style={{ padding: '24px 28px' }}>
+        <div className="admin-content" style={{ padding: '24px 28px' }}>
           {children}
         </div>
       </main>
