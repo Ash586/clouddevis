@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card } from '@/components/ui/card';
-import { AlertTriangle, LogIn, Activity, Trash2, Search } from 'lucide-react';
+import { AlertTriangle, LogIn, Activity, Trash2 } from 'lucide-react';
 
 interface LogEntry {
   id: string; action: string; entity: string; entityId: string | null;
@@ -11,16 +10,24 @@ interface LogEntry {
   adminName: string | null; userName: string | null; createdAt: string;
 }
 
+const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px', marginBottom: 12 };
+const input = { background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '9px 12px', fontSize: 13, color: '#e8ebf0', outline: 'none' };
+
+const actionColors: Record<string, { bg: string; color: string }> = {
+  CREATE: { bg: 'rgba(74,222,128,0.10)', color: '#4ade80' },
+  UPDATE: { bg: 'rgba(74,158,255,0.10)', color: '#4a9eff' },
+  DELETE: { bg: 'rgba(248,113,113,0.10)', color: '#f87171' },
+  LOGIN: { bg: 'rgba(251,191,36,0.10)', color: '#fbbf24' },
+  LOGOUT: { bg: '#282c38', color: '#a1a5ad' },
+  ERROR: { bg: 'rgba(248,113,113,0.10)', color: '#f87171' },
+};
+
 export default function AdminLogsPage() {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState('');
-  const [entityFilter, setEntityFilter] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
@@ -29,112 +36,72 @@ export default function AdminLogsPage() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: '50' });
     if (actionFilter) params.set('action', actionFilter);
-    if (entityFilter) params.set('entity', entityFilter);
-    if (dateFrom) params.set('dateFrom', dateFrom);
-    if (dateTo) params.set('dateTo', dateTo);
-    if (search) params.set('search', search);
     fetch(`/api/admin/logs?${params}`)
       .then(r => r.ok ? r.json() : { logs: [], pagination: { totalPages: 1 } })
       .then(d => { setLogs(d.logs); setTotalPages(d.pagination.totalPages); setTotal(d.pagination.total); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page, actionFilter, entityFilter, dateFrom, dateTo, search]);
-
-  const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); };
-
-  const actionColors: Record<string, string> = {
-    CREATE: 'bg-emerald-50 text-emerald-600',
-    UPDATE: 'bg-blue-50 text-blue-600',
-    DELETE: 'bg-red-50 text-red-600',
-    LOGIN: 'bg-amber-50 text-amber-600',
-    LOGOUT: 'bg-slate-100 text-slate-600',
-    ERROR: 'bg-red-50 text-red-600',
-  };
-
-  const actionIcons: Record<string, typeof Activity> = {
-    CREATE: Activity,
-    UPDATE: Activity,
-    DELETE: Trash2,
-    LOGIN: LogIn,
-    LOGOUT: LogIn,
-    ERROR: AlertTriangle,
-  };
+  }, [page, actionFilter]);
 
   const actionButtons = [
-    { value: '', label: t('filter.all'), icon: Activity },
-    { value: 'LOGIN', label: 'Login', icon: LogIn },
-    { value: 'CREATE', label: 'Create', icon: Activity },
-    { value: 'UPDATE', label: 'Update', icon: Activity },
-    { value: 'DELETE', label: 'Delete', icon: Trash2 },
-    { value: 'ERROR', label: 'Error', icon: AlertTriangle },
+    { value: '', label: 'Tous' },
+    { value: 'LOGIN', label: 'Login' },
+    { value: 'CREATE', label: 'Create' },
+    { value: 'UPDATE', label: 'Update' },
+    { value: 'DELETE', label: 'Delete' },
+    { value: 'ERROR', label: 'Error' },
   ];
 
-  const entityOptions = ['', 'USER', 'DOCUMENT', 'SUBSCRIPTION', 'SYSTEM', 'CLIENT', 'TEMPLATE', 'TEAM', 'ADMIN'];
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-2xl font-black text-slate-900">{t('nav.logs')}</h1>
-        <p className="text-sm text-slate-400">{total} entrées</p>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{t('nav.logs')}</h1>
+        <p style={{ fontSize: 13, color: '#656a73' }}>{total} entrées</p>
       </div>
 
-      {/* Filters */}
-      <Card className="p-4">
-        <div className="flex gap-2 mb-3 flex-wrap">
-          {actionButtons.map(a => {
-            const Icon = a.icon;
-            return (
-              <button key={a.value} onClick={() => { setActionFilter(a.value); setPage(1); }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${actionFilter === a.value ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-                <Icon className="w-3.5 h-3.5" />
-                {a.label}
-              </button>
-            );
-          })}
+      <div style={card}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+          {actionButtons.map(a => (
+            <button key={a.value} onClick={() => { setActionFilter(a.value); setPage(1); }}
+              style={{
+                padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                background: actionFilter === a.value ? '#1d202a' : '#282c38',
+                color: actionFilter === a.value ? '#e8ebf0' : '#a1a5ad',
+                border: actionFilter === a.value ? '0.5px solid rgba(255,255,255,0.08)' : 'none',
+              }}>{a.label}</button>
+          ))}
         </div>
+      </div>
 
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher..." className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
-          <select value={entityFilter} onChange={e => { setEntityFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Toutes entités</option>
-            {entityOptions.filter(Boolean).map(e => (<option key={e} value={e}>{e}</option>))}
-          </select>
-          <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
-          <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
-        </form>
-      </Card>
-
-      {/* Logs List */}
-      <Card className="p-4">
+      <div style={card}>
         {loading ? (
-          <div className="py-12 text-center"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>
+          <div style={{ textAlign: 'center', padding: '30px 0' }}>
+            <div style={{ width: 24, height: 24, border: '2px solid #656a73', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
+          </div>
         ) : logs.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 text-sm">{t('noLogs')}</div>
+          <div style={{ textAlign: 'center', padding: '30px 0', fontSize: 13, color: '#656a73' }}>{t('noLogs')}</div>
         ) : (
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {logs.map(log => {
-              const Icon = actionIcons[log.action] || Activity;
+              const ac = actionColors[log.action] || { bg: '#282c38', color: '#a1a5ad' };
               return (
-                <div key={log.id} className={`flex items-start gap-3 p-3 rounded-xl ${log.action === 'ERROR' ? 'bg-red-50 border border-red-100' : 'bg-slate-50'}`}>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 ${actionColors[log.action] || 'bg-slate-100 text-slate-600'}`}>
-                    <Icon className="w-3 h-3" />
+                <div key={log.id} style={{
+                  display: 'flex', gap: 10, padding: 10, borderRadius: 6,
+                  background: log.action === 'ERROR' ? 'rgba(248,113,113,0.05)' : '#1d202a',
+                  border: log.action === 'ERROR' ? '0.5px solid rgba(248,113,113,0.10)' : 'none',
+                }}>
+                  <span style={{
+                    display: 'inline-flex', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 20,
+                    background: ac.bg, color: ac.color, alignItems: 'center', gap: 4, whiteSpace: 'nowrap',
+                  }}>
                     {log.action}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-800">
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#e8ebf0', margin: 0 }}>
                       {log.entity} {log.entityId ? `#${log.entityId.slice(0, 8)}` : ''}
                     </p>
-                    {log.details != null && (
-                      <p className="text-xs text-slate-500 mt-0.5 font-mono truncate">
-                        {typeof log.details === 'string' ? log.details : JSON.stringify(log.details).slice(0, 100)}
-                      </p>
-                    )}
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {log.adminName && `by ${log.adminName}`}
+                    <p style={{ fontSize: 12, color: '#656a73', margin: '2px 0 0' }}>
+                      {log.adminName && `${log.adminName}`}
                       {log.userName && ` → ${log.userName}`}
                       {log.ipAddress && ` • ${log.ipAddress}`}
                       {' • '}{new Date(log.createdAt).toLocaleString()}
@@ -145,16 +112,19 @@ export default function AdminLogsPage() {
             })}
           </div>
         )}
-      </Card>
+      </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
           <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
-            className="px-3 py-1.5 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40">←</button>
-          <span className="px-3 py-1.5 text-sm text-slate-500 font-semibold">{page} / {totalPages}</span>
+            style={{ padding: '6px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: page === 1 ? 'default' : 'pointer', background: '#282c38', color: page === 1 ? '#656a73' : '#a1a5ad' }}>
+            ←
+          </button>
+          <span style={{ padding: '6px 14px', fontSize: 13, color: '#656a73', fontWeight: 600 }}>{page} / {totalPages}</span>
           <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
-            className="px-3 py-1.5 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40">→</button>
+            style={{ padding: '6px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: page === totalPages ? 'default' : 'pointer', background: '#282c38', color: page === totalPages ? '#656a73' : '#a1a5ad' }}>
+            →
+          </button>
         </div>
       )}
     </div>

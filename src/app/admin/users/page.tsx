@@ -3,15 +3,26 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { MobileTable } from '@/components/mobile/MobileTable';
-import { Eye, Ban, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { Eye, Ban, CheckCircle } from 'lucide-react';
 
 interface User {
   id: string; name: string; email: string; country: string; mode: string;
   subscription: string; docCount: number; clientCount: number; createdAt: string;
   suspended: boolean;
 }
+
+const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px', marginBottom: 12 };
+const input = { background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '9px 12px', fontSize: 13, color: '#e8ebf0', outline: 'none' };
+const select = { ...input, cursor: 'pointer' };
+const btnPrimary = { padding: '9px 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: '#1d202a', color: '#e8ebf0' };
+
+const statusPill: Record<string, { bg: string; color: string }> = {
+  TRIAL: { bg: 'rgba(251,191,36,0.10)', color: '#fbbf24' },
+  BASIC: { bg: 'rgba(74,158,255,0.10)', color: '#4a9eff' },
+  PRO: { bg: 'rgba(74,222,128,0.10)', color: '#4ade80' },
+  EXPIRED: { bg: 'rgba(248,113,113,0.10)', color: '#f87171' },
+  FREE: { bg: '#282c38', color: '#a1a5ad' },
+};
 
 export default function AdminUsersPage() {
   const t = useTranslations('admin');
@@ -21,7 +32,6 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [suspendedFilter, setSuspendedFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [actionUser, setActionUser] = useState<User | null>(null);
@@ -33,16 +43,14 @@ export default function AdminUsersPage() {
     const params = new URLSearchParams({ page: String(page), limit: '20' });
     if (search) params.set('search', search);
     if (statusFilter) params.set('status', statusFilter);
-    if (suspendedFilter) params.set('suspended', suspendedFilter);
     fetch(`/api/admin/users?${params}`)
       .then(r => r.ok ? r.json() : { users: [], pagination: { totalPages: 1 } })
       .then(d => { setUsers(d.users); setTotalPages(d.pagination.totalPages); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [page, statusFilter, suspendedFilter, search]);
+  }, [page, statusFilter, search]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
-
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchUsers(); };
 
   const handleSuspend = async () => {
@@ -51,152 +59,143 @@ export default function AdminUsersPage() {
     try {
       const endpoint = actionType === 'suspend' ? 'suspend' : 'unsuspend';
       const res = await fetch(`/api/admin/users/${actionUser.id}/${endpoint}`, { method: 'POST' });
-      if (res.ok) {
-        fetchUsers();
-        setActionUser(null);
-        setActionType(null);
-      }
+      if (res.ok) { fetchUsers(); setActionUser(null); setActionType(null); }
     } catch {}
     setActionLoading(false);
   };
 
-  const statusColors: Record<string, string> = {
-    TRIAL: 'bg-amber-50 text-amber-600',
-    BASIC: 'bg-blue-50 text-blue-600',
-    PRO: 'bg-emerald-50 text-emerald-600',
-    EXPIRED: 'bg-red-50 text-red-600',
-    FREE: 'bg-slate-50 text-slate-600',
-  };
-
-  const columns = [
-    { key: 'name', label: t('table.name') },
-    { key: 'email', label: t('table.email') },
-    {
-      key: 'suspended', label: t('table.status'),
-      render: (_v: unknown, row: Record<string, unknown>) => (
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${row.suspended ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
-          {row.suspended ? t('users.suspended') : t('users.active')}
-        </span>
-      ),
-    },
-    {
-      key: 'subscription', label: t('table.subscription'),
-      render: (v: unknown) => (
-        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${statusColors[String(v)] || 'bg-slate-50 text-slate-600'}`}>
-          {String(v)}
-        </span>
-      ),
-    },
-    { key: 'docCount', label: t('table.docs') },
-    {
-      key: 'actions', label: t('table.actions'),
-      render: (_v: unknown, row: Record<string, unknown>) => (
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => router.push(`/admin/users/${row.id}`)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
-            title={t('users.detail')}
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          {row.suspended ? (
-            <button
-              onClick={() => { setActionUser({ id: String(row.id), name: String(row.name), email: String(row.email), country: String(row.country), mode: String(row.mode), subscription: String(row.subscription), docCount: Number(row.docCount), clientCount: Number(row.clientCount), createdAt: String(row.createdAt), suspended: true }); setActionType('unsuspend'); }}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition"
-              title={t('users.unsuspend')}
-            >
-              <CheckCircle className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={() => { setActionUser({ id: String(row.id), name: String(row.name), email: String(row.email), country: String(row.country), mode: String(row.mode), subscription: String(row.subscription), docCount: Number(row.docCount), clientCount: Number(row.clientCount), createdAt: String(row.createdAt), suspended: false }); setActionType('suspend'); }}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition"
-              title={t('users.suspend')}
-            >
-              <Ban className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-black text-slate-900">{t('nav.users')}</h1>
+    <div>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', marginBottom: 20 }}>{t('nav.users')}</h1>
 
-      {/* Filters */}
-      <Card className="p-4">
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+      <div style={card}>
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' as const }}>
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder={tc('search')} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
-          <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+            placeholder={tc('search')} style={{ ...input, flex: 1, minWidth: 180 }} />
+          <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }} style={{ ...select, minWidth: 150 }}>
             <option value="">{t('filter.allStatus')}</option>
-            <option value="TRIAL">TRIAL</option>
-            <option value="BASIC">BASIC</option>
-            <option value="PRO">PRO</option>
-            <option value="EXPIRED">EXPIRED</option>
-            <option value="FREE">FREE</option>
+            {['TRIAL', 'BASIC', 'PRO', 'EXPIRED', 'FREE'].map(s => (<option key={s} value={s}>{s}</option>))}
           </select>
-          <select value={suspendedFilter} onChange={e => { setSuspendedFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">{t('users.active')} / {t('users.suspended')}</option>
-            <option value="true">{t('users.suspended')}</option>
-            <option value="false">{t('users.active')}</option>
-          </select>
-          <button type="submit" className="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition">{tc('search')}</button>
+          <button type="submit" style={btnPrimary}>{tc('search')}</button>
         </form>
-      </Card>
+      </div>
 
-      {/* Users Table */}
-      <Card className="p-4">
+      <div style={card}>
         {loading ? (
-          <div className="py-12 text-center"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>
+          <div style={{ textAlign: 'center', padding: '30px 0' }}>
+            <div style={{ width: 24, height: 24, border: '2px solid #656a73', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
+          </div>
         ) : users.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 text-sm">{t('noUsers')}</div>
+          <div style={{ textAlign: 'center', padding: '30px 0', fontSize: 13, color: '#656a73' }}>{t('noUsers')}</div>
         ) : (
-          <MobileTable columns={columns} data={users} keyField="id" />
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
+                  {[t('table.name'), t('table.email'), t('table.status'), t('table.subscription'), t('table.docs'), ''].map(h => (
+                    <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#656a73' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => {
+                  const pill = statusPill[u.subscription] || statusPill.FREE;
+                  return (
+                    <tr key={u.id} style={{ borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '8px 12px', fontWeight: 600, color: '#e8ebf0' }}>{u.name}</td>
+                      <td style={{ padding: '8px 12px', color: '#a1a5ad' }}>{u.email}</td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <span style={{
+                          display: 'inline-flex', fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 20,
+                          background: u.suspended ? 'rgba(248,113,113,0.10)' : 'rgba(74,222,128,0.10)',
+                          color: u.suspended ? '#f87171' : '#4ade80',
+                        }}>
+                          {u.suspended ? t('users.suspended') : t('users.active')}
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <span style={{ display: 'inline-flex', fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 20, background: pill.bg, color: pill.color }}>
+                          {u.subscription}
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px 12px', color: '#a1a5ad' }}>{u.docCount}</td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button onClick={() => router.push(`/admin/users/${u.id}`)}
+                            style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: '#282c38', color: '#a1a5ad', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Eye size={14} />
+                          </button>
+                          {u.suspended ? (
+                            <button onClick={() => { setActionUser(u); setActionType('unsuspend'); }}
+                              style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: 'rgba(74,222,128,0.10)', color: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <CheckCircle size={14} />
+                            </button>
+                          ) : (
+                            <button onClick={() => { setActionUser(u); setActionType('suspend'); }}
+                              style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: 'rgba(248,113,113,0.10)', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Ban size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-      </Card>
+      </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
             <button key={p} onClick={() => setPage(p)}
-              className={`w-9 h-9 rounded-xl text-sm font-bold transition ${p === page ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{p}</button>
+              style={{
+                width: 34, height: 34, borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                background: p === page ? '#1d202a' : 'transparent',
+                color: p === page ? '#e8ebf0' : '#a1a5ad',
+                border: p === page ? '0.5px solid rgba(255,255,255,0.08)' : 'none',
+              }}>{p}</button>
           ))}
         </div>
       )}
 
-      {/* Suspend/Unsuspend Confirmation Modal */}
       {actionUser && actionType && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setActionUser(null); setActionType(null); }}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${actionType === 'suspend' ? 'bg-red-50' : 'bg-emerald-50'}`}>
-                {actionType === 'suspend' ? <Ban className="w-5 h-5 text-red-600" /> : <CheckCircle className="w-5 h-5 text-emerald-600" />}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={() => { setActionUser(null); setActionType(null); }}>
+          <div style={{ background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: 24, maxWidth: 360, width: '100%' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: actionType === 'suspend' ? 'rgba(248,113,113,0.10)' : 'rgba(74,222,128,0.10)',
+              }}>
+                {actionType === 'suspend' ? <Ban size={20} style={{ color: '#f87171' }} /> : <CheckCircle size={20} style={{ color: '#4ade80' }} />}
               </div>
               <div>
-                <h3 className="font-bold text-slate-900">
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>
                   {actionType === 'suspend' ? t('users.suspend') : t('users.unsuspend')}
                 </h3>
-                <p className="text-sm text-slate-500">{actionUser.name} ({actionUser.email})</p>
+                <p style={{ fontSize: 13, color: '#a1a5ad', margin: '2px 0 0' }}>{actionUser.name} ({actionUser.email})</p>
               </div>
             </div>
-            <p className="text-sm text-slate-600 mb-6">
+            <p style={{ fontSize: 13, color: '#a1a5ad', marginBottom: 20 }}>
               {actionType === 'suspend' ? t('users.suspendConfirm') : t('users.unsuspendConfirm')}
             </p>
-            <div className="flex gap-3">
+            <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => { setActionUser(null); setActionType(null); }}
-                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
+                style={{ flex: 1, padding: '10px 0', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: '#282c38', color: '#a1a5ad' }}>
                 {tc('cancel')}
               </button>
               <button onClick={handleSuspend} disabled={actionLoading}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-50 ${actionType === 'suspend' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 6, fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'default' : 'pointer',
+                  background: actionType === 'suspend' ? 'rgba(248,113,113,0.10)' : 'rgba(74,222,128,0.10)',
+                  color: actionType === 'suspend' ? '#f87171' : '#4ade80',
+                  opacity: actionLoading ? 0.5 : 1,
+                }}>
                 {actionLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                  <div style={{ width: 20, height: 20, border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
                 ) : (
                   actionType === 'suspend' ? t('users.suspend') : t('users.unsuspend')
                 )}

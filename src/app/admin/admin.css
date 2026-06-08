@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg: #0f0f0d;
-  --bg2: #181816;
-  --bg3: #222220;
-  --bg4: #2c2c29;
+  --bg: #0b0d12;
+  --bg2: #14171e;
+  --bg3: #1d202a;
+  --bg4: #282c38;
   --border: rgba(255,255,255,0.08);
   --border2: rgba(255,255,255,0.04);
-  --text: #e8e6de;
-  --text2: #9c9a90;
-  --text3: #5c5a54;
+  --text: #e8ebf0;
+  --text2: #a1a5ad;
+  --text3: #656a73;
   --blue: #4a9eff;
   --blue-bg: rgba(74,158,255,0.10);
   --blue-bdr: rgba(74,158,255,0.20);

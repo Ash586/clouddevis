@@ -98,11 +98,11 @@ export default function AdminDashboardPage() {
     DELETE: '#E24B4A', ERROR: '#E24B4A',
   };
 
-  const avatarColors = ['bg-blue-100 text-blue-600', 'bg-emerald-100 text-emerald-600', 'bg-amber-100 text-amber-600', 'bg-red-100 text-red-600'];
+  const avatarColors = ['bg-slate-50 text-slate-400', 'bg-emerald-100 text-emerald-600', 'bg-amber-100 text-amber-600', 'bg-red-100 text-red-600'];
   const subPills: Record<string, { bg: string; label: string }> = {
     PRO: { bg: 'bg-emerald-50 text-emerald-600', label: 'Pro' },
-    BASIC: { bg: 'bg-blue-50 text-blue-600', label: 'Essai' },
-    TRIAL: { bg: 'bg-blue-50 text-blue-600', label: 'Essai' },
+    BASIC: { bg: 'bg-slate-100 text-slate-500', label: 'Basique' },
+    TRIAL: { bg: 'bg-slate-100 text-slate-500', label: 'Essai' },
     EXPIRED: { bg: 'bg-amber-50 text-amber-600', label: 'Expiré' },
     FREE: { bg: 'bg-slate-100 text-slate-500', label: 'Free' },
   };
@@ -444,7 +444,7 @@ export default function AdminDashboardPage() {
           />
           <RoleCard
             icon="✏️"
-            bg="bg-blue-50"
+            bg="bg-slate-100"
             name="EDITOR — Gestion opérationnelle"
             desc="Toutes les permissions VIEWER + actions sur utilisateurs et abonnements"
             perms={['+ modifier utilisateurs', '+ suspendre comptes', '+ gérer abonnements', '+ envoyer messages', '+ modifier contenu']}
@@ -546,7 +546,7 @@ function SparklineChart() {
           className="flex-1 rounded-sm"
           style={{
             height: `${h}%`,
-            background: i === heights.length - 1 ? '#1D9E75' : '#c5d5e8',
+            background: i === heights.length - 1 ? '#4ade80' : '#343840',
           }}
         />
       ))}
@@ -557,7 +557,7 @@ function SparklineChart() {
 function ApiRow({ method, path, desc }: { method: string; path: string; desc: string }) {
   const methodColors: Record<string, string> = {
     GET: 'bg-emerald-50 text-emerald-600',
-    POST: 'bg-blue-50 text-blue-600',
+    POST: 'bg-slate-100 text-slate-500',
     PATCH: 'bg-amber-50 text-amber-600',
     DELETE: 'bg-red-50 text-red-600',
   };
@@ -586,7 +586,7 @@ function SchemaModel({ title, fields }: { title: string; fields: [string, string
     <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-3">
       <p className="text-xs font-bold text-slate-900 mb-3">📦 Modèle {title}</p>
       <div className="bg-slate-50 rounded-xl p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">
-        <span className="text-blue-600 font-bold">model</span>{' '}
+            <span className="text-slate-400 font-bold">model</span>{' '}
         <span className="text-slate-900 font-bold">{title}</span> {'{\n'}
         {fields.map(([name, type, note], i) => (
           <div key={i} className="pl-4">

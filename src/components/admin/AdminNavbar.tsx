@@ -45,7 +45,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
         zIndex: 10,
         padding: '14px 28px',
         borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-        background: 'rgba(15,15,13,0.9)',
+        background: 'rgba(11,13,18,0.9)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         display: 'flex',
@@ -61,14 +61,14 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#9c9a90',
+              color: '#a1a5ad',
               padding: 4,
             }}
           >
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         )}
-        <h1 style={{ fontSize: 16, fontWeight: 500, color: '#e8e6de', margin: 0 }}>
+        <h1 style={{ fontSize: 16, fontWeight: 500, color: '#e8ebf0', margin: 0 }}>
           {pageTitle}
         </h1>
       </div>
@@ -79,7 +79,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: '#9c9a90',
+            color: '#a1a5ad',
             padding: 4,
             position: 'relative',
           }}
@@ -92,7 +92,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
             background: 'transparent',
             border: '0.5px solid rgba(255,255,255,0.08)',
             cursor: 'pointer',
-            color: '#9c9a90',
+            color: '#a1a5ad',
             padding: '6px 12px',
             borderRadius: 7,
             fontSize: 12,
@@ -109,7 +109,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
           }}
           onMouseLeave={e => {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = '#9c9a90';
+            e.currentTarget.style.color = '#a1a5ad';
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
           }}
         >

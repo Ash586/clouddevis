@@ -57,8 +57,8 @@ function NavItem({ item, pathname, router, t }: {
         border: 'none',
         cursor: 'pointer',
         transition: 'all 0.15s',
-        background: isActive ? '#222220' : 'transparent',
-        color: '#e8e6de',
+        background: isActive ? '#1d202a' : 'transparent',
+        color: '#e8ebf0',
         borderWidth: isActive ? 0.5 : 0,
         borderStyle: 'solid',
         borderColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
@@ -91,17 +91,17 @@ export function AdminSidebar() {
         width: 200,
         flexShrink: 0,
         borderRight: '0.5px solid rgba(255,255,255,0.06)',
-        background: '#181816',
+        background: '#14171e',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       <div style={{ padding: '18px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 17, fontWeight: 700, color: '#e8e6de', letterSpacing: '-0.3px' }}>
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#e8ebf0', letterSpacing: '-0.3px' }}>
             ☁️ CloudDevis
           </span>
-          <span style={{ fontSize: 10, color: '#5c5a54', fontWeight: 500 }}>
+          <span style={{ fontSize: 10, color: '#656a73', fontWeight: 500 }}>
             Admin
           </span>
         </div>
