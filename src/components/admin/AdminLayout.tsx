@@ -19,7 +19,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#0f0f0d', overflow: 'hidden' }}>
+    <div id="admin-layout" style={{ display: 'flex', height: '100vh', background: '#0f0f0d', overflow: 'hidden' }}>
       {!isMobile && <AdminSidebar />}
 
       {isMobile && menuOpen && (

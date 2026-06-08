@@ -29,94 +29,85 @@
   --rsm: 6px;
 }
 
-.admin-body,
-.admin-body * {
-  font-family: 'Sora', system-ui, sans-serif;
-}
-
-.admin-body code,
-.admin-body .mono {
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--text2);
-}
-
 /* ── Dark theme overrides for all admin pages ── */
+/* Using #admin-layout for maximum specificity */
 
 /* Card / container backgrounds */
-.admin-content :where(.bg-white) { background: var(--bg2) !important; }
-.admin-content :where(.bg-slate-50) { background: var(--bg3) !important; }
-.admin-content :where(.bg-slate-100) { background: var(--bg4) !important; }
+#admin-layout .bg-white { background: var(--bg2) !important; }
+#admin-layout .bg-slate-50 { background: var(--bg3) !important; }
+#admin-layout .bg-slate-100 { background: var(--bg4) !important; }
 
-/* Blue backgrounds → neutral dark */
-.admin-content :where(.bg-blue-50) { background: var(--bg4) !important; }
-.admin-content :where(.bg-blue-100) { background: var(--bg3) !important; }
-.admin-content :where(.bg-blue-500) { background: var(--text3) !important; }
-.admin-content :where(.bg-blue-600) { background: var(--bg3) !important; }
+/* All blue backgrounds → neutral dark */
+#admin-layout .bg-blue-50 { background: var(--bg4) !important; }
+#admin-layout .bg-blue-100 { background: var(--bg3) !important; }
+#admin-layout .bg-blue-500 { background: var(--text3) !important; }
+#admin-layout .bg-blue-600 { background: var(--bg3) !important; }
 
-/* Hover overrides for blue buttons */
-.admin-content .hover\:bg-blue-50:hover { background: var(--bg4) !important; }
-.admin-content .hover\:bg-blue-100:hover { background: var(--bg3) !important; }
-.admin-content .hover\:bg-blue-700:hover { background: var(--bg4) !important; }
-.admin-content .hover\:text-blue-600:hover { color: var(--text) !important; }
+/* Hover overrides */
+#admin-layout .hover\:bg-blue-50:hover { background: var(--bg4) !important; }
+#admin-layout .hover\:bg-blue-100:hover { background: var(--bg3) !important; }
+#admin-layout .hover\:bg-blue-700:hover { background: var(--bg4) !important; }
+#admin-layout .hover\:text-blue-600:hover { color: var(--text) !important; }
 
 /* Spinner borders */
-.admin-content :where(.border-blue-500) { border-color: var(--text3) !important; }
-.admin-content :where(.border-blue-600) { border-color: var(--text3) !important; }
+#admin-layout .border-blue-500 { border-color: var(--text3) !important; }
+#admin-layout .border-blue-600 { border-color: var(--text3) !important; }
 
 /* Focus rings & borders → neutral */
-.admin-content :where(.focus\:ring-blue-500\/30):focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
-.admin-content :where(.focus\:ring-blue-500):focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
-.admin-content :where(.focus\:border-blue-500):focus { border-color: var(--border) !important; }
+#admin-layout .focus\:ring-blue-500\/30:focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
+#admin-layout .focus\:ring-blue-500:focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
+#admin-layout .focus\:border-blue-500:focus { border-color: var(--border) !important; }
 
 /* Generic borders */
-.admin-content :where(.border-slate-200) { border-color: var(--border) !important; }
-.admin-content :where(.border-slate-100) { border-color: var(--border2) !important; }
-.admin-content :where(.border-emerald-100) { border-color: var(--green-bdr) !important; }
-.admin-content :where(.border-blue-100) { border-color: var(--border2) !important; }
-.admin-content :where(.border-amber-100) { border-color: var(--amber-bdr) !important; }
+#admin-layout .border-slate-200 { border-color: var(--border) !important; }
+#admin-layout .border-slate-100 { border-color: var(--border2) !important; }
+#admin-layout .border-emerald-100 { border-color: var(--green-bdr) !important; }
+#admin-layout .border-blue-100 { border-color: var(--border2) !important; }
+#admin-layout .border-amber-100 { border-color: var(--amber-bdr) !important; }
 
 /* Slate text → dark theme */
-.admin-content :where(.text-slate-900) { color: var(--text) !important; }
-.admin-content :where(.text-slate-800) { color: var(--text) !important; }
-.admin-content :where(.text-slate-700) { color: var(--text) !important; }
-.admin-content :where(.text-slate-600) { color: var(--text2) !important; }
-.admin-content :where(.text-slate-500) { color: var(--text2) !important; }
-.admin-content :where(.text-slate-400) { color: var(--text3) !important; }
+#admin-layout .text-slate-900 { color: var(--text) !important; }
+#admin-layout .text-slate-800 { color: var(--text) !important; }
+#admin-layout .text-slate-700 { color: var(--text) !important; }
+#admin-layout .text-slate-600 { color: var(--text2) !important; }
+#admin-layout .text-slate-500 { color: var(--text2) !important; }
+#admin-layout .text-slate-400 { color: var(--text3) !important; }
 
 /* Colored text → readable neutral */
-.admin-content :where(.text-blue-500) { color: var(--text) !important; }
-.admin-content :where(.text-blue-600) { color: var(--text) !important; }
-.admin-content :where(.text-blue-700) { color: var(--text) !important; }
-.admin-content :where(.text-indigo-600) { color: var(--text) !important; }
-.admin-content :where(.text-cyan-600) { color: var(--text) !important; }
+#admin-layout .text-blue-500 { color: var(--text) !important; }
+#admin-layout .text-blue-600 { color: var(--text) !important; }
+#admin-layout .text-blue-700 { color: var(--text) !important; }
+#admin-layout .text-indigo-600 { color: var(--text) !important; }
+#admin-layout .text-cyan-600 { color: var(--text) !important; }
 
 /* Semantic colors (keep green/amber/red for status) */
-.admin-content :where(.text-emerald-500) { color: var(--green) !important; }
-.admin-content :where(.text-emerald-600) { color: var(--green) !important; }
-.admin-content :where(.text-amber-500) { color: var(--amber) !important; }
-.admin-content :where(.text-amber-600) { color: var(--amber) !important; }
-.admin-content :where(.text-red-600) { color: var(--red) !important; }
+#admin-layout .text-emerald-500 { color: var(--green) !important; }
+#admin-layout .text-emerald-600 { color: var(--green) !important; }
+#admin-layout .text-amber-500 { color: var(--amber) !important; }
+#admin-layout .text-amber-600 { color: var(--amber) !important; }
+#admin-layout .text-red-600 { color: var(--red) !important; }
 
 /* Colored backgrounds (keep green/amber/red for status pills) */
-.admin-content :where(.bg-emerald-50) { background: var(--green-bg) !important; }
-.admin-content :where(.bg-amber-50) { background: var(--amber-bg) !important; }
-.admin-content :where(.bg-red-50) { background: var(--red-bg) !important; }
+#admin-layout .bg-emerald-50 { background: var(--green-bg) !important; }
+#admin-layout .bg-amber-50 { background: var(--amber-bg) !important; }
+#admin-layout .bg-red-50 { background: var(--red-bg) !important; }
 
 /* Select/option text color */
-.admin-content :where(select), .admin-content :where(option) { color: var(--text) !important; }
+#admin-layout select { color: var(--text) !important; }
+#admin-layout option { color: var(--text) !important; }
 
 /* Rounded corners */
-.admin-content :where(.rounded-2xl) { border-radius: var(--r) !important; }
-.admin-content :where(.rounded-xl) { border-radius: var(--rsm) !important; }
+#admin-layout .rounded-2xl { border-radius: var(--r) !important; }
+#admin-layout .rounded-xl { border-radius: var(--rsm) !important; }
 
 /* Monospace font */
-.admin-content :where(.font-mono) { font-family: 'IBM Plex Mono', monospace !important; }
+#admin-layout .font-mono { font-family: 'IBM Plex Mono', monospace !important; }
 
 /* Border bottom in tables/lists */
-.admin-content :where(.border-b) { border-bottom-color: var(--border2) !important; }
+#admin-layout .border-b { border-bottom-color: var(--border2) !important; }
 
-/* Specific compound selectors */
-.admin-content .bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
-.admin-content .flex.gap-1.bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
-.admin-content .bg-slate-100.text-slate-900 { background: var(--bg3) !important; color: var(--text) !important; }
-.admin-content .bg-slate-50.rounded-xl { background: var(--bg3) !important; }
+/* Compound selectors for compound Tailwind classes */
+#admin-layout .bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
+#admin-layout .flex.gap-1.bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
+#admin-layout .bg-slate-100.text-slate-900 { background: var(--bg3) !important; color: var(--text) !important; }
+#admin-layout .bg-slate-50.rounded-xl { background: var(--bg3) !important; }
