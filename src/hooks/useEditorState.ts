@@ -72,6 +72,17 @@ export function createEmptyDoc(mode: UserMode): DocumentState {
 }
 
 export function useEditorState(initialMode?: UserMode, initialDocId?: string) {
+  const [draftRestored, setDraftRestored] = useState<string | null>(() => {
+    if (initialDocId) return null;
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<DocumentState>;
+        if (parsed.items?.length || parsed.clientInfo?.name) return 'unsaved_draft';
+      }
+    } catch {}
+    return null;
+  });
   const [doc, setDoc] = useState<DocumentState>(() => loadDraft(initialMode ?? 'artisan'));
   const [step, setStep] = useState<WizardStep>(1);
   const [addingItem, setAddingItem] = useState(false);
@@ -126,5 +137,6 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string) {
     saving, setSaving,
     docId, setDocId,
     results,
+    draftRestored, setDraftRestored,
   };
 }

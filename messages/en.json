@@ -121,7 +121,10 @@
     "feature3Desc": "Quote, Proforma Invoice, Purchase Order, Invoice.",
     "footerRights": "All rights reserved.",
     "footerCompliant": "Compliant with Algerian standards",
-    "footerFeatures": "NIF, RC, NIS, AI, VAT, Stamp duty"
+    "footerFeatures": "NIF, RC, NIS, AI, VAT, Stamp duty",
+    "pricingTitle": "Plans that fit your business",
+    "pricingSubtitle": "Start free, upgrade when you're ready.",
+    "viewPricing": "View pricing"
   },
   "auth": {
     "loginTitle": "Log in to your account",

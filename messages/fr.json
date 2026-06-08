@@ -121,7 +121,10 @@
     "feature3Desc": "Devis, Facture Proforma, Bon de Commande, Facture.",
     "footerRights": "Tous droits réservés.",
     "footerCompliant": "Conforme aux normes algériennes",
-    "footerFeatures": "NIF, RC, NIS, AI, TVA, Timbre fiscal"
+    "footerFeatures": "NIF, RC, NIS, AI, TVA, Timbre fiscal",
+    "pricingTitle": "Des tarifs adaptés à votre activité",
+    "pricingSubtitle": "Commencez gratuitement, passez à une formule supérieure quand vous êtes prêt.",
+    "viewPricing": "Voir les tarifs"
   },
   "auth": {
     "loginTitle": "Connectez-vous à votre compte",

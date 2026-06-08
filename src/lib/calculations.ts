@@ -13,11 +13,12 @@ export function calculateDocument(doc: DocumentState): CalculationResult {
   const tvaAmount = totalHTAfterDiscount * doc.tvaRate / 100;
   const totalTTC = totalHTAfterDiscount + tvaAmount;
 
-  const isCash = doc.paymentMode === 'especes';
+  // Timbre fiscal s'applique à toutes les factures ≥ 10 000 DA (Code des Timbres, Art. 536)
   const timbreRate = (doc.stampDuty?.rate ?? 1) / 100;
   const timbreMin = doc.stampDuty?.minAmount ?? 5;
   const timbreMax = doc.stampDuty?.maxAmount ?? 2500;
-  const timbreFiscal = isCash ? Math.min(Math.max(totalTTC * timbreRate, timbreMin), timbreMax) : 0;
+  const applyTimbre = totalTTC >= 10000 && doc.documentType !== 'devis';
+  const timbreFiscal = applyTimbre ? Math.min(Math.max(totalTTC * timbreRate, timbreMin), timbreMax) : 0;
 
   const acompte = doc.acompte ?? 0;
   const netAPayer = totalTTC + timbreFiscal - acompte;

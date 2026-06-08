@@ -15,6 +15,7 @@ import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
+import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -27,7 +28,7 @@ function EditorContent() {
   const {
     doc, setDoc, mode, setMode,
     addingItem, setAddingItem, newItem, setNewItem,
-    saving, results,
+    saving, results, draftRestored, setDraftRestored,
     updateDoc, updateClientInfo,
     updateCompanyInfo, updateTaxIds, updateArtisanInfo,
     updateDiscount, updateStampDuty, updatePaymentDetails,
@@ -49,6 +50,8 @@ function EditorContent() {
   const [showSectionCreator, setShowSectionCreator] = useState(false);
   const [editingSection, setEditingSection] = useState<CustomSectionDef | null>(null);
   const [allExpanded, setAllExpanded] = useState<boolean | null>(null);
+  const [itemErrors, setItemErrors] = useState<string | null>(null);
+  const [nifErrors, setNifErrors] = useState<Record<string, string>>({});
   const ALL_SECTIONS: string[] = [...DEFAULT_SECTION_ORDER, ...customSections.map(s => s.id)];
   const allFields = ALL_SECTIONS.flatMap(s => SECTION_FIELDS[s] ?? customSections.find(c => c.id === s)?.fields.map(f => f.id) ?? []);
 
@@ -181,6 +184,14 @@ function EditorContent() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Show draft restoration notification
+  useEffect(() => {
+    if (draftRestored === 'unsaved_draft' && doc.clientInfo.name && !docIdParam) {
+      showToast(te('draftRestored' as any) || 'Brouillon restauré ✓', 'success');
+    }
+    if (draftRestored) setDraftRestored(null);
+  }, []);
+
   // Autosave every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -244,7 +255,10 @@ function EditorContent() {
         return <CollapsibleSection title={te('sections.client')} sectionId="client" {...dragProps} {...s('client')}>
           {!hiddenFields.has('clientName') && <input type="text" placeholder={te('client.clientName')} className="w-full border p-2 rounded-lg text-[11px] font-bold outline-none focus:ring-2 focus:ring-blue-500" value={doc.clientInfo.name} onChange={(e) => updateClientInfo({ name: e.target.value })} />}
           {!hiddenFields.has('clientAddress') && <textarea placeholder={te('client.clientAddress')} className="w-full border p-2 rounded-lg text-[11px] h-12 resize-none outline-none focus:ring-2 focus:ring-blue-500" value={doc.clientInfo.address ?? ''} onChange={(e) => updateClientInfo({ address: e.target.value })} />}
-          {!hiddenFields.has('clientNif') && mode === 'entreprise' && <input type="text" placeholder={te('client.clientNif')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />}
+          {!hiddenFields.has('clientNif') && mode === 'entreprise' && <div>
+            <input type="text" placeholder={te('client.clientNif')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-blue-500'}`} value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />
+            {doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
+          </div>}
           {!hiddenFields.has('clientPhone') && <input type="text" placeholder={te('client.clientPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.clientInfo.phone ?? ''} onChange={(e) => updateClientInfo({ phone: e.target.value })} />}
           {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-slate-100 pt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{te('client.yourInfo')}</h4>
@@ -257,10 +271,22 @@ function EditorContent() {
             <input type="text" placeholder={te('client.companyName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.name} onChange={(e) => updateCompanyInfo({ name: e.target.value })} />
             <input type="text" placeholder={te('client.companyAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.address} onChange={(e) => updateCompanyInfo({ address: e.target.value })} />
             <div className="grid grid-cols-2 gap-2">
-              <input type="text" placeholder={te('client.companyNif')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.taxIds.nif} onChange={(e) => updateTaxIds({ nif: e.target.value })} />
-              <input type="text" placeholder={te('client.companyRc')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.taxIds.rc} onChange={(e) => updateTaxIds({ rc: e.target.value })} />
-              <input type="text" placeholder={te('client.companyNis')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.taxIds.nis} onChange={(e) => updateTaxIds({ nis: e.target.value })} />
-              <input type="text" placeholder={te('client.companyAi')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.companyInfo.taxIds.ai} onChange={(e) => updateTaxIds({ ai: e.target.value })} />
+              <div>
+                <input type="text" placeholder={te('client.companyNif')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.companyInfo.taxIds.nif && !validateNIF(doc.companyInfo.taxIds.nif) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-blue-500'}`} value={doc.companyInfo.taxIds.nif} onChange={(e) => updateTaxIds({ nif: e.target.value })} />
+                {doc.companyInfo.taxIds.nif && !validateNIF(doc.companyInfo.taxIds.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
+              </div>
+              <div>
+                <input type="text" placeholder={te('client.companyRc')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.companyInfo.taxIds.rc && !validateRC(doc.companyInfo.taxIds.rc) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-blue-500'}`} value={doc.companyInfo.taxIds.rc} onChange={(e) => updateTaxIds({ rc: e.target.value })} />
+                {doc.companyInfo.taxIds.rc && !validateRC(doc.companyInfo.taxIds.rc) && <span className="text-[8px] text-red-500">Format RC invalide</span>}
+              </div>
+              <div>
+                <input type="text" placeholder={te('client.companyNis')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.companyInfo.taxIds.nis && !validateNIS(doc.companyInfo.taxIds.nis) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-blue-500'}`} value={doc.companyInfo.taxIds.nis} onChange={(e) => updateTaxIds({ nis: e.target.value })} />
+                {doc.companyInfo.taxIds.nis && !validateNIS(doc.companyInfo.taxIds.nis) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
+              </div>
+              <div>
+                <input type="text" placeholder={te('client.companyAi')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.companyInfo.taxIds.ai && !validateAI(doc.companyInfo.taxIds.ai) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-blue-500'}`} value={doc.companyInfo.taxIds.ai} onChange={(e) => updateTaxIds({ ai: e.target.value })} />
+                {doc.companyInfo.taxIds.ai && !validateAI(doc.companyInfo.taxIds.ai) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
+              </div>
             </div></div>}
           {!hiddenFields.has('clientEmail') && <div className="flex items-center gap-2 pt-1">
             <input type="text" placeholder={te('client.companyEmail')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-blue-500" value={doc.clientInfo.email ?? ''} onChange={(e) => updateClientInfo({ email: e.target.value })} /></div>}
@@ -317,9 +343,10 @@ function EditorContent() {
                   <option value="">{te('prestations.noCategory')}</option>
                   {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
               <div className="flex justify-center gap-1">
-                <button onClick={handleAddItem} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-green-700 disabled:opacity-50">✓</button>
-                <button onClick={() => setAddingItem(false)} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-red-600">✕</button></div>
+                <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">✓</button>
+                <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-red-600">✕</button></div>
             </div>
+            {itemErrors && <div className="text-[10px] text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">{itemErrors}</div>}
           </div>}
           {doc.items.map((item, idx) => (
             <div key={item.id} className="bg-slate-50 p-2 sm:p-3 rounded-xl border space-y-1.5">

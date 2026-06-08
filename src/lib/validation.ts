@@ -3,6 +3,41 @@ export interface ValidationResult {
   errors: Record<string, string>;
 }
 
+export function validateNIF(nif: string): boolean {
+  return /^\d{11}$/.test(nif);
+}
+
+export function validateRC(rc: string): boolean {
+  return /^[A-Z0-9]{9,14}$/.test(rc);
+}
+
+export function validateNIS(nis: string): boolean {
+  return /^\d{10}$/.test(nis);
+}
+
+export function validateAI(ai: string): boolean {
+  return /^\d{10}$/.test(ai);
+}
+
+export function validateCompanyTaxIds(taxIds: { nif?: string; rc?: string; nis?: string; ai?: string }): ValidationResult {
+  const errors: Record<string, string> = {};
+
+  if (taxIds.nif && !validateNIF(taxIds.nif)) {
+    errors.nif = 'NIF doit contenir exactement 11 chiffres';
+  }
+  if (taxIds.rc && !validateRC(taxIds.rc)) {
+    errors.rc = 'RC invalide (9–14 caractères alphanumériques)';
+  }
+  if (taxIds.nis && !validateNIS(taxIds.nis)) {
+    errors.nis = 'NIS doit contenir exactement 10 chiffres';
+  }
+  if (taxIds.ai && !validateAI(taxIds.ai)) {
+    errors.ai = 'AI doit contenir exactement 10 chiffres';
+  }
+
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
 export function validateDocumentBody(body: Record<string, unknown>): ValidationResult {
   const errors: Record<string, string> = {};
 
@@ -19,12 +54,36 @@ export function validateDocumentBody(body: Record<string, unknown>): ValidationR
     errors.paymentMode = 'Mode de paiement invalide';
   }
 
-  if (body.items && !Array.isArray(body.items)) {
-    errors.items = 'Les articles doivent être un tableau';
+  if (body.items) {
+    if (!Array.isArray(body.items)) {
+      errors.items = 'Les articles doivent être un tableau';
+    } else {
+      (body.items as any[]).forEach((item, i) => {
+        if (item.quantity !== undefined && (Number(item.quantity) <= 0 || !Number.isFinite(Number(item.quantity)))) {
+          errors[`items.${i}.qty`] = `Ligne ${i + 1} : quantité doit être > 0`;
+        }
+        if (item.unitPrice !== undefined && (Number(item.unitPrice) <= 0 || Number(item.unitPrice) > 1000000)) {
+          errors[`items.${i}.price`] = `Ligne ${i + 1} : prix unitaire invalide (max 1 000 000 DA)`;
+        }
+      });
+    }
   }
 
   if (body.acompte !== undefined && (Number(body.acompte) < 0)) {
-    errors.acompte = 'L\'acompte ne peut pas être négatif';
+    errors.acompte = "L'acompte ne peut pas être négatif";
+  }
+
+  if (body.companyInfo && typeof body.companyInfo === 'object') {
+    const taxIds = (body.companyInfo as any).taxIds || {};
+    const taxErrors = validateCompanyTaxIds(taxIds);
+    Object.assign(errors, taxErrors.errors);
+  }
+
+  if (body.clientInfo && typeof body.clientInfo === 'object') {
+    const c = body.clientInfo as any;
+    if (c.nif && !validateNIF(c.nif)) {
+      errors['clientNif'] = 'NIF client doit contenir 11 chiffres';
+    }
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
@@ -41,6 +100,13 @@ export function validateAuthInput(body: Record<string, unknown>, type: 'login' |
     errors.password = 'Mot de passe requis';
   } else if (type === 'register' && body.password.length < 6) {
     errors.password = 'Minimum 6 caractères';
+  } else if (type === 'register') {
+    let score = 0;
+    if (body.password.length >= 8) score++;
+    if (/[A-Z]/.test(body.password as string)) score++;
+    if (/[0-9]/.test(body.password as string)) score++;
+    if (/[^A-Za-z0-9]/.test(body.password as string)) score++;
+    if (score < 2) errors.password = 'Mot de passe trop faible : ajoutez majuscule, chiffre ou caractère spécial';
   }
 
   if (type === 'register') {
@@ -49,5 +115,23 @@ export function validateAuthInput(body: Record<string, unknown>, type: 'login' |
     }
   }
 
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
+export function validateLineItem(item: { designation?: string; quantity?: number; unitPrice?: number }): ValidationResult {
+  const errors: Record<string, string> = {};
+  if (!item.designation || item.designation.trim().length === 0) {
+    errors.designation = 'La désignation est requise';
+  } else if (item.designation.length > 200) {
+    errors.designation = 'La désignation ne peut pas dépasser 200 caractères';
+  }
+  if (!item.quantity || item.quantity <= 0 || !Number.isFinite(item.quantity)) {
+    errors.quantity = 'La quantité doit être un nombre positif';
+  }
+  if (!item.unitPrice || item.unitPrice <= 0 || !Number.isFinite(item.unitPrice)) {
+    errors.unitPrice = 'Le prix unitaire doit être un nombre positif';
+  } else if (item.unitPrice > 1000000) {
+    errors.unitPrice = 'Le prix unitaire ne peut pas dépasser 1 000 000 DA';
+  }
   return { valid: Object.keys(errors).length === 0, errors };
 }

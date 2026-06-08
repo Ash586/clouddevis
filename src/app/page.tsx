@@ -143,18 +143,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-3">{t('pricingTitle') || 'Des tarifs adaptés à votre activité'}</h2>
+          <p className="text-sm sm:text-base text-slate-500 max-w-lg mx-auto">{t('pricingSubtitle') || 'Commencez gratuitement, passez à une formule supérieure quand vous êtes prêt.'}</p>
+        </div>
+        <div className="text-center">
+          <Button size="lg" onClick={() => router.push('/pricing')}>
+            {t('viewPricing') || 'Voir les tarifs'}
+          </Button>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             <div className="text-center sm:text-left">
               <span className="text-lg font-black text-blue-600 tracking-tight">CloudDevis</span>
               <p className="text-xs text-slate-400 mt-1">© {new Date().getFullYear()} CloudDevis. {t('footerRights')}</p>
             </div>
-            <div className="flex gap-6 text-xs text-slate-400">
-              <span>{t('footerCompliant')}</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">{t('footerFeatures')}</span>
+            <div className="text-center sm:text-left">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Service</h3>
+              <ul className="space-y-2">
+                <li><a href="/pricing" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Tarifs</a></li>
+                <li><a href="/auth/login" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Connexion</a></li>
+                <li><a href="/auth/register" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Inscription</a></li>
+              </ul>
+            </div>
+            <div className="text-center sm:text-left">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Légal</h3>
+              <ul className="space-y-2">
+                <li><a href="/legal/cgu" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">CGU</a></li>
+                <li><a href="/legal/privacy" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Confidentialité</a></li>
+                <li><a href="/legal/mentions" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Mentions Légales</a></li>
+              </ul>
             </div>
           </div>
         </div>

@@ -121,7 +121,10 @@
     "feature3Desc": "تقدير، فاتورة Proforma، أمر شراء، فاتورة.",
     "footerRights": "جميع الحقوق محفوظة.",
     "footerCompliant": "متوافق مع المعايير الجزائرية",
-    "footerFeatures": "NIF، RC، NIS، AI، TVA، الطابع الجبائي"
+    "footerFeatures": "NIF، RC، NIS، AI، TVA، الطابع الجبائي",
+    "pricingTitle": "أسعار تناسب نشاطك",
+    "pricingSubtitle": "ابدأ مجاناً، ورقّ لاحقاً عندما تكون مستعداً.",
+    "viewPricing": "عرض الأسعار"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول إلى حسابك",
