@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Card } from '@/components/ui/card';
 import { FileText, TrendingUp, Users, DollarSign } from 'lucide-react';
 
 interface ReportData {
@@ -12,8 +10,21 @@ interface ReportData {
   subscriptionBreakdown: { status: string; count: number }[];
 }
 
+const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px' };
+const c = {
+  green: '#4ade80', greenBg: 'rgba(74,222,128,0.10)',
+  amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.10)',
+  red: '#f87171', redBg: 'rgba(248,113,113,0.10)',
+  blue: '#4a9eff', blueBg: 'rgba(74,158,255,0.10)',
+  purple: '#a78bfa', purpleBg: 'rgba(167,139,250,0.10)',
+};
+
+const typeLabels: Record<string, string> = {
+  DEVIS: 'Devis', FACTURE: 'Facture', PROFORMA: 'Proforma',
+  BC: 'Bon de Commande', BR: 'Bon de Réception',
+};
+
 export default function AdminReportsPage() {
-  const t = useTranslations('admin');
   const [data, setData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('year');
@@ -28,128 +39,130 @@ export default function AdminReportsPage() {
   }, [period]);
 
   const periods = [
-    { value: 'month', label: t('reports.period.month') },
-    { value: 'quarter', label: t('reports.period.quarter') },
-    { value: 'year', label: t('reports.period.year') },
+    { value: 'month', label: 'Mois' },
+    { value: 'quarter', label: 'Trimestre' },
+    { value: 'year', label: 'Année' },
   ];
 
-  const typeLabels: Record<string, string> = {
-    DEVIS: 'Devis',
-    FACTURE: 'Facture',
-    PROFORMA: 'Proforma',
-    BC: 'Bon de Commande',
-    BR: 'Bon de Réception',
-  };
-
-  const statusColors: Record<string, string> = {
-    TRIAL: 'text-amber-600 bg-amber-50',
-    BASIC: 'text-blue-600 bg-blue-50',
-    PRO: 'text-emerald-600 bg-emerald-50',
-    FREE: 'text-slate-600 bg-slate-50',
-    EXPIRED: 'text-red-600 bg-red-50',
-  };
-
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!data) return <div className="text-center py-20 text-slate-400">{t('error')}</div>;
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+      <div style={{ width: 28, height: 28, border: '2px solid #656a73', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    </div>
+  );
+  if (!data) return <p style={{ textAlign: 'center', padding: '80px 0', fontSize: 13, color: '#656a73' }}>Erreur de chargement</p>;
 
   const maxGrowth = Math.max(...data.userGrowth.map(g => g.count), 1);
   const maxDocs = Math.max(...data.docByType.map(d => d.count), 1);
   const totalSubs = data.subscriptionBreakdown.reduce((s, sb) => s + sb.count, 0) || 1;
 
+  const subColors: Record<string, string> = {
+    TRIAL: c.amber, BASIC: c.blue, PRO: c.green, FREE: '#a1a5ad', EXPIRED: c.red,
+  };
+  const subBgs: Record<string, string> = {
+    TRIAL: c.amberBg, BASIC: c.blueBg, PRO: c.greenBg, FREE: '#282c38', EXPIRED: c.redBg,
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-2xl font-black text-slate-900">{t('nav.reports')}</h1>
-        <div className="flex gap-2">
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>Rapports</h1>
+        <div style={{ display: 'flex', gap: 4, background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 3 }}>
           {periods.map(p => (
             <button key={p.value} onClick={() => setPeriod(p.value)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${period === p.value ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {p.label}
-            </button>
+              style={{
+                padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
+                background: period === p.value ? '#1d202a' : 'transparent',
+                color: period === p.value ? '#e8ebf0' : '#656a73',
+              }}>{p.label}</button>
           ))}
         </div>
       </div>
 
-      {/* Revenue Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-3"><DollarSign className="w-5 h-5 text-emerald-600" /></div>
-          <p className="text-lg font-black text-slate-900">{data.revenue.total} DA</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('reports.totalRevenue')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-3"><FileText className="w-5 h-5 text-blue-600" /></div>
-          <p className="text-lg font-black text-slate-900">{data.revenue.docCount}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('reports.totalDocs')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center mb-3"><TrendingUp className="w-5 h-5 text-amber-600" /></div>
-          <p className="text-lg font-black text-slate-900">{data.revenue.tva} DA</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('reports.totalTva')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-3"><Users className="w-5 h-5 text-purple-600" /></div>
-          <p className="text-lg font-black text-slate-900">{data.userGrowth.reduce((s, g) => s + g.count, 0)}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('reports.newUsers')}</p>
-        </Card>
+      {/* Revenue Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
+        <div style={card}>
+          <div style={{ width: 36, height: 36, background: c.greenBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <DollarSign size={18} style={{ color: c.green }} />
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{data.revenue.total} DA</p>
+          <p style={{ fontSize: 11, color: '#a1a5ad', fontWeight: 600, marginTop: 2 }}>Revenu total</p>
+        </div>
+        <div style={card}>
+          <div style={{ width: 36, height: 36, background: c.blueBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <FileText size={18} style={{ color: c.blue }} />
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{data.revenue.docCount}</p>
+          <p style={{ fontSize: 11, color: '#a1a5ad', fontWeight: 600, marginTop: 2 }}>Documents</p>
+        </div>
+        <div style={card}>
+          <div style={{ width: 36, height: 36, background: c.amberBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <TrendingUp size={18} style={{ color: c.amber }} />
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{data.revenue.tva} DA</p>
+          <p style={{ fontSize: 11, color: '#a1a5ad', fontWeight: 600, marginTop: 2 }}>TVA</p>
+        </div>
+        <div style={card}>
+          <div style={{ width: 36, height: 36, background: c.purpleBg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <Users size={18} style={{ color: c.purple }} />
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{data.userGrowth.reduce((s, g) => s + g.count, 0)}</p>
+          <p style={{ fontSize: 11, color: '#a1a5ad', fontWeight: 600, marginTop: 2 }}>Nouveaux utilisateurs</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
         {/* User Growth */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('reports.userGrowth')}</h2>
-          <div className="space-y-2">
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 8 }}>Croissance utilisateurs</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {data.userGrowth.map(g => (
               <div key={g.month}>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-500 font-medium">{g.month}</span>
-                  <span className="font-bold text-slate-700">{g.count}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
+                  <span style={{ color: '#a1a5ad' }}>{g.month}</span>
+                  <span style={{ fontWeight: 700, color: '#e8ebf0' }}>{g.count}</span>
                 </div>
-                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(g.count / maxGrowth) * 100}%` }} />
+                <div style={{ height: 6, background: '#1d202a', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ width: `${(g.count / maxGrowth) * 100}%`, height: '100%', borderRadius: 3, background: c.blue }} />
                 </div>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
 
-        {/* Document Type Breakdown */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('reports.docByType')}</h2>
-          <div className="space-y-3">
+        {/* Doc by type */}
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 8 }}>Documents par type</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {data.docByType.map(d => (
               <div key={d.type}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="font-semibold text-slate-700">{typeLabels[d.type] || d.type}</span>
-                  <span className="text-slate-400">{d.count} — {d.revenue.toLocaleString()} DA</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
+                  <span style={{ fontWeight: 600, color: '#e8ebf0' }}>{typeLabels[d.type] || d.type}</span>
+                  <span style={{ color: '#656a73' }}>{d.count} — {d.revenue.toLocaleString()} DA</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(d.count / maxDocs) * 100}%` }} />
+                <div style={{ height: 4, background: '#1d202a', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ width: `${(d.count / maxDocs) * 100}%`, height: '100%', borderRadius: 2, background: c.green }} />
                 </div>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Subscription Breakdown */}
-      <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4">{t('reports.subBreakdown')}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      <div style={card}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 12 }}>Répartition abonnements</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
           {data.subscriptionBreakdown.map(sb => (
-            <div key={sb.status} className="text-center p-4 rounded-xl bg-slate-50">
-              <p className={`text-lg font-black ${(statusColors[sb.status] || 'text-slate-600').split(' ')[0]}`}>
-                {sb.count}
-              </p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">{sb.status}</p>
-              <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full ${(statusColors[sb.status] || 'bg-slate-400').split(' ')[0].replace('text-', 'bg-')}`}
-                  style={{ width: `${(sb.count / totalSubs) * 100}%` }} />
+            <div key={sb.status} style={{ textAlign: 'center', padding: 12, borderRadius: 8, background: '#1d202a' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: subColors[sb.status] || '#e8ebf0', margin: 0 }}>{sb.count}</p>
+              <p style={{ fontSize: 10, color: '#656a73', fontWeight: 600, marginTop: 2 }}>{sb.status}</p>
+              <div style={{ marginTop: 6, height: 4, background: '#282c38', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ width: `${(sb.count / totalSubs) * 100}%`, height: '100%', borderRadius: 2, background: subColors[sb.status] || '#656a73' }} />
               </div>
             </div>
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

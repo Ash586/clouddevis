@@ -1,20 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Card } from '@/components/ui/card';
-import { MobileTable } from '@/components/mobile/MobileTable';
-import {
-  TrendingUp, Users, FileText, Globe,
-  BarChart3, Activity, Eye, MousePointerClick,
-} from 'lucide-react';
+import { TrendingUp, FileText, BarChart3, Activity, Eye, MousePointerClick } from 'lucide-react';
 
 interface AnalyticsData {
   userGrowth: { date: string; count: number; artisans: number; enterprises: number }[];
   docTrend: { date: string; count: number; revenue: number }[];
   countryBreakdown: { country: string; count: number }[];
   topUsers: { id: string; name: string; email: string; docCount: number }[];
-  systemMetrics: { date: string; users: number; docs: number; revenue: number }[];
   docStatusBreakdown: { status: string; count: number }[];
   visitorStats: { totalPageViews: number; uniqueSessions: number; avgPageViewsPerSession: number };
   topPages: { path: string; count: number }[];
@@ -22,8 +15,16 @@ interface AnalyticsData {
   period: string;
 }
 
+const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px' };
+const clr = {
+  green: '#4ade80', greenBg: 'rgba(74,222,128,0.10)',
+  amber: '#fbbf24', amberBg: 'rgba(251,191,36,0.10)',
+  red: '#f87171', redBg: 'rgba(248,113,113,0.10)',
+  blue: '#4a9eff', blueBg: 'rgba(74,158,255,0.10)',
+  purple: '#a78bfa', purpleBg: 'rgba(167,139,250,0.10)',
+};
+
 export default function AdminAnalyticsPage() {
-  const t = useTranslations('admin');
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('30d');
@@ -38,245 +39,204 @@ export default function AdminAnalyticsPage() {
   }, [period]);
 
   const periods = [
-    { value: '7d', label: t('analytics.period.7d') },
-    { value: '30d', label: t('analytics.period.30d') },
-    { value: '90d', label: t('analytics.period.90d') },
-    { value: 'year', label: t('analytics.period.year') },
+    { value: '7d', label: '7 jours' },
+    { value: '30d', label: '30 jours' },
+    { value: '90d', label: '90 jours' },
+    { value: 'year', label: 'Année' },
   ];
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!data) return <div className="text-center py-20 text-slate-400">{t('error')}</div>;
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+      <div style={{ width: 28, height: 28, border: '2px solid #656a73', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    </div>
+  );
+  if (!data) return <p style={{ textAlign: 'center', padding: '80px 0', fontSize: 13, color: '#656a73' }}>Erreur de chargement</p>;
 
   const totalUsersGrowth = data.userGrowth.reduce((s, d) => s + d.count, 0);
   const totalDocsCreated = data.docTrend.reduce((s, d) => s + d.count, 0);
   const totalRevenue = data.docTrend.reduce((s, d) => s + d.revenue, 0);
   const avgDailyDocs = data.docTrend.length ? Math.round(totalDocsCreated / data.docTrend.length) : 0;
-
   const maxUserCount = Math.max(...data.userGrowth.map(d => d.count), 1);
   const maxDocCount = Math.max(...data.docTrend.map(d => d.count), 1);
   const maxCountryCount = Math.max(...data.countryBreakdown.map(c => c.count), 1);
   const maxPageCount = Math.max(...data.topPages.map(p => p.count), 1);
 
-  const statusColors: Record<string, string> = {
-    DRAFT: 'bg-amber-50 text-amber-600',
-    ACCEPTED: 'bg-emerald-50 text-emerald-600',
-    PROGRESS: 'bg-blue-50 text-blue-600',
-    DELIVERED: 'bg-purple-50 text-purple-600',
+  const MetricIconCard = ({ icon, val, label, bg }: { icon: React.ReactNode; val: string; label: string; bg: string }) => (
+    <div style={card}>
+      <div style={{ width: 36, height: 36, background: bg, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>{icon}</div>
+      <p style={{ fontSize: 20, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{val}</p>
+      <p style={{ fontSize: 11, color: '#a1a5ad', fontWeight: 600, marginTop: 2 }}>{label}</p>
+    </div>
+  );
+
+  const BarChart = ({ data, maxVal, color, labelKey, valueKey }: { data: any[]; maxVal: number; color: string; labelKey: string; valueKey: string }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {data.slice(-10).map(d => {
+        const pct = maxVal > 0 ? (d[valueKey] / maxVal) * 100 : 0;
+        return (
+          <div key={d[labelKey]}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
+              <span style={{ color: '#a1a5ad' }}>{new Date(d[labelKey]).toLocaleDateString()}</span>
+              <span style={{ fontWeight: 700, color: '#e8ebf0' }}>{d[valueKey]}</span>
+            </div>
+            <div style={{ height: 4, background: '#1d202a', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: color }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const statusBadge = (status: string) => {
+    const m: Record<string, { bg: string; color: string }> = {
+      DRAFT: { bg: clr.amberBg, color: clr.amber },
+      ACCEPTED: { bg: clr.greenBg, color: clr.green },
+      PROGRESS: { bg: clr.blueBg, color: clr.blue },
+      DELIVERED: { bg: clr.purpleBg, color: clr.purple },
+    };
+    const s = m[status] || { bg: '#282c38', color: '#a1a5ad' };
+    return { ...s };
   };
 
-  const userColumns = [
-    { key: 'name', label: t('table.name') },
-    { key: 'email', label: t('table.email') },
-    { key: 'docCount', label: t('table.docs') },
-  ];
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-2xl font-black text-slate-900">{t('nav.analytics')}</h1>
-        <div className="flex gap-2">
+    <div>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>Analytics</h1>
+        <div style={{ display: 'flex', gap: 4, background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 3 }}>
           {periods.map(p => (
             <button key={p.value} onClick={() => setPeriod(p.value)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${period === p.value ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {p.label}
-            </button>
+              style={{
+                padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
+                background: period === p.value ? '#1d202a' : 'transparent',
+                color: period === p.value ? '#e8ebf0' : '#656a73',
+              }}>{p.label}</button>
           ))}
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-3"><TrendingUp className="w-5 h-5 text-blue-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{totalUsersGrowth.toLocaleString()}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('analytics.newUsers')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-3"><FileText className="w-5 h-5 text-emerald-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{totalDocsCreated.toLocaleString()}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('analytics.newDocs')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center mb-3"><BarChart3 className="w-5 h-5 text-amber-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{totalRevenue.toLocaleString()} DA</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('analytics.revenue')}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-3"><Activity className="w-5 h-5 text-purple-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{avgDailyDocs}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">{t('analytics.avgDaily')}</p>
-        </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
+        <MetricIconCard icon={<TrendingUp size={18} style={{ color: clr.blue }} />} val={totalUsersGrowth.toLocaleString()} label="Nouveaux utilisateurs" bg={clr.blueBg} />
+        <MetricIconCard icon={<FileText size={18} style={{ color: clr.green }} />} val={totalDocsCreated.toLocaleString()} label="Nouveaux documents" bg={clr.greenBg} />
+        <MetricIconCard icon={<BarChart3 size={18} style={{ color: clr.amber }} />} val={`${totalRevenue.toLocaleString()} DA`} label="Revenu" bg={clr.amberBg} />
+        <MetricIconCard icon={<Activity size={18} style={{ color: clr.purple }} />} val={String(avgDailyDocs)} label="Moy. documents/jour" bg={clr.purpleBg} />
       </div>
 
       {/* Visitor Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center mb-3"><Eye className="w-5 h-5 text-cyan-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{data.visitorStats.totalPageViews.toLocaleString()}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">Page Views</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mb-3"><MousePointerClick className="w-5 h-5 text-indigo-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{data.visitorStats.uniqueSessions.toLocaleString()}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">Sessions uniques</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center mb-3"><MousePointerClick className="w-5 h-5 text-rose-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{data.visitorStats.avgPageViewsPerSession}</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">Pages / session</p>
-        </Card>
-        <Card className="p-4">
-          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-3"><TrendingUp className="w-5 h-5 text-emerald-600" /></div>
-          <p className="text-2xl font-black text-slate-900">{data.conversion.conversionRate}%</p>
-          <p className="text-xs text-slate-400 font-semibold mt-1">Taux de conversion</p>
-        </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
+        <MetricIconCard icon={<Eye size={18} style={{ color: clr.blue }} />} val={data.visitorStats.totalPageViews.toLocaleString()} label="Pages vues" bg={clr.blueBg} />
+        <MetricIconCard icon={<MousePointerClick size={18} style={{ color: clr.purple }} />} val={data.visitorStats.uniqueSessions.toLocaleString()} label="Sessions uniques" bg={clr.purpleBg} />
+        <MetricIconCard icon={<MousePointerClick size={18} style={{ color: clr.amber }} />} val={String(data.visitorStats.avgPageViewsPerSession)} label="Pages / session" bg={clr.amberBg} />
+        <MetricIconCard icon={<TrendingUp size={18} style={{ color: clr.green }} />} val={`${data.conversion.conversionRate}%`} label="Taux conversion" bg={clr.greenBg} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        {/* User Growth Chart */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.userGrowth')}</h2>
-          <div className="space-y-2">
-            {data.userGrowth.slice(-14).map(d => {
-              const pct = maxUserCount > 0 ? (d.count / maxUserCount) * 100 : 0;
-              return (
-                <div key={d.date}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-500 font-medium">{new Date(d.date).toLocaleDateString()}</span>
-                    <span className="font-bold text-slate-700">{d.count}</span>
-                  </div>
-                  <div className="flex gap-1 h-3">
-                    <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Document Trend Chart */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.docTrend')}</h2>
-          <div className="space-y-2">
-            {data.docTrend.slice(-14).map(d => {
-              const pct = maxDocCount > 0 ? (d.count / maxDocCount) * 100 : 0;
-              return (
-                <div key={d.date}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-500 font-medium">{new Date(d.date).toLocaleDateString()}</span>
-                    <span className="font-bold text-slate-700">{d.count}</span>
-                  </div>
-                  <div className="flex gap-1 h-3">
-                    <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+      {/* Charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 10 }}>Croissance utilisateurs</p>
+          <BarChart data={data.userGrowth} maxVal={maxUserCount} color={clr.blue} labelKey="date" valueKey="count" />
+        </div>
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 10 }}>Tendance documents</p>
+          <BarChart data={data.docTrend} maxVal={maxDocCount} color={clr.green} labelKey="date" valueKey="count" />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        {/* Country Breakdown & Doc Status */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.countries')}</h2>
-          <div className="space-y-3">
-            {data.countryBreakdown.map(c => {
-              const pct = maxCountryCount > 0 ? (c.count / maxCountryCount) * 100 : 0;
-              return (
-                <div key={c.country}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-semibold text-slate-700 capitalize">{c.country}</span>
-                    <span className="text-slate-400">{c.count}</span>
+      {/* Country + Doc Status */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 8 }}>Pays d'origine</p>
+          {data.countryBreakdown.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {data.countryBreakdown.map(ct => {
+                const pct = maxCountryCount > 0 ? (ct.count / maxCountryCount) * 100 : 0;
+                return (
+                  <div key={ct.country}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
+                      <span style={{ color: '#e8ebf0', fontWeight: 600, textTransform: 'capitalize' }}>{ct.country}</span>
+                      <span style={{ color: '#656a73' }}>{ct.count}</span>
+                    </div>
+                    <div style={{ height: 4, background: '#1d202a', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: clr.purple }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: '#656a73', textAlign: 'center', padding: '10px 0' }}>Aucune donnée</p>
+          )}
+        </div>
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 8 }}>Statut des documents</p>
+          {['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'].map(status => {
+            const found = data.docStatusBreakdown.find(d => d.status === status);
+            const count = found ? found.count : 0;
+            const total = data.docStatusBreakdown.reduce((s, d) => s + d.count, 0) || 1;
+            const pct = (count / total) * 100;
+            const sb = statusBadge(status);
+            return (
+              <div key={status} style={{ marginBottom: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: sb.bg, color: sb.color }}>{status}</span>
+                  <span style={{ color: '#656a73' }}>{count} ({Math.round(pct)}%)</span>
                 </div>
-              );
-            })}
-            {data.countryBreakdown.length === 0 && (
-              <p className="text-sm text-slate-400 text-center py-4">{t('analytics.noCountryData')}</p>
-            )}
-          </div>
-        </Card>
-
-        {/* Doc Status */}
-        <Card className="p-5">
-          <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.docStatus')}</h2>
-          <div className="space-y-3">
-            {['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'].map(status => {
-              const found = data.docStatusBreakdown.find(d => d.status === status);
-              const count = found ? found.count : 0;
-              const total = data.docStatusBreakdown.reduce((s, d) => s + d.count, 0) || 1;
-              const pct = (count / total) * 100;
-              return (
-                <div key={status}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${statusColors[status] || 'bg-slate-100 text-slate-600'}`}>
-                      {status}
-                    </span>
-                    <span className="text-slate-400">{count} ({Math.round(pct)}%)</span>
-                  </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
+                <div style={{ height: 4, background: '#1d202a', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: sb.color }} />
                 </div>
-              );
-            })}
-          </div>
-        </Card>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Top Pages */}
-      <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4">Pages les plus visitées</h2>
-        {data.topPages.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-4">Aucune donnée</p>
-        ) : (
-          <div className="space-y-2">
-            {data.topPages.map(p => {
-              const pct = maxPageCount > 0 ? (p.count / maxPageCount) * 100 : 0;
-              return (
-                <div key={p.path}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-semibold text-slate-700 font-mono text-xs">{p.path}</span>
-                    <span className="text-slate-400">{p.count}</span>
+      <div style={{ marginBottom: 10 }}>
+        <div style={card}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 8 }}>Pages les plus visitées</p>
+          {data.topPages.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {data.topPages.map(p => {
+                const pct = maxPageCount > 0 ? (p.count / maxPageCount) * 100 : 0;
+                return (
+                  <div key={p.path}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#e8ebf0', fontFamily: "'IBM Plex Mono', monospace" }}>{p.path}</span>
+                      <span style={{ color: '#656a73' }}>{p.count}</span>
+                    </div>
+                    <div style={{ height: 4, background: '#1d202a', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: clr.blue }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: '#656a73', textAlign: 'center', padding: '10px 0' }}>Aucune donnée</p>
+          )}
+        </div>
+      </div>
 
       {/* Conversion */}
-      <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4">Conversion</h2>
-        <div className="grid grid-cols-3 gap-4 text-center">
+      <div style={card}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0', marginBottom: 12 }}>Conversion</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, textAlign: 'center' as const }}>
           <div>
-            <p className="text-2xl font-black text-slate-900">{data.conversion.totalUsersInPeriod}</p>
-            <p className="text-xs text-slate-400 font-semibold mt-1">Nouveaux utilisateurs</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>{data.conversion.totalUsersInPeriod}</p>
+            <p style={{ fontSize: 11, color: '#656a73', fontWeight: 600, marginTop: 2 }}>Nouveaux utilisateurs</p>
           </div>
           <div>
-            <p className="text-2xl font-black text-emerald-600">{data.conversion.paidUsersInPeriod}</p>
-            <p className="text-xs text-slate-400 font-semibold mt-1">Payants</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: clr.green, margin: 0 }}>{data.conversion.paidUsersInPeriod}</p>
+            <p style={{ fontSize: 11, color: '#656a73', fontWeight: 600, marginTop: 2 }}>Payants</p>
           </div>
           <div>
-            <p className="text-2xl font-black text-blue-600">{data.conversion.conversionRate}%</p>
-            <p className="text-xs text-slate-400 font-semibold mt-1">Taux de conversion</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: clr.blue, margin: 0 }}>{data.conversion.conversionRate}%</p>
+            <p style={{ fontSize: 11, color: '#656a73', fontWeight: 600, marginTop: 2 }}>Taux de conversion</p>
           </div>
         </div>
-      </Card>
-
-      {/* Top Users */}
-      <Card className="p-5">
-        <h2 className="text-sm font-bold text-slate-900 mb-4">{t('analytics.topUsers')}</h2>
-        <MobileTable columns={userColumns} data={data.topUsers} keyField="id" />
-      </Card>
+      </div>
     </div>
   );
 }
