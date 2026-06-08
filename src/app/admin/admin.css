@@ -37,6 +37,7 @@
 .admin-body code,
 .admin-body .mono {
   font-family: 'IBM Plex Mono', monospace;
+  color: var(--text2);
 }
 
 /* ── Dark theme overrides for page.tsx ── */

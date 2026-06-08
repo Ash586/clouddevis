@@ -58,7 +58,7 @@ function NavItem({ item, pathname, router, t }: {
         cursor: 'pointer',
         transition: 'all 0.15s',
         background: isActive ? '#222220' : 'transparent',
-        color: isActive ? '#e8e6de' : '#9c9a90',
+        color: '#e8e6de',
         borderWidth: isActive ? 0.5 : 0,
         borderStyle: 'solid',
         borderColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
@@ -66,13 +66,11 @@ function NavItem({ item, pathname, router, t }: {
       onMouseEnter={e => {
         if (!isActive) {
           e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-          e.currentTarget.style.color = '#e8e6de';
         }
       }}
       onMouseLeave={e => {
         if (!isActive) {
           e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.color = '#9c9a90';
         }
       }}
     >
