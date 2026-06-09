@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
@@ -220,6 +221,86 @@ export default function ProfilePage() {
     </button>
   );
 
+  function SubscriptionTab({ userId, memberSince: ms }: { userId: string; memberSince: string }) {
+    const subRouter = useRouter();
+    const [subData, setSubData] = useState<any>(null);
+    const [loadingSub, setLoadingSub] = useState(true);
+
+    useEffect(() => {
+      if (!userId) { setLoadingSub(false); return; }
+      fetch('/api/subscription')
+        .then(r => r.ok ? r.json() : null)
+        .then(d => setSubData(d))
+        .catch(() => {})
+        .finally(() => setLoadingSub(false));
+    }, [userId]);
+
+    if (loadingSub) return <Card className="p-4 sm:p-6"><SkeletonForm /></Card>;
+
+    const plan = subData?.plan;
+    const usage = subData?.usage;
+    const pctUsed = usage?.docsLimit === 'unlimited' ? 0 : ((usage?.docsThisMonth || 0) / (usage?.docsLimit as number || 1)) * 100;
+
+    return (
+      <div className="space-y-6">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider">{t('currentPlan') || 'Plan actuel'}</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-lg font-black text-slate-900">{plan?.name?.fr || (subData?.status === 'TRIAL' ? 'Essai' : 'Gratuit')}</p>
+              <p className="text-sm text-slate-500">{ms && `${t('memberSince') || 'Membre depuis'} ${ms}`}</p>
+              {subData?.trialDaysRemaining > 0 && (
+                <p className="text-xs text-amber-600 font-bold mt-1">{subData.trialDaysRemaining} {t('daysLeft') || 'jours restants'}</p>
+              )}
+            </div>
+            <Badge variant={subData?.status === 'PRO' || subData?.status === 'MAX' ? 'success' : subData?.status === 'STANDARD' || subData?.status === 'TRIAL' ? 'info' : 'default'}>
+              {subData?.status || 'FREE'}
+            </Badge>
+          </div>
+          {usage && usage.docsLimit !== 'unlimited' && (
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-slate-500 mb-1">
+                <span>{t('statDocs') || 'Documents'}</span>
+                <span>{usage.docsThisMonth} / {usage.docsLimit}</span>
+              </div>
+              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full transition-all ${pctUsed > 80 ? 'bg-red-500' : pctUsed > 50 ? 'bg-amber-500' : 'bg-blue-500'}`}
+                  style={{ width: `${Math.min(pctUsed, 100)}%` }} />
+              </div>
+            </div>
+          )}
+          <Button onClick={() => subRouter.push('/dashboard/subscription')} className="w-full sm:w-auto min-h-[44px]">
+            {t('upgrade') || 'Gérer mon abonnement →'}
+          </Button>
+        </Card>
+
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider">{t('stats') || 'Statistiques du compte'}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {[
+              { label: t('statDocs') || 'Documents', value: usage?.docsThisMonth ?? '-' },
+              { label: t('statClients') || 'Clients', value: subData?.usage?.totalClients ?? '-' },
+              { label: t('statSince') || 'Membre depuis', value: ms },
+            ].map(s => (
+              <div key={s.label} className="text-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <p className="text-lg font-black text-slate-900">{s.value}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-5 border-red-200 bg-red-50/30 text-center">
+          <h3 className="font-bold text-slate-800">{t('enterpriseCta') || 'Vous avez besoin de plus ?'}</h3>
+          <p className="text-xs text-slate-500 mt-1">{t('enterpriseDesc') || 'Solution sur mesure pour les grandes organisations.'}</p>
+          <Button variant="secondary" className="mt-3" onClick={() => subRouter.push('/enterprise')}>
+            {t('contactEnterprise') || 'Nous contacter'}
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -244,7 +325,7 @@ export default function ProfilePage() {
                       <p className="text-sm text-slate-500">{profile?.email || ''} • {mode === 'ENTREPRISE' ? tt('company') : tt('artisan')}</p>
                     </div>
                   </div>
-                  <Badge variant={profile?.subscriptionStatus === 'PRO' ? 'success' : profile?.subscriptionStatus === 'BASIC' ? 'info' : 'default'}>
+                    <Badge variant={profile?.subscriptionStatus === 'PRO' ? 'success' : profile?.subscriptionStatus === 'STANDARD' ? 'info' : profile?.subscriptionStatus === 'MAX' ? 'info' : 'default'}>
                     {profile?.subscriptionStatus || 'FREE'}
                   </Badge>
                 </div>
@@ -434,47 +515,7 @@ export default function ProfilePage() {
                 )}
 
                 {/* ─── TAB: SUBSCRIPTION ─── */}
-                {activeTab === 'subscription' && (
-                  <div className="space-y-6">
-                    <Card className="p-4 sm:p-6">
-                      <h2 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider">{t('currentPlan') || 'Plan actuel'}</h2>
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <p className="text-lg font-black text-slate-900">
-                            {profile?.subscriptionStatus === 'PRO' ? 'Pro' :
-                             profile?.subscriptionStatus === 'BASIC' ? 'Basic' :
-                             profile?.subscriptionStatus === 'TRIAL' ? 'Essai' : 'Gratuit'}
-                          </p>
-                          <p className="text-sm text-slate-500">{memberSince && `${t('memberSince') || 'Membre depuis'} ${memberSince}`}</p>
-                        </div>
-                        <Badge variant={profile?.subscriptionStatus === 'PRO' ? 'success' : profile?.subscriptionStatus === 'BASIC' ? 'info' : 'default'}>
-                          {profile?.subscriptionStatus || 'FREE'}
-                        </Badge>
-                      </div>
-                      {profile?.subscriptionStatus !== 'PRO' && (
-                        <Button onClick={() => window.open('/pricing', '_blank')} className="w-full sm:w-auto min-h-[44px]">
-                          {t('upgrade') || 'Voir les offres →'}
-                        </Button>
-                      )}
-                    </Card>
-
-                    <Card className="p-4 sm:p-6">
-                      <h2 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider">{t('stats') || 'Statistiques du compte'}</h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        {[
-                          { label: t('statDocs') || 'Documents', value: '-' },
-                          { label: t('statClients') || 'Clients', value: '-' },
-                          { label: t('statSince') || 'Membre depuis', value: memberSince },
-                        ].map(s => (
-                          <div key={s.label} className="text-center p-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <p className="text-lg font-black text-slate-900">{s.value}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </Card>
-                  </div>
-                )}
+                {activeTab === 'subscription' && <SubscriptionTab userId={profile?.id || ''} memberSince={memberSince} />}
               </div>
             )}
           </TrialGate>

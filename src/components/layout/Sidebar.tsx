@@ -217,6 +217,15 @@ function SidebarInner() {
           {s('team') || 'Équipe'}
         </button>
 
+        {/* Subscription */}
+        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/subscription'); setMobileOpen(false); }}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
+            isActive('/dashboard/subscription') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          }`}>
+          <CreditCard size={16} strokeWidth={1.5} className="shrink-0" />
+          {s('subscription') || 'Abonnement'}
+        </button>
+
         {/* Shared */}
         <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/shared'); setMobileOpen(false); }}
           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${

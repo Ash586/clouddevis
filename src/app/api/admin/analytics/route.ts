@@ -129,7 +129,7 @@ export async function GET(req: Request) {
     const paidUsersInPeriod = await prisma.user.count({
       where: {
         createdAt: { gte: startDate },
-        subscriptionStatus: { in: ['BASIC', 'PRO'] },
+        subscriptionStatus: { in: ['STANDARD', 'PRO', 'MAX'] },
       },
     });
 

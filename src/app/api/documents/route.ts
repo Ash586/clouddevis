@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { calculateDocument } from '@/lib/calculations';
+import type { DocumentState } from '@/types';
+
+const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
 
 export async function GET(req: Request) {
   try {
@@ -87,6 +91,86 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     logger.error('GET /api/documents error', { error: String(error) });
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { subscriptionStatus: true, docCountThisMonth: true, lastDocResetAt: true, trialStartAt: true },
+    });
+    if (!user) return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 });
+
+    // Reset doc count if new month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (!user.lastDocResetAt || user.lastDocResetAt < startOfMonth) {
+      await prisma.user.update({ where: { id: session.userId }, data: { docCountThisMonth: 0, lastDocResetAt: now } });
+      user.docCountThisMonth = 0;
+    }
+
+    // Check trial expiration (7 days)
+    const isTrial = user.subscriptionStatus === 'TRIAL';
+    if (isTrial && user.trialStartAt) {
+      const daysSinceTrial = Math.floor((now.getTime() - user.trialStartAt.getTime()) / 86400000);
+      if (daysSinceTrial >= 7) {
+        await prisma.user.update({ where: { id: session.userId }, data: { subscriptionStatus: 'FREE' } });
+        return NextResponse.json({ error: 'Essai terminé. Choisissez un forfait pour continuer.' }, { status: 403 });
+      }
+    }
+
+    // Check doc limit
+    const isExpired = user.subscriptionStatus === 'EXPIRED';
+    const isFree = user.subscriptionStatus === 'FREE';
+    const docLimit = isFree ? 5 : isExpired ? 0 : user.subscriptionStatus === 'TRIAL' ? 999999 : 999999;
+    if (user.docCountThisMonth >= (isFree ? 5 : 999999)) {
+      return NextResponse.json({ error: 'Limite mensuelle de documents atteinte. Passez à un forfait supérieur.' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const doc = body as Record<string, unknown>;
+    const items = ((doc.items as Array<Record<string, unknown>>) || []).map((i) => ({
+      id: String(i.id || ''), designation: String(i.designation || ''), quantity: Number(i.quantity) || 0,
+      unit: String(i.unit || 'unité'), unitPrice: Number(i.unitPrice) || 0, category: (i.category as string) || null,
+    }));
+
+    const result = calculateDocument({
+      items, tvaRate: Number(doc.tvaRate) || 0,
+      discount: (doc.discount as DocumentState['discount']) || { type: 'percentage', value: 0, reason: '' },
+      stampDuty: (doc.stampDuty as DocumentState['stampDuty']) || { rate: 1, minAmount: 5, maxAmount: 2500 },
+      paymentMode: String(doc.paymentMode || 'cheque'), acompte: Number(doc.acompte) || 0,
+    } as unknown as DocumentState);
+
+    const documentType = String(doc.documentType || 'devis').toLowerCase();
+    const typeValue = DOC_TYPE_MAP[documentType] || 'DEVIS';
+
+    const created = await prisma.document.create({
+      data: {
+        userId: session.userId,
+        type: typeValue,
+        number: String(doc.documentNumber || ''),
+        date: doc.date ? new Date(String(doc.date)) : new Date(),
+        mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
+        paymentMode: String(doc.paymentMode || 'cheque'),
+        items: JSON.stringify(items),
+        subTotalHT: result.subTotalHT, tvaAmount: result.tvaAmount,
+        timbreFiscal: result.timbreFiscal, totalTTC: result.totalTTC,
+        acompte: Number(doc.acompte) || 0, netAPayer: result.netAPayer,
+        totalInWords: result.totalInWords, notes: (doc.notes as string) || null,
+      },
+    });
+
+    // Increment doc count
+    await prisma.user.update({ where: { id: session.userId }, data: { docCountThisMonth: { increment: 1 } } });
+
+    return NextResponse.json({ id: created.id, number: created.number });
+  } catch (error) {
+    logger.error('POST /api/documents error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }

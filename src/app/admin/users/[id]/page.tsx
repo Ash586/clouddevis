@@ -88,9 +88,11 @@ export default function AdminUserDetailPage() {
 
   const statusColors: Record<string, string> = {
     TRIAL: 'bg-amber-50 text-amber-600',
-    BASIC: 'bg-blue-50 text-blue-600',
+    STANDARD: 'bg-blue-50 text-blue-600',
     PRO: 'bg-emerald-50 text-emerald-600',
-    EXPIRED: 'bg-red-50 text-red-600',
+    MAX: 'bg-purple-50 text-purple-600',
+    ENTERPRISE: 'bg-red-50 text-red-600',
+    EXPIRED: 'bg-slate-50 text-slate-400',
     FREE: 'bg-slate-50 text-slate-600',
   };
 
@@ -245,8 +247,10 @@ export default function AdminUserDetailPage() {
               className="mt-1 px-3 py-1.5 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             >
               <option value="TRIAL">TRIAL</option>
-              <option value="BASIC">BASIC</option>
+              <option value="STANDARD">STANDARD</option>
               <option value="PRO">PRO</option>
+              <option value="MAX">MAX</option>
+              <option value="ENTERPRISE">ENTERPRISE</option>
               <option value="FREE">FREE</option>
               <option value="EXPIRED">EXPIRED</option>
             </select>

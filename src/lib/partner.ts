@@ -38,7 +38,7 @@ const SUBSCRIPTION_PRICES: Record<string, number> = {
 };
 
 export async function handleReferralConversion(userId: string, newStatus: string): Promise<void> {
-  if (!['BASIC', 'PRO'].includes(newStatus)) return;
+  if (!['STANDARD', 'PRO', 'MAX'].includes(newStatus)) return;
 
   const referral = await prisma.referral.findUnique({
     where: { referredUserId: userId },

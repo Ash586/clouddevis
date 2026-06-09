@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { PLANS, PLAN_ORDER, formatPrice } from '@/lib/pricing';
 
 const FAQ_ITEMS = [
   { q: 'paymentMethods', a: 'paymentMethodsAnswer' },
@@ -17,13 +18,12 @@ const FAQ_ITEMS = [
 ];
 
 const COMPARISON_FEATURES = [
-  { key: 'documentsMonth', free: '5', basic: 'Illimité', pro: 'Illimité' },
-  { key: 'templates', free: 'Basiques', basic: 'Tous', pro: 'Tous + Personnalisés' },
-  { key: 'pdfExport', free: false, basic: true, pro: true },
-  { key: 'noWatermark', free: false, basic: true, pro: true },
-  { key: 'reports', free: false, basic: false, pro: true },
-  { key: 'apiAccess', free: false, basic: false, pro: true },
-  { key: 'phoneSupport', free: false, basic: false, pro: true },
+  { key: 'documentsMonth', free: '5', standard: '50', pro: 'Illimité', max: 'Illimité' },
+  { key: 'templates', free: 'Basiques', standard: 'Tous', pro: 'Tous', max: 'Personnalisés' },
+  { key: 'pdfExport', free: false, standard: true, pro: true, max: true },
+  { key: 'noWatermark', free: false, standard: true, pro: true, max: true },
+  { key: 'teamMembers', free: '1', standard: '2', pro: '5', max: '15' },
+  { key: 'reports', free: false, standard: false, pro: true, max: true },
 ];
 
 function CheckIcon() {
@@ -42,63 +42,13 @@ function CrossIcon() {
   );
 }
 
-function FeatureCell({ value }: { value: boolean | string }) {
-  if (typeof value === 'boolean') {
-    return value ? <CheckIcon /> : <CrossIcon />;
-  }
-  return <span className="text-sm text-slate-700 font-medium">{value}</span>;
-}
-
 export default function PricingPage() {
   const t = useTranslations('pricing');
   const tc = useTranslations('common');
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const plans = [
-    {
-      name: t('freePlanName'),
-      price: t('freePlanPrice'),
-      period: t('perMonth'),
-      features: [
-        t('freeDocs'),
-        t('freeTemplates'),
-        t('freeWatermark'),
-        t('freeSupport'),
-      ],
-      cta: t('freeCta'),
-      highlighted: false,
-    },
-    {
-      name: t('basicPlanName'),
-      price: t('basicPlanPrice'),
-      period: t('perMonth'),
-      features: [
-        t('basicDocs'),
-        t('basicNoWatermark'),
-        t('basicPdf'),
-        t('basicTemplates'),
-        t('basicSupport'),
-      ],
-      cta: t('basicCta'),
-      highlighted: true,
-      badge: t('popularBadge'),
-    },
-    {
-      name: t('proPlanName'),
-      price: t('proPlanPrice'),
-      period: t('perMonth'),
-      features: [
-        t('proEverything'),
-        t('proReports'),
-        t('proCustom'),
-        t('proApi'),
-        t('proSupport'),
-      ],
-      cta: t('proCta'),
-      highlighted: false,
-    },
-  ];
+  const displayPlans = PLAN_ORDER.filter(id => id !== 'enterprise');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -114,46 +64,65 @@ export default function PricingPage() {
         </section>
 
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-6 items-start">
-            {plans.map(plan => (
-              <Card
-                key={plan.name}
-                className={cn(
-                  'relative flex flex-col',
-                  plan.highlighted && 'border-blue-500 shadow-lg shadow-blue-100/50 scale-[1.02]'
-                )}
-              >
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      {plan.badge}
-                    </span>
+          <div className="grid md:grid-cols-4 gap-3 sm:gap-4 items-stretch">
+            {displayPlans.map(id => {
+              const plan = PLANS[id];
+              const nameKey = id === 'free' ? 'freePlanName' : id === 'standard' ? 'standardPlanName' : id === 'pro' ? 'proPlanName' : 'maxPlanName';
+              const tName = t(nameKey as any);
+              return (
+                <Card key={id} className={cn('relative flex flex-col', plan.highlighted && 'border-blue-500 shadow-lg shadow-blue-100/50 scale-[1.02]')}>
+                  {plan.highlighted && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        {t('popularBadge')}
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-center mb-4 pt-2">
+                    <h3 className="text-base font-bold text-slate-900">{tName}</h3>
+                    <div className="mt-2">
+                      <span className="text-2xl sm:text-3xl font-black text-slate-900">{formatPrice(plan.price)}</span>
+                      <span className="text-xs text-slate-400 ml-1">{t('perMonth')}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">{plan.description.fr}</p>
                   </div>
-                )}
-                <div className="text-center mb-6 pt-2">
-                  <h3 className="text-lg font-bold text-slate-900">{plan.name}</h3>
-                  <div className="mt-2">
-                    <span className="text-3xl sm:text-4xl font-black text-slate-900">{plan.price}</span>
-                    <span className="text-sm text-slate-400 ml-1">{plan.period}</span>
-                  </div>
-                </div>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map(f => (
-                    <li key={f} className="flex items-start gap-2.5">
+                  <ul className="space-y-2 mb-6 flex-1 text-xs">
+                    <li className="flex items-start gap-2">
                       <CheckIcon />
-                      <span className="text-sm text-slate-600">{f}</span>
+                      <span className="text-slate-600">
+                        {plan.limits.docsPerMonth === 'unlimited' ? (t('maxDocs') || 'Illimité') : (t('standardDocs').replace('50', String(plan.limits.docsPerMonth)) || `${plan.limits.docsPerMonth} docs`)}
+                      </span>
                     </li>
-                  ))}
-                </ul>
-                <Button
-                  variant={plan.highlighted ? 'primary' : 'outline'}
-                  className="w-full"
-                  onClick={() => router.push('/auth/register')}
-                >
-                  {plan.cta}
-                </Button>
-              </Card>
-            ))}
+                    <li className="flex items-start gap-2">
+                      <CheckIcon />
+                      <span className="text-slate-600">{plan.limits.teamMembers} {plan.limits.teamMembers > 1 ? 'utilisateurs' : 'utilisateur'}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckIcon />
+                      <span className="text-slate-600">{plan.limits.storageMB >= 1024 ? `${plan.limits.storageMB / 1024} Go` : `${plan.limits.storageMB} Mo`}</span>
+                    </li>
+                  </ul>
+                  <Button
+                    variant={plan.highlighted ? 'primary' : 'outline'}
+                    className="w-full"
+                    onClick={() => router.push('/auth/register')}
+                  >
+                    {t('freeCta')}
+                  </Button>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Enterprise CTA */}
+          <div className="mt-6">
+            <Card className="p-5 border-red-200 bg-red-50/30 text-center">
+              <h3 className="font-bold text-slate-800">{t('enterpriseCta')}</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">Solution sur mesure pour les grandes organisations avec support dédié 24/7.</p>
+              <Button variant="secondary" className="mt-3" onClick={() => router.push('/enterprise')}>
+                {t('enterpriseCtaBtn')}
+              </Button>
+            </Card>
           </div>
         </section>
 
@@ -167,17 +136,26 @@ export default function PricingPage() {
                 <tr className="border-b border-slate-200">
                   <th className="py-3 pr-4 text-sm font-semibold text-slate-500">{t('feature')}</th>
                   <th className="py-3 px-4 text-sm font-semibold text-slate-900 text-center">{t('freePlanName')}</th>
-                  <th className="py-3 px-4 text-sm font-semibold text-blue-600 text-center">{t('basicPlanName')}</th>
-                  <th className="py-3 pl-4 text-sm font-semibold text-slate-900 text-center">{t('proPlanName')}</th>
+                  <th className="py-3 px-4 text-sm font-semibold text-blue-600 text-center">{t('standardPlanName')}</th>
+                  <th className="py-3 px-4 text-sm font-semibold text-slate-900 text-center">{t('proPlanName')}</th>
+                  <th className="py-3 pl-4 text-sm font-semibold text-slate-900 text-center">{t('maxPlanName')}</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON_FEATURES.map(row => (
                   <tr key={row.key} className="border-b border-slate-100">
                     <td className="py-3 pr-4 text-sm text-slate-600">{t(row.key as any)}</td>
-                    <td className="py-3 px-4 text-center"><FeatureCell value={row.free} /></td>
-                    <td className="py-3 px-4 text-center"><FeatureCell value={row.basic} /></td>
-                    <td className="py-3 pl-4 text-center"><FeatureCell value={row.pro} /></td>
+                    {(['free', 'standard', 'pro', 'max'] as const).map(col => {
+                      const val = row[col];
+                      return (
+                        <td key={col} className="py-3 px-4 text-center">
+                          {typeof val === 'boolean'
+                            ? (val ? <CheckIcon /> : <CrossIcon />)
+                            : <span className="text-sm text-slate-700 font-medium">{val}</span>
+                          }
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>

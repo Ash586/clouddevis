@@ -21,7 +21,7 @@ export async function GET() {
       prisma.document.count({ where: { createdAt: { gte: startOfMonth } } }),
       prisma.client.count(),
       prisma.user.count({ where: { subscriptionStatus: 'TRIAL' } }),
-      prisma.user.count({ where: { subscriptionStatus: 'BASIC' } }),
+      prisma.user.count({ where: { subscriptionStatus: 'STANDARD' } }),
       prisma.user.count({ where: { subscriptionStatus: 'PRO' } }),
       prisma.user.findMany({
         orderBy: { createdAt: 'desc' },
