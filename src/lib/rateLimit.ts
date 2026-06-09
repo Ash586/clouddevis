@@ -1,13 +1,19 @@
+// Serverless-safe rate limiting using in-memory (best-effort).
+// For production with many concurrent users, replace with Redis (e.g. @upstash/redis).
+
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 
-// Cleanup expired entries every 5 minutes to prevent memory leaks
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of rateMap) {
-      if (now > entry.resetAt) rateMap.delete(key);
-    }
-  }, 5 * 60 * 1000);
+try {
+  if (typeof setInterval !== 'undefined') {
+    setInterval(() => {
+      const now = Date.now();
+      for (const [key, entry] of rateMap) {
+        if (now > entry.resetAt) rateMap.delete(key);
+      }
+    }, 5 * 60 * 1000);
+  }
+} catch {
+  // Edge runtime may not support setInterval — ignore
 }
 
 export function checkRateLimit(key: string, maxAttempts = 5, windowMs = 60000): { allowed: boolean; remaining: number } {

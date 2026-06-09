@@ -22,15 +22,20 @@ export async function POST(req: Request) {
         const planId = event.planId || 'pro';
         if (!event.userId) break;
 
-        const statusMap: Record<string, string> = {
+        const validStatuses = ['STANDARD', 'PRO', 'MAX'] as const;
+        const statusMap: Record<string, typeof validStatuses[number]> = {
           standard: 'STANDARD', pro: 'PRO', max: 'MAX',
         };
         const status = statusMap[planId] || 'PRO';
 
+        // Verify user exists before updating
+        const targetUser = await prisma.user.findUnique({ where: { id: event.userId }, select: { id: true } });
+        if (!targetUser) break;
+
         await prisma.user.update({
           where: { id: event.userId },
           data: {
-            subscriptionStatus: status as any,
+            subscriptionStatus: status,
             lemonsqueezyCustomerId: event.orderId,
             lemonsqueezySubscriptionId: event.orderId,
             subscriptionEndAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),

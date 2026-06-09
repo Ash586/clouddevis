@@ -2,11 +2,10 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
-if (!process.env.ADMIN_JWT_SECRET) {
-  console.warn('ADMIN_JWT_SECRET not set, using JWT_SECRET as fallback');
-}
-
 function getSecret() {
+  if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_JWT_SECRET) {
+    throw new Error('ADMIN_JWT_SECRET must be set in production');
+  }
   const secret = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
   if (!secret) throw new Error('No JWT secret configured');
   return new TextEncoder().encode(secret);

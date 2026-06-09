@@ -138,6 +138,9 @@ model Client {
   documents Document[]
   @@index([userId])
   @@index([name])
+  @@index([userId, name])
+  @@index([userId, nif])
+  @@index([userId, rc])
 }
 
 model Document {
@@ -183,6 +186,9 @@ model Document {
   @@index([status])
   @@index([number])
   @@index([createdAt])
+  @@index([userId, type, status, createdAt])
+  @@index([userId, mode])
+  @@index([userId, country])
 }
 
 model Template {
@@ -466,6 +472,7 @@ model Notification {
 
   @@index([userId])
   @@index([userId, read])
+  @@index([userId, read, createdAt])
   @@index([createdAt])
 }
 
@@ -634,4 +641,5 @@ model Transaction {
   @@index([status])
   @@index([createdAt])
   @@index([providerId])
+  @@index([userId, status, createdAt])
 }

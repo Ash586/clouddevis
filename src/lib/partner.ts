@@ -30,11 +30,14 @@ export async function getPartnerReferralUrl(code: string): Promise<string> {
   return `${baseUrl}/auth/register?ref=${code}`;
 }
 
+import { PLANS } from '@/lib/pricing';
+
 const SUBSCRIPTION_PRICES: Record<string, number> = {
   TRIAL: 0,
   FREE: 0,
-  BASIC: 1000,
-  PRO: 2000,
+  STANDARD: PLANS.standard.price,
+  PRO: PLANS.pro.price,
+  MAX: PLANS.max.price,
 };
 
 export async function handleReferralConversion(userId: string, newStatus: string): Promise<void> {

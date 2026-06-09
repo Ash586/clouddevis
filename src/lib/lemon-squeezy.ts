@@ -41,13 +41,18 @@ export interface LSWebhookPayload {
   data: { id: string; attributes: Record<string, any> };
 }
 
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 export function verifyWebhookSignature(body: string, signature: string): boolean {
   const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
   if (!secret) return false;
   const expected = createHmac('sha256', secret).update(body).digest('hex');
-  return signature === expected;
+  if (expected.length !== signature.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
 }
 
 export function parseWebhookEvent(payload: LSWebhookPayload): { event: string; orderId: string; status: string; email: string; userId?: string; planId?: string } {
