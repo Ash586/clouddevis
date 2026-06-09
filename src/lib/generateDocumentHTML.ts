@@ -86,12 +86,12 @@ export function generateDocumentHTML(params: {
     ${S('.totals-table .grand .lbl','font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase')}
     ${S('.totals-table .grand .val','font-size:16px;font-weight:900;color:#1e3a5f')}
     ${S('.totals-table .inwords','font-size:8px;font-style:italic;color:#94a3b8;text-align:right;padding-top:3px')}
-    ${S('.signature','margin-top:24px;padding-top:14px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-end')}
-    ${S('.signature .loc','font-size:9px;color:#94a3b8')}
+    ${S('.signature','margin-top:20px;padding-top:14px;border-top:1.5px solid #1e293b;display:flex;justify-content:space-between;align-items:flex-end')}
+    ${S('.signature .loc','font-size:9px;color:#64748b;font-weight:500')}
     ${S('.signature .stamp','text-align:right')}
-    ${S('.signature .stamp .lbl2','font-size:9px;color:#94a3b8;margin-bottom:3px')}
-    ${S('.signature .stamp .box','width:100px;height:48px;border:2px dashed #cbd5e1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#cbd5e1')}
-    ${S('.print-footer','text-align:center;font-size:7px;color:#cbd5e1;margin-top:24px;letter-spacing:0.5px')}
+    ${S('.signature .stamp .lbl2','font-size:8px;color:#94a3b8;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px')}
+    ${S('.signature .stamp .box','width:110px;height:52px;border:2px solid #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#cbd5e1;background:#f8fafc')}
+    ${S('.print-footer','text-align:center;font-size:7px;color:#94a3b8;margin-top:20px;border-top:1px solid #e2e8f0;padding-top:8px;letter-spacing:0.3px')}
     ${S('@media print','.page{padding:30px 40px 20px;box-shadow:none}')}
   `;
 
@@ -254,7 +254,7 @@ export function generateDocumentHTML(params: {
     </div>
   </div>` : '') + `
 
-  <div class="print-footer">${tp('footer')}</div>
+  <div class="print-footer">${tp('footer')}` + (doc.paymentDetails?.iban ? `<span style="margin:0 8px">|</span>IBAN: ${s(doc.paymentDetails.iban)}` : '') + `</div>
 </div>
 
 </div>

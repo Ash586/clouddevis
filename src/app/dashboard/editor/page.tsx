@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
-import type { UserMode, BlockId, SectionId, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
+import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
 import { cn } from '@/lib/utils';
 
 function EditorContent() {
@@ -52,6 +52,20 @@ function EditorContent() {
   const [allExpanded, setAllExpanded] = useState<boolean | null>(null);
   const [itemErrors, setItemErrors] = useState<string | null>(null);
   const [nifErrors, setNifErrors] = useState<Record<string, string>>({});
+  const [activeSection, setActiveSection] = useState<SectionId>('prestations');
+  const [showPreview, setShowPreview] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const UNDO_LIMIT = 50;
+  const undoStack = useRef<DocumentState[]>([]);
+  const redoStack = useRef<DocumentState[]>([]);
+  const lastDocRef = useRef<DocumentState>(doc);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const [catalogItems, setCatalogItems] = useState<LineItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
   const ALL_SECTIONS: string[] = [...DEFAULT_SECTION_ORDER, ...customSections.map(s => s.id)];
   const allFields = ALL_SECTIONS.flatMap(s => SECTION_FIELDS[s] ?? customSections.find(c => c.id === s)?.fields.map(f => f.id) ?? []);
 
@@ -163,11 +177,56 @@ function EditorContent() {
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   };
 
-  // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download
+  // Show draft restoration notification
+  useEffect(() => {
+    if (draftRestored === 'unsaved_draft' && doc.clientInfo.name && !docIdParam) {
+      showToast(te('draftRestored' as any) || 'Brouillon restauré ✓', 'success');
+    }
+    if (draftRestored) setDraftRestored(null);
+  }, []);
+
+  // Undo tracking with debounce
+  useEffect(() => {
+    if (lastDocRef.current === doc) return;
+    const prevDoc = lastDocRef.current;
+    lastDocRef.current = doc;
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      undoStack.current.push(prevDoc);
+      if (undoStack.current.length > UNDO_LIMIT) undoStack.current.shift();
+      redoStack.current = [];
+      setCanUndo(undoStack.current.length > 0);
+      setCanRedo(false);
+    }, 400);
+  }, [doc]);
+
+  const handleUndo = useCallback(() => {
+    const prev = undoStack.current.pop();
+    if (!prev) return;
+    redoStack.current.push(doc);
+    setDoc(prev);
+    setCanUndo(undoStack.current.length > 0);
+    setCanRedo(true);
+  }, [doc, setDoc]);
+
+  const handleRedo = useCallback(() => {
+    const next = redoStack.current.pop();
+    if (!next) return;
+    undoStack.current.push(doc);
+    setDoc(next);
+    setCanRedo(redoStack.current.length > 0);
+    setCanUndo(true);
+  }, [doc, setDoc]);
+
+  // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download, Ctrl+Z = undo, Ctrl+Shift+Z = redo
   const saveDocRef = useRef(saveDoc);
   const handleDownloadRef = useRef(handleDownload);
+  const handleUndoRef = useRef(handleUndo);
+  const handleRedoRef = useRef(handleRedo);
   saveDocRef.current = saveDoc;
   handleDownloadRef.current = handleDownload;
+  handleUndoRef.current = handleUndo;
+  handleRedoRef.current = handleRedo;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -179,17 +238,21 @@ function EditorContent() {
         e.preventDefault();
         handleDownloadRef.current();
       }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndoRef.current();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        handleRedoRef.current();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        handleRedoRef.current();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-  // Show draft restoration notification
-  useEffect(() => {
-    if (draftRestored === 'unsaved_draft' && doc.clientInfo.name && !docIdParam) {
-      showToast(te('draftRestored' as any) || 'Brouillon restauré ✓', 'success');
-    }
-    if (draftRestored) setDraftRestored(null);
   }, []);
 
   // Autosave every 30 seconds
@@ -386,16 +449,26 @@ function EditorContent() {
                 <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">✓</button>
                 <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-red-600">✕</button></div>
             </div>
+            {newItem.designation && newItem.unitPrice > 0 && (
+              <div className="flex items-center justify-between px-2 py-1 bg-blue-50 rounded-lg border border-blue-100">
+                <span className="text-[10px] text-blue-600 font-medium">{te('prestations.lineTotal') || 'Total ligne'}</span>
+                <span className="text-[12px] font-bold text-blue-700">{(newItem.quantity * newItem.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}</span>
+              </div>
+            )}
             {itemErrors && <div className="text-[10px] text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">{itemErrors}</div>}
           </div>}
           {doc.items.map((item, idx) => (
-            <div key={item.id} className="bg-slate-50 p-2 sm:p-3 rounded-xl border space-y-1.5">
+            <div key={item.id} draggable
+              onDragStart={() => setDragIdx(idx)}
+              onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx); }}
+              onDragEnter={(e) => e.preventDefault()}
+              onDragLeave={() => setDragOverIdx(null)}
+              onDrop={() => { if (dragIdx !== null && dragIdx !== idx) { moveItem(dragIdx, idx); } setDragIdx(null); setDragOverIdx(null); }}
+              onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
+              className={`bg-slate-50 p-2 sm:p-3 rounded-xl border space-y-1.5 transition-all ${dragOverIdx === idx ? 'border-blue-400 shadow-md scale-[1.02]' : 'border-slate-200'} ${dragIdx === idx ? 'opacity-40' : ''}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                  <div className="flex flex-col gap-0.5">
-                    <button onClick={() => { if (idx > 0) moveItem(idx, idx - 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 p-1 min-w-[28px] flex justify-center">▲</button>
-                    <button onClick={() => { if (idx < doc.items.length - 1) moveItem(idx, idx + 1); }} className="text-[9px] text-slate-400 hover:text-slate-600 p-1 min-w-[28px] flex justify-center">▼</button>
-                  </div>
+                  <span className="text-slate-300 cursor-grab active:cursor-grabbing text-[14px] select-none px-0.5" title={te('dragToReorder') || 'Drag to reorder'}>⠿</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[11px] font-medium text-slate-800 truncate block">{item.designation}</span>
                     {item.category && <span className="text-[8px] text-slate-400 uppercase">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? 'preview.categories.none')}</span>}
@@ -412,7 +485,60 @@ function EditorContent() {
               </div>
             </div>
           ))}
-          {!addingItem && <button onClick={startNewItem} className="w-full py-3 sm:py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>}
+          {!addingItem && <div className="flex gap-2">
+            <button onClick={startNewItem} className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>
+            <button onClick={async () => {
+              setCatalogLoading(true); setShowCatalog(true);
+              try {
+                const res = await fetch('/api/documents?limit=30');
+                const data = await res.json();
+                const seen = new Set<string>();
+                const all: LineItem[] = [];
+                for (const d of data.documents ?? []) {
+                  const items: LineItem[] = typeof d.items === 'string' ? (JSON.parse(d.items) || []) : (d.items || []);
+                  for (const item of items) {
+                    if (item.designation && !seen.has(item.designation)) {
+                      seen.add(item.designation);
+                      all.push(item);
+                    }
+                  }
+                }
+                setCatalogItems(all);
+              } catch { setCatalogItems([]); }
+              setCatalogLoading(false);
+            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-blue-300 rounded-xl text-blue-500 font-bold hover:bg-blue-50 transition text-[11px] min-h-[44px]" title={te('catalog') || 'Catalogue'}>📦</button>
+          </div>}
+          {/* Catalog Modal */}
+          {showCatalog && (
+            <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCatalog(false)}>
+              <div className="bg-white w-full sm:max-w-md sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-slate-300" /></div>
+                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                  <h3 className="text-[13px] font-semibold text-slate-900">{te('catalog') || 'Catalogue articles'}</h3>
+                  <button onClick={() => setShowCatalog(false)} className="text-slate-400 hover:text-slate-600 p-1">✕</button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                  {catalogLoading ? (
+                    <div className="text-center py-8 text-slate-400 text-[11px]">{tc('loading')}</div>
+                  ) : catalogItems.length === 0 ? (
+                    <div className="text-center py-8 text-slate-400 text-[11px]">{te('catalogEmpty') || 'Aucun article trouvé'}</div>
+                  ) : catalogItems.map((item, i) => (
+                    <button key={`${item.designation}-${i}`} onClick={() => {
+                      setNewItem({ id: '', designation: item.designation, quantity: 1, unit: item.unit, unitPrice: item.unitPrice, category: item.category ?? '' });
+                      setAddingItem(true);
+                      setShowCatalog(false);
+                    }} className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] font-medium text-slate-800 truncate">{item.designation}</div>
+                        {item.category && <div className="text-[8px] text-slate-400 uppercase mt-0.5">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? '')}</div>}
+                      </div>
+                      <div className="text-[11px] font-bold text-blue-600 whitespace-nowrap">{item.unitPrice.toLocaleString('fr-DZ')} {tc('currency')}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </CollapsibleSection> : null;
 
       case 'remise':
@@ -507,7 +633,7 @@ function EditorContent() {
     <>
       <Navbar />
       <TrialGate>
-      <div className="min-h-screen bg-slate-100 text-slate-900 font-sans print:bg-white">
+      <div className="min-h-screen bg-[#f0f4f8] text-slate-900 font-sans print:bg-white">
         {/* ─── EDITOR TOP BAR ─── */}
         <div className="no-print flex flex-wrap items-center py-1.5 px-2 sm:px-3 bg-white border-b sticky top-0 z-50 shadow-sm gap-1">
           <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap flex-1 min-w-0">
@@ -531,25 +657,60 @@ function EditorContent() {
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
               <span className="hidden sm:inline">{te('customize')}</span>
             </button>}
+            <button onClick={handleUndo} disabled={!canUndo} className="flex items-center justify-center text-[11px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 w-7 h-7 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">↩</button>
+            <button onClick={handleRedo} disabled={!canRedo} className="flex items-center justify-center text-[11px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 w-7 h-7 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)">↪</button>
             <button onClick={() => setAllExpanded(prev => prev === true ? null : true)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 w-8 h-8 sm:w-auto sm:px-2 rounded-lg transition" title={allExpanded === true ? te('collapseAll') || 'Collapse all' : te('expandAll') || 'Expand all'}>
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={allExpanded === true ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} /></svg>
               <span className="hidden sm:inline">{allExpanded === true ? te('collapseAll') || 'Collapse' : te('expandAll') || 'Expand'}</span>
             </button>
             {docIdParam && <span className="text-[9px] sm:text-[10px] text-green-600 font-medium bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full hidden sm:inline">{te('editMode')}</span>}
-            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">{saving ? te('saving') : tc('save')}</Button>
+            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">
+              {saving && <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-current inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>}
+              {saving ? te('saving') : tc('save')}
+            </Button>
             <Button size="sm" onClick={handleDownload} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">{te('downloadPdf')}</Button>
           </div>
         </div>
+
+        {/* ─── SECTION TOOLBAR ─── */}
+        <div className="no-print flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-white border-b border-slate-200 overflow-x-auto sticky top-[41px] z-40">
+          {(['prestations', 'client', 'general', 'design', 'paiement'] as SectionId[]).map(id => (
+            <button key={id} onClick={() => setActiveSection(id)}
+              className={cn('px-3 py-1.5 text-[10px] sm:text-[11px] font-bold rounded-lg whitespace-nowrap transition', activeSection === id ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100')}>
+              {id === 'prestations' ? '🧾' : id === 'client' ? '👤' : id === 'general' ? '📋' : id === 'design' ? '🎨' : '💰'} {te(`sections.${id}`)}
+            </button>
+          ))}
+          <div className="ml-auto flex items-center gap-1">
+            <button onClick={() => setShowPreview(p => !p)} className={cn('lg:hidden px-3 py-1.5 text-[11px] font-bold rounded-lg transition', showPreview ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100')}>
+              {showPreview ? '✕ ' : '👁️ '}{showPreview ? (te('hidePreview') || 'Masquer') : (te('showPreview') || 'Aperçu')}
+            </button>
+          </div>
+        </div>
+
+        {/* ─── VALIDATION BAR ─── */}
+        {itemErrors && (
+          <div className="no-print flex items-center gap-2 px-3 py-1.5 bg-red-50 border-b border-red-200 text-[11px] text-red-700 font-medium">
+            <span>⚠️</span><span>{itemErrors}</span>
+            <button onClick={() => setItemErrors(null)} className="ml-auto text-red-400 hover:text-red-600 font-bold">✕</button>
+          </div>
+        )}
+        {!itemErrors && Object.keys(nifErrors).length > 0 && (
+          <div className="no-print flex items-center gap-2 px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-700 font-medium">
+            <span>⚠️</span><span>{Object.values(nifErrors)[0]}</span>
+          </div>
+        )}
 
         {/* ─── MAIN GRID ─── */}
         <div className="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 p-2 sm:p-3 print:block">
           {/* ═══ LEFT PANEL ═══ */}
           <div className="no-print space-y-3 h-auto lg:h-[calc(100vh-80px)] overflow-y-auto text-[10px] sm:text-[11px] pr-0 sm:pr-1">
-            {(preferencesLoaded ? doc.sectionOrder.filter(id => (prefFields[id]?.length ?? 0) > 0) : doc.sectionOrder).map(id => <div key={id}>{renderSection(id)}</div>)}
+            {renderSection('prestations')}
+            {activeSection !== 'prestations' && renderSection(activeSection)}
+            {(preferencesLoaded ? doc.sectionOrder.filter(id => (prefFields[id]?.length ?? 0) > 0) : doc.sectionOrder).filter(id => id !== 'prestations' && id !== activeSection).map(id => <div key={id}>{renderSection(id)}</div>)}
           </div>
 
           {/* ═══ RIGHT PANEL: PREVIEW ═══ */}
-          <div className="hidden lg:flex preview-container flex-col bg-slate-300/40 p-3 rounded-2xl border border-slate-400/20 overflow-y-auto h-[calc(100vh-80px)] print:h-auto print:bg-white print:p-0 print:border-none">
+          <div className={`${showPreview ? 'flex' : 'hidden'} lg:flex preview-container flex-col bg-slate-300/40 p-3 rounded-2xl border border-slate-400/20 overflow-y-auto h-[calc(100vh-80px)] print:h-auto print:bg-white print:p-0 print:border-none`}>
             <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} />
           </div>
         </div>
@@ -596,28 +757,63 @@ function EditorContent() {
                 />
               ) : (
                 <>
-                  <FieldSelector
-                    sections={ALL_SECTIONS}
-                    fieldPrefs={fieldPrefs ?? Object.fromEntries(ALL_SECTIONS.map(s => {
-                      if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];
-                      const cs = customSections.find(c => c.id === s);
-                      if (cs) return [s, cs.fields.map(f => f.id)];
-                      return [s, []];
-                    }))}
-                    setFieldPrefs={setFieldPrefs}
-                    te={te}
-                    SECTION_FIELDS={SECTION_FIELDS}
-                    customSections={customSections}
-                    onEditSection={cs => { setEditingSection(cs); setShowSectionCreator(true); }}
-                    onDeleteSection={async id => {
-                      await fetch(`/api/user/custom-sections?id=${id}`, { method: 'DELETE' });
-                      setCustomSections(prev => prev.filter(c => c.id !== id));
-                      setFieldPrefs(prev => { const { [id]: _, ...rest } = prev ?? {}; return rest; });
-                      setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== id) }));
-                    }}
-                  />
+                  {/* 3-group simplified field selector */}
+                  {([
+                    { label: te('simplifyEssential') || 'Essentiel', color: 'bg-blue-50 border-blue-200', fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'clientName', 'clientAddress', 'itemsTable', 'paymentMethod', 'paymentDeposit', 'paymentConditions'] },
+                    { label: te('simplifySite') || 'Chantier', color: 'bg-green-50 border-green-200', fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'garantieLabor', 'garantieMaterials', 'garantieNotes'] },
+                    { label: te('simplifyAdvanced') || 'Avancé', color: 'bg-purple-50 border-purple-200', fields: ['businessMode', 'logo', 'logoPosition', 'vatRate', 'stampRate', 'remiseType', 'remiseValue', 'remiseReason', 'notes', 'clientNif', 'clientPhone', 'clientEmail'] },
+                  ] as const).map(group => (
+                    <div key={group.label} className={`p-2.5 rounded-xl border ${group.color} space-y-1.5`}>
+                      <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">{group.label}</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {group.fields.map(fieldId => {
+                          const isHidden = hiddenFields.has(fieldId);
+                          const label = te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
+                          return (
+                            <label key={fieldId} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg cursor-pointer transition text-[10px] ${isHidden ? 'bg-white text-slate-400 border border-slate-200' : 'bg-white text-slate-700 border border-slate-300 font-medium'}`}>
+                              <input type="checkbox" checked={!isHidden} onChange={() => {
+                                setFieldPrefs(prev => {
+                                  const current = { ...prev };
+                                  for (const section of ALL_SECTIONS) {
+                                    const sectionFields = SECTION_FIELDS[section] ?? customSections.find(c => c.id === section)?.fields.map(f => f.id) ?? [];
+                                    if (sectionFields.includes(fieldId as any)) {
+                                      const visible = [...(current[section] ?? sectionFields)];
+                                      if (isHidden) { if (!visible.includes(fieldId)) visible.push(fieldId); }
+                                      else { const idx = visible.indexOf(fieldId); if (idx >= 0) visible.splice(idx, 1); }
+                                      current[section] = visible;
+                                    }
+                                  }
+                                  return current;
+                                });
+                              }} className="w-3 h-3 rounded text-blue-600" />
+                              {label}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  {customSections.length > 0 && (
+                    <div className="p-2.5 rounded-xl border bg-amber-50 border-amber-200 space-y-1.5">
+                      <h4 className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">{te('customSections') || 'Sections personnalisées'}</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {customSections.map(cs => (
+                          <span key={cs.id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white text-[10px] text-slate-600 border border-slate-200">
+                            {cs.label}
+                            <button onClick={async () => {
+                              await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
+                              setCustomSections(prev => prev.filter(c => c.id !== cs.id));
+                              setFieldPrefs(prev => { const { [cs.id]: _, ...rest } = prev ?? {}; return rest; });
+                              setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
+                            }} className="text-red-400 hover:text-red-600 ml-1">✕</button>
+                            <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-600 ml-0.5">✎</button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <button onClick={() => { setEditingSection({ id: '', label: '', fields: [] }); setShowSectionCreator(true); }}
-                    className="w-full mt-2 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[12px]">
+                    className="w-full mt-1 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50 transition text-[12px]">
                     {te('addCustomSection') ?? '+ إضافة قسم مخصص'}
                   </button>
                 </>
