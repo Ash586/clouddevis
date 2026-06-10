@@ -8,8 +8,7 @@
     "build:prod": "npx prisma generate && npx prisma migrate deploy && next build",
     "db:push": "npx prisma db push",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
