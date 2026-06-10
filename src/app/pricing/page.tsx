@@ -67,6 +67,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-4 gap-3 sm:gap-4 items-stretch">
             {displayPlans.map(id => {
               const plan = PLANS[id];
+              if (!plan) return null;
               const nameKey = id === 'free' ? 'freePlanName' : id === 'standard' ? 'standardPlanName' : id === 'pro' ? 'proPlanName' : 'maxPlanName';
               const tName = t(nameKey as any);
               return (
@@ -90,7 +91,7 @@ export default function PricingPage() {
                     <li className="flex items-start gap-2">
                       <CheckIcon />
                       <span className="text-slate-600">
-                        {plan.limits.docsPerMonth === 'unlimited' ? (t('maxDocs') || 'Illimité') : (t('standardDocs').replace('50', String(plan.limits.docsPerMonth)) || `${plan.limits.docsPerMonth} docs`)}
+                        {plan.limits.docsPerMonth === 'unlimited' ? (t('maxDocs') || 'Illimité') : ((t('standardDocs') || '').replace('50', String(plan.limits.docsPerMonth)) || `${plan.limits.docsPerMonth} docs`)}
                       </span>
                     </li>
                     <li className="flex items-start gap-2">

@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum UserMode {
@@ -27,6 +28,8 @@ enum DocumentType {
   BC
   BR
   FACTURE
+  INTERVENTION
+  ATTACHEMENT
 }
 
 enum DocumentStatus {

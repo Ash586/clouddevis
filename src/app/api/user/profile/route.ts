@@ -43,6 +43,9 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Mode invalide' }, { status: 400 });
     }
 
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: 'Aucun champ à mettre à jour' }, { status: 400 });
+    }
     await prisma.user.update({ where: { id: session.userId }, data });
     return NextResponse.json({ ok: true });
   } catch (error) {

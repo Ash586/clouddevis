@@ -134,17 +134,28 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const doc = body as Record<string, unknown>;
-    const items = ((doc.items as Array<Record<string, unknown>>) || []).map((i) => ({
+    if (typeof doc !== 'object' || !doc) {
+      return NextResponse.json({ error: 'Corps de requête invalide' }, { status: 400 });
+    }
+    const rawItems = (doc.items as Array<Record<string, unknown>>) || [];
+    if (!Array.isArray(rawItems)) {
+      return NextResponse.json({ error: 'items doit être un tableau' }, { status: 400 });
+    }
+    const items: Array<{ id: string; designation: string; quantity: number; unit: string; unitPrice: number; category: string | null }> = rawItems.map((i) => ({
       id: String(i.id || ''), designation: String(i.designation || ''), quantity: Number(i.quantity) || 0,
       unit: String(i.unit || 'unité'), unitPrice: Number(i.unitPrice) || 0, category: (i.category as string) || null,
     }));
 
-    const result = calculateDocument({
+    const docInput = {
       items, tvaRate: Number(doc.tvaRate) || 0,
       discount: (doc.discount as DocumentState['discount']) || { type: 'percentage', value: 0, reason: '' },
       stampDuty: (doc.stampDuty as DocumentState['stampDuty']) || { rate: 1, minAmount: 5, maxAmount: 2500 },
-      paymentMode: String(doc.paymentMode || 'cheque'), acompte: Number(doc.acompte) || 0,
-    } as unknown as DocumentState);
+      paymentMode: String(doc.paymentMode || 'cheque'),
+      acompte: Number(doc.acompte) || 0,
+      documentType: String(doc.documentType || 'devis'),
+    } as unknown as DocumentState;
+
+    const result = calculateDocument(docInput);
 
     const documentType = String(doc.documentType || 'devis').toLowerCase();
     const typeValue = DOC_TYPE_MAP[documentType] || 'DEVIS';

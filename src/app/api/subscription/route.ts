@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 import { getPlanByStatus, PLANS, PLAN_ORDER, type PlanId } from '@/lib/pricing';
 
 export async function GET() {
@@ -44,9 +45,10 @@ export async function GET() {
       },
       trialDaysRemaining,
       subscriptionEndAt: user.subscriptionEndAt,
-      plans: PLAN_ORDER.map(pid => ({ ...PLANS[pid] })),
+      plans: PLAN_ORDER.map(pid => (PLANS[pid] ? { ...PLANS[pid] } : null)).filter(Boolean),
     });
   } catch (error) {
+    logger.error('GET /api/subscription', { error: String(error) });
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

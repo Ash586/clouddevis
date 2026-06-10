@@ -15,7 +15,8 @@ export async function GET() {
       select: { settings: true },
     });
     const settings = (user?.settings as Record<string, unknown>) ?? {};
-    const sections: CustomSectionDef[] = (settings.customSections as CustomSectionDef[]) ?? [];
+    const raw = settings.customSections;
+    const sections: CustomSectionDef[] = Array.isArray(raw) ? raw : [];
     return NextResponse.json({ sections });
   } catch (error) {
     logger.error('GET /api/user/custom-sections', { error: String(error) });
@@ -39,7 +40,8 @@ export async function POST(req: Request) {
       select: { settings: true },
     });
     const settings = (user?.settings as Record<string, unknown>) ?? {};
-    const sections: CustomSectionDef[] = (settings.customSections as CustomSectionDef[]) ?? [];
+    const raw = settings.customSections;
+    const sections: CustomSectionDef[] = Array.isArray(raw) ? raw : [];
 
     if (sections.some(s => s.id === section.id)) {
       return NextResponse.json({ error: 'Section existe déjà' }, { status: 409 });
@@ -71,7 +73,8 @@ export async function PUT(req: Request) {
       select: { settings: true },
     });
     const settings = (user?.settings as Record<string, unknown>) ?? {};
-    const sections: CustomSectionDef[] = (settings.customSections as CustomSectionDef[]) ?? [];
+    const raw = settings.customSections;
+    const sections: CustomSectionDef[] = Array.isArray(raw) ? raw : [];
     const idx = sections.findIndex(s => s.id === section.id);
     if (idx === -1) return NextResponse.json({ error: 'Section introuvable' }, { status: 404 });
 
@@ -101,7 +104,8 @@ export async function DELETE(req: Request) {
       select: { settings: true },
     });
     const settings = (user?.settings as Record<string, unknown>) ?? {};
-    const sections: CustomSectionDef[] = (settings.customSections as CustomSectionDef[]) ?? [];
+    const raw = settings.customSections;
+    const sections: CustomSectionDef[] = Array.isArray(raw) ? raw : [];
     const filtered = sections.filter(s => s.id !== id);
     if (filtered.length === sections.length) {
       return NextResponse.json({ error: 'Section introuvable' }, { status: 404 });

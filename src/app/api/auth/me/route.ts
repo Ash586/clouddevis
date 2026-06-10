@@ -14,7 +14,10 @@ export async function GET() {
       where: { id: session.userId },
       select: { suspended: true, suspendedAt: true },
     });
-    if (user?.suspended) {
+    if (!user) {
+      return NextResponse.json({ error: 'Compte introuvable', deleted: true }, { status: 401 });
+    }
+    if (user.suspended) {
       return NextResponse.json({
         error: 'Compte suspendu', suspended: true, suspendedAt: user.suspendedAt,
       }, { status: 403 });

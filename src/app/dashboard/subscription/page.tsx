@@ -19,6 +19,28 @@ interface SubscriptionData {
   subscriptionEndAt: string | null;
 }
 
+function WiseTransferSection() {
+  const [wise, setWise] = useState<{ configured: boolean; beneficiary: string; iban: string; bic: string; bank: string; currency: string; instructions: string } | null>(null);
+  useEffect(() => {
+    fetch('/api/subscribe/wise').then(r => r.ok ? r.json() : null).then(setWise).catch(() => {});
+  }, []);
+  if (!wise?.configured) return null;
+  return (
+    <Card className="p-5 border-emerald-200 bg-emerald-50/30">
+      <h3 className="font-bold text-slate-800 mb-2">💳 Paiement par virement Wise</h3>
+      <p className="text-xs text-slate-500 mb-3">{wise.instructions}</p>
+      <div className="bg-white rounded-xl border border-slate-200 p-3 text-xs space-y-1 text-slate-700">
+        <p><span className="font-bold text-slate-500">Bénéficiaire :</span> {wise.beneficiary}</p>
+        <p><span className="font-bold text-slate-500">IBAN :</span> <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700 font-mono">{wise.iban}</code></p>
+        {wise.bic && <p><span className="font-bold text-slate-500">BIC :</span> {wise.bic}</p>}
+        <p><span className="font-bold text-slate-500">Banque :</span> {wise.bank}</p>
+        <p><span className="font-bold text-slate-500">Devise :</span> {wise.currency}</p>
+      </div>
+      <p className="text-[10px] text-slate-400 mt-2">Envoyez le reçu du virement à support@clouddevis.io pour activation sous 24-48h.</p>
+    </Card>
+  );
+}
+
 export default function SubscriptionPage() {
   const t = useTranslations('subscription');
   const tc = useTranslations('common');
@@ -37,6 +59,7 @@ export default function SubscriptionPage() {
         if (res.status === 503) { showToast(json.note || 'Bientôt disponible', 'info'); setSubscribing(null); return; }
         throw new Error(json.error);
       }
+      if (!json.url) { showToast('Erreur de redirection', 'error'); setSubscribing(null); return; }
       window.location.href = json.url;
     } catch (err: any) {
       showToast(err.message || 'Erreur', 'error');
@@ -71,31 +94,11 @@ export default function SubscriptionPage() {
     PRO: { variant: 'success', label: t('statusPro') || 'Pro' },
     MAX: { variant: 'success', label: t('statusMax') || 'Max' },
   };
-  const badge = statusBadge[data?.status || 'FREE'] || { variant: 'default' as any, label: data?.status || 'FREE' };
+  const badge = statusBadge[data?.status || 'FREE'] || { variant: 'default' as const, label: data?.status || 'FREE' };
 
   const pctUsed = usage?.docsLimit === 'unlimited' ? 0 : ((usage?.docsThisMonth || 0) / (usage?.docsLimit as number || 1)) * 100;
 
-  function WiseTransferSection({ formatPrice: fp }: { formatPrice: (n: number) => string }) {
-    const [wise, setWise] = useState<{ configured: boolean; beneficiary: string; iban: string; bic: string; bank: string; currency: string; instructions: string } | null>(null);
-    useEffect(() => {
-      fetch('/api/subscribe/wise').then(r => r.ok ? r.json() : null).then(setWise).catch(() => {});
-    }, []);
-    if (!wise?.configured) return null;
-    return (
-      <Card className="p-5 border-emerald-200 bg-emerald-50/30">
-        <h3 className="font-bold text-slate-800 mb-2">💳 Paiement par virement Wise</h3>
-        <p className="text-xs text-slate-500 mb-3">{wise.instructions}</p>
-        <div className="bg-white rounded-xl border border-slate-200 p-3 text-xs space-y-1 text-slate-700">
-          <p><span className="font-bold text-slate-500">Bénéficiaire :</span> {wise.beneficiary}</p>
-          <p><span className="font-bold text-slate-500">IBAN :</span> <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700 font-mono">{wise.iban}</code></p>
-          {wise.bic && <p><span className="font-bold text-slate-500">BIC :</span> {wise.bic}</p>}
-          <p><span className="font-bold text-slate-500">Banque :</span> {wise.bank}</p>
-          <p><span className="font-bold text-slate-500">Devise :</span> {wise.currency}</p>
-        </div>
-        <p className="text-[10px] text-slate-400 mt-2">Envoyez le reçu du virement à support@clouddevis.io pour activation sous 24-48h.</p>
-      </Card>
-    );
-  }
+
 
   return (
     <>
@@ -194,7 +197,7 @@ export default function SubscriptionPage() {
           </Card>
 
           {/* Wise Transfer */}
-          <WiseTransferSection formatPrice={formatPrice} />
+          <WiseTransferSection />
         </div>
       </div>
       </TrialGate>

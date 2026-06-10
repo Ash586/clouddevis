@@ -26,9 +26,10 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
         if (res.status === 503) { showToast(json.note || 'Bientôt disponible', 'info'); setSubscribing(null); return; }
         throw new Error(json.error);
       }
+      if (!json.url) { showToast('Erreur de redirection', 'error'); setSubscribing(null); return; }
       window.location.href = json.url;
     } catch (err: any) {
-      showToast(err.message || 'Erreur', 'error');
+      showToast(String(err?.message ?? err ?? 'Erreur'), 'error');
     }
     setSubscribing(null);
   };

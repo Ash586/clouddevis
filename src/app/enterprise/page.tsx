@@ -6,12 +6,10 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
-import { useUser } from '@/hooks/useUser';
 
 export default function EnterprisePage() {
   const t = useTranslations('enterprise');
   const tc = useTranslations('common');
-  const { user } = useUser();
   const router = useRouter();
   const { showToast } = useToast();
   const [form, setForm] = useState({ companyName: '', employees: '', needs: '', phone: '' });

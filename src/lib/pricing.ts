@@ -115,7 +115,7 @@ export const PLANS: Record<PlanId, Plan> = {
 export const PLAN_ORDER: PlanId[] = ['free', 'standard', 'pro', 'max', 'enterprise'];
 
 export function getPlan(id: PlanId): Plan {
-  return PLANS[id];
+  return PLANS[id] || PLANS.free;
 }
 
 export function getPlanByStatus(status: string): Plan {

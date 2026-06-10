@@ -39,6 +39,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (notes !== undefined) data.notes = notes;
     if (status) { data.handledById = session.adminId; data.handledAt = new Date(); }
 
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: 'Aucun champ à mettre à jour' }, { status: 400 });
+    }
     const updated = await prisma.enterpriseRequest.update({ where: { id }, data });
 
     await prisma.activityLog.create({

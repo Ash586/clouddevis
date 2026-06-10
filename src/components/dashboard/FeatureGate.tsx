@@ -3,6 +3,7 @@
 import { useFeature } from '@/hooks/useFeature';
 import { getFeatureLabel, type FeatureId } from '@/lib/features';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 interface FeatureGateProps {
   featureId: FeatureId;
@@ -14,6 +15,7 @@ interface FeatureGateProps {
 export function FeatureGate({ featureId, children, fallback, showLock = true }: FeatureGateProps) {
   const { check } = useFeature();
   const t = useTranslations('subscription');
+  const router = useRouter();
 
   if (check(featureId)) return <>{children}</>;
 
@@ -35,9 +37,9 @@ export function FeatureGate({ featureId, children, fallback, showLock = true }: 
           <p className="text-[10px] text-slate-500 mb-3">
             {t('featureLockedDesc') || 'Passez à un forfait supérieur pour y accéder'}
           </p>
-          <a href="/pricing" className="inline-block bg-blue-600 text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/pricing')} className="inline-block bg-blue-600 text-white text-[11px] font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             {t('upgrade') || 'Voir les offres →'}
-          </a>
+          </button>
         </div>
       </div>
     </div>

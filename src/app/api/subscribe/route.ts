@@ -31,13 +31,20 @@ export async function POST(req: Request) {
       }, { status: 503 });
     }
 
+    const productId = process.env.LEMONSQUEEZY_PRODUCT_ID;
+    if (!productId) {
+      return NextResponse.json({ message: 'Produit non configuré', note: 'Bientôt disponible.' }, { status: 503 });
+    }
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+
     const checkout = await createCheckout({
-      productId: process.env.LEMONSQUEEZY_PRODUCT_ID!,
+      productId,
       variantId,
       email: session.email,
       name: session.name,
       metadata: { userId: session.userId, planId },
-      redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=1`,
+      redirectUrl: `${appUrl}/dashboard/subscription?success=1`,
     });
 
     return NextResponse.json({ url: checkout.attributes.url });

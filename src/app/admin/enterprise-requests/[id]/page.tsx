@@ -99,12 +99,17 @@ export default function AdminEnterpriseRequestDetailPage() {
             <Button onClick={() => updateStatus('REJECTED')} disabled={saving} className="bg-red-600 hover:bg-red-700">Rejeter</Button>
 
             {request.status === 'APPROVED' && (
-              <Button onClick={() => {
-                fetch('/api/admin/enterprise-requests/' + params.id + '/activate', { method: 'POST' })
-                  .then(r => { if (r.ok) showToast('Compte Enterprise activé ✓', 'success'); fetchData(); })
-                  .catch(() => showToast('Erreur', 'error'));
+              <Button onClick={async () => {
+                if (!params.id) return;
+                setSaving(true);
+                try {
+                  const r = await fetch(`/api/admin/enterprise-requests/${params.id}/activate`, { method: 'POST' });
+                  if (r.ok) { showToast('Compte Enterprise activé ✓', 'success'); fetchData(); }
+                  else showToast('Erreur', 'error');
+                } catch { showToast('Erreur', 'error'); }
+                setSaving(false);
               }} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
-                Activer le compte Enterprise
+                {saving ? '...' : 'Activer le compte Enterprise'}
               </Button>
             )}
           </div>

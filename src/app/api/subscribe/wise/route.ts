@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -18,7 +19,8 @@ export async function GET() {
     const isConfigured = !!(process.env.WISE_IBAN || process.env.WISE_BENEFICIARY);
 
     return NextResponse.json({ configured: isConfigured, ...wiseInfo });
-  } catch {
+  } catch (error) {
+    logger.error('GET /api/subscribe/wise', { error: String(error) });
     return NextResponse.json({ configured: false, error: 'Erreur' }, { status: 500 });
   }
 }

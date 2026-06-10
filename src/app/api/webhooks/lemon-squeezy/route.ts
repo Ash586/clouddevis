@@ -32,20 +32,25 @@ export async function POST(req: Request) {
         const targetUser = await prisma.user.findUnique({ where: { id: event.userId }, select: { id: true } });
         if (!targetUser) break;
 
+        const lsAttributes = payload.data.attributes;
+        const lsSubscriptionId = lsAttributes?.customer_id || event.orderId;
+        const lsCustomerId = lsAttributes?.customer_id || event.orderId;
+
         await prisma.user.update({
           where: { id: event.userId },
           data: {
             subscriptionStatus: status,
-            lemonsqueezyCustomerId: event.orderId,
-            lemonsqueezySubscriptionId: event.orderId,
+            lemonsqueezyCustomerId: String(lsCustomerId),
+            lemonsqueezySubscriptionId: String(lsSubscriptionId),
             subscriptionEndAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
         });
 
+        const amount = typeof lsAttributes?.total === 'number' ? lsAttributes.total : Number(lsAttributes?.total) || 0;
         await prisma.transaction.create({
           data: {
             userId: event.userId,
-            amount: payload.data.attributes.total || 0,
+            amount,
             status: 'COMPLETED',
             provider: 'LEMON_SQUEEZY',
             providerId: event.orderId,

@@ -3,16 +3,17 @@ import { randomBytes } from 'crypto';
 
 export async function generateReferralCode(userId: string): Promise<string> {
   const prefix = 'CD';
-  let code: string;
-  let exists = true;
+  let attempts = 0;
 
-  while (exists) {
+  while (attempts < 100) {
     const suffix = randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
-    code = `${prefix}${suffix}`;
-    exists = !!(await prisma.partner.findUnique({ where: { code } }));
+    const code = `${prefix}${suffix}`;
+    const exists = await prisma.partner.findUnique({ where: { code } });
+    if (!exists) return code;
+    attempts++;
   }
 
-  return code!;
+  throw new Error('Impossible de générer un code de parrainage unique');
 }
 
 export async function calculateCommission(subscriptionPrice: number, partnerTier: string): Promise<{ direct: number; override: number }> {
@@ -49,6 +50,7 @@ export async function handleReferralConversion(userId: string, newStatus: string
   });
 
   if (!referral || referral.status === 'CONVERTED') return;
+  if (!referral.partner) return;
 
   const price = SUBSCRIPTION_PRICES[newStatus] || 0;
   if (price <= 0) return;
