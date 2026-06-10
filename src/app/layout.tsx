@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import './rtl.css';
+import './landing.css';
 import { I18nClientProvider } from '@/contexts/I18nClientProvider';
 import { PageViewTracker } from '@/components/tracking/PageViewTracker';
 import { cookies } from 'next/headers';
@@ -38,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col">
+      <body className="min-h-screen antialiased flex flex-col">
         <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
       </body>
     </html>

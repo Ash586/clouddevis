@@ -20,6 +20,20 @@
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
+  /* Brand colors */
+  --color-navy: #0B0F1A;
+  --color-navy-2: #111827;
+  --color-navy-3: #1C2537;
+  --color-navy-4: #243045;
+  --color-sand: #F5EDD6;
+  --color-sand-2: #E8DCC4;
+  --color-sand-muted: #A89D85;
+  --color-green: #006233;
+  --color-green-2: #007A40;
+  --color-green-3: #00954D;
+  --color-gold: #D4A843;
+  --color-gold-2: #F0C864;
+  --color-teal: #2A7F6F;
 }
 
 /* Theming CSS variables */

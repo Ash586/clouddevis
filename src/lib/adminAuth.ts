@@ -3,11 +3,8 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
 function getSecret() {
-  if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_JWT_SECRET) {
-    throw new Error('ADMIN_JWT_SECRET must be set in production');
-  }
   const secret = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
-  if (!secret) throw new Error('No JWT secret configured');
+  if (!secret) throw new Error('No JWT secret configured. Set ADMIN_JWT_SECRET or JWT_SECRET.');
   return new TextEncoder().encode(secret);
 }
 

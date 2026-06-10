@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 /* ═══════════════════════════════════════
    DESIGN TOKENS
 ═══════════════════════════════════════ */
-:root {
+.landing-page {
   --navy:      #0B0F1A;
   --navy-2:    #111827;
   --navy-3:    #1C2537;
