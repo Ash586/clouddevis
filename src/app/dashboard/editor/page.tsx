@@ -275,35 +275,26 @@ function EditorContent() {
       case 'design':
         return <CollapsibleSection title={te('sections.design')} sectionId="design" {...dragProps} {...s()}>
           {!hiddenFields.has('logo') && <div className="space-y-2">
-            <div className="flex items-center gap-3 p-2 bg-[var(--navy-3)] rounded-xl border border-dashed border-[rgba(245,237,214,0.15)]">
-              <div className="w-14 h-14 bg-[var(--navy-2)] border rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                {doc.companyInfo?.logo ? (
-                  <img src={doc.companyInfo.logo} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <span className="text-[9px] text-[var(--sand-muted)]">Logo</span>
-                )}
-              </div>
-              <div className="flex-1 flex flex-wrap items-center gap-1">
-                <input type="file" accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    if (file.size > 500 * 1024) { showToast('Logo max 500 Ko', 'error'); return; }
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      const dataUrl = ev.target?.result as string;
-                      updateCompanyInfo({ logo: dataUrl });
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                  className="text-[10px] text-[var(--sand-muted)] file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[var(--green-glow)] file:text-[var(--green-3)] hover:file:bg-[var(--green-glow)]" />
-                {doc.companyInfo?.logo && (
-                  <button onClick={() => updateCompanyInfo({ logo: '' })}
-                    className="text-[10px] text-red-500 font-semibold hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-50 transition">
-                    {te('removeLogo') || '✕ Supprimer'}
-                  </button>
-                )}
-              </div>
+            <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)]">
+              <input type="file" accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 500 * 1024) { showToast('Logo max 500 Ko', 'error'); return; }
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const dataUrl = ev.target?.result as string;
+                    updateCompanyInfo({ logo: dataUrl });
+                  };
+                  reader.readAsDataURL(file);
+                }}
+                className="text-[10px] text-[var(--sand-muted)] file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[var(--green-glow)] file:text-[var(--green-3)] hover:file:bg-[var(--green-glow)] flex-1" />
+              {doc.companyInfo?.logo && (
+                <button onClick={() => updateCompanyInfo({ logo: '' })}
+                  className="text-[10px] text-red-500 font-semibold hover:text-red-700 px-2 py-1 rounded-lg hover:bg-red-400/10 transition whitespace-nowrap">
+                  {te('removeLogo') || '✕'}
+                </button>
+              )}
             </div>
             {!hiddenFields.has('logoPosition') && doc.companyInfo?.logo && (
               <div className="flex items-center gap-3 px-1">
