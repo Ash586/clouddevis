@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function HomePage() {
-  const t = useTranslations('home');
-  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeLang, setActiveLang] = useState('FR');
 
@@ -34,12 +31,12 @@ export default function HomePage() {
   }, []);
 
   const FAQ_ITEMS = [
-    { q: 'Le Timbre Fiscal est-il vraiment obligatoire ?', a: 'Oui. Selon l\'article 220 du Code des Impôts Indirects algérien, le Timbre Fiscal est obligatoire sur tout document commercial. CloudDevis l\'ajoute automatiquement à chaque document généré.' },
-    { q: 'Puis-je utiliser CloudDevis sans compte ?', a: 'Oui ! Vous pouvez créer vos 5 premiers documents du mois sans inscription. Pour sauvegarder l\'historique et accéder à plus de fonctionnalités, la création d\'un compte gratuit est recommandée.' },
-    { q: 'Mes données sont-elles sécurisées ?', a: 'Absolument. Vos données fiscales restent dans votre navigateur lors de la génération du PDF. Aucune donnée sensible n\'est transmise à des tiers. Nous appliquons le chiffrement HTTPS sur toutes les communications.' },
+    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: 'Oui. CloudDevis l’applique automatiquement aux factures concernées à partir de 10 000 DA, selon les règles configurées dans l’application. Les devis restent exclus du calcul.' },
+    { q: 'Puis-je essayer CloudDevis gratuitement ?', a: 'Oui. Vous pouvez créer un compte gratuit et générer vos premiers documents avec les limites incluses dans la formule gratuite.' },
+    { q: 'Mes données sont-elles sécurisées ?', a: 'Vos sessions utilisent des cookies sécurisés et les communications passent par HTTPS en production. Les données de compte et documents sont associées à votre espace utilisateur.' },
     { q: 'CloudDevis fonctionne-t-il sur mobile ?', a: 'Oui, CloudDevis est entièrement responsive. Vous pouvez créer des devis depuis votre smartphone ou tablette, directement depuis un navigateur — sans installation requise.' },
-    { q: 'Comment fonctionne la TVA sur les devis ?', a: 'CloudDevis calcule automatiquement la TVA à 9% ou 19% selon le secteur d\'activité que vous sélectionnez. Certains produits et services sont exonérés — le système vous en informe en temps réel.' },
-    { q: 'Comment payer l\'abonnement Pro en Algérie ?', a: 'Nous acceptons les paiements via CIB et Edahabia (Dahabia). Bientôt disponible : virement bancaire et BaridiMob. Aucune carte internationale n\'est nécessaire.' },
+    { q: 'Comment fonctionne la TVA sur les documents ?', a: 'CloudDevis calcule la TVA selon le taux sélectionné et affiche les totaux en temps réel pour limiter les erreurs de saisie.' },
+    { q: 'Comment payer l’abonnement Pro en Algérie ?', a: 'Les moyens de paiement disponibles dépendent de la configuration active du compte et des options proposées au moment de la souscription.' },
   ];
 
   return (
@@ -50,18 +47,18 @@ export default function HomePage() {
         <nav>
           <div className="container">
             <div className="nav-inner">
-              <a href="/" className="logo">
+              <Link href="/" className="logo">
                 <div className="logo-dot"></div>
                 CloudDevis
-              </a>
+              </Link>
               <ul className="nav-links">
                 <li><a href="#features">Fonctionnalités</a></li>
                 <li><a href="#pricing">Tarifs</a></li>
                 <li><a href="#faq">FAQ</a></li>
               </ul>
               <div className="nav-cta">
-                <a href="/auth/login" className="btn btn-ghost">Se connecter</a>
-                <a href="/auth/register" className="btn btn-primary">Essai gratuit →</a>
+                <Link href="/auth/login" className="btn btn-ghost">Se connecter</Link>
+                <Link href="/auth/register" className="btn btn-primary">Essai gratuit →</Link>
               </div>
             </div>
           </div>
@@ -84,12 +81,12 @@ export default function HomePage() {
                   <em>conformes en 2 minutes</em>
                 </h1>
                 <p className="hero-sub">
-                  La seule plateforme algérienne qui gère automatiquement NIF, RC, TVA 9%/19% et le Timbre Fiscal. Fini les erreurs — fini les retards.
+                  Une plateforme algérienne pensée pour NIF, RC, TVA 9%/19% et Timbre Fiscal sur les factures concernées. Moins d’erreurs, moins de retards.
                 </p>
                 <div className="hero-ctas">
-                  <a href="/auth/register" className="btn btn-primary btn-lg">
+                  <Link href="/auth/register" className="btn btn-primary btn-lg">
                     Créer mon premier devis →
-                  </a>
+                  </Link>
                 </div>
                 <div className="hero-trust">
                   <div className="trust-item">
@@ -125,19 +122,19 @@ export default function HomePage() {
                         <div className="doc-company-sub">NIF: 00212345678901</div>
                       </div>
                     </div>
-                    <div className="doc-type-badge">DEVIS</div>
+                    <div className="doc-type-badge">FACTURE</div>
                   </div>
                   <div className="doc-meta-row">
-                    <div className="doc-meta-item"><label>N° Devis</label><span>DEV-2026-042</span></div>
+                    <div className="doc-meta-item"><label>N° Facture</label><span>FAC-2026-042</span></div>
                     <div className="doc-meta-item"><label>Date</label><span>10 juin 2026</span></div>
                     <div className="doc-meta-item"><label>RC</label><span>16/00-1234567B08</span></div>
-                    <div className="doc-meta-item"><label>Valable jusqu'au</label><span>10 juil. 2026</span></div>
+                    <div className="doc-meta-item"><label>Échéance</label><span>10 juil. 2026</span></div>
                   </div>
                   <table className="doc-table">
                     <thead><tr><th>Désignation</th><th>Qté</th><th>P.U. (DA)</th><th>Total HT</th></tr></thead>
                     <tbody>
                       <tr><td>Installation électrique Type A</td><td>3</td><td>24 000</td><td>72 000</td></tr>
-                      <tr><td>Main d'œuvre forfait</td><td>1</td><td>40 000</td><td>40 000</td></tr>
+                      <tr><td>{"Main d'œuvre forfait"}</td><td>1</td><td>40 000</td><td>40 000</td></tr>
                     </tbody>
                   </table>
                   <div className="doc-totals">
@@ -332,7 +329,7 @@ export default function HomePage() {
             <div className="section-head">
               <div className="section-eyebrow">Tarifs transparents</div>
               <h2 className="section-title">Choisissez votre formule</h2>
-              <p className="section-sub">Pas de surprise. Pas d'engagement. Passez à la formule supérieure quand vous en avez besoin.</p>
+              <p className="section-sub">{"Pas de surprise. Pas d'engagement. Passez à la formule supérieure quand vous en avez besoin."}</p>
             </div>
             <div className="pricing-grid">
               {[
@@ -437,10 +434,10 @@ export default function HomePage() {
           <div className="container">
             <div className="footer-grid">
               <div className="footer-brand">
-                <a href="/" className="logo">
+                <Link href="/" className="logo">
                   <div className="logo-dot"></div>
                   CloudDevis
-                </a>
+                </Link>
                 <p>La première plateforme SaaS algérienne de génération de devis et factures conformes à la réglementation DGI. Simple, rapide, légal.</p>
                 <div className="footer-social">
                   <a href="#" className="social-btn" aria-label="Facebook">f</a>
@@ -466,7 +463,7 @@ export default function HomePage() {
               <div className="footer-col">
                 <h5>Légal</h5>
                 <ul>
-                  <li><a href="/legal/cgu">Conditions d'utilisation</a></li>
+                  <li><Link href="/legal/cgu">{"Conditions d'utilisation"}</Link></li>
                   <li><a href="/legal/privacy">Politique de confidentialité</a></li>
                   <li><a href="/legal/mentions">Mentions légales</a></li>
                 </ul>

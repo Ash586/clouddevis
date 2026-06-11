@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
+import { TRIAL_DAYS } from '@/lib/subscription';
 import type { DocumentState } from '@/types';
 
 const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
@@ -114,11 +115,11 @@ export async function POST(req: Request) {
       user.docCountThisMonth = 0;
     }
 
-    // Check trial expiration (7 days)
+    // Check trial expiration
     const isTrial = user.subscriptionStatus === 'TRIAL';
     if (isTrial && user.trialStartAt) {
       const daysSinceTrial = Math.floor((now.getTime() - user.trialStartAt.getTime()) / 86400000);
-      if (daysSinceTrial >= 7) {
+      if (daysSinceTrial >= TRIAL_DAYS) {
         await prisma.user.update({ where: { id: session.userId }, data: { subscriptionStatus: 'FREE' } });
         return NextResponse.json({ error: 'Essai terminé. Choisissez un forfait pour continuer.' }, { status: 403 });
       }

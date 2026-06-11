@@ -149,7 +149,7 @@ export default function TemplatesPage() {
     }
   }
 
-  function useTemplate(id: string) {
+  function handleUseTemplate(id: string) {
     router.push(`/dashboard/editor?template=${id}`);
   }
 
@@ -227,7 +227,7 @@ export default function TemplatesPage() {
                         <span className="capitalize">{tpl.mode.toLowerCase()}</span>
                       </div>
                       <div className="mt-auto flex items-center gap-2">
-                        <Button size="sm" className="flex-1" onClick={() => useTemplate(tpl.id)}>
+                        <Button size="sm" className="flex-1" onClick={() => handleUseTemplate(tpl.id)}>
                           {t('use')}
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => openEdit(tpl)}>

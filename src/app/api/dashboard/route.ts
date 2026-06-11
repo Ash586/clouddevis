@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { TRIAL_DAYS } from '@/lib/subscription';
 
 export async function GET() {
   try {
@@ -42,11 +43,11 @@ export async function GET() {
       typeBreakdown[row.type] = row._count.type;
     }
 
-    let trialDaysRemaining = 14;
+    let trialDaysRemaining = TRIAL_DAYS;
     if (user?.subscriptionStatus === 'TRIAL') {
       if (user.trialStartAt) {
         const trialEnd = new Date(user.trialStartAt);
-        trialEnd.setDate(trialEnd.getDate() + 14);
+        trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
         trialDaysRemaining = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
       }
     } else {

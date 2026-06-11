@@ -68,6 +68,7 @@ export async function proxy(req: NextRequest) {
 
   if (pathname.startsWith('/api')) {
     if (isPublicApiPath(pathname)) return res;
+    if (pathname.startsWith('/api/admin/')) return res;
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     return res;
