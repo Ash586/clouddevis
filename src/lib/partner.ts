@@ -27,7 +27,7 @@ export async function calculateCommission(subscriptionPrice: number, partnerTier
 }
 
 export async function getPartnerReferralUrl(code: string): Promise<string> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app';
   return `${baseUrl}/auth/register?ref=${code}`;
 }
 

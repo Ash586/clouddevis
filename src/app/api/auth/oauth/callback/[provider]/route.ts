@@ -67,7 +67,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
         code,
         client_id: provider === 'google' ? process.env.GOOGLE_CLIENT_ID : process.env.GITHUB_CLIENT_ID,
         client_secret: provider === 'google' ? process.env.GOOGLE_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET,
-        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth/callback/${provider}`,
+        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/${provider}`,
         grant_type: 'authorization_code',
         state: callbackState,
       }),

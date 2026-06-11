@@ -9,7 +9,6 @@ import {
   FileText,
   Users,
   ChevronDown,
-  Plus,
   User,
   Bell,
   LogOut,
@@ -43,7 +42,6 @@ function SidebarInner() {
   const [clientCount, setClientCount] = useState(0);
   const [typeBreakdown, setTypeBreakdown] = useState<Record<string, number>>({});
   const [documentsOpen, setDocumentsOpen] = useState(true);
-  const [clientsOpen, setClientsOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -64,25 +62,14 @@ function SidebarInner() {
   }, []);
 
   async function handleLogout() {
-    try {
-      const res = await fetch('/api/auth/logout', { method: 'POST' });
-      if (!res.ok) return;
-    } catch {
-      return;
-    }
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/');
   }
 
-  function isActive(path: string) {
-    return pathname === path;
-  }
-
-  function isDocType(type: string) {
-    return searchParams?.get('type') === type;
-  }
+  function isActive(path: string) { return pathname === path; }
+  function isDocType(type: string) { return searchParams?.get('type') === type; }
 
   function navigateTo(type: string) {
-    setClientsOpen(false);
     setDocumentsOpen(true);
     setMobileOpen(false);
     router.push(`/dashboard/editor?type=${type}`);
@@ -91,196 +78,133 @@ function SidebarInner() {
   const userName = user?.name || tc('user');
   const userInitial = userName.charAt(0);
 
-  const sidebarContent = (inDrawer = false) => (
+  const sidebarContent = () => (
     <>
       {/* User Pill */}
-      <div className="relative mb-4">
+      <div className="relative mb-6">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-          aria-expanded={userDropdownOpen}
-          className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-50/60 border border-blue-100/60 hover:bg-blue-50 transition">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-black shrink-0">
+          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] hover:bg-[var(--navy-4)] transition-all">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center text-white text-sm font-black shrink-0 shadow-lg">
             {userInitial}
           </div>
           <div className="flex-1 min-w-0 text-start">
-            <div className="text-sm font-bold text-slate-900 truncate">{userName}</div>
-            <div className="text-xs text-slate-400 font-semibold">
+            <div className="text-[13px] font-bold text-[var(--sand)] truncate">{userName}</div>
+            <div className="text-[10px] text-[var(--sand-muted)] font-semibold uppercase tracking-wider">
               {user?.mode === 'ENTREPRISE' ? s('company') : s('artisan')}
             </div>
           </div>
-          <ChevronDown size={16} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-[var(--sand-muted)] transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {userDropdownOpen && (
           <>
-            <div className="absolute top-full start-0 end-0 mt-2 bg-white/90 backdrop-blur-xl border border-white/90 rounded-lg shadow-xl overflow-hidden z-20 animate-in">
-              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
+            <div className="absolute top-full start-0 end-0 mt-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
+              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
-              <button className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition">
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition">
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
-              <div className="h-px bg-slate-200/60 mx-3" />
-              <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 transition">
+              <div className="h-px bg-[rgba(245,237,214,0.08)] mx-4" />
+              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition">
                 <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
               </button>
             </div>
-            <div className="fixed inset-0 z-10" onClick={() => setUserDropdownOpen(false)} />
+            <div className="fixed inset-0 z-[105]" onClick={() => setUserDropdownOpen(false)} />
           </>
         )}
       </div>
 
       {/* Navigation */}
-      <nav aria-label="Main navigation" className="flex-1 overflow-y-auto space-y-0.5">
-        {/* Dashboard */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard'); }}
-          aria-current={isActive('/dashboard') ? 'page' : undefined}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <LayoutDashboard size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('stats')}
-        </button>
-
-        {/* Documents */}
+      <nav className="flex-1 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
+        <NavItem icon={<LayoutDashboard size={18} />} label={s('stats')} active={isActive('/dashboard')} onClick={() => router.push('/dashboard')} />
+        
         <div>
-          <button onClick={() => { setDocumentsOpen(!documentsOpen); setClientsOpen(false); }}
-            aria-expanded={documentsOpen}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-              documentsOpen ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
+          <button onClick={() => setDocumentsOpen(!documentsOpen)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              documentsOpen ? 'bg-[rgba(0,149,77,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
             }`}>
-            <FileText size={16} strokeWidth={1.5} className="shrink-0" />
+            <FileText size={18} />
             <span className="flex-1 text-start">{s('documents')}</span>
-            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{docCount > 0 ? docCount : ''}</span>
-            <ChevronDown size={14} strokeWidth={1.5} className={`text-slate-400 transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown size={14} className={`transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
           </button>
-          <div className={`overflow-hidden transition-all duration-200 ${documentsOpen ? 'max-h-96' : 'max-h-0'}`}>
-            <div className="ms-5 space-y-0.5 pt-0.5">
-              <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
-                className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-semibold transition border-s-2 ${
-                  isActive('/dashboard/documents') ? 'bg-blue-50 text-blue-600 border-s-blue-600' : 'text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 border-s-transparent hover:border-s-blue-200'
+          
+          {documentsOpen && (
+            <div className="mt-1 ml-4 space-y-1 border-l border-[rgba(245,237,214,0.1)] pl-2 animate-in">
+              <button onClick={() => router.push('/dashboard/documents')}
+                className={`w-full flex items-center px-4 py-2 rounded-lg text-[13px] font-semibold transition ${
+                  isActive('/dashboard/documents') ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
                 }`}>
-                <span className="flex-1 text-start">{s('allDocuments') || 'Tous les documents'}</span>
+                {s('allDocuments')}
               </button>
-              {DOCUMENT_TYPES.map((dt) => {
-                const count = typeBreakdown[TYPE_MAP[dt.id] ?? ''] ?? 0;
-                return (
-                  <button key={dt.id} onClick={() => navigateTo(dt.id)}
-                    className={`w-full flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-start transition border-s-2 ${
-                      isDocType(dt.id)
-                        ? 'bg-blue-50 text-blue-600 border-s-blue-600'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-blue-50/50 border-s-transparent hover:border-s-blue-200'
-                    }`}>
-                    <span className="flex-1">{s(dt.key)}</span>
-                    {count > 0 && <span className="text-[10px] font-bold text-slate-400 ms-1">{count}</span>}
-                  </button>
-                );
-              })}
+              {DOCUMENT_TYPES.map((dt) => (
+                <button key={dt.id} onClick={() => navigateTo(dt.id)}
+                  className={`w-full flex items-center px-4 py-2 rounded-lg text-[13px] font-semibold transition ${
+                    isDocType(dt.id) ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
+                  }`}>
+                  <span className="flex-1 text-start">{s(dt.key)}</span>
+                  {typeBreakdown[TYPE_MAP[dt.id] ?? ''] > 0 && (
+                    <span className="text-[10px] bg-[var(--navy-4)] text-[var(--sand-muted)] px-1.5 py-0.5 rounded-md">{typeBreakdown[TYPE_MAP[dt.id] ?? '']}</span>
+                  )}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Clients */}
-        <div>
-          <button onClick={() => { setClientsOpen(!clientsOpen); setDocumentsOpen(false); router.push('/dashboard/clients'); setMobileOpen(false); }}
-            aria-expanded={clientsOpen}
-            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-              isActive('/dashboard/clients') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-            }`}>
-            <Users size={16} strokeWidth={1.5} className="shrink-0" />
-            <span className="flex-1 text-start">{s('clients')}</span>
-            <span className="bg-blue-50 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">{clientCount > 0 ? clientCount : ''}</span>
-          </button>
-        </div>
-
-        {/* Templates */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/templates'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/templates') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <FileStack size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('templates') || 'Modèles'}
-        </button>
-
-        {/* Reports */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/reports'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/reports') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <BarChart3 size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('reports') || 'Rapports'}
-        </button>
-
-        {/* Team */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/team'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/team') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <UsersRound size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('team') || 'Équipe'}
-        </button>
-
-        {/* Subscription */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/subscription'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/subscription') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <CreditCard size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('subscription') || 'Abonnement'}
-        </button>
-
-        {/* Shared */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/shared'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/shared') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <Share2 size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('shared') || 'Partagés'}
-        </button>
-
-        {/* Recurring */}
-        <button onClick={() => { setDocumentsOpen(false); setClientsOpen(false); router.push('/dashboard/recurring'); setMobileOpen(false); }}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 ${
-            isActive('/dashboard/recurring') ? 'bg-blue-50 text-blue-600 border-l-blue-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent'
-          }`}>
-          <RefreshCw size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('recurring') || 'Récurrents'}
-        </button>
-
-        {/* Pricing */}
-        <button onClick={() => { window.open('/pricing', '_blank'); setMobileOpen(false); }}
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition border-l-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 border-l-transparent">
-          <CreditCard size={16} strokeWidth={1.5} className="shrink-0" />
-          {s('pricing') || 'Tarifs'}
-        </button>
+        <NavItem icon={<Users size={18} />} label={s('clients')} active={isActive('/dashboard/clients')} onClick={() => router.push('/dashboard/clients')} badge={clientCount} />
+        <NavItem icon={<FileStack size={18} />} label={s('templates')} active={isActive('/dashboard/templates')} onClick={() => router.push('/dashboard/templates')} />
+        <NavItem icon={<BarChart3 size={18} />} label={s('reports')} active={isActive('/dashboard/reports')} onClick={() => router.push('/dashboard/reports')} />
+        <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => router.push('/dashboard/team')} />
+        <NavItem icon={<CreditCard size={18} />} label={s('subscription')} active={isActive('/dashboard/subscription')} onClick={() => router.push('/dashboard/subscription')} />
+        <NavItem icon={<Share2 size={18} />} label={s('shared')} active={isActive('/dashboard/shared')} onClick={() => router.push('/dashboard/shared')} />
+        <NavItem icon={<RefreshCw size={18} />} label={s('recurring')} active={isActive('/dashboard/recurring')} onClick={() => router.push('/dashboard/recurring')} />
       </nav>
     </>
   );
 
   return (
     <>
-      <aside aria-label="Navigation" className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 sticky top-0 h-screen p-4 bg-white/60 backdrop-blur-xl border-r border-slate-200 shadow-sm">
+      <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-6 bg-[var(--navy)] border-r border-[rgba(245,237,214,0.08)]">
+        <div className="flex items-center gap-3 mb-10">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
+          <span className="text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight">CloudDevis</span>
+        </div>
         {sidebarContent()}
       </aside>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-[220px] flex flex-col p-4 bg-white shadow-2xl z-50 animate-in">
-            {sidebarContent(true)}
+        <div className="fixed inset-0 z-[150] md:hidden">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
+          <aside className="fixed inset-y-0 left-0 w-[280px] flex flex-col p-6 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-r border-[rgba(245,237,214,0.1)]">
+            {sidebarContent()}
           </aside>
         </div>
       )}
 
       <button onClick={() => setMobileOpen(!mobileOpen)}
-        aria-label="Open menu"
-        aria-expanded={mobileOpen}
-        className="fixed bottom-6 left-4 z-40 md:hidden w-11 h-11 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition active:scale-95">
-        <Menu size={20} strokeWidth={1.5} />
+        className="fixed bottom-6 right-6 z-[140] md:hidden w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95">
+        <Menu size={24} />
       </button>
     </>
+  );
+}
+
+function NavItem({ icon, label, active, onClick, badge }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void, badge?: number }) {
+  return (
+    <button onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+        active ? 'bg-[rgba(0,149,77,0.12)] text-[var(--green-3)] shadow-[inset_0_0_0_1px_rgba(0,149,77,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
+      }`}>
+      <span className={active ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]'}>{icon}</span>
+      <span className="flex-1 text-start">{label}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="bg-[var(--navy-4)] text-[var(--sand-muted)] text-[10px] font-bold px-2 py-0.5 rounded-full">{badge}</span>
+      )}
+    </button>
   );
 }
 

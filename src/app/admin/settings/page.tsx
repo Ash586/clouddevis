@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Save, RefreshCw } from 'lucide-react';
+import { TRIAL_DAYS } from '@/lib/subscription';
 
 export default function AdminSettingsPage() {
   const t = useTranslations('admin');
@@ -15,7 +16,7 @@ export default function AdminSettingsPage() {
     sessionTimeout: '60',
     maintenance: false,
     registrationOpen: true,
-    trialDays: '14',
+    trialDays: String(TRIAL_DAYS),
     maxDocsPerUser: '100',
     maxClientsPerUser: '50',
   });

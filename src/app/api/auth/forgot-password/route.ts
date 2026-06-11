@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       },
     });
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password?token=${token}`;
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/auth/reset-password?token=${token}`;
 
     // TODO: Send reset email via Resend/Nodemailer in production
     // For now, return success silently (no console.log of reset URL in production)

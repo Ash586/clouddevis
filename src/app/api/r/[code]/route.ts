@@ -12,15 +12,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ code: st
     });
 
     if (!partner || partner.status !== 'ACTIVE') {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app';
       return NextResponse.redirect(new URL('/auth/register', baseUrl));
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app';
     return NextResponse.redirect(new URL(`/auth/register?ref=${partner.code}`, baseUrl));
   } catch (error) {
     logger.error('Referral redirect error', { error: String(error) });
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app';
     return NextResponse.redirect(new URL('/auth/register', baseUrl));
   }
 }

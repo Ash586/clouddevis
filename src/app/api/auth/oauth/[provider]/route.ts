@@ -6,7 +6,7 @@ const PROVIDERS: Record<string, { authUrl: string; params: Record<string, string
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     params: {
       client_id: process.env.GOOGLE_CLIENT_ID || '',
-      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth/callback/google`,
+      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/google`,
       response_type: 'code',
       scope: 'openid email profile',
       access_type: 'offline',
@@ -17,7 +17,7 @@ const PROVIDERS: Record<string, { authUrl: string; params: Record<string, string
     authUrl: 'https://github.com/login/oauth/authorize',
     params: {
       client_id: process.env.GITHUB_CLIENT_ID || '',
-      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth/callback/github`,
+      redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/github`,
       scope: 'read:user user:email',
     },
   },

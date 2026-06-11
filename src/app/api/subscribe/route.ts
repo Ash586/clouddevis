@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Produit non configuré', note: 'Bientôt disponible.' }, { status: 503 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.app';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app';
 
     const checkout = await createCheckout({
       productId,
