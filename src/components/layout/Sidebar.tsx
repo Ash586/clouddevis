@@ -169,10 +169,6 @@ function SidebarInner() {
   return (
     <>
       <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-6 bg-[var(--navy)] border-r border-[rgba(245,237,214,0.08)]">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
-          <span className="text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight">CloudDevis</span>
-        </div>
         {sidebarContent()}
       </aside>
 
