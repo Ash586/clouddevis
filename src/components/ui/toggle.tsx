@@ -10,7 +10,7 @@ interface Props {
 export function Toggle({ label, checked, onChange }: Props) {
   return (
     <label className="flex items-center justify-between py-1.5 cursor-pointer group">
-      <span className="text-sm text-slate-700 group-hover:text-slate-900 transition">{label}</span>
+      <span className="text-sm text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition">{label}</span>
       <button
         type="button"
         role="switch"
@@ -18,8 +18,8 @@ export function Toggle({ label, checked, onChange }: Props) {
         onClick={() => onChange(!checked)}
         className={cn(
           'relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500/30',
-          checked ? 'bg-blue-600' : 'bg-slate-200'
+          'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
+          checked ? 'bg-[var(--green-3)]' : 'bg-[var(--navy-4)]'
         )}
       >
         <span className={cn(

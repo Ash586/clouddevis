@@ -162,7 +162,7 @@ export default function TemplatesPage() {
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
               <div className="flex items-center justify-between gap-4">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900">{t('title')}</h1>
+                <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
                 <Button onClick={openCreate}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
@@ -193,9 +193,9 @@ export default function TemplatesPage() {
                   {[1, 2, 3].map(i => (
                     <Card key={i} className="animate-pulse">
                       <div className="space-y-3">
-                        <div className="h-4 bg-slate-200 rounded w-2/3" />
-                        <div className="h-3 bg-slate-100 rounded w-full" />
-                        <div className="h-3 bg-slate-100 rounded w-1/2" />
+                        <div className="h-4 bg-[var(--navy-3)] rounded w-2/3" />
+                        <div className="h-3 bg-[var(--navy-4)] rounded w-full" />
+                        <div className="h-3 bg-[var(--navy-4)] rounded w-1/2" />
                       </div>
                     </Card>
                   ))}
@@ -203,7 +203,7 @@ export default function TemplatesPage() {
               ) : templates.length === 0 ? (
                 <Card className="text-center py-12">
                   <div className="text-4xl mb-3">📋</div>
-                  <p className="text-slate-500 text-sm mb-4">{t('empty')}</p>
+                  <p className="text-[var(--sand-muted)] text-sm mb-4">{t('empty')}</p>
                   <Button onClick={openCreate}>{t('createFirst')}</Button>
                 </Card>
               ) : (
@@ -211,15 +211,15 @@ export default function TemplatesPage() {
                   {templates.map(tpl => (
                     <Card key={tpl.id} className="flex flex-col">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-bold text-slate-900 truncate">{tpl.name}</h3>
+                        <h3 className="font-bold text-[var(--sand)] truncate">{tpl.name}</h3>
                         <Badge variant={TYPE_BADGE_VARIANT[tpl.documentType] ?? 'default'}>
                           {TYPE_LABEL[tpl.documentType] ?? tpl.documentType}
                         </Badge>
                       </div>
                       {tpl.description && (
-                        <p className="text-xs text-slate-400 mb-3 line-clamp-2">{tpl.description}</p>
+                        <p className="text-xs text-[var(--sand-muted)] mb-3 line-clamp-2">{tpl.description}</p>
                       )}
-                      <div className="flex items-center gap-3 text-xs text-slate-400 mb-4">
+                      <div className="flex items-center gap-3 text-xs text-[var(--sand-muted)] mb-4">
                         <span>{tpl.itemCount} {tc('type').toLowerCase() === 'type' ? 'éléments' : 'items'}</span>
                         <span>·</span>
                         <span>{tpl.createdAt}</span>
@@ -285,7 +285,7 @@ export default function TemplatesPage() {
 
       <Modal open={!!deleteId} onClose={() => setDeleteId(null)} title={t('deleteTitle')}>
         <div className="space-y-4">
-          <p className="text-sm text-slate-500">{t('deleteConfirm')}</p>
+          <p className="text-sm text-[var(--sand-muted)]">{t('deleteConfirm')}</p>
           <div className="flex gap-2">
             <Button variant="ghost" className="flex-1" onClick={() => setDeleteId(null)}>{tc('cancel')}</Button>
             <Button variant="secondary" className="flex-1 bg-red-600 hover:bg-red-700 text-white" onClick={handleDelete} disabled={deleting}>

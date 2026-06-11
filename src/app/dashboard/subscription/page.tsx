@@ -26,17 +26,17 @@ function WiseTransferSection() {
   }, []);
   if (!wise?.configured) return null;
   return (
-    <Card className="p-5 border-emerald-200 bg-emerald-50/30">
-      <h3 className="font-bold text-slate-800 mb-2">💳 Paiement par virement Wise</h3>
-      <p className="text-xs text-slate-500 mb-3">{wise.instructions}</p>
-      <div className="bg-white rounded-xl border border-slate-200 p-3 text-xs space-y-1 text-slate-700">
-        <p><span className="font-bold text-slate-500">Bénéficiaire :</span> {wise.beneficiary}</p>
-        <p><span className="font-bold text-slate-500">IBAN :</span> <code className="bg-slate-100 px-1.5 py-0.5 rounded text-blue-700 font-mono">{wise.iban}</code></p>
-        {wise.bic && <p><span className="font-bold text-slate-500">BIC :</span> {wise.bic}</p>}
-        <p><span className="font-bold text-slate-500">Banque :</span> {wise.bank}</p>
-        <p><span className="font-bold text-slate-500">Devise :</span> {wise.currency}</p>
+    <Card className="p-5 border-[rgba(0,149,77,0.2)] bg-[rgba(0,149,77,0.05)]">
+      <h3 className="font-bold text-[var(--sand)] mb-2">💳 Paiement par virement Wise</h3>
+      <p className="text-xs text-[var(--sand-muted)] mb-3">{wise.instructions}</p>
+      <div className="bg-[var(--navy-2)] rounded-xl border border-[rgba(245,237,214,0.1)] p-3 text-xs space-y-1 text-[var(--sand-2)]">
+        <p><span className="font-bold text-[var(--sand-muted)]">Bénéficiaire :</span> {wise.beneficiary}</p>
+        <p><span className="font-bold text-[var(--sand-muted)]">IBAN :</span> <code className="bg-[var(--navy-4)] px-1.5 py-0.5 rounded text-[var(--green-3)] font-mono">{wise.iban}</code></p>
+        {wise.bic && <p><span className="font-bold text-[var(--sand-muted)]">BIC :</span> {wise.bic}</p>}
+        <p><span className="font-bold text-[var(--sand-muted)]">Banque :</span> {wise.bank}</p>
+        <p><span className="font-bold text-[var(--sand-muted)]">Devise :</span> {wise.currency}</p>
       </div>
-      <p className="text-[10px] text-slate-400 mt-2">Envoyez le reçu du virement à support@clouddevis.io pour activation sous 24-48h.</p>
+      <p className="text-[10px] text-[var(--sand-muted)] mt-2">Envoyez le reçu du virement à support@clouddevis.io pour activation sous 24-48h.</p>
     </Card>
   );
 }
@@ -78,8 +78,8 @@ export default function SubscriptionPage() {
   if (loading) return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[#f0f4f8] flex items-center justify-center">
-        <div className="animate-pulse text-sm text-slate-400">{tc('loading')}</div>
+      <div className="min-h-screen bg-[var(--navy)] flex items-center justify-center">
+        <div className="animate-pulse text-sm text-[var(--sand-muted)]">{tc('loading')}</div>
       </div>
     </>
   );
@@ -104,16 +104,16 @@ export default function SubscriptionPage() {
     <>
       <Navbar />
       <TrialGate>
-      <div className="min-h-screen bg-[#f0f4f8] p-4 sm:p-6">
+      <div className="min-h-screen bg-[var(--navy)] p-4 sm:p-6">
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Current Plan */}
           <Card className="p-5">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h1 className="text-lg font-black text-slate-900">{t('mySubscription') || 'Mon abonnement'}</h1>
+                <h1 className="text-lg font-black text-[var(--sand)]">{t('mySubscription') || 'Mon abonnement'}</h1>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-slate-500">
+                  <span className="text-sm text-[var(--sand-muted)]">
                     {plan?.name?.fr || currentPlanId}
                   </span>
                   <Badge variant={badge.variant}>{badge.label}</Badge>
@@ -129,11 +129,11 @@ export default function SubscriptionPage() {
             {/* Usage bar */}
             {usage && usage.docsLimit !== 'unlimited' && (
               <div className="mb-4">
-                <div className="flex justify-between text-xs text-slate-500 mb-1">
+                <div className="flex justify-between text-xs text-[var(--sand-muted)] mb-1">
                   <span>{t('docsUsed') || 'Documents utilisés'}</span>
                   <span>{usage.docsThisMonth} / {usage.docsLimit}</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-[var(--navy-4)] rounded-full overflow-hidden">
                   <div className={`h-full rounded-full transition-all ${pctUsed > 80 ? 'bg-red-500' : pctUsed > 50 ? 'bg-amber-500' : 'bg-blue-500'}`}
                     style={{ width: `${Math.min(pctUsed, 100)}%` }} />
                 </div>
@@ -142,31 +142,31 @@ export default function SubscriptionPage() {
 
             {/* Storage & Team */}
             <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <p className="text-lg font-black text-slate-900">{usage?.docsThisMonth || 0}</p>
-                <p className="text-[10px] text-slate-500">{t('statDocs') || 'Documents'}</p>
+              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.1)]">
+                <p className="text-lg font-black text-[var(--sand)]">{usage?.docsThisMonth || 0}</p>
+                <p className="text-[10px] text-[var(--sand-muted)]">{t('statDocs') || 'Documents'}</p>
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <p className="text-lg font-black text-slate-900">{plan?.limits?.teamMembers || 1}</p>
-                <p className="text-[10px] text-slate-500">{t('teamLimit', { count: plan?.limits?.teamMembers || 1 }) || 'Utilisateurs'}</p>
+              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.1)]">
+                <p className="text-lg font-black text-[var(--sand)]">{plan?.limits?.teamMembers || 1}</p>
+                <p className="text-[10px] text-[var(--sand-muted)]">{t('teamLimit', { count: plan?.limits?.teamMembers || 1 }) || 'Utilisateurs'}</p>
               </div>
             </div>
           </Card>
 
           {/* All Plans */}
-          <h2 className="text-sm font-bold text-slate-700">{t('choosePlan') || 'Choisissez votre offre'}</h2>
+          <h2 className="text-sm font-bold text-[var(--sand-2)]">{t('choosePlan') || 'Choisissez votre offre'}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {PLAN_ORDER.filter(id => id !== 'enterprise').map(id => {
               const p = PLANS[id];
               const isCurrent = currentPlanId === id;
               return (
-                <Card key={id} className={`p-4 relative ${isCurrent ? 'ring-2 ring-blue-500 border-blue-500' : p.highlighted ? 'border-blue-300' : ''}`}>
+                <Card key={id} className={`p-4 relative ${isCurrent ? 'ring-2 ring-[var(--green-2)] border-[var(--green-2)]' : p.highlighted ? 'border-[var(--green-glow)]' : ''}`}>
                   {p.highlighted && !isCurrent && (
-                    <span className="absolute -top-2 right-3 text-[9px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">{t('popular') || 'Populaire'}</span>
+                    <span className="absolute -top-2 right-3 text-[9px] font-bold text-[var(--green-3)] bg-[var(--green-glow)] px-2 py-0.5 rounded-full">{t('popular') || 'Populaire'}</span>
                   )}
-                  <h3 className="font-bold text-slate-800 text-sm">{p.name.fr}</h3>
-                  <p className="text-xl font-black text-blue-600 mt-1">{formatPrice(p.price)}<span className="text-xs font-normal text-slate-400"> {t('perMonth') || '/mois'}</span></p>
-                  <ul className="text-[11px] text-slate-500 mt-3 space-y-1">
+                  <h3 className="font-bold text-[var(--sand)] text-sm">{p.name.fr}</h3>
+                  <p className="text-xl font-black text-[var(--green-3)] mt-1">{formatPrice(p.price)}<span className="text-xs font-normal text-[var(--sand-muted)]"> {t('perMonth') || '/mois'}</span></p>
+                  <ul className="text-[11px] text-[var(--sand-muted)] mt-3 space-y-1">
                     <li>✓ {p.limits.docsPerMonth === 'unlimited' ? (t('unlimitedDocs') || 'Documents illimités') : (t('docsLimit', { count: p.limits.docsPerMonth }) || `${p.limits.docsPerMonth} docs`)}</li>
                     <li>✓ {t('teamLimit', { count: p.limits.teamMembers }) || `${p.limits.teamMembers} utilisateurs`}</li>
                     <li>✓ {p.limits.storageMB >= 1024 ? `${p.limits.storageMB / 1024} Go` : `${p.limits.storageMB} Mo`}</li>
@@ -184,11 +184,11 @@ export default function SubscriptionPage() {
           </div>
 
           {/* Enterprise CTA */}
-          <Card className="p-5 border-red-200 bg-red-50/30">
+          <Card className="p-5 border-red-400/20 bg-red-400/5">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h3 className="font-bold text-slate-800">{t('enterpriseTitle') || 'Vous avez besoin de plus ?'}</h3>
-                <p className="text-xs text-slate-500 mt-1">{t('enterpriseDesc') || 'Solution sur mesure pour les grandes organisations.'}</p>
+                <h3 className="font-bold text-[var(--sand)]">{t('enterpriseTitle') || 'Vous avez besoin de plus ?'}</h3>
+                <p className="text-xs text-[var(--sand-muted)] mt-1">{t('enterpriseDesc') || 'Solution sur mesure pour les grandes organisations.'}</p>
               </div>
               <Button variant="secondary" onClick={() => router.push('/enterprise')}>
                 {t('contactEnterprise') || 'Nous contacter'}

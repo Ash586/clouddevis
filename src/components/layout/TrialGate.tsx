@@ -44,9 +44,9 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
     <>
       {isTrial ? (
         <div>
-          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2">
+          <div className="bg-amber-400/10 border-b border-amber-400/20 px-4 py-2">
             <div className="max-w-4xl mx-auto flex items-center gap-3 flex-wrap">
-              <span className="text-xs font-medium text-amber-700">
+              <span className="text-xs font-medium text-amber-400">
                 {s('trialBanner') || 'Période d\'essai — 7 jours'}&ensp;
                 <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Souscrire'}</button>
               </span>
@@ -58,8 +58,8 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-center min-h-[60vh] p-8">
           <Card className="max-w-sm p-8 text-center">
             <div className="text-5xl mb-4">🔒</div>
-            <h2 className="text-lg font-bold text-slate-800 mb-2">{s('accessLimited') || 'Accès limité'}</h2>
-            <p className="text-sm text-slate-500 mb-6">{s('trialExpired') || 'Votre période d\'essai a expiré. Choisissez un forfait pour continuer.'}</p>
+            <h2 className="text-lg font-bold text-[var(--sand)] mb-2">{s('accessLimited') || 'Accès limité'}</h2>
+            <p className="text-sm text-[var(--sand-muted)] mb-6">{s('trialExpired') || 'Votre période d\'essai a expiré. Choisissez un forfait pour continuer.'}</p>
             <Button onClick={() => setShowUpgrade(true)}>{s('seePlans') || 'Voir les offres'}</Button>
           </Card>
         </div>
@@ -72,13 +72,13 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
           {PLAN_ORDER.filter(id => id !== 'enterprise').map(id => {
             const plan = PLANS[id];
             return (
-              <Card key={id} className={`p-4 cursor-pointer hover:ring-2 hover:ring-blue-300 transition ${plan.highlighted ? 'border-blue-400 bg-blue-50/50 ring-2 ring-blue-200' : 'border-slate-200'}`}>
+              <Card key={id} className={`p-4 cursor-pointer hover:ring-2 hover:ring-[var(--green-glow)] transition ${plan.highlighted ? 'border-[var(--green-2)] bg-[rgba(0,149,77,0.05)] ring-2 ring-[rgba(0,149,77,0.15)]' : 'border-[rgba(245,237,214,0.08)]'}`}>
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-bold text-slate-800 text-sm">{plan.name.fr}</h3>
-                  {plan.highlighted && <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">{s('popular') || 'Populaire'}</span>}
+                  <h3 className="font-bold text-[var(--sand)] text-sm">{plan.name.fr}</h3>
+                  {plan.highlighted && <span className="text-[10px] font-bold text-[var(--green-3)] bg-[var(--green-glow)] px-2 py-0.5 rounded-full">{s('popular') || 'Populaire'}</span>}
                 </div>
-                <p className="text-2xl font-black text-blue-600 mt-1">{formatPrice(plan.price)}<span className="text-sm font-normal text-slate-400"> {s('perMonth') || '/mois'}</span></p>
-                <ul className="text-[11px] text-slate-500 mt-2 space-y-1">
+                <p className="text-2xl font-black text-[var(--green-3)] mt-1">{formatPrice(plan.price)}<span className="text-sm font-normal text-[var(--sand-muted)]"> {s('perMonth') || '/mois'}</span></p>
+                <ul className="text-[11px] text-[var(--sand-muted)] mt-2 space-y-1">
                   {(plan.limits.docsPerMonth === 'unlimited'
                     ? [s('unlimitedDocs') || 'Documents illimités']
                     : [s('docsLimit', { count: plan.limits.docsPerMonth }) || `${plan.limits.docsPerMonth} documents/mois`]

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { FileText, CreditCard, Users, RefreshCw, FileStack } from 'lucide-react';
 
 interface CompanyInfo {
   name?: string; address?: string; capital?: string;
@@ -192,7 +193,7 @@ export function UnifiedDashboard({ userName, userPhone, companyInfo, stats, docs
   );
 }
 
-function StatCard({ label, value, sub, icon, color = 'default' }: { label: string, value: string | number, subText?: string, icon: React.ReactNode, color?: 'default' | 'green' | 'blue' | 'gold' }) {
+function StatCard({ label, value, sub, icon, color = 'default' }: { label: string, value: string | number, sub?: string, icon: React.ReactNode, color?: 'default' | 'green' | 'blue' | 'gold' }) {
   const colorMap = {
     default: 'text-[var(--sand-muted)] bg-[var(--navy-3)]',
     green: 'text-[var(--green-3)] bg-[var(--green-glow)]',
