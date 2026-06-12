@@ -20,7 +20,6 @@ interface TeamData {
 
 export default function TeamDetailPage() {
   const t = useTranslations('teams');
-  const tc = useTranslations('common');
   const params = useParams();
   const router = useRouter();
   const [team, setTeam] = useState<TeamData | null>(null);
@@ -38,6 +37,7 @@ export default function TeamDetailPage() {
     setLoading(false);
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => { fetchTeam(); }, [params.id]);
 
   const handleInvite = async () => {
@@ -50,22 +50,6 @@ export default function TeamDetailPage() {
     setInviteEmail('');
     fetchTeam();
   };
-
-  const handleRemoveMember = async (userId: string) => {
-    await fetch(`/api/teams/${params.id}/members/${userId}`, { method: 'DELETE' });
-    fetchTeam();
-  };
-
-  const handleChangeRole = async (userId: string, role: string) => {
-    await fetch(`/api/teams/${params.id}/members/${userId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role }),
-    });
-    fetchTeam();
-  };
-
-  const isOwner = team?.owner?.id === 'current'; // Will be checked server-side
 
   const memberColumns = [
     { key: 'user.name', label: t('memberName') },

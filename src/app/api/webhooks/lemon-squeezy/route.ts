@@ -22,8 +22,7 @@ export async function POST(req: Request) {
         const planId = event.planId || 'pro';
         if (!event.userId) break;
 
-        const validStatuses = ['STANDARD', 'PRO', 'MAX'] as const;
-        const statusMap: Record<string, typeof validStatuses[number]> = {
+        const statusMap: Record<string, 'STANDARD' | 'PRO' | 'MAX'> = {
           standard: 'STANDARD', pro: 'PRO', max: 'MAX',
         };
         const status = statusMap[planId] || 'PRO';

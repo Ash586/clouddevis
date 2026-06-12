@@ -1,25 +1,28 @@
 'use client';
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import type { DocumentState, CalculationResult, CustomSectionDef } from '@/types';
+import type { DocumentState, CalculationResult, CustomSectionDef, BlockId } from '@/types';
 import { formatCurrency } from '@/lib/calculations';
 import { PreviewHeader } from './preview/PreviewHeader';
 import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
+
+export type PreviewFocus = 'header' | 'client' | 'items' | 'totals' | 'payment' | null;
 
 interface Props {
   doc: DocumentState;
   results: CalculationResult;
   customSections?: CustomSectionDef[];
   hiddenFields?: Set<string>;
+  previewFocus?: PreviewFocus;
+  showGrid?: boolean;
 }
 
-export function DocumentPreview({ doc, results, customSections = [], hiddenFields }: Props) {
+export function DocumentPreview({ doc, results, customSections = [], hiddenFields, previewFocus = null, showGrid = false }: Props) {
   const t = useTranslations('preview');
   const tcat = useTranslations('preview.categories');
   const tcommon = useTranslations('common');
   const tu = useTranslations('preview.units');
-  const isEnt = doc.mode === 'entreprise';
   const UNIT_LABELS: Record<string, string> = { u:tu('u'), h:tu('h'), j:tu('j'), m2:tu('m2'), m3:tu('m3'), ml:tu('ml'), kg:tu('kg'), forfait:tu('forfait') };
   const CATEGORY_LABELS: Record<string, string> = {
     preparation: tcat('preparation'), peinture: tcat('peinture'), finition: tcat('finition'),
@@ -27,7 +30,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     main_oeuvre: tcat('main_oeuvre'), materiaux: tcat('materiaux'), transport: tcat('transport'),
     divers: tcat('divers'), services: tcat('services'),
   };
-  const vb = (block: string) => !doc.hiddenBlocks.includes(block as any);
+  const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
   const hf = new Set(hiddenFields ?? []);
   const sf = (fieldId: string) => !hf.has(fieldId);
   const bv = (...fieldIds: string[]) => fieldIds.some(f => sf(f));
@@ -46,13 +49,15 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
   const categoryOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
   return (
-    <div id="print-area" className="w-[21cm] min-h-[29.7cm] bg-white p-10 flex flex-col justify-between shadow-md print:shadow-none border-t-[12px] border-slate-800">
+    <div id="print-area" className={`w-[21cm] min-h-[29.7cm] bg-white p-10 flex flex-col justify-between shadow-md print:shadow-none border-t-[12px] border-slate-800 relative ${showGrid ? 'print:grid' : ''}`}>
+      {showGrid && <div className="absolute inset-0 pointer-events-none print:hidden" style={{ backgroundImage: 'linear-gradient(rgba(200,200,200,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(200,200,200,0.15) 1px, transparent 1px)', backgroundSize: '10px 10px' }} />}
       <div>
-        <PreviewHeader doc={doc} sf={sf} bv={bv} vb={vb} t={t} />
-        <PreviewMetaSections doc={doc} sf={sf} vb={vb} bv={bv} t={t} />
+        <PreviewHeader doc={doc} sf={sf} bv={bv} vb={vb} t={t} highlight={previewFocus === 'header'} />
+        <PreviewMetaSections doc={doc} sf={sf} vb={vb} bv={bv} t={t} highlight={previewFocus === 'client'} />
 
         {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-          <table className="w-full text-left text-[10px] mb-6 border-collapse">
+          <div className={`mb-6 rounded-lg transition-all duration-700 print:rounded-none ${previewFocus === 'items' ? 'ring-2 ring-blue-400/50 bg-blue-50/40 p-2 -m-2' : ''}`}>
+          <table className="w-full text-left text-[10px] border-collapse">
             <thead>
               <tr className="border-b-2 border-slate-800 text-slate-500 text-[8px] font-black uppercase tracking-wider">
                 <th className="pb-2 pr-2 w-8">{t('tableHash')}</th>
@@ -109,6 +114,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
               })()}
             </tbody>
           </table>
+          </div>
         )}
 
         {vb('situations') && (
@@ -149,7 +155,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
                 {visibleFields.map(f => {
                   const v = sectionData[f.id];
                   if (v === undefined || v === null || v === '') return null;
-                  return <p key={f.id}><span className="font-semibold">{f.label}:</span> {v}</p>;
+                  return <p key={f.id}><span className="font-semibold">{f.label}:</span> {String(v)}</p>;
                 })}
               </div>
             </div>
@@ -157,7 +163,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
         })}
       </div>
 
-      <PreviewFooter doc={doc} results={results} vb={vb} bv={bv} sf={sf} />
+      <PreviewFooter doc={doc} results={results} vb={vb} bv={bv} sf={sf} highlight={previewFocus === 'totals' || previewFocus === 'payment'} />
     </div>
   );
 }

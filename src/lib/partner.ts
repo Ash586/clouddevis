@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 
-export async function generateReferralCode(userId: string): Promise<string> {
+export async function generateReferralCode(): Promise<string> {
   const prefix = 'CD';
   let attempts = 0;
 
@@ -16,12 +16,12 @@ export async function generateReferralCode(userId: string): Promise<string> {
   throw new Error('Impossible de générer un code de parrainage unique');
 }
 
-export async function calculateCommission(subscriptionPrice: number, partnerTier: string): Promise<{ direct: number; override: number }> {
-  const directRate = 0.20;
-  const overrideRate = 0.05;
+const DIRECT_RATE = parseFloat(process.env.PARTNER_DIRECT_RATE || '') || 0.20;
+const OVERRIDE_RATE = parseFloat(process.env.PARTNER_OVERRIDE_RATE || '') || 0.05;
 
-  const direct = Math.round(subscriptionPrice * directRate);
-  const override = partnerTier === 'SUPER_AFFILIATE' ? Math.round(subscriptionPrice * overrideRate) : 0;
+export async function calculateCommission(subscriptionPrice: number, partnerTier: string): Promise<{ direct: number; override: number }> {
+  const direct = Math.round(subscriptionPrice * DIRECT_RATE);
+  const override = partnerTier === 'SUPER_AFFILIATE' ? Math.round(subscriptionPrice * OVERRIDE_RATE) : 0;
 
   return { direct, override };
 }
@@ -41,7 +41,11 @@ const SUBSCRIPTION_PRICES: Record<string, number> = {
   MAX: PLANS.max.price,
 };
 
-export async function handleReferralConversion(userId: string, newStatus: string): Promise<void> {
+export async function handleReferralConversion(
+  userId: string,
+  newStatus: string,
+  options?: { subscriptionId?: string; amountPaid?: number; planId?: string }
+): Promise<void> {
   if (!['STANDARD', 'PRO', 'MAX'].includes(newStatus)) return;
 
   const referral = await prisma.referral.findUnique({
@@ -52,7 +56,18 @@ export async function handleReferralConversion(userId: string, newStatus: string
   if (!referral || referral.status === 'CONVERTED') return;
   if (!referral.partner) return;
 
-  const price = SUBSCRIPTION_PRICES[newStatus] || 0;
+  const subId = options?.subscriptionId || `sub_${userId}_${newStatus}`;
+
+  const existingCommission = await prisma.commission.findFirst({
+    where: {
+      partnerId: referral.partner.id,
+      subscriptionId: subId,
+      type: 'DIRECT',
+    },
+  });
+  if (existingCommission) return;
+
+  const price = options?.amountPaid || SUBSCRIPTION_PRICES[newStatus] || 0;
   if (price <= 0) return;
 
   const commission = await calculateCommission(price, referral.partner.tier);
@@ -67,6 +82,7 @@ export async function handleReferralConversion(userId: string, newStatus: string
         partnerId: referral.partner.id,
         amount: commission.direct,
         type: 'DIRECT',
+        subscriptionId: subId,
         status: 'PENDING',
       },
     }),
@@ -77,6 +93,7 @@ export async function handleReferralConversion(userId: string, newStatus: string
               partnerId: referral.partner.parentId,
               amount: commission.override,
               type: 'OVERRIDE',
+              subscriptionId: subId,
               status: 'PENDING',
             },
           }),

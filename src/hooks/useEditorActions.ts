@@ -42,7 +42,7 @@ export function useEditorActions(deps: EditorActionsDeps) {
     setDoc(prev => ({ ...prev, artisanInfo: prev.artisanInfo ? { ...prev.artisanInfo, ...info } : prev.artisanInfo }));
   }, [setDoc]);
 
-  const updateCustomField = useCallback((sectionId: string, fieldId: string, value: any) => {
+  const updateCustomField = useCallback((sectionId: string, fieldId: string, value: unknown) => {
     setDoc(prev => {
       const sectionData = { ...(prev.customFields[sectionId] ?? {}) };
       sectionData[fieldId] = value;
@@ -128,7 +128,7 @@ export function useEditorActions(deps: EditorActionsDeps) {
   const resetDoc = useCallback(() => {
     localStorage.removeItem(LS_KEY);
     setDocId(null);
-    setDoc(createEmptyDoc(mode as any));
+    setDoc(createEmptyDoc(mode as 'artisan' | 'entreprise'));
   }, [mode, setDocId, setDoc]);
 
   const saveDoc = useCallback(async () => {

@@ -285,6 +285,21 @@
   justify-content: center;
 }
 
+.landing-body .hero-visual-desktop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-body .hero-visual-mobile {
+  display: none;
+}
+
+.landing-body .hero-trust-mobile {
+  display: none;
+}
+
 .landing-body .doc-preview {
   background: var(--navy-2);
   border: 0.5px solid var(--border-2);
@@ -1261,7 +1276,8 @@
 ═══════════════════════════════════════ */
 @media (max-width: 900px) {
   .landing-body .hero-grid, .landing-body .compliance-grid { grid-template-columns: 1fr; }
-  .landing-body .hero-visual { display: none; }
+  .landing-body .hero-visual-desktop { display: none; }
+  .landing-body .hero-visual-mobile { display: block !important; }
   .landing-body .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .landing-body .stats-grid .stat-item:nth-child(3)::before { display: none; }
   .landing-body .bento-grid { grid-template-columns: 1fr 1fr; }
@@ -1272,10 +1288,15 @@
   .landing-body .faq-grid { grid-template-columns: 1fr; }
   .landing-body .footer-grid { grid-template-columns: 1fr 1fr; }
   .landing-body .steps-grid::before { display: none; }
+  /* Add bottom padding for sticky CTA */
+  .landing-body .cta-section { padding-bottom: 120px; }
 }
 
 @media (max-width: 580px) {
   .landing-body .nav-links { display: none; }
+  .landing-body .hero { padding: 48px 0 40px; }
+  .landing-body .hero-sub { font-size: 15px; margin-bottom: 24px; }
+  .landing-body .hero-ctas { margin-bottom: 20px; }
   .landing-body .stats-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
   .landing-body .stat-item::before { display: none; }
   .landing-body .bento-grid { grid-template-columns: 1fr; }
@@ -1285,6 +1306,45 @@
   .landing-body .compliance-fields { grid-template-columns: 1fr; }
   .landing-body .footer-grid { grid-template-columns: 1fr; }
   .landing-body .cta-card { padding: 48px 24px; }
+  .landing-body .hero-visual-mobile { padding: 0 8px; margin-top: 8px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact {
+    padding: 16px;
+    border-radius: 14px;
+    max-width: 100%;
+  }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-table { font-size: 10px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-meta-row { flex-direction: column; gap: 4px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-totals { font-size: 10px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-topbar { margin-bottom: 10px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-logo-box { width: 28px; height: 28px; font-size: 10px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-company-name { font-size: 11px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-company-sub { font-size: 9px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-type-badge { font-size: 9px; padding: 2px 8px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact table th,
+  .landing-body .hero-visual-mobile .doc-preview-compact table td { padding: 4px 2px; font-size: 9px; }
+  .landing-body .hero-visual-mobile .doc-preview-compact .doc-total-row { font-size: 10px; padding: 3px 0; }
+  /* Trust items scroll horizontally on mobile */
+  .landing-body .hero-trust-mobile {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+  }
+  .landing-body .hero-trust-mobile::-webkit-scrollbar { display: none; }
+  .landing-body .hero-trust-mobile .trust-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: var(--navy-3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 0.5px solid var(--border);
+  }
+  /* Footer: add bottom padding for sticky CTA */
+  .landing-body footer { padding-bottom: 80px; }
 }
 
 /* ═══════════════════════════════════════

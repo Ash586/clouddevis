@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { LandingAnimations, LandingFAQ, LangSwitcher } from '@/components/landing/LandingPageClient';
+import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
 
 const FAQ_ITEMS = [
   { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui. CloudDevis l\u2019applique automatiquement aux factures concernées à partir de 10 000 DA, selon les règles configurées dans l\u2019application. Les devis restent exclus du calcul." },
@@ -45,9 +46,9 @@ export default function HomePage() {
                   <div className="hero-eyebrow">
                     <span className="badge badge-green">
                       <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#4DCA8A" /></svg>
-                      🇩🇿 Conforme DGI Algérie
+                      Conforme DGI Algérie
                     </span>
-                    <span className="badge badge-gold">⚡ Gratuit pour démarrer</span>
+                    <span className="badge badge-gold">Gratuit pour démarrer</span>
                   </div>
                   <h1 className="hero-title">
                     Vos devis &amp; factures<br />
@@ -61,7 +62,8 @@ export default function HomePage() {
                       Créer mon premier devis →
                     </Link>
                   </div>
-                  <div className="hero-trust">
+                  {/* Trust items — horizontal scroll chips on mobile */}
+                  <div className="hero-trust-mobile">
                     <div className="trust-item">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4DCA8A" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#4DCA8A" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       Aucune carte requise
@@ -77,7 +79,8 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="hero-visual">
+                {/* Desktop hero visual */}
+                <div className="hero-visual hero-visual-desktop">
                   <div className="glow-chip chip-1">
                     <div className="chip-dot" style={{ background: '#4DCA8A', boxShadow: '0 0 6px #4DCA8A' }}></div>
                     TVA calculée automatiquement
@@ -114,6 +117,38 @@ export default function HomePage() {
                       <div className="doc-total-row"><span className="tl">Total HT</span><span className="tv">112 000,00 DA</span></div>
                       <div className="doc-total-row"><span className="tl">TVA (9%)</span><span className="tv">10 080,00 DA</span></div>
                       <div className="doc-total-row"><span className="tl">Timbre fiscal</span><span className="tv">1 000,00 DA</span></div>
+                      <div className="doc-total-row grand"><span className="tl">TOTAL TTC</span><span className="tv">123 080,00 DA</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Compact doc preview for mobile — shown below text */}
+                <div className="hero-visual-mobile">
+                  <div className="doc-preview doc-preview-compact">
+                    <div className="doc-topbar">
+                      <div className="doc-logo-area">
+                        <div className="doc-logo-box">SB</div>
+                        <div>
+                          <div className="doc-company-name">SARL Bâtiment Plus</div>
+                          <div className="doc-company-sub">NIF: 00212345678901</div>
+                        </div>
+                      </div>
+                      <div className="doc-type-badge">FACTURE</div>
+                    </div>
+                    <div className="doc-meta-row">
+                      <div className="doc-meta-item"><label>N°</label><span>FAC-2026-042</span></div>
+                      <div className="doc-meta-item"><label>Date</label><span>10 juin 2026</span></div>
+                    </div>
+                    <table className="doc-table">
+                      <thead><tr><th>Désignation</th><th>Qté</th><th>P.U.</th><th>Total</th></tr></thead>
+                      <tbody>
+                        <tr><td>Installation élec.</td><td>3</td><td>24 000</td><td>72 000</td></tr>
+                        <tr><td>Main d&apos;œuvre</td><td>1</td><td>40 000</td><td>40 000</td></tr>
+                      </tbody>
+                    </table>
+                    <div className="doc-totals">
+                      <div className="doc-total-row"><span className="tl">Total HT</span><span className="tv">112 000,00 DA</span></div>
+                      <div className="doc-total-row"><span className="tl">TVA (9%)</span><span className="tv">10 080,00 DA</span></div>
                       <div className="doc-total-row grand"><span className="tl">TOTAL TTC</span><span className="tv">123 080,00 DA</span></div>
                     </div>
                   </div>
@@ -418,6 +453,7 @@ export default function HomePage() {
                   <ul>
                     <li><a href="#faq">FAQ</a></li>
                     <li><Link href="/enterprise">Nous contacter</Link></li>
+                    <li><Link href="/partners">Programme Partenaire</Link></li>
                   </ul>
                 </div>
                 <div className="footer-col">
@@ -437,7 +473,7 @@ export default function HomePage() {
           </footer>
 
         </LandingAnimations>
-
+        <StickyMobileCTA />
       </div>
     </div>
   );

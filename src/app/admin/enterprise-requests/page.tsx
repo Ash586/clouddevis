@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +24,6 @@ const STATUS_COLORS: Record<string, 'default' | 'info' | 'warning' | 'success' |
 };
 
 export default function AdminEnterpriseRequestsPage() {
-  const t = useTranslations('admin');
   const [requests, setRequests] = useState<ER[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');

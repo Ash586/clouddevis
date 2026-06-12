@@ -4,7 +4,7 @@ export type SectorId =
   | 'reparation_auto' | 'sante' | 'formation' | 'immobilier'
   | 'transport_personnes' | 'artisanat' | 'agriculture'
   | 'professions_liberales' | 'informatique';
-export type DocumentType = 'devis' | 'proforma' | 'bc' | 'br' | 'facture';
+export type DocumentType = 'devis' | 'proforma' | 'bc' | 'br' | 'facture' | 'intervention' | 'attachement';
 export type WorkflowState = 'draft' | 'accepted' | 'progress' | 'delivered';
 export type TaxRegimeId = 'tva_19' | 'tva_9' | 'tva_0' | 'tva_7_tn' | 'tva_20_ma' | 'tva_20_fr';
 export type PaymentMode = 'cheque' | 'virement' | 'especes' | 'cb';
@@ -162,7 +162,7 @@ export interface DocumentState {
   garantieMateriaux: string;
   garantieNotes: string;
   sectionOrder: string[];
-  customFields: Record<string, Record<string, any>>;
+  customFields: Record<string, Record<string, unknown>>;
   logoPosition?: 'left' | 'right';
 }
 

@@ -39,6 +39,7 @@ export function useUser(): UseUserReturn {
       .finally(() => setLoading(false));
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchUser(); }, [fetchUser]);
 
   return { user, loading, refresh: fetchUser };

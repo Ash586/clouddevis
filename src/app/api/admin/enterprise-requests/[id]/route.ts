@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import type { EnterpriseRequestStatus } from '@prisma/client';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -34,15 +35,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     const { status, notes } = body as { status?: string; notes?: string };
 
-    const data: Record<string, any> = {};
-    if (status) data.status = status;
-    if (notes !== undefined) data.notes = notes;
-    if (status) { data.handledById = session.adminId; data.handledAt = new Date(); }
+    const updateData: { status?: EnterpriseRequestStatus; notes?: string; handledBy?: { connect: { id: string } }; handledAt?: Date } = {};
+    if (status) updateData.status = status as EnterpriseRequestStatus;
+    if (notes !== undefined) updateData.notes = notes;
+    if (status) { updateData.handledBy = { connect: { id: session.adminId } }; updateData.handledAt = new Date(); }
 
-    if (Object.keys(data).length === 0) {
+    if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'Aucun champ à mettre à jour' }, { status: 400 });
     }
-    const updated = await prisma.enterpriseRequest.update({ where: { id }, data });
+    const updated = await prisma.enterpriseRequest.update({ where: { id }, data: updateData });
 
     await prisma.activityLog.create({
       data: {

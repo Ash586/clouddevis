@@ -19,7 +19,7 @@ export async function createCheckout(opts: LSCheckoutOptions) {
   const storeId = process.env.LEMONSQUEEZY_STORE_ID;
   if (!storeId) throw new Error('LEMONSQUEEZY_STORE_ID not set');
 
-  const body: Record<string, any> = {
+  const body: Record<string, unknown> = {
     data: {
       type: 'checkouts',
       attributes: {
@@ -44,7 +44,7 @@ export async function createCheckout(opts: LSCheckoutOptions) {
 
 export interface LSWebhookPayload {
   meta: { event_name: string; custom_data?: Record<string, string> };
-  data: { id: string; attributes: Record<string, any> };
+  data: { id: string; attributes: Record<string, unknown> };
 }
 
 import { createHmac, timingSafeEqual } from 'crypto';
@@ -72,8 +72,8 @@ export function parseWebhookEvent(payload: LSWebhookPayload): { event: string; o
   return {
     event,
     orderId: payload.data.id,
-    status: attrs.status,
-    email: attrs.user_email || customData.email || '',
+    status: attrs.status as string,
+    email: (attrs.user_email as string) || customData.email || '',
     userId: customData.userId,
     planId: customData.planId,
   };

@@ -329,6 +329,7 @@ model Partner {
   referrals     Referral[]
   commissions   Commission[]
   payouts       Payout[]
+  clicks        PartnerClick[]
   courses       PartnerCourse[]
 
   @@index([code])
@@ -380,6 +381,23 @@ model Payout {
 
   @@index([partnerId])
   @@index([status])
+}
+
+model PartnerClick {
+  id          String   @id @default(cuid())
+  partnerId   String
+  code        String
+  ipHash      String?
+  userAgent   String?
+  referrer    String?
+  landingPath String?
+  createdAt   DateTime @default(now())
+
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([createdAt])
+  @@index([code])
 }
 
 model PartnerCourse {

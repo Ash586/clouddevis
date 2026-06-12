@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { email, password, rememberMe } = body;
 
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const rateCheck = checkRateLimit(`login:${ip}`, 5, 60000);
+    const rateCheck = await checkRateLimit(`login:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }

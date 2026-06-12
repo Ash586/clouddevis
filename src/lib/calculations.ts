@@ -17,7 +17,7 @@ export function calculateDocument(doc: DocumentState): CalculationResult {
   const timbreRate = (doc.stampDuty?.rate ?? 1) / 100;
   const timbreMin = doc.stampDuty?.minAmount ?? 5;
   const timbreMax = doc.stampDuty?.maxAmount ?? 2500;
-  const applyTimbre = totalTTC >= 10000 && doc.documentType !== 'devis';
+  const applyTimbre = totalTTC >= 10000 && doc.documentType !== 'devis' && doc.documentType !== 'attachement';
   const timbreFiscal = applyTimbre ? Math.min(Math.max(totalTTC * timbreRate, timbreMin), timbreMax) : 0;
 
   const acompte = doc.acompte ?? 0;

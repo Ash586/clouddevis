@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,6 @@ interface ER {
 }
 
 export default function AdminEnterpriseRequestDetailPage() {
-  const t = useTranslations('admin');
   const params = useParams();
   const router = useRouter();
   const { showToast } = useToast();
@@ -40,6 +38,7 @@ export default function AdminEnterpriseRequestDetailPage() {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, [params.id]);
 
   const updateStatus = async (status: string) => {

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import type { DocumentState, CustomSectionDef } from '@/types';
+import type { DocumentState } from '@/types';
 
 interface HeaderProps {
   doc: DocumentState;
@@ -8,9 +8,15 @@ interface HeaderProps {
   bv: (...fieldIds: string[]) => boolean;
   vb: (block: string) => boolean;
   t: (key: string) => string;
+  highlight?: boolean;
 }
 
-export function PreviewHeader({ doc, sf, bv, vb, t }: HeaderProps) {
+function LogoImg({ url }: { url: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="Logo" className="max-w-[120px] max-h-[60px] object-contain" />;
+}
+
+export function PreviewHeader({ doc, sf, bv, vb, t, highlight = false }: HeaderProps) {
   const isEnt = doc.mode === 'entreprise';
   const docTypeLabel = doc.documentType === 'devis' ? t('docTypeQuote') : doc.documentType === 'facture' ? t('docTypeInvoice') : doc.documentType === 'proforma' ? t('docTypeProforma') : doc.documentType === 'bc' ? t('docTypeOrder') : doc.documentType === 'br' ? t('docTypeBR') : doc.documentType;
 
@@ -21,12 +27,8 @@ export function PreviewHeader({ doc, sf, bv, vb, t }: HeaderProps) {
   const showLogoLeft = !!(logoUrl && logoPos === 'left');
   const showLogoRight = !!(logoUrl && logoPos === 'right');
 
-  function LogoImg({ url }: { url: string }) {
-    return <img src={url} alt="Logo" className="max-w-[120px] max-h-[60px] object-contain" />;
-  }
-
   return (
-    <div className="flex justify-between items-start mb-8">
+    <div className={`flex justify-between items-start mb-8 transition-all duration-700 print:transition-none ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`}>
       {/* LEFT SIDE: doc type + number + dates */}
       <div className={`flex items-start gap-4 ${showLogoRight ? 'max-w-[50%]' : ''}`}>
         {showLogoLeft && <LogoImg url={logoUrl!} />}

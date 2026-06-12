@@ -15,10 +15,6 @@ interface SharedDoc {
   permission: string; date: string; sharedAt: string;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  DRAFT: 'draft', ACCEPTED: 'accepted', PROGRESS: 'progress', DELIVERED: 'delivered',
-};
-
 export default function SharedDocumentsPage() {
   const t = useTranslations('shared');
   const tc = useTranslations('common');
@@ -28,6 +24,7 @@ export default function SharedDocumentsPage() {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetch('/api/documents/shared')
       .then(r => r.ok ? r.json() : { documents: [] })

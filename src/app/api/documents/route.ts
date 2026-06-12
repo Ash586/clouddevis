@@ -3,10 +3,11 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
-import { TRIAL_DAYS } from '@/lib/subscription';
+import { TRIAL_DAYS, canCreateDocument, getDocLimit } from '@/lib/subscription';
+import { validateDocumentBody } from '@/lib/validation';
 import type { DocumentState } from '@/types';
 
-const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
+const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
 
 export async function GET(req: Request) {
   try {
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
       ];
     }
     if (type) {
-      const validTypes = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE'];
+      const validTypes = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE', 'INTERVENTION', 'ATTACHEMENT'];
       const upperType = type.toUpperCase();
       if (validTypes.includes(upperType)) where.type = upperType;
     }
@@ -126,14 +127,17 @@ export async function POST(req: Request) {
     }
 
     // Check doc limit
-    const isExpired = user.subscriptionStatus === 'EXPIRED';
-    const isFree = user.subscriptionStatus === 'FREE';
-    const docLimit = isFree ? 5 : isExpired ? 0 : user.subscriptionStatus === 'TRIAL' ? 999999 : 999999;
-    if (user.docCountThisMonth >= (isFree ? 5 : 999999)) {
-      return NextResponse.json({ error: 'Limite mensuelle de documents atteinte. Passez à un forfait supérieur.' }, { status: 403 });
+    const sessionUser = { userId: session.userId, email: session.email, subscriptionStatus: user.subscriptionStatus, name: '', mode: '', sector: null, country: '', language: 'fr' };
+    if (!canCreateDocument(sessionUser, user.docCountThisMonth)) {
+      const limit = getDocLimit(sessionUser);
+      return NextResponse.json({ error: `Limite mensuelle de documents atteinte (${limit}). Passez à un forfait supérieur.`, limit }, { status: 403 });
     }
 
     const body = await req.json();
+    const validation = validateDocumentBody(body);
+    if (!validation.valid) {
+      return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
+    }
     const doc = body as Record<string, unknown>;
     if (typeof doc !== 'object' || !doc) {
       return NextResponse.json({ error: 'Corps de requête invalide' }, { status: 400 });
@@ -158,6 +162,17 @@ export async function POST(req: Request) {
 
     const result = calculateDocument(docInput);
 
+    let existingClientId: string | null = null;
+    const clientInfo = doc.clientInfo as Record<string, unknown> | undefined;
+    const clientName = clientInfo?.name ? String(clientInfo.name).trim() : '';
+    if (clientName) {
+      const existingClient = await prisma.client.findFirst({
+        where: { userId: session.userId, name: clientName },
+        select: { id: true },
+      });
+      existingClientId = existingClient?.id ?? null;
+    }
+
     const documentType = String(doc.documentType || 'devis').toLowerCase();
     const typeValue = DOC_TYPE_MAP[documentType] || 'DEVIS';
 
@@ -170,6 +185,12 @@ export async function POST(req: Request) {
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
         items: JSON.stringify(items),
+        clientId: existingClientId,
+        customFields: JSON.stringify({
+          ...(typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}),
+          sectionOrder: Array.isArray(doc.sectionOrder) ? doc.sectionOrder : [],
+          hiddenBlocks: Array.isArray(doc.hiddenBlocks) ? doc.hiddenBlocks : [],
+        }),
         subTotalHT: result.subTotalHT, tvaAmount: result.tvaAmount,
         timbreFiscal: result.timbreFiscal, totalTTC: result.totalTTC,
         acompte: Number(doc.acompte) || 0, netAPayer: result.netAPayer,

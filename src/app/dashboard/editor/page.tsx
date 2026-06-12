@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
 import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
-import { FieldSelector } from '@/components/editor/FieldSelector';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
@@ -17,8 +15,16 @@ import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
-import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
+import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode } from '@/types';
+import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
+import {
+  ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
+  AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
+  MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
+  Grid3X3, GripVertical, Trash2, Plus, EyeOff, MoreHorizontal, Grip,
+  ChevronDown,
+} from 'lucide-react';
 
 function EditorContent() {
   const sp = useSearchParams();
@@ -34,7 +40,7 @@ function EditorContent() {
     updateDiscount, updateStampDuty, updatePaymentDetails,
     setChantierField, setMateriauxField, setGarantieField,
     toggleBlock, isBlockVisible,
-    handleAddItem, handleRemoveItem, moveItem, moveSection, startNewItem, resetDoc, saveDoc,
+    handleAddItem, handleRemoveItem, moveItem, moveSection, startNewItem, saveDoc,
     updateCustomField,
   } = useEditor(modeParam ?? 'artisan', docIdParam ?? undefined);
 
@@ -45,15 +51,15 @@ function EditorContent() {
 
   const [fieldPrefs, setFieldPrefs] = useState<Record<string, string[]> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
-  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [customSections, setCustomSections] = useState<CustomSectionDef[]>([]);
   const [showSectionCreator, setShowSectionCreator] = useState(false);
   const [editingSection, setEditingSection] = useState<CustomSectionDef | null>(null);
-  const [allExpanded, setAllExpanded] = useState<boolean | null>(null);
   const [itemErrors, setItemErrors] = useState<string | null>(null);
-  const [nifErrors, setNifErrors] = useState<Record<string, string>>({});
   const [activeSection, setActiveSection] = useState<SectionId>('prestations');
-  const [showPreview, setShowPreview] = useState(false);
+  const [previewZoom, setPreviewZoom] = useState<'fit' | number>('fit');
+  const [previewFocus, setPreviewFocus] = useState<PreviewFocus>(null);
+  const [mobileTab, setMobileTab] = useState<'editor' | 'preview' | 'totals'>('editor');
+  const [showGrid, setShowGrid] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -67,10 +73,48 @@ function EditorContent() {
   const [catalogItems, setCatalogItems] = useState<LineItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const ALL_SECTIONS: string[] = [...DEFAULT_SECTION_ORDER, ...customSections.map(s => s.id)];
-  const allFields = ALL_SECTIONS.flatMap(s => SECTION_FIELDS[s] ?? customSections.find(c => c.id === s)?.fields.map(f => f.id) ?? []);
+
+  // Left rail navigation config
+  const sectionNavItems = useMemo(() => [
+    { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
+    { id: 'client' as SectionId, icon: User, label: te('sections.client').replace(/^\d+\.\s*/, '') },
+    { id: 'general' as SectionId, icon: FileText, label: te('sections.general').replace(/^\d+\.\s*/, '') },
+    { id: 'design' as SectionId, icon: Palette, label: te('sections.design') },
+    { id: 'paiement' as SectionId, icon: CreditCard, label: te('sections.paiement').replace(/^\d+\.\s*/, '') },
+    { id: 'chantier' as SectionId, icon: MapPin, label: te('sections.chantier').replace(/^\d+\.\s*/, '') },
+    { id: 'materiaux' as SectionId, icon: Package, label: te('sections.materiaux').replace(/^\d+\.\s*/, '') },
+    { id: 'remise' as SectionId, icon: Percent, label: te('sections.remise').replace(/^\d+\.\s*/, '') },
+    { id: 'garanties' as SectionId, icon: Shield, label: te('sections.garanties').replace(/^\d+\.\s*/, '') },
+    { id: 'notes' as SectionId, icon: StickyNote, label: te('sections.notes') },
+    ...customSections.map(cs => ({ id: cs.id as SectionId, icon: FileText, label: cs.label })),
+  ], [te, customSections]);
+
+  // Map section → preview focus area
+  const sectionFocusMap: Record<string, PreviewFocus> = {
+    prestations: 'items', client: 'client', general: 'header', design: 'header',
+    paiement: 'payment', chantier: 'header', materiaux: 'header', remise: 'totals',
+    garanties: 'payment', notes: null, mode: 'header',
+  };
+
+  // Preview scale calculation via effect (refs can't be accessed during render)
+  const [fitScale, setFitScale] = useState(0.55);
+  useEffect(() => {
+    if (previewZoom !== 'fit') return;
+    const calc = () => {
+      const container = document.getElementById('preview-scroll');
+      if (container) {
+        setFitScale(Math.min(1, (container.clientWidth - 48) / 794));
+      }
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, [previewZoom]);
+
+  const computedScale = previewZoom === 'fit' ? fitScale : previewZoom;
 
   useEffect(() => {
-    if (docIdParam) { setPreferencesLoaded(true); return; }
+    if (docIdParam) return;
     fetch('/api/user/preferences')
       .then(r => r.ok ? r.json() : { fields: null })
       .then(data => {
@@ -79,11 +123,9 @@ function EditorContent() {
         } else {
           setShowCustomizer(true);
         }
-        setPreferencesLoaded(true);
       })
-      .catch(() => {
-        setPreferencesLoaded(true);
-      });
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -100,6 +142,7 @@ function EditorContent() {
         }
       })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const prefFields: Record<string, string[]> = {
@@ -136,16 +179,11 @@ function EditorContent() {
 
   const router = useRouter();
 
-  const handleSave = async () => {
-    await saveDoc();
-    showToast(tc('save') + ' ✓', 'success');
-  };
-
   const handleDownload = async () => {
     await saveDoc();
     const isEnt = doc.mode === 'entreprise';
     const docTypeLabel = doc.documentType === 'devis' ? tp('docTypeQuote') : doc.documentType === 'facture' ? tp('docTypeInvoice') : tp('docTypeProforma');
-    const vb = (block: string) => !doc.hiddenBlocks.includes(block as any);
+    const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
     const hf = new Set(hiddenFields);
     const sf = (fieldId: string) => !hf.has(fieldId);
     const bv = (...fieldIds: string[]) => fieldIds.some(f => sf(f));
@@ -164,7 +202,7 @@ function EditorContent() {
       isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels,
       grouped, uncategorized, catOrder, doc, results,
       tc: (k: string) => tc(k),
-      tp: (k: string, vars?: Record<string, any>) => tp(k, vars as any),
+      tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
       te: (k: string) => te(k),
       tu: (k: string) => tu(k),
       customSections, currency: tc('currency'),
@@ -180,9 +218,10 @@ function EditorContent() {
   // Show draft restoration notification
   useEffect(() => {
     if (draftRestored === 'unsaved_draft' && doc.clientInfo.name && !docIdParam) {
-      showToast(te('draftRestored' as any) || 'Brouillon restauré ✓', 'success');
+      showToast(te('draftRestored' as unknown as string) || 'Brouillon restauré ✓', 'success');
     }
     if (draftRestored) setDraftRestored(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Undo tracking with debounce
@@ -223,9 +262,13 @@ function EditorContent() {
   const handleDownloadRef = useRef(handleDownload);
   const handleUndoRef = useRef(handleUndo);
   const handleRedoRef = useRef(handleRedo);
+  // eslint-disable-next-line react-hooks/refs
   saveDocRef.current = saveDoc;
+  // eslint-disable-next-line react-hooks/refs
   handleDownloadRef.current = handleDownload;
+  // eslint-disable-next-line react-hooks/refs
   handleUndoRef.current = handleUndo;
+  // eslint-disable-next-line react-hooks/refs
   handleRedoRef.current = handleRedo;
 
   useEffect(() => {
@@ -267,9 +310,18 @@ function EditorContent() {
 
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
+  // Update preview focus when active section changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPreviewFocus(sectionFocusMap[activeSection] ?? null);
+    const timer = setTimeout(() => setPreviewFocus(null), 700);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection]);
+
   const renderSection = (id: SectionId): React.ReactNode => {
     const s = (blockId?: BlockId) => blockId ? { blockId, visible: isBlockVisible(blockId), onToggle: toggleBlock } : { visible: true, onToggle: () => {} };
-    const dragProps = { sectionOrder: doc.sectionOrder, moveSection, ...(allExpanded !== null ? { forceOpen: allExpanded, forceClose: !allExpanded } : {}) };
+    const dragProps = { sectionOrder: doc.sectionOrder, moveSection };
 
     switch (id) {
       case 'design':
@@ -424,21 +476,22 @@ function EditorContent() {
         return !hiddenFields.has('itemsTable') ? <CollapsibleSection title={te('sections.prestations')} sectionId="prestations" {...dragProps} {...s('table')}>
           {addingItem && <div className="bg-[var(--navy-3)] p-2 rounded-xl border space-y-1.5">
             <input type="text" placeholder={te('prestations.description')} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
-            <div className="grid grid-cols-5 gap-1.5 items-end">
+            {/* Mobile: stacked rows; Desktop: 5-col grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-end">
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.qty')}</label>
-                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
-              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unitPrice')}</label>
-                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unit')}</label>
-                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as any }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as UnitMeasure }))}>
                   {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}</select></div>
+              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unitPrice')}</label>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.category')}</label>
-                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
                   <option value="">{te('prestations.noCategory')}</option>
                   {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
-              <div className="flex justify-center gap-1">
-                <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">✓</button>
-                <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 sm:py-2 min-h-[36px] rounded-lg hover:bg-red-600">✕</button></div>
+              <div className="flex justify-center gap-1 col-span-2 sm:col-span-1">
+                <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-2 min-h-[44px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 w-full sm:w-auto"><Plus size={14} /><span>Ajouter</span></button>
+                <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-3 py-2 min-h-[44px] rounded-lg hover:bg-red-600 flex items-center justify-center"><Trash2 size={14} /></button></div>
             </div>
             {newItem.designation && newItem.unitPrice > 0 && (
               <div className="flex items-center justify-between px-2 py-1 bg-[var(--green-glow)] rounded-lg border border-blue-100">
@@ -465,7 +518,7 @@ function EditorContent() {
                     {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? 'preview.categories.none')}</span>}
                   </div>
                 </div>
-                <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 text-[11px] font-bold hover:text-red-700 shrink-0 ml-1 min-h-[36px] min-w-[36px] flex items-center justify-center">✕</button>
+                <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 hover:text-red-700 shrink-0 ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-red-500/10 transition"><Trash2 size={15} /></button>
               </div>
               <div className="grid grid-cols-5 gap-1.5 text-[10px] text-[var(--sand-muted)]">
                 <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
@@ -497,7 +550,7 @@ function EditorContent() {
                 setCatalogItems(all);
               } catch { setCatalogItems([]); }
               setCatalogLoading(false);
-            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-blue-300 rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px]" title={te('catalog') || 'Catalogue'}>📦</button>
+            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-blue-300 rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px] flex items-center justify-center" title={te('catalog') || 'Catalogue'}><Package size={16} /></button>
           </div>}
           {/* Catalog Modal */}
           {showCatalog && (
@@ -565,7 +618,7 @@ function EditorContent() {
         return <CollapsibleSection title={te('sections.paiement')} sectionId="paiement" {...dragProps} {...s('payment')}>
           <div className="grid grid-cols-2 gap-2">
             {!hiddenFields.has('paymentMethod') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.method')}</label>
-              <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.paymentMode} onChange={(e) => updateDoc('paymentMode', e.target.value as any)}>
+              <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.paymentMode} onChange={(e) => updateDoc('paymentMode', e.target.value as PaymentMode)}>
                 <option value="cheque">{te('paiement.check')}</option><option value="virement">{te('paiement.transfer')}</option><option value="especes">{te('paiement.cash')}</option><option value="cb">{te('paiement.card')}</option></select></div>}
             {!hiddenFields.has('paymentDeposit') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.deposit')}</label>
               <input type="number" min="0" step="100" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.acompte ?? 0} onChange={(e) => updateDoc('acompte', parseFloat(e.target.value) || 0)} /></div>}
@@ -596,14 +649,14 @@ function EditorContent() {
     }
   };
 
-  function renderCustomSection(cs: CustomSectionDef, dragProps: { sectionOrder: string[]; moveSection: (id: string, dir: 'up' | 'down') => void }, s: (blockId?: any) => { blockId?: any; visible: boolean; onToggle: (b: any) => void }): React.ReactNode {
+  function renderCustomSection(cs: CustomSectionDef, dragProps: { sectionOrder: string[]; moveSection: (id: string, dir: 'up' | 'down') => void }, s: (blockId?: BlockId) => { blockId?: BlockId; visible: boolean; onToggle: (b: BlockId) => void }): React.ReactNode {
     return (
       <CollapsibleSection title={cs.label} sectionId={cs.id} {...dragProps} {...s()} defaultOpen={true}>
         {cs.fields.map(field => {
           const hiddenKey = `custom_${cs.id}_${field.id}`;
           if (hiddenFields.has(hiddenKey)) return null;
-          const val = (doc.customFields[cs.id] ?? {})[field.id] ?? '';
-          const onChange = (v: any) => updateCustomField(cs.id, field.id, v);
+          const val = String((doc.customFields[cs.id] ?? {})[field.id] ?? '');
+          const onChange = (v: string | number) => updateCustomField(cs.id, field.id, v);
           switch (field.type) {
             case 'text':
             case 'number':
@@ -621,107 +674,195 @@ function EditorContent() {
   }
 
   return (
-    <>
-      <Navbar />
-      <TrialGate>
-      <div className="min-h-screen bg-[var(--navy)] text-[var(--sand)] font-sans print:bg-white">
-        {/* ─── EDITOR TOP BAR ─── */}
-        <div className="no-print flex flex-wrap items-center py-1.5 px-2 sm:px-3 bg-[var(--navy-2)] border-b sticky top-0 z-50 shadow-sm gap-1">
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap flex-1 min-w-0">
-            {/* Breadcrumb */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[10px] sm:text-[11px] text-[var(--sand-muted)]">
-              <button onClick={() => router.push('/dashboard')} className="hover:text-[var(--green-3)] transition font-medium">{tc('dashboard') || 'Dashboard'}</button>
-              <span>/</span>
-              <span className="text-[var(--sand)] font-bold truncate max-w-[80px] sm:max-w-none">{doc.documentType === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}</span>
-            </nav>
-            <div className="flex gap-1 bg-[var(--navy-4)] p-0.5 rounded-lg border border-[rgba(245,237,214,0.1)]">
-              {['facture', 'devis'].map((t) => (
-                <button key={t} onClick={() => updateDoc('documentType', t as any)}
-                  className={cn('px-2 sm:px-3 py-1.5 text-[9px] sm:text-[11px] font-black rounded-md uppercase tracking-wider transition-all duration-200 min-w-[44px]', doc.documentType === t ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
-                  {t === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}
+    <TrialGate>
+      <div className="h-screen flex flex-col bg-[var(--navy)] text-[var(--sand)] font-sans print:bg-white overflow-hidden">
+
+        {/* ═══════════════ COMMAND BAR ═══════════════ */}
+        <div className="no-print h-11 flex items-center px-3 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.08)] z-50 shrink-0 gap-2">
+          {/* Left: Nav back + Doc type segmented */}
+          <button onClick={() => router.push('/dashboard')} className="shrink-0 p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
+            <ChevronRight size={16} className="rotate-180" />
+          </button>
+          <div className="flex gap-0.5 bg-[var(--navy-4)] p-0.5 rounded-lg shrink-0">
+            {(['devis', 'facture'] as const).map(t => (
+              <button key={t} onClick={() => updateDoc('documentType', t)}
+                className={cn('px-2.5 py-1 text-[9px] font-black rounded-md uppercase tracking-wider transition-all min-w-[48px] text-center', doc.documentType === t ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
+                {t === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}
+              </button>
+            ))}
+          </div>
+
+          {/* Center: Save status */}
+          <div className="hidden md:flex items-center gap-1.5 text-[10px] ml-2">
+            {saving ? (
+              <span className="flex items-center gap-1 text-blue-400"><Loader2 size={11} className="animate-spin" />{te('saving')}</span>
+            ) : (
+              <span className="flex items-center gap-1 text-[var(--sand-muted)]"><Check size={11} className="text-green-400" />Enregistré</span>
+            )}
+          </div>
+
+          {/* Right: Undo/Redo + Save + PDF */}
+          <div className="flex items-center gap-0.5 ml-auto">
+            {!docIdParam && (
+              <button onClick={() => setShowCustomizer(true)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
+                <Settings size={15} />
+              </button>
+            )}
+            <button onClick={handleUndo} disabled={!canUndo} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={15} /></button>
+            <button onClick={handleRedo} disabled={!canRedo} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={15} /></button>
+            <div className="w-px h-5 bg-[rgba(245,237,214,0.08)] mx-1" />
+            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
+              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+              <span className="hidden sm:inline">{tc('save')}</span>
+            </Button>
+            <Button size="sm" onClick={handleDownload} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
+              <Download size={12} />
+              <span className="hidden sm:inline">PDF</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* ═══════════════ MOBILE BOTTOM BAR ═══════════════ */}
+        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          {/* Action row */}
+          <div className="flex items-center gap-1.5 px-2 py-1.5">
+            <button onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+              <span>{tc('save')}</span>
+            </button>
+            <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97] disabled:opacity-50">
+              <Download size={14} />
+              <span>PDF</span>
+            </button>
+            <button onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97]">
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
+          {/* Tab row */}
+          <div className="flex items-center gap-1 px-2 pb-2">
+            {([
+              { key: 'editor' as const, label: te('editorTabEdit') || 'Éditer', icon: FileText },
+              { key: 'preview' as const, label: te('editorTabPreview') || 'Aperçu', icon: Eye },
+              { key: 'totals' as const, label: te('editorTabTotals') || 'Totaux', icon: Grid3X3 },
+            ]).map(tab => (
+              <button key={tab.key} onClick={() => setMobileTab(tab.key)}
+                className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] text-[11px] font-bold rounded-xl transition', mobileTab === tab.key ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] active:bg-[var(--navy-4)]')}>
+                <tab.icon size={13} />{tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ═══════════════ MAIN AREA ═══════════════ */}
+        <div className="flex-1 flex overflow-hidden min-h-0">
+
+          {/* ──── LEFT RAIL (desktop) ──── */}
+          <nav className="hidden lg:flex flex-col items-center gap-0.5 py-2 px-1 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[60px] shrink-0 overflow-y-auto">
+            {sectionNavItems.map(item => {
+              const active = activeSection === item.id;
+              return (
+                <button key={item.id} onClick={() => { setActiveSection(item.id); setMobileTab('editor'); }}
+                  className={cn('w-full flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl transition-all', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] shadow-[0_0_12px_rgba(0,149,77,0.15)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                  <item.icon size={17} strokeWidth={active ? 2.2 : 1.8} />
+                  <span className="text-[7px] font-bold leading-tight text-center uppercase tracking-wide truncate w-full">{item.label}</span>
                 </button>
-              ))}
+              );
+            })}
+          </nav>
+
+          {/* ──── EDITOR PANEL ──── */}
+          <div className={cn('flex-1 flex flex-col min-w-0', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
+            {/* Validation errors banner */}
+            {itemErrors && (
+              <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
+                <AlertTriangle size={12} /><span>{itemErrors}</span>
+                <button onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
+              </div>
+            )}
+            {/* Scrollable section area */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
+              {renderSection(activeSection)}
+            </div>
+            {/* ──── BOTTOM TOTALS BAR ──── */}
+            <div className="shrink-0 border-t border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2 flex items-center gap-3 overflow-x-auto">
+              <div className="flex items-center gap-3 sm:gap-4 text-[10px] min-w-0 flex-1">
+                <span className="shrink-0"><span className="text-[var(--sand-muted)]">HT </span><span className="font-bold text-[var(--sand)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></span>
+                {results.tvaRate > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}% </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></span>}
+                {results.timbreFiscal > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">Timbre </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></span>}
+                <div className="w-px h-4 bg-[rgba(245,237,214,0.1)] shrink-0" />
+                <span className="shrink-0"><span className="text-[var(--sand)] font-bold">Net </span><span className="font-black text-[var(--green-3)] text-[11px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></span>
+              </div>
+              {itemErrors && (
+                <button onClick={() => setActiveSection('prestations')} className="flex items-center gap-1 text-[9px] font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded-lg transition shrink-0">
+                  <AlertTriangle size={10} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
+                </button>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            {!docIdParam && <button onClick={() => setShowCustomizer(true)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[10px] font-bold text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[var(--green-glow)] w-8 h-8 sm:w-auto sm:px-2 rounded-lg transition" title={te('customize')}>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
-              <span className="hidden sm:inline">{te('customize')}</span>
-            </button>}
-            <button onClick={handleUndo} disabled={!canUndo} className="flex items-center justify-center text-[11px] font-bold text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] w-7 h-7 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">↩</button>
-            <button onClick={handleRedo} disabled={!canRedo} className="flex items-center justify-center text-[11px] font-bold text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] w-7 h-7 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)">↪</button>
-            <button onClick={() => setAllExpanded(prev => prev === true ? null : true)} className="flex items-center justify-center gap-1 text-[9px] sm:text-[10px] font-bold text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] w-8 h-8 sm:w-auto sm:px-2 rounded-lg transition" title={allExpanded === true ? te('collapseAll') || 'Collapse all' : te('expandAll') || 'Expand all'}>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={allExpanded === true ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"} /></svg>
-              <span className="hidden sm:inline">{allExpanded === true ? te('collapseAll') || 'Collapse' : te('expandAll') || 'Expand'}</span>
-            </button>
-            {docIdParam && <span className="text-[9px] sm:text-[10px] text-green-600 font-medium bg-green-50 px-1.5 sm:px-2 py-0.5 rounded-full hidden sm:inline">{te('editMode')}</span>}
-            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">
-              {saving && <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-current inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>}
-              {saving ? te('saving') : tc('save')}
-            </Button>
-            <Button size="sm" onClick={handleDownload} disabled={saving} className="min-h-[36px] text-[10px] sm:text-xs">{te('downloadPdf')}</Button>
-          </div>
-        </div>
 
-        {/* ─── SECTION TOOLBAR ─── */}
-        <div className="no-print flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.1)] overflow-x-auto sticky top-[41px] z-40">
-          {(['prestations', 'client', 'general', 'design', 'paiement'] as SectionId[]).map(id => (
-            <button key={id} onClick={() => setActiveSection(id)}
-              className={cn('px-3 py-1.5 text-[10px] sm:text-[11px] font-bold rounded-lg whitespace-nowrap transition', activeSection === id ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
-              {id === 'prestations' ? '🧾' : id === 'client' ? '👤' : id === 'general' ? '📋' : id === 'design' ? '🎨' : '💰'} {te(`sections.${id}`)}
-            </button>
-          ))}
-          <div className="ml-auto flex items-center gap-1">
-            <button onClick={() => setShowPreview(p => !p)} className={cn('lg:hidden px-3 py-1.5 text-[11px] font-bold rounded-lg transition', showPreview ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)]')}>
-              {showPreview ? '✕ ' : '👁️ '}{showPreview ? (te('hidePreview') || 'Masquer') : (te('showPreview') || 'Aperçu')}
-            </button>
-          </div>
-        </div>
+          {/* ──── TOTALS VIEW (mobile only) ──── */}
+          {mobileTab === 'totals' && (
+            <div className="flex-1 lg:hidden p-4 space-y-3 overflow-y-auto">
+              <div className="space-y-2 text-[11px]">
+                <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('paiement.totalHT')}</span><span className="font-bold text-[var(--sand)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></div>
+                {results.discountAmount > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('remise.display') || 'Remise'}</span><span className="font-semibold text-red-400">-{formatCurrency(results.discountAmount, tc('currency'))}</span></div>}
+                {results.tvaRate > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}%</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></div>}
+                {results.timbreFiscal > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('paiement.stampDuty')}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></div>}
+                {results.acompte > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('paiement.depositPaid')}</span><span className="font-semibold text-red-400">-{formatCurrency(results.acompte, tc('currency'))}</span></div>}
+                <div className="flex justify-between pt-2 border-t border-[rgba(245,237,214,0.1)]"><span className="font-bold text-[var(--sand)]">{te('paiement.netToPay')}</span><span className="font-black text-[var(--green-3)] text-[13px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
+              </div>
+              {/* Validation state */}
+              <div className="border-t border-[rgba(245,237,214,0.06)] pt-3 space-y-2">
+                <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('validationState') || 'État de validation'}</h4>
+                <div className="space-y-1.5">
+                  <div className={cn('flex items-center gap-2 text-[11px] p-2 rounded-lg', doc.clientInfo.name ? 'text-[var(--green-3)] bg-[var(--green-glow)]' : 'text-[var(--sand-muted)] bg-[var(--navy-3)]')}>
+                    {doc.clientInfo.name ? <Check size={12} /> : <AlertTriangle size={12} />}
+                    <span>{te('client.clientName')}: {doc.clientInfo.name || '—'}</span>
+                  </div>
+                  <div className={cn('flex items-center gap-2 text-[11px] p-2 rounded-lg', doc.items.length > 0 ? 'text-[var(--green-3)] bg-[var(--green-glow)]' : 'text-[var(--sand-muted)] bg-[var(--navy-3)]')}>
+                    {doc.items.length > 0 ? <Check size={12} /> : <AlertTriangle size={12} />}
+                    <span>{doc.items.length} {te('prestations.items') || 'articles'}</span>
+                  </div>
+                  <div className={cn('flex items-center gap-2 text-[11px] p-2 rounded-lg', doc.date ? 'text-[var(--green-3)] bg-[var(--green-glow)]' : 'text-[var(--sand-muted)] bg-[var(--navy-3)]')}>
+                    {doc.date ? <Check size={12} /> : <AlertTriangle size={12} />}
+                    <span>{te('general.issueDate')}: {doc.date || '—'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* ─── VALIDATION BAR ─── */}
-        {itemErrors && (
-          <div className="no-print flex items-center gap-2 px-3 py-1.5 bg-red-50 border-b border-red-200 text-[11px] text-red-700 font-medium">
-            <span>⚠️</span><span>{itemErrors}</span>
-            <button onClick={() => setItemErrors(null)} className="ml-auto text-red-400 hover:text-red-600 font-bold">✕</button>
-          </div>
-        )}
-        {!itemErrors && Object.keys(nifErrors).length > 0 && (
-          <div className="no-print flex items-center gap-2 px-3 py-1.5 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-700 font-medium">
-            <span>⚠️</span><span>{Object.values(nifErrors)[0]}</span>
-          </div>
-        )}
-
-        {/* ─── MAIN GRID ─── */}
-        <div className="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 p-2 sm:p-3 print:block">
-          {/* ═══ LEFT PANEL ═══ */}
-          <div className="no-print space-y-3 h-auto lg:h-[calc(100vh-80px)] overflow-y-auto text-[10px] sm:text-[11px] pr-0 sm:pr-1">
-            {renderSection('prestations')}
-            {activeSection !== 'prestations' && renderSection(activeSection)}
-            {(preferencesLoaded ? doc.sectionOrder.filter(id => (prefFields[id]?.length ?? 0) > 0) : doc.sectionOrder).filter(id => id !== 'prestations' && id !== activeSection).map(id => <div key={id}>{renderSection(id)}</div>)}
-          </div>
-
-          {/* ═══ RIGHT PANEL: PREVIEW ═══ */}
-          <div className={`${showPreview ? 'flex' : 'hidden'} lg:flex preview-container flex-col bg-[var(--navy-3)]/40 p-3 rounded-2xl border border-[rgba(245,237,214,0.1)] overflow-y-auto h-[calc(100vh-80px)] print:h-auto print:bg-white print:p-0 print:border-none`}>
-            <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} />
+          {/* ──── PREVIEW PANEL ──── */}
+          <div className={cn('lg:flex flex-col border-l border-[rgba(245,237,214,0.08)] bg-[var(--navy-3)]/30', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
+            {/* Preview toolbar */}
+            <div className="no-print flex items-center gap-2 px-3 py-1.5 border-b border-[rgba(245,237,214,0.06)] shrink-0">
+              <div className="flex gap-0.5 bg-[var(--navy-4)] p-0.5 rounded-lg">
+                <button onClick={() => setPreviewZoom('fit')} className={cn('flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 'fit' ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}><Maximize size={10} />Ajuster</button>
+                <button onClick={() => setPreviewZoom(0.75)} className={cn('px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 0.75 ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>75%</button>
+                <button onClick={() => setPreviewZoom(1)} className={cn('px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 1 ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>100%</button>
+              </div>
+              <button onClick={() => setShowGrid(g => !g)} className={cn('p-1.5 rounded-lg transition', showGrid ? 'text-blue-400 bg-blue-400/10' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')} title="Grid"><Grid3X3 size={13} /></button>
+            </div>
+            {/* A4 scaled preview — mobile uses transform to fit width */}
+            <div id="preview-scroll" className="flex-1 overflow-auto p-2 sm:p-4 flex justify-center items-start print:p-0 print:overflow-visible">
+              <div className="print-area-wrapper origin-top transition-transform duration-200"
+                style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
+                <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ─── CUSTOMIZATION MODAL — iOS style ─── */}
+      {/* ──── CUSTOMIZATION MODAL ──── */}
       {showCustomizer && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="bg-[var(--navy-2)] w-full sm:max-w-lg sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
-            style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05)' }}>
-            {/* Handle bar for mobile */}
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCustomizer(false)}>
+          <div className="bg-[var(--navy-2)] w-full sm:max-w-lg sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
-            {/* Header */}
             <div className="px-5 py-4 border-b border-[rgba(245,237,214,0.06)] flex items-center justify-between">
               <h3 className="text-[15px] font-semibold text-[var(--sand)] tracking-tight">{te('customizeTitle')}</h3>
-              <button onClick={() => setShowCustomizer(false)} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+              <button onClick={() => setShowCustomizer(false)} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">✕</button>
             </div>
-            {/* Body */}
             <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
               {showSectionCreator ? (
                 <SectionCreatorForm
@@ -736,10 +877,7 @@ function EditorContent() {
                     const data = await res.json();
                     setCustomSections(data.sections ?? []);
                     setFieldPrefs(prev => ({ ...(prev ?? {}), [section.id]: section.fields.map(f => f.id) }));
-                    setDoc(prev => ({
-                      ...prev,
-                      sectionOrder: prev.sectionOrder.includes(section.id) ? prev.sectionOrder : [...prev.sectionOrder, section.id],
-                    }));
+                    setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.includes(section.id) ? prev.sectionOrder : [...prev.sectionOrder, section.id] }));
                     setShowSectionCreator(false);
                     setEditingSection(null);
                   }}
@@ -748,7 +886,6 @@ function EditorContent() {
                 />
               ) : (
                 <>
-                  {/* 3-group simplified field selector */}
                   {([
                     { label: te('simplifyEssential') || 'Essentiel', color: 'bg-[var(--green-glow)] border-blue-200', fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'clientName', 'clientAddress', 'itemsTable', 'paymentMethod', 'paymentDeposit', 'paymentConditions'] },
                     { label: te('simplifySite') || 'Chantier', color: 'bg-green-50 border-green-200', fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'garantieLabor', 'garantieMaterials', 'garantieNotes'] },
@@ -767,7 +904,7 @@ function EditorContent() {
                                   const current = { ...prev };
                                   for (const section of ALL_SECTIONS) {
                                     const sectionFields = SECTION_FIELDS[section] ?? customSections.find(c => c.id === section)?.fields.map(f => f.id) ?? [];
-                                    if (sectionFields.includes(fieldId as any)) {
+                                    if (sectionFields.includes(fieldId)) {
                                       const visible = [...(current[section] ?? sectionFields)];
                                       if (isHidden) { if (!visible.includes(fieldId)) visible.push(fieldId); }
                                       else { const idx = visible.indexOf(fieldId); if (idx >= 0) visible.splice(idx, 1); }
@@ -794,7 +931,7 @@ function EditorContent() {
                             <button onClick={async () => {
                               await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
                               setCustomSections(prev => prev.filter(c => c.id !== cs.id));
-                              setFieldPrefs(prev => { const { [cs.id]: _, ...rest } = prev ?? {}; return rest; });
+                              setFieldPrefs(prev => { const rest = Object.fromEntries(Object.entries(prev ?? {}).filter(([k]) => k !== cs.id)); return rest; });
                               setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
                             }} className="text-red-400 hover:text-red-600 ml-1">✕</button>
                             <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-[var(--green-3)] ml-0.5">✎</button>
@@ -810,7 +947,6 @@ function EditorContent() {
                 </>
               )}
             </div>
-            {/* Footer */}
             <div className="px-5 py-3 border-t border-[rgba(245,237,214,0.06)] flex items-center justify-between bg-[var(--navy-3)]/50">
               <div className="flex gap-2">
                 <button onClick={() => {
@@ -838,8 +974,7 @@ function EditorContent() {
           </div>
         </div>
       )}
-      </TrialGate>
-    </>
+    </TrialGate>
   );
 
 }
@@ -847,9 +982,8 @@ function EditorContent() {
 
 
 export default function EditorPage() {
-  const tc = useTranslations('common');
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--navy-4)] flex items-center justify-center"><div className="animate-pulse space-y-4 text-center"><div className="w-8 h-8 bg-[var(--navy-3)] rounded-full mx-auto" /><p className="text-sm text-[var(--sand-muted)]">{tc('loading')}</p></div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--navy)] flex items-center justify-center"><div className="animate-pulse space-y-4 text-center"><div className="w-8 h-8 bg-[var(--navy-3)] rounded-full mx-auto" /><p className="text-sm text-[var(--sand-muted)]">Chargement…</p></div></div>}>
       <EditorContent />
     </Suspense>
   );

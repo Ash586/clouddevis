@@ -2,15 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { Users, Link, TrendingUp, DollarSign, Copy, CheckCheck, ExternalLink } from 'lucide-react';
+import { Copy, CheckCheck, MousePointerClick, Users, TrendingUp, DollarSign, ExternalLink, ArrowUpRight, ShieldCheck, Clock } from 'lucide-react';
 
 interface PartnerData {
   partner: { id: string; code: string; tier: string; status: string; parent: { id: string; code: string; user: { name: string } } | null };
   stats: {
-    totalReferrals: number; convertedReferrals: number; conversionRate: number;
-    childrenCount: number; totalCommissions: number; pendingCommissions: number; paidCommissions: number;
+    clicks: number;
+    totalReferrals: number;
+    convertedReferrals: number;
+    conversionRate: number;
+    childrenCount: number;
+    totalCommissions: number;
+    pendingCommissions: number;
+    paidCommissions: number;
+    commissionRate: number;
+    minimumPayout: number;
+    nextPayoutAvailable: boolean;
   };
+  recentReferrals: { id: string; maskedEmail: string; status: string; createdAt: string }[];
   recentCommissions: { id: string; amount: number; type: string; status: string; createdAt: string }[];
 }
 
@@ -19,7 +28,8 @@ export default function PartnerDashboardPage() {
   const [data, setData] = useState<PartnerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     fetch('/api/partner/dashboard')
@@ -29,117 +39,246 @@ export default function PartnerDashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--navy)' }}>
+      <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--green-3)', borderTopColor: 'transparent' }} />
+    </div>
+  );
 
   if (error || !data) {
     return (
-      <div className="max-w-xl mx-auto mt-12 text-center">
-        <h1 className="text-xl font-bold mb-2">Vous n'êtes pas encore partenaire</h1>
-        <p className="text-slate-500 mb-6">Rejoignez le programme d'affiliation CloudDevis et gagnez des commissions.</p>
-        <button onClick={() => router.push('/dashboard/partner/apply')} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700">
-          Devenir partenaire
-        </button>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--navy)' }}>
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,98,51,0.1)' }}>
+            <ShieldCheck className="w-8 h-8" style={{ color: 'var(--green-3)' }} />
+          </div>
+          <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Vous n&apos;êtes pas encore partenaire</h1>
+          <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez le programme d&apos;affiliation CloudDevis et gagnez des commissions.</p>
+          <button
+            onClick={() => router.push('/dashboard/partner/apply')}
+            className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white min-h-[44px]"
+            style={{ background: 'var(--green-2, #006233)' }}
+          >
+            Devenir partenaire
+          </button>
+        </div>
       </div>
     );
   }
 
   if (data.partner.status === 'PENDING') {
     return (
-      <div className="max-w-xl mx-auto mt-12 text-center">
-        <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <TrendingUp className="w-8 h-8 text-amber-600" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--navy)' }}>
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(212,168,67,0.1)' }}>
+            <Clock className="w-8 h-8" style={{ color: 'var(--gold)' }} />
+          </div>
+          <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Demande en cours d&apos;examen</h1>
+          <p className="text-sm" style={{ color: 'var(--sand-muted)' }}>Votre demande de partenariat est en attente de validation par notre équipe. Vous serez notifié dès qu&apos;elle sera approuvée.</p>
         </div>
-        <h1 className="text-xl font-bold mb-2">Demande en cours d'examen</h1>
-        <p className="text-slate-500">Votre demande de partenariat est en attente de validation par notre équipe. Vous serez notifié dès qu'elle sera approuvée.</p>
       </div>
     );
   }
 
-  const referralUrl = `${window.location.origin}/auth/register?ref=${data.partner.code}`;
+  const referralUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/register?ref=${data.partner.code}`;
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(data.partner.code);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const isSuper = data.partner.tier === 'SUPER_AFFILIATE';
+  const minPayout = data.stats.minimumPayout || 2000;
+  const pendingAmount = data.stats.pendingCommissions;
+  const payoutProgress = Math.min(100, Math.round((pendingAmount / minPayout) * 100));
+
+  const cardBg = 'var(--navy-2, #111827)';
+  const cardBorder = 'rgba(245,237,214,0.06)';
+  const textColor = 'var(--sand)';
+  const mutedColor = 'var(--sand-muted)';
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Espace Partenaire</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Code: <span className="font-mono font-bold text-blue-600">{data.partner.code}</span>
-            {isSuper && <span className="ml-2 bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">Super Affiliate</span>}
-          </p>
+    <div className="min-h-screen p-4 sm:p-6" style={{ background: 'var(--navy)' }}>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: textColor }}>Espace Partenaire</h1>
+            <p className="text-sm mt-1" style={{ color: mutedColor }}>
+              {isSuper && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold mr-2" style={{ background: 'rgba(0,98,51,0.15)', color: 'var(--green-3)' }}>Super Affiliate</span>}
+              Taux de commission : <span className="font-bold" style={{ color: 'var(--green-3)' }}>{data.stats.commissionRate || 20}%</span>
+            </p>
+          </div>
         </div>
-        <button
-          onClick={handleCopyLink}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+
+        <div
+          className="rounded-xl p-4"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
         >
-          {copied ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          {copied ? 'Copié !' : 'Copier mon lien'}
-        </button>
-      </div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={{ color: mutedColor }}>Votre code de parrainage</p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div
+              className="text-2xl font-mono font-black tracking-widest px-4 py-2 rounded-lg select-all"
+              style={{ background: 'var(--navy-3, #1C2537)', color: 'var(--green-3)' }}
+            >
+              {data.partner.code}
+            </div>
+            <button
+              onClick={handleCopyCode}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
+              style={{
+                background: copiedCode ? 'var(--green-3)' : 'var(--navy-3, #1C2537)',
+                color: copiedCode ? '#fff' : mutedColor,
+                border: `1px solid ${cardBorder}`,
+              }}
+            >
+              {copiedCode ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copiedCode ? 'Copié !' : 'Copier le code'}
+            </button>
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
+              style={{
+                background: copiedLink ? 'var(--green-3)' : 'var(--green-2, #006233)',
+                color: '#fff',
+                border: 'none',
+              }}
+            >
+              {copiedLink ? <CheckCheck className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
+              {copiedLink ? 'Copié !' : 'Copier le lien'}
+            </button>
+          </div>
+        </div>
 
-      <div className="bg-slate-50 border rounded-lg p-3 flex items-center gap-2 text-sm text-slate-600">
-        <Link className="w-4 h-4 text-slate-400 flex-shrink-0" />
-        <span className="truncate">{referralUrl}</span>
-        <ExternalLink className="w-3 h-3 text-slate-400 flex-shrink-0" />
-      </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { icon: <MousePointerClick className="w-5 h-5" />, value: data.stats.clicks || 0, label: 'Clics', color: 'var(--green-3)' },
+            { icon: <Users className="w-5 h-5" />, value: data.stats.totalReferrals, label: 'Inscriptions', color: 'var(--gold)' },
+            { icon: <TrendingUp className="w-5 h-5" />, value: data.stats.convertedReferrals, label: 'Abonnements', color: 'var(--green-3)' },
+            { icon: <ArrowUpRight className="w-5 h-5" />, value: `${data.stats.conversionRate}%`, label: 'Conversion', color: '#a78bfa' },
+          ].map((card, i) => (
+            <div
+              key={i}
+              className="rounded-xl p-4"
+              style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+            >
+              <div className="mb-2" style={{ color: card.color }}>{card.icon}</div>
+              <p className="text-2xl font-bold" style={{ color: textColor }}>{card.value}</p>
+              <p className="text-xs font-semibold" style={{ color: mutedColor }}>{card.label}</p>
+            </div>
+          ))}
+        </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="p-4">
-          <Users className="w-5 h-5 text-blue-600 mb-2" />
-          <p className="text-2xl font-bold">{data.stats.totalReferrals}</p>
-          <p className="text-xs text-slate-500 font-semibold">Parrainages</p>
-        </Card>
-        <Card className="p-4">
-          <TrendingUp className="w-5 h-5 text-emerald-600 mb-2" />
-          <p className="text-2xl font-bold">{data.stats.convertedReferrals}</p>
-          <p className="text-xs text-slate-500 font-semibold">Convertis ({data.stats.conversionRate}%)</p>
-        </Card>
-        <Card className="p-4">
-          <DollarSign className="w-5 h-5 text-amber-600 mb-2" />
-          <p className="text-2xl font-bold">{data.stats.totalCommissions.toLocaleString()} DA</p>
-          <p className="text-xs text-slate-500 font-semibold">Commissions totales</p>
-        </Card>
-        <Card className="p-4">
-          <DollarSign className="w-5 h-5 text-purple-600 mb-2" />
-          <p className="text-2xl font-bold">{data.stats.pendingCommissions.toLocaleString()} DA</p>
-          <p className="text-xs text-slate-500 font-semibold">En attente de paiement</p>
-        </Card>
-      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { label: 'En attente', value: pendingAmount, color: 'var(--gold)' },
+            { label: 'Payé', value: data.stats.paidCommissions, color: 'var(--green-3)' },
+            { label: 'Total', value: data.stats.totalCommissions, color: textColor },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="rounded-xl p-4"
+              style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: mutedColor }}>{item.label}</p>
+              <p className="text-xl font-bold" style={{ color: item.color }}>{item.value.toLocaleString('fr-DZ')} DA</p>
+            </div>
+          ))}
+        </div>
 
-      {isSuper && (
-        <Card className="p-5 border-l-4 border-l-emerald-500">
-          <h2 className="text-sm font-bold mb-2">Super Affiliate</h2>
-          <p className="text-sm text-slate-500">Vous gagnez 5% sur les ventes de votre équipe de {data.stats.childrenCount} affiliés.</p>
-        </Card>
-      )}
+        <div
+          className="rounded-xl p-5"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold" style={{ color: textColor }}>Progression vers le paiement minimum</p>
+            <p className="text-xs font-semibold" style={{ color: mutedColor }}>{minPayout.toLocaleString('fr-DZ')} DA</p>
+          </div>
+          <div className="h-2 rounded-full overflow-hidden mb-2" style={{ background: 'var(--navy-3, #1C2537)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${payoutProgress}%`, background: data.stats.nextPayoutAvailable ? 'var(--green-3)' : 'var(--gold)' }}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs" style={{ color: mutedColor }}>{pendingAmount.toLocaleString('fr-DZ')} DA / {minPayout.toLocaleString('fr-DZ')} DA</p>
+            {data.stats.nextPayoutAvailable ? (
+              <button
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white min-h-[44px]"
+                style={{ background: 'var(--green-2, #006233)' }}
+              >
+                Demander un paiement
+              </button>
+            ) : (
+              <p className="text-xs" style={{ color: mutedColor }}>Paiement disponible à {minPayout.toLocaleString('fr-DZ')} DA</p>
+            )}
+          </div>
+        </div>
 
-      <Card className="p-5">
-        <h2 className="text-sm font-bold mb-4">Commissions récentes</h2>
-        {data.recentCommissions.length === 0 ? (
-          <p className="text-sm text-slate-400">Aucune commission pour le moment.</p>
-        ) : (
-          <div className="space-y-2">
-            {data.recentCommissions.map(c => (
-              <div key={c.id} className="flex items-center justify-between py-2 border-b last:border-0 text-sm">
-                <div>
-                  <span className="font-semibold">{c.amount.toLocaleString()} DA</span>
-                  <span className="ml-2 text-xs text-slate-400">{c.type === 'OVERRIDE' ? 'Override' : 'Directe'}</span>
+        {data.recentReferrals && data.recentReferrals.length > 0 && (
+          <div
+            className="rounded-xl p-5"
+            style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+          >
+            <h2 className="text-sm font-bold mb-4" style={{ color: textColor }}>Parrainages récents</h2>
+            <div className="space-y-2">
+              {data.recentReferrals.map(r => (
+                <div key={r.id} className="flex items-center justify-between py-2 border-b text-sm" style={{ borderColor: cardBorder }}>
+                  <span className="font-mono text-xs" style={{ color: mutedColor }}>{r.maskedEmail}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs" style={{ color: mutedColor }}>{r.createdAt}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === 'CONVERTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                      {r.status === 'CONVERTED' ? 'Converti' : 'En attente'}
+                    </span>
+                  </div>
                 </div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${c.status === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                  {c.status}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
-      </Card>
+
+        <div
+          className="rounded-xl p-5"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+        >
+          <h2 className="text-sm font-bold mb-4" style={{ color: textColor }}>Commissions récentes</h2>
+          {data.recentCommissions.length === 0 ? (
+            <p className="text-sm" style={{ color: mutedColor }}>Aucune commission pour le moment.</p>
+          ) : (
+            <div className="space-y-2">
+              {data.recentCommissions.map(c => (
+                <div key={c.id} className="flex items-center justify-between py-2 border-b text-sm" style={{ borderColor: cardBorder }}>
+                  <div>
+                    <span className="font-semibold" style={{ color: textColor }}>{c.amount.toLocaleString('fr-DZ')} DA</span>
+                    <span className="ml-2 text-xs" style={{ color: mutedColor }}>{c.type === 'OVERRIDE' ? 'Override' : 'Directe'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs" style={{ color: mutedColor }}>{c.createdAt}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                      {c.status === 'PAID' ? 'Payé' : 'En attente'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div
+          className="rounded-xl p-4 text-center"
+          style={{ background: 'rgba(212,168,67,0.05)', border: '1px solid rgba(212,168,67,0.1)' }}
+        >
+          <p className="text-[11px] leading-relaxed" style={{ color: mutedColor }}>
+            Votre commission est calculée uniquement après activation d&apos;un abonnement payé.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

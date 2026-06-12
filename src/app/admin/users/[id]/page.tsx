@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import {
   ArrowLeft, Mail, Globe, UserCheck, FileText, Users, Layout,
-  Ban, CheckCircle, CreditCard, Calendar, Clock,
+  Ban, CheckCircle, Calendar, Clock,
 } from 'lucide-react';
 
 interface UserDetail {
@@ -20,7 +20,6 @@ interface UserDetail {
 
 export default function AdminUserDetailPage() {
   const t = useTranslations('admin');
-  const tc = useTranslations('common');
   const params = useParams();
   const router = useRouter();
   const [user, setUser] = useState<UserDetail | null>(null);
@@ -42,6 +41,7 @@ export default function AdminUserDetailPage() {
     setLoading(false);
   }, [userId]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchUser(); }, [fetchUser]);
 
   const handleSuspendToggle = async () => {

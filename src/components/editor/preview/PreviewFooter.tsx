@@ -19,9 +19,10 @@ interface FooterProps {
   vb: (block: string) => boolean;
   bv: (...fieldIds: string[]) => boolean;
   sf: (fieldId: string) => boolean;
+  highlight?: boolean;
 }
 
-export function PreviewFooter({ doc, results, vb, bv, sf }: FooterProps) {
+export function PreviewFooter({ doc, results, vb, bv, sf, highlight = false }: FooterProps) {
   const t = useTranslations('preview');
   const tcommon = useTranslations('common');
 
@@ -72,7 +73,7 @@ export function PreviewFooter({ doc, results, vb, bv, sf }: FooterProps) {
               </tbody>
             </table>
           )}
-          <div className="space-y-1 text-[11px] border-t border-slate-200 pt-2">
+          <div className={`space-y-1 text-[11px] border-t border-slate-200 pt-2 transition-all duration-700 print:transition-none ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`}>
             <div className="flex justify-between font-medium text-slate-500">
               <span>{t('totalHT')}</span>
               <span className="text-slate-700">{formatCurrency(results.subTotalHT, tcommon('currency'))}</span>
@@ -131,6 +132,7 @@ export function PreviewFooter({ doc, results, vb, bv, sf }: FooterProps) {
           <div className="text-right">
             <p className="text-[9px] text-slate-400 mb-1">{t('signatureLabel')}</p>
             <div className="w-28 h-14 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-[8px] text-slate-300">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {doc.companyInfo?.signature ? <img src={doc.companyInfo.signature} className="max-w-full max-h-full" alt={t('signatureStamp')} /> : t('signatureStamp')}
             </div>
           </div>

@@ -132,11 +132,174 @@ html {
   #print-area {
     box-shadow: none !important;
     border: none !important;
+    border-top: none !important;
     page-break-after: avoid;
+    width: 21cm !important;
+    min-height: 29.7cm !important;
+    transform: none !important;
+  }
+  .print-area-wrapper {
+    transform: none !important;
+    width: 21cm !important;
+  }
+  #preview-scroll {
+    overflow: visible !important;
+    height: auto !important;
   }
 }
 
 .preview-container {
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+}
+
+/* Document Studio zoom wrapper */
+.print-area-wrapper {
+  transform-origin: top center;
+  transition: transform 0.2s ease;
+}
+
+/* Focus highlight pulse animation */
+@keyframes focus-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(96, 165, 250, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
+}
+
+@media print {
+  .ring-2 { box-shadow: none !important; ring: none !important; }
+  .ring-blue-400\/50 { box-shadow: none !important; }
+  .bg-blue-50\/40 { background-color: transparent !important; }
+}
+
+/* ═══════════════════════════════════════
+   MOBILE UX UTILITIES
+═══════════════════════════════════════ */
+
+/* Prevent horizontal overflow globally on mobile */
+html, body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile shell: wraps page content below navbar with safe-area */
+.mobile-shell {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  min-height: 100dvh;
+}
+
+/* Bottom navigation bar */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 130;
+  background: var(--navy-2);
+  border-top: 1px solid rgba(245,237,214,0.08);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Bottom sheet overlay */
+.mobile-bottom-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.mobile-bottom-sheet .sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.mobile-bottom-sheet .sheet-content {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85dvh;
+  background: var(--navy-2);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: sheet-slide-up 0.25s ease-out;
+}
+.mobile-bottom-sheet .sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--navy-4);
+  margin: 10px auto 6px;
+}
+
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Touch-friendly interactive elements (44px minimum) */
+.mobile-touch {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card list for tables on mobile */
+.mobile-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* No horizontal overflow helper */
+.no-horizontal-overflow {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Scrollable chip row */
+.scroll-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-chips::-webkit-scrollbar { display: none; }
+
+/* Mobile tab bar (editor) */
+.mobile-tab-bar {
+  display: flex;
+  background: var(--navy-2);
+  border-top: 1px solid rgba(245,237,214,0.08);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile-only utilities */
+@media (min-width: 768px) {
+  .mobile-shell,
+  .mobile-bottom-nav,
+  .mobile-tab-bar {
+    display: none;
+  }
 }

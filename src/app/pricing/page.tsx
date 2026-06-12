@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { PLANS, PLAN_ORDER, formatPrice } from '@/lib/pricing';
+import { Check, ChevronDown, X } from 'lucide-react';
 
 const FAQ_ITEMS = [
   { q: 'paymentMethods', a: 'paymentMethodsAnswer' },
@@ -26,29 +27,28 @@ const COMPARISON_FEATURES = [
   { key: 'reports', free: false, standard: false, pro: true, max: true },
 ];
 
-function CheckIcon() {
-  return (
-    <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
-
-function CrossIcon() {
-  return (
-    <svg className="w-4 h-4 text-slate-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  );
-}
+const COMPARISON_SECTIONS = [
+  { title: 'Documents', keys: ['documentsMonth', 'templates'] },
+  { title: 'PDF', keys: ['pdfExport', 'noWatermark'] },
+  { title: 'Équipe', keys: ['teamMembers'] },
+  { title: 'Rapports', keys: ['reports'] },
+];
 
 export default function PricingPage() {
   const t = useTranslations('pricing');
   const tc = useTranslations('common');
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [openCompSection, setOpenCompSection] = useState<string | null>(null);
 
   const displayPlans = PLAN_ORDER.filter(id => id !== 'enterprise');
+
+  function renderCheck(val: boolean | string) {
+    if (typeof val === 'boolean') {
+      return val ? <Check size={16} className="text-emerald-500 shrink-0" /> : <X size={16} className="text-slate-300 shrink-0" />;
+    }
+    return <span className="text-sm text-slate-700 font-medium">{val}</span>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -64,14 +64,14 @@ export default function PricingPage() {
         </section>
 
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
-          <div className="grid md:grid-cols-4 gap-3 sm:gap-4 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4 items-stretch">
             {displayPlans.map(id => {
               const plan = PLANS[id];
               if (!plan) return null;
               const nameKey = id === 'free' ? 'freePlanName' : id === 'standard' ? 'standardPlanName' : id === 'pro' ? 'proPlanName' : 'maxPlanName';
-              const tName = t(nameKey as any);
+              const tName = t(nameKey as string);
               return (
-                <Card key={id} className={cn('relative flex flex-col', plan.highlighted && 'border-blue-500 shadow-lg shadow-blue-100/50 scale-[1.02]')}>
+                <Card key={id} className={cn('relative flex flex-col', plan.highlighted && 'border-blue-500 shadow-lg shadow-blue-100/50 md:scale-[1.02]')}>
                   {plan.highlighted && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -89,23 +89,23 @@ export default function PricingPage() {
                   </div>
                   <ul className="space-y-2 mb-6 flex-1 text-xs">
                     <li className="flex items-start gap-2">
-                      <CheckIcon />
+                      <Check size={16} className="text-emerald-500 shrink-0" />
                       <span className="text-slate-600">
                         {plan.limits.docsPerMonth === 'unlimited' ? (t('maxDocs') || 'Illimité') : ((t('standardDocs') || '').replace('50', String(plan.limits.docsPerMonth)) || `${plan.limits.docsPerMonth} docs`)}
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckIcon />
+                      <Check size={16} className="text-emerald-500 shrink-0" />
                       <span className="text-slate-600">{plan.limits.teamMembers} {plan.limits.teamMembers > 1 ? 'utilisateurs' : 'utilisateur'}</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckIcon />
+                      <Check size={16} className="text-emerald-500 shrink-0" />
                       <span className="text-slate-600">{plan.limits.storageMB >= 1024 ? `${plan.limits.storageMB / 1024} Go` : `${plan.limits.storageMB} Mo`}</span>
                     </li>
                   </ul>
                   <Button
                     variant={plan.highlighted ? 'primary' : 'outline'}
-                    className="w-full"
+                    className="w-full min-h-[44px]"
                     onClick={() => router.push('/auth/register')}
                   >
                     {t('freeCta')}
@@ -120,18 +120,21 @@ export default function PricingPage() {
             <Card className="p-5 border-red-200 bg-red-50/30 text-center">
               <h3 className="font-bold text-slate-800">{t('enterpriseCta')}</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">Solution sur mesure pour les grandes organisations avec support dédié 24/7.</p>
-              <Button variant="secondary" className="mt-3" onClick={() => router.push('/enterprise')}>
+              <Button variant="secondary" className="mt-3 min-h-[44px]" onClick={() => router.push('/enterprise')}>
                 {t('enterpriseCtaBtn')}
               </Button>
             </Card>
           </div>
         </section>
 
+        {/* Comparison — table on desktop, accordion on mobile */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-16">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 text-center mb-8">
             {t('comparisonTitle')}
           </h2>
-          <div className="overflow-x-auto">
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-200">
@@ -145,22 +148,57 @@ export default function PricingPage() {
               <tbody>
                 {COMPARISON_FEATURES.map(row => (
                   <tr key={row.key} className="border-b border-slate-100">
-                    <td className="py-3 pr-4 text-sm text-slate-600">{t(row.key as any)}</td>
-                    {(['free', 'standard', 'pro', 'max'] as const).map(col => {
-                      const val = row[col];
-                      return (
-                        <td key={col} className="py-3 px-4 text-center">
-                          {typeof val === 'boolean'
-                            ? (val ? <CheckIcon /> : <CrossIcon />)
-                            : <span className="text-sm text-slate-700 font-medium">{val}</span>
-                          }
-                        </td>
-                      );
-                    })}
+                    <td className="py-3 pr-4 text-sm text-slate-600">{t(row.key as string)}</td>
+                    {(['free', 'standard', 'pro', 'max'] as const).map(col => (
+                      <td key={col} className="py-3 px-4 text-center">
+                        {renderCheck(row[col])}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile accordion */}
+          <div className="md:hidden space-y-2">
+            {COMPARISON_SECTIONS.map(section => (
+              <div key={section.title} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setOpenCompSection(openCompSection === section.title ? null : section.title)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left min-h-[44px]"
+                >
+                  <span className="text-sm font-semibold text-slate-800">{section.title}</span>
+                  <ChevronDown size={16} className={cn('text-slate-400 transition-transform shrink-0', openCompSection === section.title && 'rotate-180')} />
+                </button>
+                {openCompSection === section.title && (
+                  <div className="px-4 pb-3 space-y-2">
+                    {section.keys.map(key => {
+                      const row = COMPARISON_FEATURES.find(r => r.key === key);
+                      if (!row) return null;
+                      return (
+                        <div key={key} className="flex items-center justify-between py-2 border-t border-slate-100 first:border-0">
+                          <span className="text-xs text-slate-600">{t(row.key as string)}</span>
+                          <div className="flex items-center gap-3">
+                            {(['free', 'standard', 'pro', 'max'] as const).map(col => (
+                              <div key={col} className="w-12 text-center" title={t(`${col}PlanName` as string)}>
+                                {renderCheck(row[col])}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
+                      <span className="text-[10px] text-slate-400 w-12">Free</span>
+                      <span className="text-[10px] text-blue-600 w-12 text-center">Std</span>
+                      <span className="text-[10px] text-slate-700 w-12 text-center">Pro</span>
+                      <span className="text-[10px] text-slate-700 w-12 text-center">Max</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
@@ -173,19 +211,16 @@ export default function PricingPage() {
               <Card key={i} className="!p-0 overflow-hidden">
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left"
+                  className="w-full flex items-center justify-between px-5 py-4 text-left min-h-[44px]"
                 >
-                  <span className="text-sm font-semibold text-slate-800">{t(item.q as any)}</span>
-                  <svg
+                  <span className="text-sm font-semibold text-slate-800">{t(item.q as string)}</span>
+                  <ChevronDown
                     className={cn('w-4 h-4 text-slate-400 transition-transform shrink-0 ml-4', openFaq === i && 'rotate-180')}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  />
                 </button>
                 {openFaq === i && (
                   <div className="px-5 pb-4">
-                    <p className="text-sm text-slate-500 leading-relaxed">{t(item.a as any)}</p>
+                    <p className="text-sm text-slate-500 leading-relaxed">{t(item.a as string)}</p>
                   </div>
                 )}
               </Card>

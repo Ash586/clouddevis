@@ -9,7 +9,6 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
-import { cn } from '@/lib/utils';
 
 interface ClientDoc {
   number: string;
@@ -73,6 +72,7 @@ export default function ClientsPage() {
     }
   }, [page, searchQuery]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchClients(); }, [fetchClients]);
 
   useEffect(() => {

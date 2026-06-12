@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
-import { getPlanByStatus, PLANS, PLAN_ORDER, type PlanId } from '@/lib/pricing';
+import { getPlanByStatus, PLANS, PLAN_ORDER } from '@/lib/pricing';
 
 export async function GET() {
   try {

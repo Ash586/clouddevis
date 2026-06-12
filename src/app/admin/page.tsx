@@ -99,6 +99,7 @@ export default function AdminDashboardPage() {
   };
 
   const timeAgo = (d: string) => {
+    // eslint-disable-next-line react-hooks/purity
     const diff = Date.now() - new Date(d).getTime();
     const m = Math.floor(diff / 60000);
     if (m < 1) return 'à l\'instant';
@@ -122,6 +123,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
+    /* eslint-disable react-hooks/static-components */
     <div style={{ maxWidth: 900 }}>
       {/* ── Top badge bar ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, ...card }}>
@@ -152,7 +154,7 @@ export default function AdminDashboardPage() {
 
       {/* ── Country breakdown ── */}
       <div style={{ marginBottom: 10 }}>
-        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#656a73', marginBottom: 8 }}>🌍 Pays d'origine</p>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#656a73', marginBottom: 8 }}>🌍 Pays d&apos;origine</p>
         <div style={card}>
           {countryData.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

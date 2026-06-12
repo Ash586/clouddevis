@@ -7,7 +7,6 @@ import { TRIAL_DAYS } from '@/lib/subscription';
 
 export default function AdminSettingsPage() {
   const t = useTranslations('admin');
-  const tc = useTranslations('common');
 
   const [settings, setSettings] = useState({
     siteName: 'CloudDevIs',

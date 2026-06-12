@@ -47,6 +47,7 @@ export function LanguageProvider({ children, initialLang }: { children: ReactNod
   useEffect(() => {
     const cookieLang = getCookieLang();
     if (cookieLang && cookieLang !== lang) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLangState(cookieLang);
     }
   }, [lang]);

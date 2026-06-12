@@ -11,7 +11,6 @@ export async function GET() {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const [totalUsers, newUsersThisMonth, usersToday, totalDocs, docsThisMonth, totalClients, activeTrialUsers, activeBasicUsers, activeProUsers, recentUsers] = await Promise.all([
       prisma.user.count(),

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { CreditCard, Users, Clock, AlertTriangle } from 'lucide-react';
+
 
 interface Subscription {
   id: string; name: string; email: string;
@@ -59,6 +59,7 @@ export default function AdminSubscriptionsPage() {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, [page, statusFilter]);
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchData(); };
 

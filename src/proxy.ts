@@ -25,7 +25,10 @@ function isPublicApiPath(pathname: string): boolean {
     pathname === '/api/auth/forgot-password' ||
     pathname === '/api/auth/reset-password' ||
     pathname === '/api/admin/auth/login' ||
-    pathname.startsWith('/api/auth/oauth')
+    pathname.startsWith('/api/auth/oauth') ||
+    pathname === '/api/track/pageview' ||
+    pathname.startsWith('/api/webhooks/') ||
+    pathname.startsWith('/api/r/')
   );
 }
 
@@ -70,7 +73,16 @@ export async function proxy(req: NextRequest) {
 
   if (pathname.startsWith('/api')) {
     if (isPublicApiPath(pathname)) return res;
-    if (pathname.startsWith('/api/admin/')) return res;
+    if (pathname.startsWith('/api/admin/')) {
+      const adminToken = req.cookies.get(ADMIN_COOKIE)?.value;
+      if (!adminToken) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      try {
+        await jwtVerify(adminToken, getAdminSecret());
+      } catch {
+        return NextResponse.json({ error: 'Session admin expirée' }, { status: 401 });
+      }
+      return res;
+    }
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     try {

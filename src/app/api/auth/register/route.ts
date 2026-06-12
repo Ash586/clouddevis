@@ -13,10 +13,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
 
-    const { name, email, password, mode, sector, country, language, companyInfo, ref } = body;
+    const { name, email, password, mode, sector, country, language, companyInfo, ref: bodyRef } = body;
+
+    let referralCode = bodyRef;
+    if (!referralCode) {
+      const cookieHeader = req.headers.get('cookie') || '';
+      const cdRefMatch = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('cd_ref='));
+      if (cdRefMatch) {
+        referralCode = cdRefMatch.split('=').slice(1).join('=');
+      }
+    }
 
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const rateCheck = checkRateLimit(`register:${ip}`, 3, 60000);
+    const rateCheck = await checkRateLimit(`register:${ip}`, 3, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }
@@ -43,16 +52,25 @@ export async function POST(req: Request) {
       },
     });
 
-    if (ref) {
-      const partner = await prisma.partner.findUnique({ where: { code: ref.toUpperCase() } });
-      if (partner && partner.status === 'ACTIVE') {
-        await prisma.referral.create({
-          data: {
-            partnerId: partner.id,
-            referredUserId: user.id,
-            status: 'PENDING',
-          },
-        });
+    if (referralCode && typeof referralCode === 'string') {
+      const partner = await prisma.partner.findUnique({ where: { code: referralCode.toUpperCase() } });
+      if (partner && partner.status === 'ACTIVE' && partner.userId !== user.id) {
+        try {
+          await prisma.referral.create({
+            data: {
+              partnerId: partner.id,
+              referredUserId: user.id,
+              status: 'PENDING',
+            },
+          });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          if (msg.includes('Unique constraint') || msg.includes('unique constraint')) {
+            logger.warn('Referral already exists for user', { userId: user.id });
+          } else {
+            logger.error('Failed to create referral', { error: msg });
+          }
+        }
       }
     }
 
@@ -67,7 +85,13 @@ export async function POST(req: Request) {
       subscriptionStatus: user.subscriptionStatus,
     });
 
-    return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
+    const response = NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
+
+    if (referralCode) {
+      response.cookies.set('cd_ref', '', { maxAge: 0, path: '/' });
+    }
+
+    return response;
   } catch (error) {
     logger.error('Register error', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });

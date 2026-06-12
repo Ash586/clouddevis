@@ -10,7 +10,6 @@ import { useUser } from '@/hooks/useUser';
 import { PLANS, PLAN_ORDER, formatPrice } from '@/lib/pricing';
 
 export function TrialGate({ children }: { children: React.ReactNode }) {
-  const t = useTranslations('trial');
   const s = useTranslations('subscription');
   const { showToast } = useToast();
   const { user, loading } = useUser();
@@ -27,9 +26,10 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
         throw new Error(json.error);
       }
       if (!json.url) { showToast('Erreur de redirection', 'error'); setSubscribing(null); return; }
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = json.url;
-    } catch (err: any) {
-      showToast(String(err?.message ?? err ?? 'Erreur'), 'error');
+    } catch (err: unknown) {
+      showToast(String((err instanceof Error ? err.message : null) ?? err ?? 'Erreur'), 'error');
     }
     setSubscribing(null);
   };

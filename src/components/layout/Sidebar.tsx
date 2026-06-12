@@ -19,16 +19,38 @@ import {
   UsersRound,
   Share2,
   RefreshCw,
+  Plus,
+  PenLine,
+  Receipt,
+  ClipboardList,
+  X,
 } from 'lucide-react';
 
+const QUICK_DOCS = [
+  { type: 'devis', icon: FileText, color: 'blue' },
+  { type: 'facture', icon: Receipt, color: 'green' },
+  { type: 'proforma', icon: ClipboardList, color: 'purple' },
+  { type: 'bon_commande', icon: FileStack, color: 'amber' },
+] as const;
+
+const QUICK_DOC_COLORS: Record<string, string> = {
+  blue: 'bg-blue-400/10 text-blue-400 hover:bg-blue-400/20',
+  green: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.2)]',
+  purple: 'bg-purple-400/10 text-purple-400 hover:bg-purple-400/20',
+  amber: 'bg-amber-400/10 text-amber-400 hover:bg-amber-400/20',
+};
+
 const DOCUMENT_TYPES = [
-  { id: 'facture', key: 'facture' },
   { id: 'devis', key: 'devis' },
+  { id: 'facture', key: 'facture' },
   { id: 'proforma', key: 'proforma' },
   { id: 'bon_commande', key: 'bonCommande' },
-  { id: 'intervention', key: 'intervention' },
-  { id: 'attachement', key: 'attachement' },
 ] as const;
+
+const TYPE_MAP: Record<string, string> = {
+  devis: 'DEVIS', facture: 'FACTURE', proforma: 'PROFORMA',
+  bon_commande: 'BC',
+};
 
 function SidebarInner() {
   const t = useTranslations('navbar');
@@ -38,23 +60,17 @@ function SidebarInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
-  const [docCount, setDocCount] = useState(0);
   const [clientCount, setClientCount] = useState(0);
   const [typeBreakdown, setTypeBreakdown] = useState<Record<string, number>>({});
   const [documentsOpen, setDocumentsOpen] = useState(true);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const TYPE_MAP: Record<string, string> = {
-    facture: 'FACTURE', devis: 'DEVIS', proforma: 'PROFORMA',
-    bon_commande: 'BC', attachement: 'BR',
-  };
+  const [quickCreateOpen, setQuickCreateOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/dashboard')
       .then(r => r.ok ? r.json() : { stats: {} })
       .then(dashData => {
-        setDocCount(dashData.stats?.totalDocs ?? 0);
         setClientCount(dashData.stats?.totalClients ?? 0);
         setTypeBreakdown(dashData.stats?.typeBreakdown ?? {});
       })
@@ -81,9 +97,9 @@ function SidebarInner() {
   const sidebarContent = () => (
     <>
       {/* User Pill */}
-      <div className="relative mb-6">
+      <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] hover:bg-[var(--navy-4)] transition-all">
+          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] hover:bg-[var(--navy-4)] transition-all min-h-[44px]">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center text-white text-sm font-black shrink-0 shadow-lg">
             {userInitial}
           </div>
@@ -99,16 +115,16 @@ function SidebarInner() {
         {userDropdownOpen && (
           <>
             <div className="absolute top-full start-0 end-0 mt-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
-              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition">
+              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition">
+              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
               <div className="h-px bg-[rgba(245,237,214,0.08)] mx-4" />
-              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition">
+              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition min-h-[44px]">
                 <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
               </button>
@@ -118,81 +134,144 @@ function SidebarInner() {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto space-y-1 pr-2 custom-scrollbar">
-        <NavItem icon={<LayoutDashboard size={18} />} label={s('stats')} active={isActive('/dashboard')} onClick={() => router.push('/dashboard')} />
-        
-        <div>
-          <button onClick={() => setDocumentsOpen(!documentsOpen)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-              documentsOpen ? 'bg-[rgba(0,149,77,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
-            }`}>
-            <FileText size={18} />
-            <span className="flex-1 text-start">{s('documents')}</span>
-            <ChevronDown size={14} className={`transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {documentsOpen && (
-            <div className="mt-1 ml-4 space-y-1 border-l border-[rgba(245,237,214,0.1)] pl-2 animate-in">
-              <button onClick={() => router.push('/dashboard/documents')}
-                className={`w-full flex items-center px-4 py-2 rounded-lg text-[13px] font-semibold transition ${
-                  isActive('/dashboard/documents') ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
-                }`}>
-                {s('allDocuments')}
-              </button>
-              {DOCUMENT_TYPES.map((dt) => (
-                <button key={dt.id} onClick={() => navigateTo(dt.id)}
-                  className={`w-full flex items-center px-4 py-2 rounded-lg text-[13px] font-semibold transition ${
-                    isDocType(dt.id) ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
-                  }`}>
-                  <span className="flex-1 text-start">{s(dt.key)}</span>
-                  {typeBreakdown[TYPE_MAP[dt.id] ?? ''] > 0 && (
-                    <span className="text-[10px] bg-[var(--navy-4)] text-[var(--sand-muted)] px-1.5 py-0.5 rounded-md">{typeBreakdown[TYPE_MAP[dt.id] ?? '']}</span>
-                  )}
+      {/* New Document Button */}
+      <div className="relative mb-4">
+        <button onClick={() => setQuickCreateOpen(!quickCreateOpen)}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--green)] text-white text-sm font-bold hover:bg-[var(--green-2)] transition-all active:scale-[0.98] shadow-lg shadow-[rgba(0,149,77,0.2)] min-h-[44px]">
+          <Plus size={16} />
+          {s('newDocument')}
+        </button>
+
+        {quickCreateOpen && (
+          <>
+            <div className="absolute left-0 right-0 top-full mt-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
+              <div className="px-3 pt-3 pb-1 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">
+                {s('quickCreate')}
+              </div>
+              {QUICK_DOCS.map((qd) => (
+                <button key={qd.type} onClick={() => { navigateTo(qd.type); setQuickCreateOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition min-h-[44px] ${QUICK_DOC_COLORS[qd.color]}`}>
+                  <qd.icon size={16} />
+                  <span>{s(`docTypes.${qd.type}`)}</span>
                 </button>
               ))}
+              <div className="h-px bg-[rgba(245,237,214,0.08)] mx-3" />
+              <button onClick={() => { navigateTo('devis'); setQuickCreateOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
+                <PenLine size={16} />
+                {s('customDocument')}
+              </button>
             </div>
-          )}
-        </div>
+            <div className="fixed inset-0 z-[105]" onClick={() => setQuickCreateOpen(false)} />
+          </>
+        )}
+      </div>
 
-        <NavItem icon={<Users size={18} />} label={s('clients')} active={isActive('/dashboard/clients')} onClick={() => router.push('/dashboard/clients')} badge={clientCount} />
-        <NavItem icon={<FileStack size={18} />} label={s('templates')} active={isActive('/dashboard/templates')} onClick={() => router.push('/dashboard/templates')} />
-        <NavItem icon={<BarChart3 size={18} />} label={s('reports')} active={isActive('/dashboard/reports')} onClick={() => router.push('/dashboard/reports')} />
-        <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => router.push('/dashboard/team')} />
-        <NavItem icon={<CreditCard size={18} />} label={s('subscription')} active={isActive('/dashboard/subscription')} onClick={() => router.push('/dashboard/subscription')} />
-        <NavItem icon={<Share2 size={18} />} label={s('shared')} active={isActive('/dashboard/shared')} onClick={() => router.push('/dashboard/shared')} />
-        <NavItem icon={<RefreshCw size={18} />} label={s('recurring')} active={isActive('/dashboard/recurring')} onClick={() => router.push('/dashboard/recurring')} />
+      {/* Navigation Groups */}
+      <nav className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+        {/* Principal */}
+        <NavGroup label={s('groups.principal')}>
+          <NavItem icon={<LayoutDashboard size={18} />} label={s('stats')} active={isActive('/dashboard')} onClick={() => { router.push('/dashboard'); setMobileOpen(false); }} />
+          <NavItem icon={<Users size={18} />} label={s('clients')} active={isActive('/dashboard/clients')} onClick={() => { router.push('/dashboard/clients'); setMobileOpen(false); }} badge={clientCount} />
+        </NavGroup>
+
+        {/* Documents */}
+        <NavGroup label={s('groups.documents')}>
+          <div>
+            <button onClick={() => setDocumentsOpen(!documentsOpen)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
+                documentsOpen ? 'bg-[rgba(0,149,77,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
+              }`}>
+              <FileText size={18} />
+              <span className="flex-1 text-start">{s('documents')}</span>
+              <ChevronDown size={14} className={`transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {documentsOpen && (
+              <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(245,237,214,0.1)] pl-2 animate-in">
+                <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
+                    isActive('/dashboard/documents') ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
+                  }`}>
+                  {s('allDocuments')}
+                </button>
+                {DOCUMENT_TYPES.map((dt) => (
+                  <button key={dt.id} onClick={() => navigateTo(dt.id)}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
+                      isDocType(dt.id) ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
+                    }`}>
+                    <span className="flex-1 text-start">{s(`docTypes.${dt.key}`)}</span>
+                    {typeBreakdown[TYPE_MAP[dt.id]] > 0 && (
+                      <span className="text-[10px] bg-[var(--navy-4)] text-[var(--sand-muted)] px-1.5 py-0.5 rounded-md">{typeBreakdown[TYPE_MAP[dt.id]]}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </NavGroup>
+
+        {/* Gestion */}
+        <NavGroup label={s('groups.gestion')}>
+          <NavItem icon={<FileStack size={18} />} label={s('templates')} active={isActive('/dashboard/templates')} onClick={() => { router.push('/dashboard/templates'); setMobileOpen(false); }} />
+          <NavItem icon={<BarChart3 size={18} />} label={s('reports')} active={isActive('/dashboard/reports')} onClick={() => { router.push('/dashboard/reports'); setMobileOpen(false); }} />
+          <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => { router.push('/dashboard/team'); setMobileOpen(false); }} />
+        </NavGroup>
+
+        {/* Compte */}
+        <NavGroup label={s('groups.compte')}>
+          <NavItem icon={<CreditCard size={18} />} label={s('subscription')} active={isActive('/dashboard/subscription')} onClick={() => { router.push('/dashboard/subscription'); setMobileOpen(false); }} />
+          <NavItem icon={<Share2 size={18} />} label={s('shared')} active={isActive('/dashboard/shared')} onClick={() => { router.push('/dashboard/shared'); setMobileOpen(false); }} />
+          <NavItem icon={<RefreshCw size={18} />} label={s('recurring')} active={isActive('/dashboard/recurring')} onClick={() => { router.push('/dashboard/recurring'); setMobileOpen(false); }} />
+        </NavGroup>
       </nav>
     </>
   );
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-6 bg-[var(--navy)] border-r border-[rgba(245,237,214,0.08)]">
+      <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-4 bg-[var(--navy)] border-r border-[rgba(245,237,214,0.08)]">
         {sidebarContent()}
       </aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-[150] md:hidden">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-[280px] flex flex-col p-6 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-r border-[rgba(245,237,214,0.1)]">
-            {sidebarContent()}
+          <aside className="fixed inset-y-0 right-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-l border-[rgba(245,237,214,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+            <button onClick={() => setMobileOpen(false)}
+              className="absolute top-4 left-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+              <X size={18} />
+            </button>
+            <div className="pt-12 flex-1 flex flex-col overflow-hidden">
+              {sidebarContent()}
+            </div>
           </aside>
         </div>
       )}
 
       <button onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed bottom-6 right-6 z-[140] md:hidden w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95">
+        className="hidden md:hidden fixed bottom-6 right-6 z-[140] w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95"
+        style={{ display: 'none' }}
+        aria-hidden="true">
         <Menu size={24} />
       </button>
     </>
   );
 }
 
-function NavItem({ icon, label, active, onClick, badge }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void, badge?: number }) {
+function NavGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="px-4 mb-1 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{label}</div>
+      <div className="space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function NavItem({ icon, label, active, onClick, badge }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void; badge?: number }) {
   return (
     <button onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
         active ? 'bg-[rgba(0,149,77,0.12)] text-[var(--green-3)] shadow-[inset_0_0_0_1px_rgba(0,149,77,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
       }`}>
       <span className={active ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]'}>{icon}</span>

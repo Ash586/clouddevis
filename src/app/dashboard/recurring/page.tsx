@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MobileTable } from '@/components/mobile/MobileTable';
 import { RefreshCw, Plus, Pause, Play, Trash2 } from 'lucide-react';
 
 interface RecurringInvoice {
@@ -24,7 +22,6 @@ const FREQ_LABELS: Record<string, string> = {
 export default function RecurringInvoicesPage() {
   const t = useTranslations('recurring');
   const tc = useTranslations('common');
-  const router = useRouter();
   const [invoices, setInvoices] = useState<RecurringInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -41,6 +38,7 @@ export default function RecurringInvoicesPage() {
     setLoading(false);
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchInvoices(); }, []);
 
   const handleCreate = async () => {
@@ -68,23 +66,6 @@ export default function RecurringInvoicesPage() {
     await fetch(`/api/recurring-invoices/${id}`, { method: 'DELETE' });
     fetchInvoices();
   };
-
-  const columns = [
-    { key: 'name', label: t('table.name') },
-    { key: 'documentType', label: t('table.type') },
-    {
-      key: 'frequency', label: t('table.frequency'),
-      render: (v: unknown) => t(FREQ_LABELS[String(v)] || String(v)),
-    },
-    {
-      key: 'nextDate', label: t('table.nextDate'),
-      render: (v: unknown) => v ? new Date(String(v)).toLocaleDateString() : '—',
-    },
-    {
-      key: 'active', label: t('table.active'),
-      render: (v: unknown) => v ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">{t('active')}</span> : <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">{t('paused')}</span>,
-    },
-  ];
 
   return (
     <div className="min-h-screen flex flex-col">

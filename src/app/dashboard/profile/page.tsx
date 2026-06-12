@@ -12,9 +12,7 @@ import { Select } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/toast';
-import { useUser } from '@/hooks/useUser';
 import { validateNIF, validateRC, validateNIS, validateAI } from '@/lib/validation';
 
 const LANGS = [
@@ -69,6 +67,7 @@ function SubscriptionTab({ userId, memberSince: ms }: { userId: string; memberSi
   const [loadingSub, setLoadingSub] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!userId) { setLoadingSub(false); return; }
     fetch('/api/subscription')
       .then(r => r.ok ? r.json() : null)
@@ -144,6 +143,21 @@ function SubscriptionTab({ userId, memberSince: ms }: { userId: string; memberSi
   );
 }
 
+function TabButton({ id, label, activeTab, setActiveTab }: { id: 'info' | 'preferences' | 'security' | 'subscription'; label: string; activeTab: string; setActiveTab: (id: 'info' | 'preferences' | 'security' | 'subscription') => void }) {
+  return (
+    <button
+      onClick={() => setActiveTab(id)}
+      className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${
+        activeTab === id
+          ? 'bg-[var(--green-2)] text-white shadow-sm'
+          : 'text-[var(--sand-muted)] hover:text-[var(--sand-2)] hover:bg-[var(--navy-4)]'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function ProfilePage() {
   const t = useTranslations('profile');
   const tc = useTranslations('common');
@@ -216,6 +230,7 @@ export default function ProfilePage() {
     }
   }, [showToast]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   const handleSave = async () => {
@@ -295,19 +310,6 @@ export default function ProfilePage() {
     { value: 'autre', label: 'Autre' },
   ];
 
-  const TabButton = ({ id, label }: { id: typeof activeTab; label: string }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${
-        activeTab === id
-          ? 'bg-[var(--green-2)] text-white shadow-sm'
-          : 'text-[var(--sand-muted)] hover:text-[var(--sand-2)] hover:bg-[var(--navy-4)]'
-      }`}
-    >
-      {label}
-    </button>
-  );
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -339,10 +341,10 @@ export default function ProfilePage() {
 
                 {/* ─── Tabs ─── */}
                 <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-                  <TabButton id="info" label={t('infoTab') || 'Informations'} />
-                  <TabButton id="preferences" label={t('prefsTab') || 'Préférences'} />
-                  <TabButton id="security" label={t('securityTab') || 'Sécurité'} />
-                  <TabButton id="subscription" label={t('subTab') || 'Abonnement'} />
+                  <TabButton id="info" label={t('infoTab') || 'Informations'} activeTab={activeTab} setActiveTab={setActiveTab} />
+                  <TabButton id="preferences" label={t('prefsTab') || 'Préférences'} activeTab={activeTab} setActiveTab={setActiveTab} />
+                  <TabButton id="security" label={t('securityTab') || 'Sécurité'} activeTab={activeTab} setActiveTab={setActiveTab} />
+                  <TabButton id="subscription" label={t('subTab') || 'Abonnement'} activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
                 {/* ─── TAB: INFO ─── */}

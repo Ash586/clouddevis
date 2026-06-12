@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import type { CustomSectionDef, CustomFieldDef, CustomFieldType } from '@/types';
 
 export function SectionCreatorForm({ initialSection, onSave, onCancel, te }: {

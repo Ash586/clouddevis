@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
+import { DEFAULT_SECTION_ORDER } from '@/types';
 import type { CustomSectionDef } from '@/types';
-import { SectionCreatorForm } from './SectionCreatorForm';
 
 interface FieldSelectorProps {
   sections: string[];
@@ -38,8 +36,7 @@ export function FieldSelector({ sections, fieldPrefs, setFieldPrefs, te, SECTION
     const selected = fieldPrefs[sectionId] ?? [];
     setFieldPrefs({ ...fieldPrefs, [sectionId]: selected.includes(fieldId) ? selected.filter(f => f !== fieldId) : [...selected, fieldId] });
   };
-  const isBuiltinSection = (id: string) => DEFAULT_SECTION_ORDER.includes(id as any);
-  const isBuiltinField = (fieldId: string) => Object.values(sf).some(arr => arr.includes(fieldId));
+  const isBuiltinSection = (id: string) => DEFAULT_SECTION_ORDER.includes(id);
 
   return (
     <div className="space-y-1">

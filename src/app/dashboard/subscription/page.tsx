@@ -60,9 +60,10 @@ export default function SubscriptionPage() {
         throw new Error(json.error);
       }
       if (!json.url) { showToast('Erreur de redirection', 'error'); setSubscribing(null); return; }
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = json.url;
-    } catch (err: any) {
-      showToast(err.message || 'Erreur', 'error');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Erreur', 'error');
     }
     setSubscribing(null);
   };

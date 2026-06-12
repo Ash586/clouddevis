@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
@@ -10,7 +9,6 @@ import { useToast } from '@/components/ui/toast';
 export default function EnterprisePage() {
   const t = useTranslations('enterprise');
   const tc = useTranslations('common');
-  const router = useRouter();
   const { showToast } = useToast();
   const [form, setForm] = useState({ companyName: '', employees: '', needs: '', phone: '' });
   const [sending, setSending] = useState(false);
@@ -31,8 +29,8 @@ export default function EnterprisePage() {
       if (!res.ok) throw new Error(data.error);
       showToast(data.message || t('successMessage'), 'success');
       setForm({ companyName: '', employees: '', needs: '', phone: '' });
-    } catch (err: any) {
-      showToast(err.message || 'Erreur', 'error');
+    } catch (err: unknown) {
+      showToast((err instanceof Error ? err.message : null) || 'Erreur', 'error');
     }
     setSending(false);
   };
