@@ -154,8 +154,37 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
       subscriptionStatus: user.subscriptionStatus,
     });
 
-    const redirect = NextResponse.redirect(new URL('/dashboard', _req.url));
+    const referralCode = cookies['oauth_referral'] || '';
+    const savedRedirect = cookies['oauth_redirect'] || '/dashboard';
+
+    const redirect = NextResponse.redirect(new URL(savedRedirect, _req.url));
     redirect.cookies.delete('oauth_state');
+    redirect.cookies.delete('oauth_referral');
+    redirect.cookies.delete('oauth_redirect');
+
+    // Create referral record if referral code exists (same logic as register API)
+    if (referralCode && !existingAccount) {
+      try {
+        const partner = await prisma.partner.findUnique({ where: { code: referralCode.toUpperCase() } });
+        if (partner && partner.status === 'ACTIVE' && partner.userId !== user.id) {
+          const existingReferral = await prisma.referral.findFirst({
+            where: { referredUserId: user.id },
+          });
+          if (!existingReferral) {
+            await prisma.referral.create({
+              data: {
+                partnerId: partner.id,
+                referredUserId: user.id,
+                status: 'PENDING',
+              },
+            });
+          }
+        }
+      } catch {
+        // Non-critical: don't block login if referral creation fails
+      }
+    }
+
     return redirect;
   } catch (error) {
     logger.error('OAuth callback error', { error: String(error) });
