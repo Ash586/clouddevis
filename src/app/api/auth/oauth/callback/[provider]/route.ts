@@ -60,17 +60,29 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
 
   try {
     // Exchange code for access token
+    const tokenBody = provider === 'github'
+      ? new URLSearchParams({
+          code,
+          client_id: process.env.GITHUB_CLIENT_ID || '',
+          client_secret: process.env.GITHUB_CLIENT_SECRET || '',
+          redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/github`,
+        }).toString()
+      : JSON.stringify({
+          code,
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/google`,
+          grant_type: 'authorization_code',
+          state: callbackState,
+        });
+
     const tokenRes = await fetch(TOKEN_URLS[provider], {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        code,
-        client_id: provider === 'google' ? process.env.GOOGLE_CLIENT_ID : process.env.GITHUB_CLIENT_ID,
-        client_secret: provider === 'google' ? process.env.GOOGLE_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET,
-        redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/api/auth/oauth/callback/${provider}`,
-        grant_type: 'authorization_code',
-        state: callbackState,
-      }),
+      headers: {
+        'Content-Type': provider === 'github' ? 'application/x-www-form-urlencoded' : 'application/json',
+        Accept: 'application/json',
+      },
+      body: tokenBody,
     });
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;

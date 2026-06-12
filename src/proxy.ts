@@ -8,7 +8,9 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 function getAdminSecret(): Uint8Array {
-  return new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET || '');
+  const secret = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
+  if (!secret) throw new Error('ADMIN_JWT_SECRET or JWT_SECRET is required');
+  return new TextEncoder().encode(secret);
 }
 
 const PROTECTED_ROUTES = ['/dashboard', '/editor'];
@@ -71,6 +73,11 @@ export async function proxy(req: NextRequest) {
     if (pathname.startsWith('/api/admin/')) return res;
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    try {
+      await jwtVerify(token, getSecret());
+    } catch {
+      return NextResponse.json({ error: 'Session expirée' }, { status: 401 });
+    }
     return res;
   }
 

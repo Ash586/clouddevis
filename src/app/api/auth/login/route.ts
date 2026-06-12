@@ -31,6 +31,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
     }
 
+    if (user.suspended) {
+      return NextResponse.json({ error: 'Votre compte a été suspendu. Contactez le support.' }, { status: 403 });
+    }
+
     await createSession({
       id: user.id,
       email: user.email,

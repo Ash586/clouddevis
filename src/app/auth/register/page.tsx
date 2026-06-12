@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [mode, setMode] = useState<'artisan' | 'entreprise'>('artisan');
   const [sector, setSector] = useState('btp');
-  const [country, setCountry] = useState('dz');
+  const [country, setCountry] = useState('algeria');
   const [showPw, setShowPw] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [companyRc, setCompanyRc] = useState('');
@@ -176,10 +176,10 @@ export default function RegisterPage() {
           <div>
             <label style={labelStyle}>Pays</label>
             <select value={country} onChange={e => setCountry(e.target.value)} style={selectStyle}>
-              <option value="dz">🇩🇿 Algérie</option>
-              <option value="tn">🇹🇳 Tunisie</option>
-              <option value="ma">🇲🇦 Maroc</option>
-              <option value="fr">🇫🇷 France</option>
+              <option value="algeria">🇩🇿 Algérie</option>
+              <option value="tunisia">🇹🇳 Tunisie</option>
+              <option value="morocco">🇲🇦 Maroc</option>
+              <option value="france">🇫🇷 France</option>
             </select>
           </div>
 

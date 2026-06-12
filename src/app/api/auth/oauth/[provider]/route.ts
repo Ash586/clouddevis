@@ -56,7 +56,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: STATE_COOKIE_MAX_AGE,
-    path: '/api/auth/oauth/callback',
+    path: '/',
   });
 
   return response;
