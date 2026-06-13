@@ -83,12 +83,20 @@ function SidebarInner() {
   }
 
   function isActive(path: string) { return pathname === path; }
-  function isDocType(type: string) { return searchParams?.get('type') === type; }
+  function isDocumentsActive(type?: string) { 
+    return pathname === '/dashboard/documents' && searchParams?.get('type') === type; 
+  }
 
   function navigateTo(type: string) {
     setDocumentsOpen(true);
     setMobileOpen(false);
     router.push(`/dashboard/editor?type=${type}`);
+  }
+
+  function filterDocumentsByType(type: string) {
+    setDocumentsOpen(true);
+    setMobileOpen(false);
+    router.push(`/dashboard/documents?type=${type}`);
   }
 
   const userName = user?.name || tc('user');
@@ -191,14 +199,18 @@ function SidebarInner() {
               <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(245,237,214,0.1)] pl-2 animate-in">
                 <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
-                    isActive('/dashboard/documents') ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
+                    pathname === '/dashboard/documents' && !searchParams?.get('type') 
+                      ? 'text-[var(--sand)] bg-[var(--navy-3)]' 
+                      : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
                   }`}>
                   {s('allDocuments')}
                 </button>
                 {DOCUMENT_TYPES.map((dt) => (
-                  <button key={dt.id} onClick={() => navigateTo(dt.id)}
+                  <button key={dt.id} onClick={() => filterDocumentsByType(dt.id)}
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
-                      isDocType(dt.id) ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
+                      isDocumentsActive(dt.id) 
+                        ? 'text-[var(--sand)] bg-[var(--navy-3)]' 
+                        : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
                     }`}>
                     <span className="flex-1 text-start">{s(`docTypes.${dt.key}`)}</span>
                     {typeBreakdown[TYPE_MAP[dt.id]] > 0 && (
