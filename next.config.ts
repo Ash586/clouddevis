@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  images: {
+    unoptimized: true,
+  },
   async headers() {
     return [
       {

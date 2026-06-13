@@ -3,36 +3,34 @@ export interface ValidationResult {
   errors: Record<string, string>;
 }
 
-export function validateNIF(nif: string): boolean {
-  return /^\d{11}$/.test(nif);
-}
+// Import from DGI engine (single source of truth) and re-export
+import {
+  validateNIF as dgiValidateNIF,
+  validateRC as dgiValidateRC,
+  validateNIS as dgiValidateNIS,
+  validateAI as dgiValidateAI,
+} from './dgi';
 
-export function validateRC(rc: string): boolean {
-  return /^[A-Z0-9]{9,14}$/.test(rc);
-}
+export const validateNIF = dgiValidateNIF;
+export const validateRC = dgiValidateRC;
+export const validateNIS = dgiValidateNIS;
+export const validateAI = dgiValidateAI;
 
-export function validateNIS(nis: string): boolean {
-  return /^\d{10}$/.test(nis);
-}
-
-export function validateAI(ai: string): boolean {
-  return /^\d{10}$/.test(ai);
-}
-
+// Keep legacy wrapper for backward compatibility (returns ValidationResult type)
 export function validateCompanyTaxIds(taxIds: { nif?: string; rc?: string; nis?: string; ai?: string }): ValidationResult {
   const errors: Record<string, string> = {};
 
   if (taxIds.nif && !validateNIF(taxIds.nif)) {
-    errors.nif = 'NIF doit contenir exactement 11 chiffres';
+    errors.nif = 'NIF invalide: 11 ou 15 chiffres requis';
   }
   if (taxIds.rc && !validateRC(taxIds.rc)) {
-    errors.rc = 'RC invalide (9–14 caractères alphanumériques)';
+    errors.rc = 'RC invalide: 9-14 caractères alphanumériques requis';
   }
   if (taxIds.nis && !validateNIS(taxIds.nis)) {
-    errors.nis = 'NIS doit contenir exactement 10 chiffres';
+    errors.nis = 'NIS invalide: exactement 10 chiffres requis';
   }
   if (taxIds.ai && !validateAI(taxIds.ai)) {
-    errors.ai = 'AI doit contenir exactement 10 chiffres';
+    errors.ai = 'AI invalide: exactement 10 chiffres requis';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
@@ -92,7 +90,7 @@ export function validateDocumentBody(body: Record<string, unknown>): ValidationR
   if (body.clientInfo && typeof body.clientInfo === 'object') {
     const c = body.clientInfo as Record<string, unknown>;
     if (c.nif && !validateNIF(c.nif as string)) {
-      errors['clientNif'] = 'NIF client doit contenir 11 chiffres';
+      errors['clientNif'] = 'NIF client invalide: 11 ou 15 chiffres requis';
     }
   }
 

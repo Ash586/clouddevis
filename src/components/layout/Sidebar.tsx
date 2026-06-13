@@ -23,6 +23,9 @@ import {
   PenLine,
   Receipt,
   ClipboardList,
+  Package,
+  Wrench,
+  FilePen,
   X,
 } from 'lucide-react';
 
@@ -31,6 +34,7 @@ const QUICK_DOCS = [
   { type: 'facture', icon: Receipt, color: 'green' },
   { type: 'proforma', icon: ClipboardList, color: 'purple' },
   { type: 'bon_commande', icon: FileStack, color: 'amber' },
+  { type: 'intervention', icon: Wrench, color: 'teal' },
 ] as const;
 
 const QUICK_DOC_COLORS: Record<string, string> = {
@@ -38,6 +42,7 @@ const QUICK_DOC_COLORS: Record<string, string> = {
   green: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.2)]',
   purple: 'bg-purple-400/10 text-purple-400 hover:bg-purple-400/20',
   amber: 'bg-amber-400/10 text-amber-400 hover:bg-amber-400/20',
+  teal: 'bg-teal-400/10 text-teal-400 hover:bg-teal-400/20',
 };
 
 const DOCUMENT_TYPES = [
@@ -45,11 +50,14 @@ const DOCUMENT_TYPES = [
   { id: 'facture', key: 'facture' },
   { id: 'proforma', key: 'proforma' },
   { id: 'bon_commande', key: 'bonCommande' },
+  { id: 'bon_reception', key: 'bonReception' },
+  { id: 'intervention', key: 'intervention' },
+  { id: 'attachement', key: 'attachement' },
 ] as const;
 
 const TYPE_MAP: Record<string, string> = {
   devis: 'DEVIS', facture: 'FACTURE', proforma: 'PROFORMA',
-  bon_commande: 'BC',
+  bon_commande: 'BC', bon_reception: 'BR', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT',
 };
 
 function SidebarInner() {

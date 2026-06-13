@@ -108,6 +108,7 @@
       "facture": "Invoice",
       "proforma": "Proforma Invoice",
       "bonCommande": "Purchase Order",
+      "bonReception": "Receipt Note",
       "intervention": "Intervention Sheet",
       "attachement": "Work Attachment"
     }

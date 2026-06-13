@@ -1,0 +1,341 @@
+'use client';
+
+// ============================================================
+// CloudDevis Mobile — Documents List Screen
+// Filters: All | DEVIS | FACTURE | Payé | En attente | Ce mois
+// Swipe-to-action on each row
+// Long press opens ActionSheet
+// ============================================================
+
+import { useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  IconSearch,
+  IconFilter,
+  IconFilePlus,
+  IconFiles,
+  IconX,
+} from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
+import { useDocumentStore } from '@/stores/documentStore';
+import { DocumentRow } from '@/mobile/components/DocumentRow';
+import { ActionSheet } from '@/mobile/components/ActionSheet';
+import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
+
+// ── Filter definitions ───────────────────────────────────────
+
+type FilterId = 'all' | 'devis' | 'facture' | 'paid' | 'pending' | 'thisMonth';
+
+interface Filter {
+  id: FilterId;
+  label: string;
+}
+
+const FILTERS: Filter[] = [
+  { id: 'all', label: 'Tout' },
+  { id: 'devis', label: 'Devis' },
+  { id: 'facture', label: 'Facture' },
+  { id: 'paid', label: 'Payé' },
+  { id: 'pending', label: 'En attente' },
+  { id: 'thisMonth', label: 'Ce mois' },
+];
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function isThisMonth(dateStr: string): boolean {
+  const date = new Date(dateStr);
+  const now = new Date();
+  return (
+    date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+  );
+}
+
+function filterDocuments(docs: Document[], filter: FilterId): Document[] {
+  switch (filter) {
+    case 'devis':
+      return docs.filter((d) => d.type === 'DEVIS');
+    case 'facture':
+      return docs.filter((d) => d.type === 'FACTURE');
+    case 'paid':
+      return docs.filter((d) => d.status === 'PAID');
+    case 'pending':
+      return docs.filter((d) => d.status === 'SENT');
+    case 'thisMonth':
+      return docs.filter((d) => isThisMonth(d.date));
+    default:
+      return docs;
+  }
+}
+
+// ── Props ────────────────────────────────────────────────────
+
+interface DocumentsListScreenProps {
+  onNewDocument?: () => void;
+  onEditDocument?: (doc: Document) => void;
+}
+
+// ── Component ────────────────────────────────────────────────
+
+export function DocumentsListScreen({
+  onNewDocument,
+  onEditDocument,
+}: DocumentsListScreenProps) {
+  const [activeFilter, setActiveFilter] = useState<FilterId>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [actionSheetDoc, setActionSheetDoc] = useState<Document | null>(null);
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
+
+  const savedDocuments = useDocumentStore((s) => s.savedDocuments);
+  const deleteDocument = useDocumentStore((s) => s.deleteDocument);
+  const duplicateDocument = useDocumentStore((s) => s.duplicateDocument);
+
+  // ── Filter + search ────────────────────────────────────────
+  const filteredDocs = useMemo(() => {
+    let docs = filterDocuments(savedDocuments, activeFilter);
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      docs = docs.filter(
+        (d) =>
+          d.client?.name?.toLowerCase().includes(q) ||
+          d.number.toLowerCase().includes(q) ||
+          d.client?.nif?.includes(q)
+      );
+    }
+
+    // Sort: newest first
+    return [...docs].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [savedDocuments, activeFilter, searchQuery]);
+
+  // ── Count per filter for badges ────────────────────────────
+  const counts = useMemo(
+    () => ({
+      all: savedDocuments.length,
+      devis: savedDocuments.filter((d) => d.type === 'DEVIS').length,
+      facture: savedDocuments.filter((d) => d.type === 'FACTURE').length,
+      paid: savedDocuments.filter((d) => d.status === 'PAID').length,
+      pending: savedDocuments.filter((d) => d.status === 'SENT').length,
+      thisMonth: savedDocuments.filter((d) => isThisMonth(d.date)).length,
+    }),
+    [savedDocuments]
+  );
+
+  // ── Handlers ───────────────────────────────────────────────
+  const handleEdit = useCallback(
+    (doc: Document) => {
+      onEditDocument?.(doc);
+    },
+    [onEditDocument]
+  );
+
+  const handleDuplicate = useCallback(
+    (doc: Document) => {
+      const newDoc = duplicateDocument(doc.id);
+      if (newDoc) {
+        // TODO: show toast "Document dupliqué"
+      }
+    },
+    [duplicateDocument]
+  );
+
+  const handleDelete = useCallback(
+    (doc: Document) => {
+      setActionSheetDoc(doc);
+      setActionSheetOpen(true);
+    },
+    []
+  );
+
+  const handleLongPress = useCallback((doc: Document) => {
+    setActionSheetDoc(doc);
+    setActionSheetOpen(true);
+  }, []);
+
+  const handleActionSheet = useCallback(
+    (actionId: string, doc: Document) => {
+      switch (actionId) {
+        case 'edit':
+          onEditDocument?.(doc);
+          break;
+        case 'duplicate':
+          duplicateDocument(doc.id);
+          break;
+        case 'delete':
+          deleteDocument(doc.id);
+          break;
+        case 'share':
+          // TODO: integrate with share.ts
+          break;
+        case 'download':
+          // TODO: generate PDF and download
+          break;
+        case 'print':
+          // TODO: open print dialog
+          break;
+      }
+    },
+    [onEditDocument, duplicateDocument, deleteDocument]
+  );
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* ── Header ──────────────────────────────────────────── */}
+      <div className="px-5 pt-4 pb-3">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-xl font-bold text-[var(--sand)]">Documents</h1>
+            <p className="text-xs text-[var(--sand-muted)] mt-0.5">
+              {savedDocuments.length} document{savedDocuments.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className={cn(
+                'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
+                showSearch
+                  ? 'bg-[#0B3D2E] text-white'
+                  : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
+              )}
+            >
+              {showSearch ? <IconX size={18} /> : <IconSearch size={18} />}
+            </button>
+            <button
+              onClick={onNewDocument}
+              className="w-10 h-10 rounded-xl bg-[#0B3D2E] flex items-center justify-center text-white active:scale-95 transition-transform"
+            >
+              <IconFilePlus size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* ── Search bar ──────────────────────────────────────── */}
+        <AnimatePresence>
+          {showSearch && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="relative mb-3">
+                <IconSearch
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher un client, NIF, numéro..."
+                  className={cn(
+                    'w-full pl-10 pr-4 py-2.5 rounded-xl text-sm',
+                    'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
+                    'border border-[rgba(245,237,214,0.06)]',
+                    'focus:outline-none focus:border-[rgba(0,149,77,0.3)]',
+                  )}
+                  autoFocus
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Filters bar (horizontal scroll) ─────────────────── */}
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+          {FILTERS.map((filter) => {
+            const isActive = activeFilter === filter.id;
+            const count = counts[filter.id];
+            return (
+              <button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={cn(
+                  'flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',
+                  'transition-all duration-200 border',
+                  isActive
+                    ? 'bg-[#0B3D2E] text-white border-[#0B3D2E]'
+                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)] active:bg-[var(--navy-2)]',
+                )}
+              >
+                {filter.label}
+                {count > 0 && (
+                  <span
+                    className={cn(
+                      'min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center px-1',
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-[rgba(245,237,214,0.08)] text-[var(--sand-muted)]',
+                    )}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Document list ───────────────────────────────────── */}
+      <div className="flex-1 overflow-y-auto px-5 pb-24">
+        {filteredDocs.length === 0 ? (
+          <motion.div
+            className="flex flex-col items-center justify-center py-20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
+              <IconFiles size={28} className="text-[var(--sand-muted)]" />
+            </div>
+            <p className="text-sm font-semibold text-[var(--sand-muted)]">
+              {searchQuery
+                ? 'Aucun résultat'
+                : activeFilter === 'all'
+                  ? 'Aucun document'
+                  : `Aucun document "${FILTERS.find((f) => f.id === activeFilter)?.label}"`}
+            </p>
+            <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px]">
+              {searchQuery
+                ? 'Essayez un autre terme de recherche'
+                : 'Créez votre premier document en appuyant sur le bouton +'}
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            {filteredDocs.map((doc, i) => (
+              <DocumentRow
+                key={doc.id}
+                document={doc}
+                index={i}
+                onEdit={handleEdit}
+                onDuplicate={handleDuplicate}
+                onDelete={handleDelete}
+                onLongPress={handleLongPress}
+              />
+            ))}
+          </motion.div>
+        )}
+      </div>
+
+      {/* ── ActionSheet ──────────────────────────────────────── */}
+      <ActionSheet
+        open={actionSheetOpen}
+        actionDoc={actionSheetDoc}
+        onClose={() => {
+          setActionSheetOpen(false);
+          setActionSheetDoc(null);
+        }}
+        onAction={handleActionSheet}
+      />
+    </div>
+  );
+}

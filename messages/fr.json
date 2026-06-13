@@ -108,6 +108,7 @@
       "facture": "Facture",
       "proforma": "Facture Proforma",
       "bonCommande": "Bon de Commande",
+      "bonReception": "Bon de Réception",
       "intervention": "Fiche d'Intervention",
       "attachement": "Attachement des Travaux"
     }

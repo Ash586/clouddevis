@@ -108,6 +108,7 @@
       "facture": "فاتورة",
       "proforma": "فاتورة Proforma",
       "bonCommande": "أمر شراء",
+      "bonReception": "ورقة استلام",
       "intervention": "استمارة تدخل",
       "attachement": "ملحق الأشغال"
     }
