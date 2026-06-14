@@ -11,15 +11,15 @@ export function Select({ label, options, className, id, ...props }: Props) {
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={iid} className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+        <label htmlFor={iid} className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">
           {label}
         </label>
       )}
       <select
         id={iid}
         className={cn(
-          'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all',
+          'w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3.5 py-2.5 text-sm text-[var(--sand)]',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all',
           className
         )}
         {...props}

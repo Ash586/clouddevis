@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { TRIAL_DAYS } from '@/lib/subscription';
 
 export async function GET() {
   try {
@@ -13,7 +14,9 @@ export async function GET() {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [totalDocs, monthDocs, totalClients, aggregated, typeGroup, user] = await Promise.all([
+    const ALL_TYPES = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE', 'INTERVENTION', 'ATTACHEMENT'] as const;
+
+    const [totalDocs, monthDocs, totalClients, aggregated, typeGroup, statusGroup, draftCount, recentDraft, user] = await Promise.all([
       prisma.document.count({ where: { userId: session.userId } }),
       prisma.document.count({ where: { userId: session.userId, createdAt: { gte: startOfMonth } } }),
       prisma.client.count({ where: { userId: session.userId } }),
@@ -26,6 +29,17 @@ export async function GET() {
         where: { userId: session.userId },
         _count: { type: true },
       }),
+      prisma.document.groupBy({
+        by: ['status'],
+        where: { userId: session.userId },
+        _count: { status: true },
+      }),
+      prisma.document.count({ where: { userId: session.userId, status: 'DRAFT' } }),
+      prisma.document.findFirst({
+        where: { userId: session.userId, status: 'DRAFT' },
+        orderBy: { updatedAt: 'desc' },
+        select: { id: true, number: true, type: true, updatedAt: true, client: { select: { name: true } } },
+      }),
       prisma.user.findUnique({
         where: { id: session.userId },
         select: { name: true, mode: true, phone: true, companyInfo: true, trialStartAt: true, subscriptionEndAt: true, subscriptionStatus: true },
@@ -35,18 +49,23 @@ export async function GET() {
     const totalTTC = aggregated._sum.totalTTC || 0;
 
     const typeBreakdown: Record<string, number> = {};
-    for (const t of ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE']) {
+    for (const t of ALL_TYPES) {
       typeBreakdown[t] = 0;
     }
     for (const row of typeGroup) {
       typeBreakdown[row.type] = row._count.type;
     }
 
-    let trialDaysRemaining = 14;
+    const statusBreakdown: Record<string, number> = {};
+    for (const row of statusGroup) {
+      statusBreakdown[row.status] = row._count.status;
+    }
+
+    let trialDaysRemaining = TRIAL_DAYS;
     if (user?.subscriptionStatus === 'TRIAL') {
       if (user.trialStartAt) {
         const trialEnd = new Date(user.trialStartAt);
-        trialEnd.setDate(trialEnd.getDate() + 14);
+        trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS);
         trialDaysRemaining = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
       }
     } else {
@@ -67,6 +86,11 @@ export async function GET() {
         totalClients,
         trialDaysRemaining,
         typeBreakdown,
+        statusBreakdown,
+        draftCount,
+        recentDraft: recentDraft
+          ? { id: recentDraft.id, number: recentDraft.number, type: recentDraft.type, clientName: recentDraft.client?.name || '', updatedAt: recentDraft.updatedAt }
+          : null,
       },
     });
   } catch (error) {

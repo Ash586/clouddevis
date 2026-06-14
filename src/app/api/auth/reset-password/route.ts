@@ -7,7 +7,7 @@ import { logger } from '@/lib/logger';
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const rateCheck = checkRateLimit(`reset:${ip}`, 10, 60000);
+    const rateCheck = await checkRateLimit(`reset:${ip}`, 10, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }

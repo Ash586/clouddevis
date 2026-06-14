@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import {
-  Activity, Server, Database, HardDrive, Cpu, Globe,
-  Users, FileText, AlertTriangle, LogIn, BarChart3, Eye,
+  Activity, Server, HardDrive, Cpu,
+  Users, FileText, AlertTriangle, LogIn,
   Shield, Loader2, CheckCircle,
 } from 'lucide-react';
 
@@ -32,6 +32,19 @@ export default function AdminSystemPage() {
   const [backupLoading, setBackupLoading] = useState(false);
   const [backups, setBackups] = useState<{ id: string; type: string; status: string; startedAt: string; completedAt: string | null }[]>([]);
   const [showBackups, setShowBackups] = useState(false);
+
+  const fetchBackups = async () => {
+    try {
+      const res = await fetch('/api/admin/system/backup');
+      if (res.ok) {
+        const d = await res.json();
+        setBackups(d.backups);
+      }
+    } catch {}
+  };
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { if (showBackups) fetchBackups(); }, [showBackups]);
 
   useEffect(() => {
     fetch('/api/admin/system')
@@ -62,18 +75,6 @@ export default function AdminSystemPage() {
     } catch {}
     setBackupLoading(false);
   };
-
-  const fetchBackups = async () => {
-    try {
-      const res = await fetch('/api/admin/system/backup');
-      if (res.ok) {
-        const d = await res.json();
-        setBackups(d.backups);
-      }
-    } catch {}
-  };
-
-  useEffect(() => { if (showBackups) fetchBackups(); }, [showBackups]);
 
   const metrics = [
     { label: t('system.status'), value: t('system.healthy'), icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50' },

@@ -13,13 +13,13 @@ export async function POST(req: Request) {
     if (existing) return NextResponse.json({ error: 'Vous êtes déjà partenaire' }, { status: 400 });
 
     const body = await req.json();
-    const { fullName, wilaya, sector, howPromote } = body;
+    const { fullName, wilaya, sector, howPromote, stats: extraStats } = body;
 
     if (!fullName || !wilaya || !sector || !howPromote) {
       return NextResponse.json({ error: 'Tous les champs sont requis' }, { status: 400 });
     }
 
-    const code = await generateReferralCode(session.userId);
+    const code = await generateReferralCode();
 
     const partner = await prisma.partner.create({
       data: {
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         code,
         tier: 'AFFILIATE',
         status: 'PENDING',
-        stats: { fullName, wilaya, sector, howPromote },
+        stats: extraStats || { fullName, wilaya, sector, howPromote },
       },
     });
 

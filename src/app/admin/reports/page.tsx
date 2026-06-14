@@ -30,6 +30,7 @@ export default function AdminReportsPage() {
   const [period, setPeriod] = useState('year');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetch(`/api/admin/reports?period=${period}`)
       .then(r => r.ok ? r.json() : null)
@@ -57,9 +58,6 @@ export default function AdminReportsPage() {
 
   const subColors: Record<string, string> = {
     TRIAL: c.amber, BASIC: c.blue, PRO: c.green, FREE: '#a1a5ad', EXPIRED: c.red,
-  };
-  const subBgs: Record<string, string> = {
-    TRIAL: c.amberBg, BASIC: c.blueBg, PRO: c.greenBg, FREE: '#282c38', EXPIRED: c.redBg,
   };
 
   return (

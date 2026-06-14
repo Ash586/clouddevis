@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- ── Bundle Identification ───────────────────────────── -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>fr</string>
+	<key>CFBundleDisplayName</key>
+	<string>CloudDevis</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+
+	<!-- ── Versioning ─────────────────────────────────────── -->
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>14.0</string>
+
+	<!-- ── Device Requirements ────────────────────────────── -->
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+
+	<!-- ── Status Bar ─────────────────────────────────────── -->
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+
+	<!-- ── Launch Screen ──────────────────────────────────── -->
+	<key>UILaunchStoryboardName</key>
+	<string>Capacitor</string>
+
+	<!-- ── App Transport Security (Remote Server Mode) ────── -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>clouddevis.vercel.app</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+
+	<!-- ── Privacy Descriptions ───────────────────────────── -->
+
+	<!-- Photo Library (logo upload) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CloudDevis a besoin d'accéder à votre photo pour importer le logo de votre entreprise sur vos devis et factures.</string>
+
+	<!-- Camera (document scan) -->
+	<key>NSCameraUsageDescription</key>
+	<string>CloudDevis utilise l'appareil photo pour scanner des documents et des codes QR.</string>
+
+	<!-- Microphone (voice notes - future) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>CloudDevis utilise le microphone pour enregistrer des notes vocales sur vos documents.</string>
+
+	<!-- Contacts (client lookup - future) -->
+	<key>NSContactsUsageDescription</key>
+	<string>CloudDevis peut accéder à vos contacts pour simplifier l'ajout de clients.</string>
+
+	<!-- File Access (PDF export) -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+
+	<!-- ── Associated Domains (Universal Links) ───────────── -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:clouddevis.vercel.app</string>
+	</array>
+
+	<!-- ── Background Modes ───────────────────────────────── -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+</dict>
+</plist>

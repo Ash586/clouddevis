@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { email, password, rememberMe } = body;
 
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const rateCheck = checkRateLimit(`login:${ip}`, 5, 60000);
+    const rateCheck = await checkRateLimit(`login:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
     }
@@ -29,6 +29,10 @@ export async function POST(req: Request) {
     const valid = await verifyPassword(password, user.password);
     if (!valid) {
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
+    }
+
+    if (user.suspended) {
+      return NextResponse.json({ error: 'Votre compte a été suspendu. Contactez le support.' }, { status: 403 });
     }
 
     await createSession({

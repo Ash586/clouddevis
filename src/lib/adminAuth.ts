@@ -2,13 +2,9 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
-if (!process.env.ADMIN_JWT_SECRET) {
-  console.warn('ADMIN_JWT_SECRET not set, using JWT_SECRET as fallback');
-}
-
 function getSecret() {
   const secret = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
-  if (!secret) throw new Error('No JWT secret configured');
+  if (!secret) throw new Error('No JWT secret configured. Set ADMIN_JWT_SECRET or JWT_SECRET.');
   return new TextEncoder().encode(secret);
 }
 
@@ -30,6 +26,11 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export async function createAdminSession(admin: { id: string; email: string; name: string; role: string }) {
+  const maxAgeSeconds = parseInt(process.env.ADMIN_SESSION_MAX_AGE_SECONDS || '', 10) || (12 * 60 * 60);
+  const expirySeconds = maxAgeSeconds;
+  const expiryHours = Math.max(1, Math.floor(expirySeconds / 3600));
+  const expiry = `${expiryHours}h`;
+
   const token = await new SignJWT({
     adminId: admin.id,
     email: admin.email,
@@ -37,7 +38,7 @@ export async function createAdminSession(admin: { id: string; email: string; nam
     role: admin.role,
   })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('7d')
+    .setExpirationTime(expiry)
     .setIssuedAt()
     .sign(getSecret());
 
@@ -46,7 +47,7 @@ export async function createAdminSession(admin: { id: string; email: string; nam
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60,
+    maxAge: expirySeconds,
     path: '/',
   });
 

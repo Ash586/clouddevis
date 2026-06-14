@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import './rtl.css';
+import './landing.css';
 import { I18nClientProvider } from '@/contexts/I18nClientProvider';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { PageViewTracker } from '@/components/tracking/PageViewTracker';
 import { cookies } from 'next/headers';
 
@@ -35,11 +37,14 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value ?? 'fr';
+  const theme = cookieStore.get('theme')?.value as 'dark' | 'light' | undefined;
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col">
-        <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
+    <html lang={locale} dir={dir} data-theme={theme ?? 'dark'} suppressHydrationWarning className={inter.variable}>
+      <body className="min-h-screen antialiased flex flex-col">
+        <ThemeProvider initialTheme={theme ?? 'dark'}>
+          <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

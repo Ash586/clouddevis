@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { AlertTriangle, LogIn, Activity, Trash2 } from 'lucide-react';
 
 interface LogEntry {
   id: string; action: string; entity: string; entityId: string | null;
@@ -11,7 +10,6 @@ interface LogEntry {
 }
 
 const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px', marginBottom: 12 };
-const input = { background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '9px 12px', fontSize: 13, color: '#e8ebf0', outline: 'none' };
 
 const actionColors: Record<string, { bg: string; color: string }> = {
   CREATE: { bg: 'rgba(74,222,128,0.10)', color: '#4ade80' },
@@ -24,7 +22,6 @@ const actionColors: Record<string, { bg: string; color: string }> = {
 
 export default function AdminLogsPage() {
   const t = useTranslations('admin');
-  const tc = useTranslations('common');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionFilter, setActionFilter] = useState('');
@@ -33,6 +30,7 @@ export default function AdminLogsPage() {
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: '50' });
     if (actionFilter) params.set('action', actionFilter);

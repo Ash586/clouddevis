@@ -66,19 +66,11 @@ export function DemoEditor({ onDownload }: Props) {
   const tc = useTranslations('common');
   const pu = useTranslations('preview.units');
   const [doc, setDoc] = useState<DocumentState>(() => createDemoDoc(t));
-  const [editingItem, setEditingItem] = useState<LineItem | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const results = useMemo(() => calculateDocument(doc), [doc]);
 
   const updateClient = (field: keyof typeof doc.clientInfo, value: string) => {
     setDoc(prev => ({ ...prev, clientInfo: { ...prev.clientInfo, [field]: value } }));
-  };
-
-  const updateCompany = (field: string, value: string) => {
-    setDoc(prev => ({
-      ...prev,
-      companyInfo: prev.companyInfo ? { ...prev.companyInfo, [field]: value } : prev.companyInfo,
-    }));
   };
 
   const updateItem = (id: string, field: keyof LineItem, value: string | number) => {
@@ -111,8 +103,6 @@ export function DemoEditor({ onDownload }: Props) {
       tvaRate: newMode === 'artisan' ? 0 : 19,
     }));
   };
-
-  const UNIT_LABELS: Record<string, string> = { u: pu('u'), h: pu('h'), j: pu('j'), m2: pu('m2'), m3: pu('m3'), ml: pu('ml'), kg: pu('kg'), forfait: pu('forfait') };
 
   const UNIT_OPTIONS_LOCAL = [
     { value: 'u', label: pu('u') },

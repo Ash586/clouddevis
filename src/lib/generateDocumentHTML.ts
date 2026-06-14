@@ -1,3 +1,5 @@
+import type { LineItem, DocumentState, CalculationResult, CustomSectionDef } from '@/types';
+
 export function generateDocumentHTML(params: {
   isEnt: boolean;
   docTypeLabel: string;
@@ -7,23 +9,23 @@ export function generateDocumentHTML(params: {
   catLabels: Record<string, string>;
   paymentLabels: Record<string, string>;
   unitLabels: Record<string, string>;
-  grouped: Record<string, any[]>;
-  uncategorized: any[];
+  grouped: Record<string, LineItem[]>;
+  uncategorized: LineItem[];
   catOrder: string[];
-  doc: any;
-  results: any;
+  doc: DocumentState;
+  results: CalculationResult;
   tc: (key: string) => string;
-  tp: (key: string, vars?: Record<string, any>) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
   te: (key: string) => string;
   tu: (key: string) => string;
-  customSections: any[];
+  customSections: CustomSectionDef[];
   currency: string;
 }) {
   const { isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency } = params;
 
   const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 
-  function itemRow(item: any, idx: number): string {
+  function itemRow(item: LineItem, idx: number): string {
     return `<tr>
       <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#94a3b8;font-weight:700;width:22px">${idx}</td>
       <td style="padding:5px 6px;border-bottom:1px solid #e2e8f0;font-size:10px">${escHtml(item.designation)}</td>
@@ -215,14 +217,14 @@ export function generateDocumentHTML(params: {
         <span style="color:#475569">${tp('legalRecovery')}</span><br>
         <span style="color:#64748b">${tp('legalRetention')}</span>
       </div>` : '') + `
-      ` + customSections.map((cs: any) => {
-        const sectionData = doc.customFields[cs.id];
-        const visibleFields = cs.fields.filter((f: any) => sf(`custom_${cs.id}_${f.id}`));
-        const hasVisibleData = sectionData && visibleFields.some((f: any) => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; });
+      ` + customSections.map((cs) => {
+        const sectionData = doc.customFields?.[cs.id] as Record<string, unknown> | undefined;
+        const visibleFields = cs.fields.filter((f) => sf(`custom_${cs.id}_${f.id}`));
+        const hasVisibleData = sectionData && visibleFields.some((f) => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; });
         if (vb(cs.id) && hasVisibleData) {
           return `<div class="card" style="background:#f8fafc">
             <strong style="font-size:9px;color:#475569">${ s(cs.label) }</strong><br>
-            ` + visibleFields.filter((f: any) => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; }).map((f: any) => `<span style="color:#64748b"><strong>${ s(f.label) } :</strong> ${ s(sectionData[f.id]) }</span><br>`).join('') + `
+            ` + visibleFields.filter((f) => { const v = sectionData[f.id]; return v !== undefined && v !== null && v !== ''; }).map((f) => `<span style="color:#64748b"><strong>${ s(f.label) } :</strong> ${ s(sectionData[f.id] as string) }</span><br>`).join('') + `
           </div>`;
         }
         return '';

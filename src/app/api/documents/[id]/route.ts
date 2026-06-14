@@ -6,8 +6,7 @@ import { logger } from '@/lib/logger';
 import { validateDocumentBody } from '@/lib/validation';
 import { DocumentState } from '@/types';
 
-const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE' };
-const VALID_DOC_TYPES = Object.values(DOC_TYPE_MAP);
+const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

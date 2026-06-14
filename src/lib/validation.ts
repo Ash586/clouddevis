@@ -3,36 +3,34 @@ export interface ValidationResult {
   errors: Record<string, string>;
 }
 
-export function validateNIF(nif: string): boolean {
-  return /^\d{11}$/.test(nif);
-}
+// Import from DGI engine (single source of truth) and re-export
+import {
+  validateNIF as dgiValidateNIF,
+  validateRC as dgiValidateRC,
+  validateNIS as dgiValidateNIS,
+  validateAI as dgiValidateAI,
+} from './dgi';
 
-export function validateRC(rc: string): boolean {
-  return /^[A-Z0-9]{9,14}$/.test(rc);
-}
+export const validateNIF = dgiValidateNIF;
+export const validateRC = dgiValidateRC;
+export const validateNIS = dgiValidateNIS;
+export const validateAI = dgiValidateAI;
 
-export function validateNIS(nis: string): boolean {
-  return /^\d{10}$/.test(nis);
-}
-
-export function validateAI(ai: string): boolean {
-  return /^\d{10}$/.test(ai);
-}
-
+// Keep legacy wrapper for backward compatibility (returns ValidationResult type)
 export function validateCompanyTaxIds(taxIds: { nif?: string; rc?: string; nis?: string; ai?: string }): ValidationResult {
   const errors: Record<string, string> = {};
 
   if (taxIds.nif && !validateNIF(taxIds.nif)) {
-    errors.nif = 'NIF doit contenir exactement 11 chiffres';
+    errors.nif = 'NIF invalide: 11 ou 15 chiffres requis';
   }
   if (taxIds.rc && !validateRC(taxIds.rc)) {
-    errors.rc = 'RC invalide (9–14 caractères alphanumériques)';
+    errors.rc = 'RC invalide: 9-14 caractères alphanumériques requis';
   }
   if (taxIds.nis && !validateNIS(taxIds.nis)) {
-    errors.nis = 'NIS doit contenir exactement 10 chiffres';
+    errors.nis = 'NIS invalide: exactement 10 chiffres requis';
   }
   if (taxIds.ai && !validateAI(taxIds.ai)) {
-    errors.ai = 'AI doit contenir exactement 10 chiffres';
+    errors.ai = 'AI invalide: exactement 10 chiffres requis';
   }
 
   return { valid: Object.keys(errors).length === 0, errors };
@@ -41,7 +39,7 @@ export function validateCompanyTaxIds(taxIds: { nif?: string; rc?: string; nis?:
 export function validateDocumentBody(body: Record<string, unknown>): ValidationResult {
   const errors: Record<string, string> = {};
 
-  if (body.documentType && !['devis', 'proforma', 'bc', 'br', 'facture'].includes(body.documentType as string)) {
+  if (body.documentType && !['devis', 'proforma', 'bc', 'br', 'facture', 'intervention', 'attachement'].includes(body.documentType as string)) {
     errors.documentType = 'Type de document invalide';
   }
 
@@ -58,7 +56,7 @@ export function validateDocumentBody(body: Record<string, unknown>): ValidationR
     if (!Array.isArray(body.items)) {
       errors.items = 'Les articles doivent être un tableau';
     } else {
-      (body.items as any[]).forEach((item, i) => {
+      (body.items as Record<string, unknown>[]).forEach((item, i) => {
         if (item.quantity !== undefined && (Number(item.quantity) <= 0 || !Number.isFinite(Number(item.quantity)))) {
           errors[`items.${i}.qty`] = `Ligne ${i + 1} : quantité doit être > 0`;
         }
@@ -73,16 +71,26 @@ export function validateDocumentBody(body: Record<string, unknown>): ValidationR
     errors.acompte = "L'acompte ne peut pas être négatif";
   }
 
+  if (body.discount && typeof body.discount === 'object') {
+    const disc = body.discount as Record<string, unknown>;
+    if (disc.value !== undefined && Number(disc.value) < 0) {
+      errors.discount = 'La remise ne peut pas être négative';
+    }
+    if (disc.type === 'percentage' && Number(disc.value) > 100) {
+      errors.discount = 'Le pourcentage de remise ne peut pas dépasser 100%';
+    }
+  }
+
   if (body.companyInfo && typeof body.companyInfo === 'object') {
-    const taxIds = (body.companyInfo as any).taxIds || {};
-    const taxErrors = validateCompanyTaxIds(taxIds);
+    const taxIds = (body.companyInfo as Record<string, unknown>).taxIds || {};
+    const taxErrors = validateCompanyTaxIds(taxIds as { nif?: string; rc?: string; nis?: string; ai?: string });
     Object.assign(errors, taxErrors.errors);
   }
 
   if (body.clientInfo && typeof body.clientInfo === 'object') {
-    const c = body.clientInfo as any;
-    if (c.nif && !validateNIF(c.nif)) {
-      errors['clientNif'] = 'NIF client doit contenir 11 chiffres';
+    const c = body.clientInfo as Record<string, unknown>;
+    if (c.nif && !validateNIF(c.nif as string)) {
+      errors['clientNif'] = 'NIF client invalide: 11 ou 15 chiffres requis';
     }
   }
 

@@ -8,13 +8,14 @@ interface MetaSectionsProps {
   vb: (block: string) => boolean;
   bv: (...fieldIds: string[]) => boolean;
   t: (key: string) => string;
+  highlight?: boolean;
 }
 
-export function PreviewMetaSections({ doc, sf, vb, bv, t }: MetaSectionsProps) {
+export function PreviewMetaSections({ doc, sf, vb, bv, t, highlight = false }: MetaSectionsProps) {
   return (
     <>
       {vb('client') && bv('clientName','clientAddress','clientPhone','clientEmail') && (
-        <div className="mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-sm">
+        <div className={`mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-sm transition-all duration-700 print:transition-none ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/60' : ''}`}>
           <span className="text-[8px] font-bold uppercase tracking-[1.5px] text-slate-400 block mb-1">{t('billedTo')}</span>
           {sf('clientName') && <h3 className="text-sm font-bold text-slate-900 mb-0.5">{doc.clientInfo.name}</h3>}
           {sf('clientAddress') && doc.clientInfo.address && <p className="text-[10px] text-slate-500 leading-relaxed">{doc.clientInfo.address}</p>}

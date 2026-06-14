@@ -24,7 +24,7 @@ export async function GET() {
       prisma.client.count(),
       prisma.template.count(),
       prisma.admin.count(),
-      prisma.user.count({ where: { subscriptionStatus: { in: ['TRIAL', 'BASIC', 'PRO'] } } }),
+      prisma.user.count({ where: { subscriptionStatus: { in: ['TRIAL', 'STANDARD', 'PRO', 'MAX'] } } }),
       prisma.user.count({ where: { suspended: true } }),
       prisma.pageView.count(),
       prisma.pageView.count({ where: { timestamp: { gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) } } }),

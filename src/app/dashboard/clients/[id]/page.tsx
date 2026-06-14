@@ -81,6 +81,7 @@ export default function ClientDetailPage() {
     }
   }, [id, router]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchClient(); }, [fetchClient]);
 
   function formatCurrency(value: number) {

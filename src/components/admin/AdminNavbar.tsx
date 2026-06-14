@@ -2,8 +2,9 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { LogOut, Bell, Menu, X } from 'lucide-react';
+import { LogOut, Bell, Menu, X, Sun, Moon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AdminNavbarProps {
   onMenuToggle?: () => void;
@@ -27,6 +28,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
 
   const pageTitle = Object.entries(PAGE_TITLES).find(([path]) =>
     pathname === path || (path !== '/admin' && pathname.startsWith(path))
@@ -79,12 +81,30 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: '#a1a5ad',
+            color: 'var(--text2)',
             padding: 4,
             position: 'relative',
           }}
         >
           <Bell size={16} />
+        </button>
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--text2)',
+            padding: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
+          }}
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
         <button
           onClick={handleLogout}

@@ -1,17 +1,45 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, Loader2, Hammer, Truck, Sparkles, Hotel, Wrench, Heart, BookOpen, Building, Bus, Palette, Wheat, Scale, Monitor, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 
-export default function RegisterPage() {
+const SECTORS = [
+  { value: 'btp', label: 'BTP', Icon: Hammer },
+  { value: 'moving', label: 'Déménagement', Icon: Truck },
+  { value: 'cleaning', label: 'Nettoyage', Icon: Sparkles },
+  { value: 'hotel', label: 'Hôtellerie', Icon: Hotel },
+  { value: 'auto', label: 'Automobile', Icon: Wrench },
+  { value: 'health', label: 'Santé', Icon: Heart },
+  { value: 'training', label: 'Formation', Icon: BookOpen },
+  { value: 'realestate', label: 'Immobilier', Icon: Building },
+  { value: 'transport', label: 'Transport', Icon: Bus },
+  { value: 'craft', label: 'Artisanat', Icon: Palette },
+  { value: 'agriculture', label: 'Agriculture', Icon: Wheat },
+  { value: 'liberal', label: 'Libéral', Icon: Scale },
+  { value: 'it', label: 'Informatique', Icon: Monitor },
+];
+
+const COUNTRIES = [
+  { value: 'algeria', label: 'Algérie' },
+  { value: 'tunisia', label: 'Tunisie' },
+  { value: 'morocco', label: 'Maroc' },
+  { value: 'france', label: 'France' },
+];
+
+function RegisterForm() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const refCode = searchParams.get('ref');
+  const intentPartner = searchParams.get('intent') === 'partner';
+  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [mode, setMode] = useState<'artisan' | 'entreprise'>('artisan');
   const [sector, setSector] = useState('btp');
-  const [country, setCountry] = useState('dz');
+  const [country, setCountry] = useState('algeria');
   const [showPw, setShowPw] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [companyRc, setCompanyRc] = useState('');
@@ -22,23 +50,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14,
-    background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)',
-    color: '#e8ebf0', outline: 'none', boxSizing: 'border-box',
-  };
-  const selectStyle: React.CSSProperties = { ...inputStyle, cursor: 'pointer' };
-  const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: '#656a73', display: 'block', marginBottom: 5 };
-
-  const sectors = [
-    { value: 'btp', label: '🏗️ BTP' }, { value: 'moving', label: '🚛 Déménagement' },
-    { value: 'cleaning', label: '🧹 Nettoyage' }, { value: 'hotel', label: '🏨 Hôtellerie' },
-    { value: 'auto', label: '🔧 Automobile' }, { value: 'health', label: '🏥 Santé' },
-    { value: 'training', label: '📚 Formation' }, { value: 'realestate', label: '🏠 Immobilier' },
-    { value: 'transport', label: '🚌 Transport' }, { value: 'craft', label: '🎨 Artisanat' },
-    { value: 'agriculture', label: '🌾 Agriculture' }, { value: 'liberal', label: '⚖️ Libéral' },
-    { value: 'it', label: '💻 Informatique' },
-  ];
+  const totalSteps = mode === 'entreprise' ? 3 : 2;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,20 +61,26 @@ export default function RegisterPage() {
     if (password !== confirmPassword) { setError('Les mots de passe ne correspondent pas'); return; }
     setLoading(true);
     try {
+      const body: Record<string, unknown> = {
+        name: name.trim(), email: email.trim(), password, mode, sector, country, language: 'fr',
+        companyInfo: mode === 'entreprise' ? {
+          name: companyName.trim() || name.trim(),
+          taxIds: { rc: companyRc.trim(), nif: companyNif.trim(), nis: companyNis.trim(), ai: companyAi.trim() },
+          capital: companyCapital.trim(),
+        } : undefined,
+      };
+      if (refCode) body.referralCode = refCode;
       const res = await fetch('/api/auth/register', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(), email: email.trim(), password, mode, sector, country, language: 'fr',
-          companyInfo: mode === 'entreprise' ? {
-            name: companyName.trim() || name.trim(),
-            taxIds: { rc: companyRc.trim(), nif: companyNif.trim(), nis: companyNis.trim(), ai: companyAi.trim() },
-            capital: companyCapital.trim(),
-          } : undefined,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Échec d\'inscription'); return; }
-      router.push('/dashboard');
+      if (intentPartner) {
+        router.push('/dashboard/partner/apply');
+      } else {
+        router.push('/dashboard');
+      }
     } catch { setError('Erreur réseau');
     } finally { setLoading(false); }
   }
@@ -74,135 +92,201 @@ export default function RegisterPage() {
     if (/[A-Z]/.test(pw)) s++;
     if (/[0-9]/.test(pw)) s++;
     if (/[^A-Za-z0-9]/.test(pw)) s++;
-    const colors = ['#282c38', '#f87171', '#fbbf24', '#4a9eff', '#4ade80'];
+    const colors = ['var(--navy-3)', '#f87171', '#fbbf24', '#4a9eff', '#4ade80'];
     const labels = ['', 'Faible', 'Moyen', 'Bon', 'Fort'];
     return { score: s, color: colors[s] || colors[0], label: labels[s] || '' };
   };
   const pwStr = strength(password);
 
+  function canNext() {
+    if (step === 1) return name.trim() && email.trim() && password.length >= 6 && password === confirmPassword;
+    if (step === 2) return true;
+    if (step === 3) return true;
+    return false;
+  }
+
+  function nextStep() {
+    if (step === 1 && !canNext()) { setError('Remplissez tous les champs correctement'); return; }
+    setError('');
+    if (step < totalSteps) setStep(step + 1);
+  }
+
+  function prevStep() { if (step > 1) setStep(step - 1); setError(''); }
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: '#0b0d12' }}>
-      <div style={{ width: '100%', maxWidth: 420, background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '24px 22px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <div style={{ width: 44, height: 44, background: '#1d202a', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 18, fontWeight: 800, color: '#e8ebf0' }}>CD</div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>CloudDevis</h1>
-          <p style={{ fontSize: 13, color: '#656a73', marginTop: 4 }}>Créez votre compte</p>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--navy)]">
+      <div className="w-full max-w-[420px] bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-xl p-6 sm:p-5.5">
+        <div className="text-center mb-5">
+          <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center mx-auto mb-3 text-lg font-extrabold text-[var(--sand)]">CD</div>
+          <h1 className="text-xl font-bold text-[var(--sand)] m-0">CloudDevis</h1>
+          <p className="text-[13px] text-[var(--sand-muted)] mt-1">Créez votre compte</p>
         </div>
 
+        {refCode && (
+          <div className="bg-[var(--green-glow)] text-[var(--green-3)] text-[12px] font-semibold text-center rounded-lg py-2 px-3 mb-4 border border-[rgba(0,149,77,0.2)]">
+            Invitation partenaire appliquée : {refCode}
+          </div>
+        )}
+
         {error && (
-          <div style={{ background: 'rgba(248,113,113,0.10)', color: '#f87171', fontSize: 13, borderRadius: 8, padding: '10px 14px', textAlign: 'center', fontWeight: 600, marginBottom: 16 }}>
+          <div className="bg-[rgba(248,113,113,0.10)] text-[#f87171] text-[13px] rounded-lg py-2.5 px-3.5 text-center font-semibold mb-4">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div>
-            <label style={labelStyle}>Nom complet</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Votre nom" required style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>Mot de passe</label>
-            <div style={{ position: 'relative' }}>
-              <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 caractères" required minLength={6} style={inputStyle} />
-              <button type="button" onClick={() => setShowPw(!showPw)}
-                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#656a73', fontSize: 13 }}>
-                {showPw ? '🙈' : '👁️'}
-              </button>
+        {/* Step indicator */}
+        <div className="flex items-center gap-2 mb-5">
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
+            <div key={s} className="flex-1 flex items-center gap-2">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all ${step >= s ? 'bg-[var(--green-2)] text-white' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]'}`}>
+                {step > s ? <Check size={12} /> : s}
+              </div>
+              {s < totalSteps && <div className={`flex-1 h-0.5 rounded-full transition-all ${step > s ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-4)]'}`} />}
             </div>
-            {password.length > 0 && (
-              <div style={{ marginTop: 6 }}>
-                <div style={{ display: 'flex', gap: 4, marginBottom: 2 }}>
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= pwStr.score ? pwStr.color : '#282c38', transition: 'background 0.3s' }} />
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {/* Step 1: Compte */}
+          {step === 1 && (
+            <>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Nom complet</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Votre nom" required
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Email</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
+                <div className="relative">
+                  <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 caractères" required minLength={6}
+                    className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+                  <button type="button" onClick={() => setShowPw(!showPw)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[var(--sand-muted)] hover:text-[var(--sand)] p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center transition">
+                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {password.length > 0 && (
+                  <div className="mt-1.5">
+                    <div className="flex gap-1 mb-0.5">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="flex-1 h-[3px] rounded-sm transition-colors" style={{ background: i <= pwStr.score ? pwStr.color : 'var(--navy-3)' }} />
+                      ))}
+                    </div>
+                    <p className="text-[10px] font-semibold m-0" style={{ color: pwStr.color }}>{pwStr.label}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Confirmer le mot de passe</label>
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={6}
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+              </div>
+            </>
+          )}
+
+          {/* Step 2: Sécurité */}
+          {step === 2 && (
+            <>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Type de compte</label>
+                <div className="flex gap-1.5">
+                  {(['artisan', 'entreprise'] as const).map(m => (
+                    <button key={m} type="button" onClick={() => setMode(m)}
+                      className={`flex-1 py-2.5 rounded-lg text-[13px] font-semibold border transition min-h-[44px] ${mode === m ? 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(245,237,214,0.15)]' : 'bg-transparent text-[var(--sand-muted)] border-[rgba(245,237,214,0.08)] hover:bg-[var(--navy-4)]'}`}>
+                      {m === 'artisan' ? 'Artisan' : 'Entreprise'}
+                    </button>
                   ))}
                 </div>
-                <p style={{ fontSize: 10, fontWeight: 600, color: pwStr.color, margin: 0 }}>{pwStr.label}</p>
-              </div>
-            )}
-          </div>
-          <div>
-            <label style={labelStyle}>Confirmer le mot de passe</label>
-            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={6} style={inputStyle} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>Type de compte</label>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {['artisan', 'entreprise'].map(m => (
-                <button key={m} type="button" onClick={() => setMode(m as typeof mode)}
-                  style={{
-                    flex: 1, padding: '9px 0', borderRadius: 8, fontSize: 13, fontWeight: 600,
-                    border: '0.5px solid rgba(255,255,255,0.08)', cursor: 'pointer',
-                    background: mode === m ? '#1d202a' : 'transparent',
-                    color: mode === m ? '#e8ebf0' : '#656a73',
-                  }}>
-                  {m === 'artisan' ? '👤 Artisan' : '🏢 Entreprise'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {mode === 'entreprise' && (
-            <div style={{ background: '#1d202a', borderRadius: 8, padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#656a73', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Informations entreprise</p>
-              <div>
-                <label style={labelStyle}>Raison sociale</label>
-                <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Nom de l'entreprise" style={inputStyle} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <div><label style={labelStyle}>RC</label><input type="text" value={companyRc} onChange={e => setCompanyRc(e.target.value)} placeholder="00-00-0000000" style={inputStyle} /></div>
-                <div><label style={labelStyle}>NIF</label><input type="text" value={companyNif} onChange={e => setCompanyNif(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
-                <div><label style={labelStyle}>NIS</label><input type="text" value={companyNis} onChange={e => setCompanyNis(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
-                <div><label style={labelStyle}>AI</label><input type="text" value={companyAi} onChange={e => setCompanyAi(e.target.value)} placeholder="000000000000000" style={inputStyle} /></div>
               </div>
               <div>
-                <label style={labelStyle}>Capital</label>
-                <input type="text" value={companyCapital} onChange={e => setCompanyCapital(e.target.value)} placeholder="1 000 000" style={inputStyle} />
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Secteur d&apos;activité</label>
+                <select value={sector} onChange={e => setSector(e.target.value)}
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]">
+                  {SECTORS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Pays</label>
+                <select value={country} onChange={e => setCountry(e.target.value)}
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]">
+                  {COUNTRIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Step 3: Entreprise (conditional) */}
+          {step === 3 && mode === 'entreprise' && (
+            <div className="bg-[var(--navy-3)] rounded-lg p-3.5 space-y-3">
+              <p className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider m-0">Informations entreprise</p>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Raison sociale</label>
+                <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Nom de l'entreprise"
+                  className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div><label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">RC</label><input type="text" value={companyRc} onChange={e => setCompanyRc(e.target.value)} placeholder="00-00-0000000" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" /></div>
+                <div><label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIF</label><input type="text" value={companyNif} onChange={e => setCompanyNif(e.target.value)} placeholder="000000000000000" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" /></div>
+                <div><label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIS</label><input type="text" value={companyNis} onChange={e => setCompanyNis(e.target.value)} placeholder="000000000000000" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" /></div>
+                <div><label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">AI</label><input type="text" value={companyAi} onChange={e => setCompanyAi(e.target.value)} placeholder="000000000000000" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" /></div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Capital</label>
+                <input type="text" value={companyCapital} onChange={e => setCompanyCapital(e.target.value)} placeholder="1 000 000"
+                  className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
               </div>
             </div>
           )}
 
-          <div>
-            <label style={labelStyle}>Secteur d'activité</label>
-            <select value={sector} onChange={e => setSector(e.target.value)} style={selectStyle}>
-              {sectors.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
+          {/* Navigation buttons */}
+          <div className="flex gap-2 mt-1">
+            {step > 1 && (
+              <button type="button" onClick={prevStep}
+                className="flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.08)] transition hover:bg-[var(--navy-3)] active:scale-[0.98]">
+                <ChevronLeft size={16} /> Retour
+              </button>
+            )}
+            {step < totalSteps ? (
+              <button type="button" onClick={nextStep}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-lg text-sm font-bold bg-[var(--green-2)] text-white border-none cursor-pointer transition hover:bg-[var(--green-3)] active:scale-[0.98] shadow-lg shadow-[rgba(0,122,64,0.3)]">
+                Suivant <ChevronRight size={16} />
+              </button>
+            ) : (
+              <button type="submit" disabled={loading}
+                className="flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-bold border border-[rgba(245,237,214,0.08)] cursor-pointer bg-[var(--navy-3)] text-[var(--sand)] transition hover:bg-[var(--navy-4)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    Inscription...
+                  </span>
+                ) : 'Créer mon compte'}
+              </button>
+            )}
           </div>
-
-          <div>
-            <label style={labelStyle}>Pays</label>
-            <select value={country} onChange={e => setCountry(e.target.value)} style={selectStyle}>
-              <option value="dz">🇩🇿 Algérie</option>
-              <option value="tn">🇹🇳 Tunisie</option>
-              <option value="ma">🇲🇦 Maroc</option>
-              <option value="fr">🇫🇷 France</option>
-            </select>
-          </div>
-
-          <button type="submit" disabled={loading}
-            style={{
-              width: '100%', padding: '11px 0', borderRadius: 8, fontSize: 14, fontWeight: 700,
-              border: '0.5px solid rgba(255,255,255,0.08)', cursor: loading ? 'default' : 'pointer',
-              background: '#1d202a', color: '#e8ebf0', opacity: loading ? 0.5 : 1, marginTop: 4,
-            }}>
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <span style={{ width: 16, height: 16, border: '2px solid #e8ebf0', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', display: 'inline-block' }} />
-                Inscription...
-              </span>
-            ) : 'Créer mon compte'}
-          </button>
         </form>
 
-        <p style={{ textAlign: 'center', fontSize: 12, color: '#656a73', marginTop: 16 }}>
+        <p className="text-center text-xs text-[var(--sand-muted)] mt-4">
           Déjà un compte ?{' '}
-          <a href="/auth/login" style={{ color: '#a1a5ad', fontWeight: 600, textDecoration: 'none' }}>Se connecter</a>
+          <a href="/auth/login" className="text-[var(--sand-muted)] font-semibold no-underline hover:text-[var(--sand)] transition">Se connecter</a>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[var(--navy)]">
+        <Loader2 size={28} className="animate-spin text-[var(--sand-muted)]" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }

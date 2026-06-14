@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
@@ -20,13 +19,12 @@ interface DocSummary {
 }
 
 export default function DashboardPage() {
-  const common = useTranslations('common');
   const [docs, setDocs] = useState<DocSummary[]>([]);
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
   const [userPhone, setUserPhone] = useState<string | null>(null);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [stats, setStats] = useState({ totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0 });
+  const [stats, setStats] = useState({ totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {} as Record<string, number>, typeBreakdown: {} as Record<string, number>, recentDraft: null as { id: string; number: string; type: string; clientName: string; updatedAt: string } | null });
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(() => {
@@ -40,7 +38,7 @@ export default function DashboardPage() {
         setUserMode(dashData.user?.mode || '');
         setUserPhone(dashData.user?.phone || null);
         setCompanyInfo(dashData.user?.companyInfo || null);
-        setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0 });
+        setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
       })
       .catch(() => { setDocs([]); })
       .finally(() => setLoading(false));

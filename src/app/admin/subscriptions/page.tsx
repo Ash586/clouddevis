@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { CreditCard, Users, Clock, AlertTriangle } from 'lucide-react';
+
 
 interface Subscription {
   id: string; name: string; email: string;
@@ -24,7 +24,9 @@ const btnPrimary = { ...btn, background: '#1d202a', color: '#e8ebf0', border: '0
 
 const statusPill: Record<string, { bg: string; color: string }> = {
   TRIAL: { bg: 'rgba(251,191,36,0.10)', color: '#fbbf24' },
-  BASIC: { bg: 'rgba(74,158,255,0.10)', color: '#4a9eff' },
+  STANDARD: { bg: 'rgba(74,158,255,0.10)', color: '#4a9eff' },
+  MAX: { bg: 'rgba(139,92,246,0.10)', color: '#8b5cf6' },
+  ENTERPRISE: { bg: 'rgba(239,68,68,0.10)', color: '#ef4444' },
   PRO: { bg: 'rgba(74,222,128,0.10)', color: '#4ade80' },
   EXPIRED: { bg: 'rgba(248,113,113,0.10)', color: '#f87171' },
   FREE: { bg: '#282c38', color: '#a1a5ad' },
@@ -57,10 +59,11 @@ export default function AdminSubscriptionsPage() {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, [page, statusFilter]);
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchData(); };
 
-  const statuses = ['TRIAL', 'BASIC', 'PRO', 'EXPIRED', 'FREE'];
+  const statuses = ['TRIAL', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'EXPIRED', 'FREE'];
 
   return (
     <div>

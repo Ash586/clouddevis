@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     const totalRevenue = documents.reduce((sum, d) => sum + d.totalTTC, 0);
 
     if (format === 'xls') {
-      const xlsContent = buildXlsReport(users, documents, pageViews, totalRevenue, period);
+      const xlsContent = buildXlsReport(users, documents, pageViews, totalRevenue);
       return new NextResponse(xlsContent, {
         headers: {
           'Content-Type': 'application/vnd.ms-excel',
@@ -113,7 +113,7 @@ function buildCsvReport(users: { name: string; email: string; country: string; s
   return '\uFEFF' + rows.join('\r\n');
 }
 
-function buildXlsReport(users: { name: string; email: string; country: string; subscriptionStatus: string; createdAt: Date }[], documents: { type: string; status: string; totalTTC: number; createdAt: Date }[], pageViews: { country: string; path: string; timestamp: Date }[], totalRevenue: number, _period: string): string {
+function buildXlsReport(users: { name: string; email: string; country: string; subscriptionStatus: string; createdAt: Date }[], documents: { type: string; status: string; totalTTC: number; createdAt: Date }[], pageViews: { country: string; path: string; timestamp: Date }[], totalRevenue: number): string {
   const rows: string[] = [];
   rows.push('<html><head><meta charset="utf-8"><title>Admin Report</title></head><body>');
 

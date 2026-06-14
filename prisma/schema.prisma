@@ -14,9 +14,18 @@ enum UserMode {
 enum SubscriptionStatus {
   FREE
   TRIAL
-  BASIC
+  STANDARD
   PRO
+  MAX
+  ENTERPRISE
   EXPIRED
+}
+
+// ── Mobile-compatible Plan enum (added) ─────────────────────
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
 }
 
 enum DocumentType {
@@ -25,6 +34,8 @@ enum DocumentType {
   BC
   BR
   FACTURE
+  INTERVENTION
+  ATTACHEMENT
 }
 
 enum DocumentStatus {
@@ -32,6 +43,14 @@ enum DocumentStatus {
   ACCEPTED
   PROGRESS
   DELIVERED
+}
+
+// ── Mobile-compatible DocumentStatus enum (added) ───────────
+enum MobileDocumentStatus {
+  DRAFT
+  SENT
+  PAID
+  CANCELLED
 }
 
 model User {
@@ -47,9 +66,13 @@ model User {
   subscriptionStatus SubscriptionStatus @default(TRIAL)
   trialStartAt      DateTime?
   subscriptionEndAt DateTime?
+  docCountThisMonth Int              @default(0)
+  lastDocResetAt    DateTime?
+  storageUsedBytes  BigInt           @default(0)
+  maxTeamMembers    Int              @default(1)
   suspended         Boolean          @default(false)
   suspendedAt       DateTime?
-  companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature }
+  companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature } (DEPRECATED — use Company model)
   settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -59,6 +82,7 @@ model User {
   resetTokens       PasswordResetToken[]
   clients           Client[]
   documents         Document[]
+  company           Company?           // NEW — separate Company model
   templates         Template[]
   backups           Backup[]
   activityLogs      ActivityLog[]
@@ -69,6 +93,10 @@ model User {
   recurringInvoices RecurringInvoice[]
   partner           Partner?
   referrals         Referral[]          @relation("ReferredUser")
+  lemonsqueezyCustomerId    String?
+  lemonsqueezySubscriptionId String?
+  transactions      Transaction[]
+  enterpriseRequests EnterpriseRequest[]
 }
 
 model Account {
@@ -128,24 +156,70 @@ model Client {
   documents Document[]
   @@index([userId])
   @@index([name])
+  @@index([userId, name])
+  @@index([userId, nif])
+  @@index([userId, rc])
+}
+
+// ── Company Model (NEW — separate from User.companyInfo Json) ──
+model Company {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  name      String
+  nif       String?  // 15-digit NIF (Algerian companies)
+  rc        String?  // Registre du Commerce (9-14 alphanum)
+  nis       String?  // Numéro d'Identification Statistique (10 digits)
+  ai        String?  // Identifiant d'Acte (10 digits)
+  phone     String?
+  address   String?
+  logo      String?  // Base64 data URL
+  signature String?  // Base64 signature image
+  capital   String?
+  tvaRate   Int      @default(19) // Default TVA: 9 or 19
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents Document[]
+  @@index([userId])
+  @@index([nif])
+}
+
+// ── LineItem Model (NEW — separate from Document.items Json) ──
+model LineItem {
+  id         String   @id @default(cuid())
+  documentId String
+  label      String
+  quantity   Float
+  unit       String   @default("u") // u, h, j, m2, m3, ml, kg, forfait
+  unitPrice  Float
+  tvaRate    Int      @default(19) // 0, 9, or 19
+  totalHT    Float    @default(0)  // quantity * unitPrice
+  createdAt  DateTime @default(now())
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  @@index([documentId])
 }
 
 model Document {
   id            String         @id @default(cuid())
   userId        String
   clientId      String?
+  companyId     String?        // NEW — link to Company model
   type          DocumentType   @default(DEVIS)
   status        DocumentStatus @default(DRAFT)
   number        String         @default("")
   date          DateTime       @default(now())
   validUntil    DateTime?
   deliveryDate  DateTime?
+  dueDate       DateTime?      // NEW — payment due date
   mode          UserMode       @default(ARTISAN)
   country       String         @default("algeria")
   sector        String?
   taxRegime     String         @default("tva_19")
   paymentMode   String         @default("cheque")
-  items         Json           @default("[]")
+  language      String         @default("fr") // NEW — FR, AR, EN
+  items         Json           @default("[]") // Keep for backward compat
   subTotalHT    Float          @default(0)
   tvaAmount     Float          @default(0)
   timbreFiscal  Float          @default(0)
@@ -165,14 +239,20 @@ model Document {
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   client        Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  company       Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
   team          Team?          @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  lineItems     LineItem[]     // NEW — separate LineItem model
   shares        DocumentShare[]
   @@index([userId])
   @@index([clientId])
+  @@index([companyId])
   @@index([type])
   @@index([status])
   @@index([number])
   @@index([createdAt])
+  @@index([userId, type, status, createdAt])
+  @@index([userId, mode])
+  @@index([userId, country])
 }
 
 model Template {
@@ -227,6 +307,7 @@ model Admin {
 
   activityLogs    ActivityLog[]
   backupLogs      BackupLog[]
+  handledRequests EnterpriseRequest[]
 
   @@index([email])
 }
@@ -310,6 +391,7 @@ model Partner {
   referrals     Referral[]
   commissions   Commission[]
   payouts       Payout[]
+  clicks        PartnerClick[]
   courses       PartnerCourse[]
 
   @@index([code])
@@ -361,6 +443,23 @@ model Payout {
 
   @@index([partnerId])
   @@index([status])
+}
+
+model PartnerClick {
+  id          String   @id @default(cuid())
+  partnerId   String
+  code        String
+  ipHash      String?
+  userAgent   String?
+  referrer    String?
+  landingPath String?
+  createdAt   DateTime @default(now())
+
+  partner     Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([createdAt])
+  @@index([code])
 }
 
 model PartnerCourse {
@@ -455,6 +554,7 @@ model Notification {
 
   @@index([userId])
   @@index([userId, read])
+  @@index([userId, read, createdAt])
   @@index([createdAt])
 }
 
@@ -558,4 +658,70 @@ model RecurringInvoice {
   @@index([userId])
   @@index([nextDate])
   @@index([active])
+}
+
+enum EnterpriseRequestStatus {
+  PENDING
+  CONTACTED
+  APPROVED
+  REJECTED
+}
+
+model EnterpriseRequest {
+  id           String                    @id @default(cuid())
+  userId       String
+  companyName  String
+  employees    String
+  needs        String
+  phone        String?
+  status       EnterpriseRequestStatus   @default(PENDING)
+  handledById  String?
+  handledAt    DateTime?
+  notes        String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  user         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  handledBy    Admin?                    @relation(fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum TransactionProvider {
+  LEMON_SQUEEZY
+  EDAHABIA
+}
+
+model Transaction {
+  id              String                @id @default(cuid())
+  userId          String
+  amount          Float
+  currency        String                @default("DZD")
+  status          TransactionStatus     @default(PENDING)
+  provider        TransactionProvider
+  providerId      String?               // LemonSqueezy order/charge ID
+  planId          String                // 'standard' | 'pro' | 'max'
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  description     String?
+  metadata        Json                  @default("{}")
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([providerId])
+  @@index([userId, status, createdAt])
 }
