@@ -962,9 +962,9 @@ function EditorContent() {
               ) : (
                 <>
                   {([
-                    { label: te('simplifyEssential') || 'Essentiel', color: 'bg-[var(--green-glow)] border-blue-200', fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'clientName', 'clientAddress', 'itemsTable', 'paymentMethod', 'paymentDeposit', 'paymentConditions'] },
-                    { label: te('simplifySite') || 'Chantier', color: 'bg-green-50 border-green-200', fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'garantieLabor', 'garantieMaterials', 'garantieNotes'] },
-                    { label: te('simplifyAdvanced') || 'Avancé', color: 'bg-purple-50 border-purple-200', fields: ['businessMode', 'logo', 'logoPosition', 'vatRate', 'stampRate', 'remiseType', 'remiseValue', 'remiseReason', 'notes', 'clientNif', 'clientPhone', 'clientEmail'] },
+                    { label: te('simplifyEssential') || 'Informations de base', color: 'bg-[var(--green-glow)] border-blue-200', fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'clientName', 'clientAddress', 'itemsTable', 'paymentMethod', 'paymentDeposit', 'paymentConditions'] },
+                    { label: te('simplifySite') || 'Détails du chantier', color: 'bg-green-50 border-green-200', fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'garantieLabor', 'garantieMaterials', 'garantieNotes'] },
+                    { label: te('simplifyAdvanced') || 'Options avancées', color: 'bg-purple-50 border-purple-200', fields: ['businessMode', 'logo', 'logoPosition', 'vatRate', 'stampRate', 'remiseType', 'remiseValue', 'remiseReason', 'notes', 'clientNif', 'clientPhone', 'clientEmail'] },
                   ] as const).map(group => (
                     <div key={group.label} className={`p-2.5 rounded-xl border ${group.color} space-y-1.5`}>
                       <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{group.label}</h4>
@@ -998,7 +998,7 @@ function EditorContent() {
                   ))}
                   {customSections.length > 0 && (
                     <div className="p-2.5 rounded-xl border bg-amber-50 border-amber-200 space-y-1.5">
-                      <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('customSections') || 'Sections personnalisées'}</h4>
+                      <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('customSections') || 'Mes sections'}</h4>
                       <div className="flex flex-wrap gap-1.5">
                         {customSections.map(cs => (
                           <span key={cs.id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[var(--navy-2)] text-[10px] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)]">
