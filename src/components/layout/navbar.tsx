@@ -52,7 +52,7 @@ export function Navbar() {
     <>
       <nav className="sticky top-0 z-[100] bg-[var(--navy)]/85 backdrop-blur-xl border-b border-[rgba(245,237,214,0.08)]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
+          <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
             <span className="text-lg sm:text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight hidden sm:inline">CloudDevis</span>
           </Link>
