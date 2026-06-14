@@ -27,8 +27,8 @@ function LoginForm() {
   } as React.CSSProperties;
 
   const toggleBtnClass = isDark
-    ? 'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--sand)] hover:bg-[var(--navy-4)]'
-    : 'bg-white border border-[rgba(0,0,0,0.08)] text-[#374151] hover:bg-gray-100';
+    ? 'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[#4DCA8A] hover:bg-[var(--navy-4)]'
+    : 'bg-white border border-[rgba(0,0,0,0.08)] text-[#4DCA8A] hover:bg-gray-100';
 
   // Validate redirect: must start with /dashboard for security
   const safeRedirect = redirectTo.startsWith('/dashboard') ? redirectTo : '';
