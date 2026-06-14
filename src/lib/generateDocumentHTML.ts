@@ -20,8 +20,19 @@ export function generateDocumentHTML(params: {
   tu: (key: string) => string;
   customSections: CustomSectionDef[];
   currency: string;
+  companyTagline?: string;
+  companyCapital?: string;
+  rcNumber?: string;
+  nisNumber?: string;
+  aiNumber?: string;
+  rib?: string;
+  bankName?: string;
+  bankAgency?: string;
+  ccpNumber?: string;
+  validityDays?: number;
+  reference?: string;
 }) {
-  const { isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency } = params;
+  const { isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency, companyTagline, companyCapital, rcNumber, nisNumber, aiNumber, rib, bankName, bankAgency, ccpNumber, validityDays, reference } = params;
 
   const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 
@@ -93,6 +104,11 @@ export function generateDocumentHTML(params: {
     ${S('.signature .stamp','text-align:right')}
     ${S('.signature .stamp .lbl2','font-size:8px;color:#94a3b8;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px')}
     ${S('.signature .stamp .box','width:110px;height:52px;border:2px solid #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#cbd5e1;background:#f8fafc')}
+    ${S('.rib-block','padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #fde68a;background:#fffbeb')}
+    ${S('.rib-block strong','font-size:9px;color:#d97706')}
+    ${S('.rib-block span','display:block;font-size:8px;color:#475569;line-height:1.5')}
+    ${S('.validity-banner','padding:8px 10px;border-radius:6px;margin-bottom:6px;border:1px solid #fde68a;background:#FEF3C7')}
+    ${S('.validity-banner span','font-size:9px;color:#92400e;font-weight:700')}
     ${S('.print-footer','text-align:center;font-size:7px;color:#94a3b8;margin-top:20px;border-top:1px solid #e2e8f0;padding-top:8px;letter-spacing:0.3px')}
     ${S('@media print','.page{padding:30px 40px 20px;box-shadow:none}')}
   `;
@@ -130,6 +146,7 @@ export function generateDocumentHTML(params: {
       ` + (logoUrl && logoPos === 'right' ? `<div class="meta-logo"><img src="` + s(logoUrl) + `" alt="Logo" /></div>` : '') + `
       <div class="meta">
         ` + (sf('docNumber') ? `<div class="num">` + s(doc.documentNumber) + `</div>` : '') + `
+        ` + (reference ? `<div class="line">Réf: ` + s(reference) + `</div>` : '') + `
         ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + doc.date + `</div>` : '') + `
         ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + doc.validUntil + `</div>` : '') + `
         ` + (sf('orderRef') && doc.bcRef ? `<div class="line">${tp('orderRef')} ` + s(doc.bcRef) + `</div>` : '') + `
@@ -144,11 +161,16 @@ export function generateDocumentHTML(params: {
       <div class="val">
         ` + (isEnt && doc.companyInfo ? `
           <strong>` + s(doc.companyInfo.name) + `</strong><br>
+          ` + (companyTagline ? `<span class="muted" style="font-style:italic">` + s(companyTagline) + `</span><br>` : '') + `
           ` + (doc.companyInfo.address ? `<span class="muted">` + s(doc.companyInfo.address) + `</span><br>` : '') + `
+          ` + (companyCapital ? `<span class="muted">Au Capital Social de ` + s(companyCapital) + `</span><br>` : '') + `
           ` + (doc.companyInfo.taxIds.nif ? `<span class="muted">${te('client.companyNif')} : ` + s(doc.companyInfo.taxIds.nif) + `</span><br>` : '') + `
           ` + (doc.companyInfo.taxIds.rc ? `<span class="muted">${te('client.companyRc')} : ` + s(doc.companyInfo.taxIds.rc) + `</span><br>` : '') + `
           ` + (doc.companyInfo.taxIds.nis ? `<span class="muted">${te('client.companyNis')} : ` + s(doc.companyInfo.taxIds.nis) + `</span><br>` : '') + `
           ` + (doc.companyInfo.taxIds.ai ? `<span class="muted">${te('client.companyAi')} : ` + s(doc.companyInfo.taxIds.ai) + `</span>` : '') + `
+          ` + (rcNumber ? `<span class="muted">R.C. : ` + s(rcNumber) + `</span><br>` : '') + `
+          ` + (nisNumber ? `<span class="muted">NIS : ` + s(nisNumber) + `</span><br>` : '') + `
+          ` + (aiNumber ? `<span class="muted">N°AI : ` + s(aiNumber) + `</span>` : '') + `
         ` : doc.artisanInfo ? `
           <strong>` + s(doc.artisanInfo.name) + `</strong><br>
           ` + (doc.artisanInfo.address ? `<span class="muted">` + s(doc.artisanInfo.address) + `</span><br>` : '') + `
@@ -199,6 +221,18 @@ export function generateDocumentHTML(params: {
 <div class="bottom-section">
   <div class="inner">
     <div class="left">
+      ` + (rib ? `
+      <div class="card" style="background:#fffbeb;border-color:#fde68a">
+        <strong style="font-size:9px;color:#d97706">RIB</strong><br>
+        <span style="color:#475569">RIB: ` + s(rib) + `</span><br>
+        ` + (bankName ? `<span style="color:#475569">Banque: ` + s(bankName) + `</span><br>` : '') + `
+        ` + (bankAgency ? `<span style="color:#475569">Agence: ` + s(bankAgency) + `</span><br>` : '') + `
+        ` + (ccpNumber ? `<span style="color:#475569">CCP: ` + s(ccpNumber) + `</span>` : '') + `
+      </div>` : '') + `
+      ` + (validityDays ? `
+      <div class="card" style="background:#FEF3C7;border-color:#fde68a">
+        <span style="color:#92400e;font-weight:700">Ce devis est valable ` + validityDays + ` jours à compter de la date d'émission.</span>
+      </div>` : '') + `
       ` + (vb('garanties') && bv('garantieLabor','garantieMaterials','garantieNotes') ? `
       <div class="card" style="background:#f0fdf4;border-color:#bbf7d0">
         <strong style="font-size:9px;color:#15803d">${tp('garanties')}</strong><br>

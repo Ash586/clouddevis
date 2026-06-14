@@ -7,6 +7,7 @@ import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import { TemplateFR } from './template-fr';
 import { TemplateAR } from './template-ar';
+import { DevisFRTemplate } from './templates/devis-fr';
 import type { PDFDocumentData, PDFOptions } from './types';
 
 export type { PDFDocumentData, PDFCompany, PDFClient, PDFLineItem, PDFDocumentType, PDFOptions } from './types';
@@ -23,8 +24,8 @@ export async function generatePDF(
   docData: PDFDocumentData,
   options?: PDFOptions,
 ): Promise<Uint8Array> {
-  // Select template based on language
-  const Template = docData.language === 'AR' ? TemplateAR : TemplateFR;
+  // Select template: DEVIS gets its own template, others use language-based selection
+  const Template = docData.type === 'DEVIS' ? DevisFRTemplate : (docData.language === 'AR' ? TemplateAR : TemplateFR);
 
   // Render the template (returns a <Document> element from @react-pdf/renderer)
   const docElement = <Template data={docData} />;
@@ -75,8 +76,8 @@ export async function generatePDFBlob(
   docData: PDFDocumentData,
   options?: PDFOptions,
 ): Promise<Blob> {
-  // Select template based on language
-  const Template = docData.language === 'AR' ? TemplateAR : TemplateFR;
+  // Select template: DEVIS gets its own template, others use language-based selection
+  const Template = docData.type === 'DEVIS' ? DevisFRTemplate : (docData.language === 'AR' ? TemplateAR : TemplateFR);
   const docElement = <Template data={docData} />;
   const pdfDoc = pdf(docElement);
   return pdfDoc.toBlob();

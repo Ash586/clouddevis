@@ -109,6 +109,20 @@ export interface Document {
   notes?: string;
   validUntil?: string;   // Devis validity date
   acompte?: number;      // Deposit amount
+
+  // DEVIS-specific fields
+  companyTagline?: string;
+  companyCapital?: string;
+  rcNumber?: string;
+  nisNumber?: string;
+  aiNumber?: string;
+  rib?: string;
+  bankName?: string;
+  bankAgency?: string;
+  ccpNumber?: string;
+  validityDays?: number;
+  reference?: string;
+  showWatermark?: boolean;
 }
 
 // ── User & Auth ──────────────────────────────────────────────

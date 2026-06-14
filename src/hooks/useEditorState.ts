@@ -69,6 +69,18 @@ export function createEmptyDoc(mode: UserMode): DocumentState {
     sectionOrder: [...DEFAULT_SECTION_ORDER],
     customFields: {},
     logoPosition: 'right',
+    companyTagline: '',
+    companyCapital: '',
+    rcNumber: '',
+    nisNumber: '',
+    aiNumber: '',
+    rib: '',
+    bankName: '',
+    bankAgency: '',
+    ccpNumber: '',
+    validityDays: 30,
+    reference: '',
+    showWatermark: false,
   };
 }
 

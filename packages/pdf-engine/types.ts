@@ -68,6 +68,20 @@ export interface PDFDocumentData {
 
   // Settings
   language: 'FR' | 'AR' | 'EN';
+
+  // DEVIS-specific fields
+  companyTagline?: string;
+  companyCapital?: string;
+  rcNumber?: string;
+  nisNumber?: string;
+  aiNumber?: string;
+  rib?: string;
+  bankName?: string;
+  bankAgency?: string;
+  ccpNumber?: string;
+  validityDays?: number;
+  reference?: string;
+  showWatermark?: boolean;
 }
 
 /** PDF generation options */

@@ -61,6 +61,18 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
       ? numberToArabicWords(doc.totalTTC + doc.timbreAmount - (doc.acompte || 0))
       : numberToFrenchWords(doc.totalTTC + doc.timbreAmount - (doc.acompte || 0)),
     language: doc.language,
+    companyTagline: doc.companyTagline,
+    companyCapital: doc.companyCapital,
+    rcNumber: doc.rcNumber,
+    nisNumber: doc.nisNumber,
+    aiNumber: doc.aiNumber,
+    rib: doc.rib,
+    bankName: doc.bankName,
+    bankAgency: doc.bankAgency,
+    ccpNumber: doc.ccpNumber,
+    validityDays: doc.validityDays,
+    reference: doc.reference,
+    showWatermark: doc.status === 'DRAFT',
   };
 
   return engineGeneratePDF(pdfData);
@@ -101,7 +113,7 @@ export async function generatePDFBase64(options: {
   notes?: string;
 }): Promise<string> {
   const pdfData: PDFDocumentData = {
-    type: (options.docType.toUpperCase() as any) || 'FACTURE',
+    type: (options.docType.toUpperCase() as PDFDocumentData['type']) || 'FACTURE',
     number: options.docNumber,
     date: options.date || new Date().toISOString().split('T')[0],
     notes: options.notes,

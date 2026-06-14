@@ -97,13 +97,14 @@ export interface CustomSectionDef {
 export type SectionId = string;
 
 export const DEFAULT_SECTION_ORDER: string[] = [
-  'design', 'general', 'mode', 'client', 'chantier', 'materiaux',
+  'design', 'general', 'devis', 'mode', 'client', 'chantier', 'materiaux',
   'prestations', 'remise', 'garanties', 'paiement', 'notes',
 ];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   design: 'Design & Logo',
   general: 'General',
+  devis: 'Informations Devis',
   mode: 'Mode',
   client: 'Client',
   chantier: 'Chantier',
@@ -164,11 +165,26 @@ export interface DocumentState {
   sectionOrder: string[];
   customFields: Record<string, Record<string, unknown>>;
   logoPosition?: 'left' | 'right';
+
+  // DEVIS-specific fields
+  companyTagline?: string;
+  companyCapital?: string;
+  rcNumber?: string;
+  nisNumber?: string;
+  aiNumber?: string;
+  rib?: string;
+  bankName?: string;
+  bankAgency?: string;
+  ccpNumber?: string;
+  validityDays?: number;
+  reference?: string;
+  showWatermark?: boolean;
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
   design: ['logo', 'logoPosition'],
   general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
+  devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
   mode: ['businessMode'],
   client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone', 'clientEmail'],
   chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection'],
