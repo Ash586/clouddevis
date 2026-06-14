@@ -971,7 +971,7 @@ function EditorContent() {
                       <div className="flex flex-wrap gap-1.5">
                         {group.fields.map(fieldId => {
                           const isHidden = hiddenFields.has(fieldId);
-                          const label = te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
+                          const label = te(`fields.${fieldId}`) || te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
                           return (
                             <label key={fieldId} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg cursor-pointer transition text-[10px] ${isHidden ? 'bg-[var(--navy-2)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)]' : 'bg-[var(--navy-2)] text-[var(--sand-2)] border border-[rgba(245,237,214,0.15)] font-medium'}`}>
                               <input type="checkbox" checked={!isHidden} onChange={() => {
