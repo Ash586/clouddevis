@@ -111,3 +111,37 @@
 #admin-layout .flex.gap-1.bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
 #admin-layout .bg-slate-100.text-slate-900 { background: var(--bg3) !important; color: var(--text) !important; }
 #admin-layout .bg-slate-50.rounded-xl { background: var(--bg3) !important; }
+
+/* ═══════════════════════════════════════
+   LIGHT THEME FOR ADMIN
+═════════════════════════════════════ */
+:root[data-theme="light"] #admin-layout {
+  --bg:      #F5F1E8;
+  --bg2:     #FFFFFF;
+  --bg3:     #ECE5D4;
+  --bg4:     #E0D8C8;
+  --border:  #D4CCB8;
+  --border2: #ECE5D4;
+  --text:    #1A1A1A;
+  --text2:   #4A4A4A;
+  --text3:   #868E96;
+  --stamp-red: #E8542E;
+  /* Keep semantic status colors */
+  --blue:    #1864AB;
+  --green:   #1AA74E;
+  --amber:   #E67700;
+  --red:     #C92A2A;
+}
+
+/* Light theme — override the dark overrides */
+:root[data-theme="light"] #admin-layout .bg-white { background: var(--bg2) !important; }
+:root[data-theme="light"] #admin-layout .bg-slate-50 { background: var(--bg3) !important; }
+:root[data-theme="light"] #admin-layout .bg-slate-100 { background: var(--bg4) !important; }
+:root[data-theme="light"] #admin-layout .text-slate-900 { color: var(--text) !important; }
+:root[data-theme="light"] #admin-layout .text-slate-800 { color: var(--text) !important; }
+:root[data-theme="light"] #admin-layout .text-slate-700 { color: var(--text) !important; }
+:root[data-theme="light"] #admin-layout .text-slate-600 { color: var(--text2) !important; }
+:root[data-theme="light"] #admin-layout .text-slate-500 { color: var(--text2) !important; }
+:root[data-theme="light"] #admin-layout .border-slate-200 { border-color: var(--border) !important; }
+:root[data-theme="light"] #admin-layout select { color: var(--text) !important; }
+:root[data-theme="light"] #admin-layout option { color: var(--text) !important; }

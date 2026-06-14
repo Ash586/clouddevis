@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/hooks/useUser';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { Menu, X, Home } from 'lucide-react';
+import { Menu, X, Home, Sun, Moon } from 'lucide-react';
 
 const LANG_LABELS: Record<string, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
 const LANGS = ['fr', 'ar', 'en'] as const;
@@ -17,6 +18,7 @@ export function Navbar() {
   const t = useTranslations('navbar');
   const router = useRouter();
   const { lang, setLang } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const { user, loading, refresh } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -70,6 +72,15 @@ export function Navbar() {
                 title={lang === 'fr' ? t('langFr') : lang === 'ar' ? t('langAr') : t('langEn')}
               >
                 {LANG_LABELS[lang]}
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[var(--sand)] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
+                title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+                aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+              >
+                {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </button>
 
               {user && <NotificationBell />}
