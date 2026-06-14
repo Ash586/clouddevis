@@ -18,12 +18,13 @@ import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS }
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
-import {
+  import {
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
-  Grid3X3, GripVertical, Trash2, Plus, EyeOff, MoreHorizontal, Grip,
-  ChevronDown,
+  Grid3X3, Trash2, Plus, MoreHorizontal,
+  ChevronDown, Building2, Receipt, BadgeCheck,
+  CircleDollarSign, ScrollText, Briefcase, ClipboardList,
 } from 'lucide-react';
 
 function EditorContent() {
@@ -931,14 +932,17 @@ function EditorContent() {
 
       {/* ──── CUSTOMIZATION MODAL ──── */}
       {showCustomizer && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCustomizer(false)}>
-          <div className="bg-[var(--navy-2)] w-full sm:max-w-lg sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowCustomizer(false)}>
+          <div className="bg-[var(--navy-2)] w-full sm:max-w-2xl sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
             <div className="px-5 py-4 border-b border-[rgba(245,237,214,0.06)] flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-[var(--sand)] tracking-tight">{te('customizeTitle')}</h3>
+              <div>
+                <h3 className="text-[16px] font-bold text-[var(--sand)] tracking-tight">{te('customizeTitle')}</h3>
+                <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">{te('customizeSubtitle') || 'Cliquez sur une catégorie pour voir les champs'}</p>
+              </div>
               <button onClick={() => setShowCustomizer(false)} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">✕</button>
             </div>
-            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
               {showSectionCreator ? (
                 <SectionCreatorForm
                   initialSection={editingSection}
@@ -962,62 +966,153 @@ function EditorContent() {
               ) : (
                 <>
                   {([
-                    { label: te('simplifyEssential') || 'Informations de base', color: 'bg-[var(--green-glow)] border-blue-200', fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'clientName', 'clientAddress', 'itemsTable', 'paymentMethod', 'paymentDeposit', 'paymentConditions'] },
-                    { label: te('simplifySite') || 'Détails du chantier', color: 'bg-green-50 border-green-200', fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'garantieLabor', 'garantieMaterials', 'garantieNotes'] },
-                    { label: te('simplifyAdvanced') || 'Options avancées', color: 'bg-purple-50 border-purple-200', fields: ['businessMode', 'logo', 'logoPosition', 'vatRate', 'stampRate', 'remiseType', 'remiseValue', 'remiseReason', 'notes', 'clientNif', 'clientPhone', 'clientEmail'] },
-                  ] as const).map(group => (
-                    <div key={group.label} className={`p-2.5 rounded-xl border ${group.color} space-y-1.5`}>
-                      <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{group.label}</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {group.fields.map(fieldId => {
-                          const isHidden = hiddenFields.has(fieldId);
-                          const label = te(`fields.${fieldId}`) || te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
-                          return (
-                            <label key={fieldId} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg cursor-pointer transition text-[10px] ${isHidden ? 'bg-[var(--navy-2)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)]' : 'bg-[var(--navy-2)] text-[var(--sand-2)] border border-[rgba(245,237,214,0.15)] font-medium'}`}>
-                              <input type="checkbox" checked={!isHidden} onChange={() => {
-                                setFieldPrefs(prev => {
-                                  const current = { ...prev };
-                                  for (const section of ALL_SECTIONS) {
-                                    const sectionFields = SECTION_FIELDS[section] ?? customSections.find(c => c.id === section)?.fields.map(f => f.id) ?? [];
-                                    if (sectionFields.includes(fieldId)) {
-                                      const visible = [...(current[section] ?? sectionFields)];
-                                      if (isHidden) { if (!visible.includes(fieldId)) visible.push(fieldId); }
-                                      else { const idx = visible.indexOf(fieldId); if (idx >= 0) visible.splice(idx, 1); }
-                                      current[section] = visible;
-                                    }
-                                  }
-                                  return current;
-                                });
-                              }} className="w-3 h-3 rounded text-[var(--green-3)]" />
-                              {label}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                    {
+                      id: 'docInfo',
+                      icon: <FileText size={16} />,
+                      label: 'Document',
+                      color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                      fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef'],
+                    },
+                    {
+                      id: 'company',
+                      icon: <Building2 size={16} />,
+                      label: 'Entreprise',
+                      color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+                      fields: ['businessMode', 'logo', 'logoPosition'],
+                    },
+                    {
+                      id: 'clientSection',
+                      icon: <User size={16} />,
+                      label: 'Client',
+                      color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                      fields: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+                    },
+                    {
+                      id: 'chantier',
+                      icon: <MapPin size={16} />,
+                      label: 'Chantier',
+                      color: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                      fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
+                    },
+                    {
+                      id: 'materiaux',
+                      icon: <Package size={16} />,
+                      label: 'Matériaux',
+                      color: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                      fields: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+                    },
+                    {
+                      id: 'prestations',
+                      icon: <ClipboardList size={16} />,
+                      label: 'Prestations',
+                      color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+                      fields: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+                    },
+                    {
+                      id: 'remise',
+                      icon: <Percent size={16} />,
+                      label: 'Remise',
+                      color: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
+                      fields: ['remiseType', 'remiseValue', 'remiseReason'],
+                    },
+                    {
+                      id: 'garanties',
+                      icon: <BadgeCheck size={16} />,
+                      label: 'Garanties',
+                      color: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
+                      fields: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
+                    },
+                    {
+                      id: 'fiscalite',
+                      icon: <Receipt size={16} />,
+                      label: 'Fiscalité',
+                      color: 'bg-red-500/10 text-red-400 border-red-500/20',
+                      fields: ['vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+                    },
+                    {
+                      id: 'paiement',
+                      icon: <CircleDollarSign size={16} />,
+                      label: 'Paiement',
+                      color: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+                      fields: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+                    },
+                    {
+                      id: 'notes',
+                      icon: <ScrollText size={16} />,
+                      label: 'Notes',
+                      color: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+                      fields: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+                    },
+                  ] as const).map(group => {
+                    const visibleCount = group.fields.filter(f => !hiddenFields.has(f)).length;
+                    return (
+                      <details key={group.id} className="group rounded-xl border border-[rgba(245,237,214,0.08)] overflow-hidden">
+                        <summary className={`flex items-center gap-3 px-3.5 py-3 cursor-pointer select-none transition hover:bg-[rgba(245,237,214,0.04)] ${group.color.split(' ').slice(0, 2).join(' ')}`}>
+                          <span className={`flex items-center justify-center w-8 h-8 rounded-lg ${group.color}`}>{group.icon}</span>
+                          <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{group.label}</span>
+                          <span className="text-[10px] text-[var(--sand-muted)] font-medium">{visibleCount}/{group.fields.length}</span>
+                          <ChevronDown size={14} className="text-[var(--sand-muted)] transition group-open:rotate-180" />
+                        </summary>
+                        <div className="px-3.5 pb-3 pt-1 space-y-1 bg-[rgba(245,237,214,0.02)]">
+                          <div className="flex flex-wrap gap-1.5">
+                            {group.fields.map(fieldId => {
+                              const isHidden = hiddenFields.has(fieldId);
+                              const label = te(`fields.${fieldId}`) || te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
+                              return (
+                                <label key={fieldId} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition text-[11px] ${isHidden ? 'bg-[var(--navy-3)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] opacity-60' : 'bg-[var(--navy-3)] text-[var(--sand)] border border-[rgba(245,237,214,0.12)] font-medium'}`}>
+                                  <input type="checkbox" checked={!isHidden} onChange={() => {
+                                    setFieldPrefs(prev => {
+                                      const current = { ...prev };
+                                      for (const section of ALL_SECTIONS) {
+                                        const sectionFields = SECTION_FIELDS[section] ?? customSections.find(c => c.id === section)?.fields.map(f => f.id) ?? [];
+                                        if (sectionFields.includes(fieldId)) {
+                                          const visible = [...(current[section] ?? sectionFields)];
+                                          if (isHidden) { if (!visible.includes(fieldId)) visible.push(fieldId); }
+                                          else { const idx = visible.indexOf(fieldId); if (idx >= 0) visible.splice(idx, 1); }
+                                          current[section] = visible;
+                                        }
+                                      }
+                                      return current;
+                                    });
+                                  }} className="w-3.5 h-3.5 rounded text-[var(--green-3)]" />
+                                  {label}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </details>
+                    );
+                  })}
                   {customSections.length > 0 && (
-                    <div className="p-2.5 rounded-xl border bg-amber-50 border-amber-200 space-y-1.5">
-                      <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('customSections') || 'Mes sections'}</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {customSections.map(cs => (
-                          <span key={cs.id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[var(--navy-2)] text-[10px] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)]">
-                            {cs.label}
-                            <button onClick={async () => {
-                              await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
-                              setCustomSections(prev => prev.filter(c => c.id !== cs.id));
-                              setFieldPrefs(prev => { const rest = Object.fromEntries(Object.entries(prev ?? {}).filter(([k]) => k !== cs.id)); return rest; });
-                              setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
-                            }} className="text-red-400 hover:text-red-600 ml-1">✕</button>
-                            <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-[var(--green-3)] ml-0.5">✎</button>
-                          </span>
-                        ))}
+                    <details className="group rounded-xl border border-amber-500/20 overflow-hidden">
+                      <summary className="flex items-center gap-3 px-3.5 py-3 cursor-pointer select-none transition hover:bg-amber-500/5 bg-amber-500/5">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400"><Briefcase size={16} /></span>
+                        <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{te('customSections') || 'Mes sections'}</span>
+                        <ChevronDown size={14} className="text-[var(--sand-muted)] transition group-open:rotate-180" />
+                      </summary>
+                      <div className="px-3.5 pb-3 pt-1 space-y-1 bg-amber-500/2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {customSections.map(cs => (
+                            <span key={cs.id} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--navy-3)] text-[11px] text-[var(--sand)] border border-amber-500/20 font-medium">
+                              {cs.label}
+                              <button onClick={async () => {
+                                await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
+                                setCustomSections(prev => prev.filter(c => c.id !== cs.id));
+                                setFieldPrefs(prev => { const rest = Object.fromEntries(Object.entries(prev ?? {}).filter(([k]) => k !== cs.id)); return rest; });
+                                setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
+                              }} className="text-red-400 hover:text-red-600 ml-1">✕</button>
+                              <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-[var(--green-3)] ml-0.5">✎</button>
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    </details>
                   )}
                   <button onClick={() => { setEditingSection({ id: '', label: '', fields: [] }); setShowSectionCreator(true); }}
-                    className="w-full mt-1 py-2.5 border-2 border-dashed border-[rgba(245,237,214,0.15)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[12px]">
-                    {te('addCustomSection') ?? '+ إضافة قسم مخصص'}
+                    className="w-full mt-2 py-3 border-2 border-dashed border-[rgba(245,237,214,0.15)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[12px] flex items-center justify-center gap-2">
+                    <Plus size={14} />
+                    {te('addCustomSection') ?? '+ Ajouter ma propre section'}
                   </button>
                 </>
               )}
@@ -1044,7 +1139,7 @@ function EditorContent() {
                 if (cs) return [s, cs.fields.map(f => f.id)];
                 return [s, []];
               })))}
-                className="bg-blue-600 text-white text-[12px] font-semibold px-5 py-2 rounded-xl hover:bg-blue-700 active:bg-blue-800 transition shadow-sm">{te('customizeSave')}</button>
+                className="bg-[var(--green-2)] text-white text-[12px] font-semibold px-6 py-2.5 rounded-xl hover:opacity-90 active:scale-[0.97] transition shadow-sm">{te('customizeSave')}</button>
             </div>
           </div>
         </div>
