@@ -43,17 +43,7 @@ export function Navbar() {
     </>
   ) : (
     <>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={toggleTheme}
-          className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[#4DCA8A] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
-          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
-          aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-        >
-          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-        </button>
-        <a href="/auth/login" onClick={() => setMobileOpen(false)} className="block md:inline text-[13px] text-[var(--sand-muted)] hover:text-[var(--sand)] font-medium text-center md:text-left transition-colors min-h-[44px] flex items-center justify-center md:min-h-0">{t('login')}</a>
-      </div>
+      <a href="/auth/login" onClick={() => setMobileOpen(false)} className="block md:inline text-[13px] text-[var(--sand-muted)] hover:text-[var(--sand)] font-medium text-center md:text-left transition-colors min-h-[44px] flex items-center justify-center md:min-h-0">{t('login')}</a>
       <Button size="sm" variant="primary" onClick={() => { router.push('/auth/register'); setMobileOpen(false); }}>{t('signup')}</Button>
     </>
   );
@@ -82,6 +72,15 @@ export function Navbar() {
                 title={lang === 'fr' ? t('langFr') : lang === 'ar' ? t('langAr') : t('langEn')}
               >
                 {LANG_LABELS[lang]}
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[#4DCA8A] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
+                title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+                aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+              >
+                {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </button>
 
               {user && <NotificationBell />}
