@@ -1179,7 +1179,7 @@ function EditorContent() {
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-1.5 cursor-pointer select-none">
                   <input type="checkbox" checked={showSectionNav} onChange={() => setShowSectionNav(v => !v)} className="w-3.5 h-3.5 rounded text-emerald-600" />
-                  <span className="text-[10px] font-medium text-slate-600">{'Navigateur sections' || te('showSectionNav')}</span>
+                  <span className="text-[10px] font-medium text-slate-600">{te('showSectionNav') || 'Navigateur sections'}</span>
                 </label>
                 <div className="w-px h-4 bg-slate-200" />
                 <button onClick={() => {
