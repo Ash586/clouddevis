@@ -1,18 +1,18 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
-import type { DocumentState, LineItem, UserMode, WizardStep } from '@/types';
+import type { DocumentState, LineItem, UserMode, WizardStep, DocumentType } from '@/types';
 import { DEFAULT_SECTION_ORDER } from '@/types';
-import { calculateDocument, generateDocumentNumber, formatDateISO } from '@/lib/calculations';
+import { calculateDocument, generateDocumentNumber, formatDateISO, generateId } from '@/lib/calculations';
 
 export const LS_KEY = 'clouddevis-draft';
 
-export function loadDraft(mode: UserMode): DocumentState {
+export function loadDraft(mode: UserMode, initialType?: DocumentType): DocumentState {
   try {
     const saved = localStorage.getItem(LS_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as Partial<DocumentState>;
       const savedMode = parsed.mode ?? mode;
-      const defaults = createEmptyDoc(savedMode);
+      const defaults = createEmptyDoc(savedMode, initialType);
       const merged: DocumentState = {
         ...defaults,
         ...parsed,
@@ -33,11 +33,12 @@ export function loadDraft(mode: UserMode): DocumentState {
       return merged;
     }
   } catch {}
-  return createEmptyDoc(mode);
+  return createEmptyDoc(mode, initialType);
 }
 
-export function createEmptyDoc(mode: UserMode): DocumentState {
-  return {
+export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): DocumentState {
+  const docType: DocumentType = initialType ?? 'devis';
+  const base: DocumentState = {
     mode,
     clientInfo: { name: '', address: '', phone: '', email: '' },
     artisanInfo: mode === 'artisan' ? { name: '', address: '', phone: '' } : undefined,
@@ -47,8 +48,8 @@ export function createEmptyDoc(mode: UserMode): DocumentState {
     items: [],
     tvaRate: mode === 'artisan' ? 0 : 19,
     paymentMode: 'cheque',
-    documentType: 'devis',
-    documentNumber: generateDocumentNumber('devis', mode),
+    documentType: docType,
+    documentNumber: generateDocumentNumber(docType, mode),
     date: formatDateISO(new Date()),
     discount: { type: 'percentage', value: 0, reason: '' },
     stampDuty: { rate: 1, minAmount: 5, maxAmount: 2500 },
@@ -82,9 +83,24 @@ export function createEmptyDoc(mode: UserMode): DocumentState {
     reference: '',
     showWatermark: false,
   };
+
+  if (docType === 'attachement') {
+    base.items = [
+      { id: generateId(), designation: 'Fourniture et application de peinture acrylique mate', quantity: 120, unit: 'm2', unitPrice: 850, category: 'peinture' },
+      { id: generateId(), designation: 'Enduit de lissage des murs et plafonds', quantity: 85, unit: 'm2', unitPrice: 320, category: 'enduit' },
+      { id: generateId(), designation: 'Ponçage et préparation des surfaces', quantity: 1, unit: 'forfait', unitPrice: 18000, category: 'preparation' },
+      { id: generateId(), designation: 'Nettoyage chantier après travaux', quantity: 1, unit: 'forfait', unitPrice: 5000, category: 'divers' },
+    ];
+    base.chantierAddress = 'Cité des Annassers, Bloc 15, 3e étage, Alger';
+    base.chantierType = 'Appartement';
+    base.chantierSurface = 85;
+    base.notes = 'Travaux conformes au devis initial. Réception effectuée sans réserves.';
+  }
+
+  return base;
 }
 
-export function useEditorState(initialMode?: UserMode, initialDocId?: string) {
+export function useEditorState(initialMode?: UserMode, initialDocId?: string, initialType?: DocumentType) {
   const [draftRestored, setDraftRestored] = useState<string | null>(() => {
     if (initialDocId) return null;
     try {
@@ -96,7 +112,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string) {
     } catch {}
     return null;
   });
-  const [doc, setDoc] = useState<DocumentState>(() => loadDraft(initialMode ?? 'artisan'));
+  const [doc, setDoc] = useState<DocumentState>(() => loadDraft(initialMode ?? 'artisan', initialType));
   const [step, setStep] = useState<WizardStep>(1);
   const [addingItem, setAddingItem] = useState(false);
   const [newItem, setNewItem] = useState<LineItem>({ id: '', designation: '', quantity: 1, unit: 'u', unitPrice: 0, category: '' });

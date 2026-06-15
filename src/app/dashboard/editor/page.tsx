@@ -11,12 +11,12 @@ import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
-import { formatCurrency, generateDocumentNumber, generateId } from '@/lib/calculations';
+import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS } from '@/types';
-import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode } from '@/types';
+import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
   import {
@@ -32,6 +32,7 @@ function EditorContent() {
   const sp = useSearchParams();
   const modeParam = sp.get('mode') as UserMode | null;
   const docIdParam = sp.get('id');
+  const typeParam = sp.get('type') as DocumentType | null;
   const { showToast } = useToast();
   const {
     doc, setDoc, mode, setMode,
@@ -44,7 +45,7 @@ function EditorContent() {
     toggleBlock, isBlockVisible,
     handleAddItem, handleRemoveItem, moveItem, moveSection, startNewItem, saveDoc,
     updateCustomField,
-  } = useEditor(modeParam ?? 'artisan', docIdParam ?? undefined);
+  } = useEditor(modeParam ?? 'artisan', docIdParam ?? undefined, typeParam ?? undefined);
 
   const te = useTranslations('editor');
   const tu = useTranslations('preview.units');
@@ -801,28 +802,7 @@ function EditorContent() {
             {showTypeMenu && (
               <div className="absolute top-full left-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[170px]">
                 {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
-                  <button key={t} onClick={() => { setDoc(prev => {
-  const newDoc = { ...prev, documentType: t as DocumentState['documentType'] };
-  if (t === 'attachement' && !prev.items.length) {
-    const sampleItems = [
-      { id: generateId(), designation: 'Fourniture et application de peinture acrylique mate', quantity: 120, unit: 'm2' as const, unitPrice: 850, category: 'peinture' },
-      { id: generateId(), designation: 'Enduit de lissage des murs et plafonds', quantity: 85, unit: 'm2' as const, unitPrice: 320, category: 'enduit' },
-      { id: generateId(), designation: 'Ponçage et préparation des surfaces', quantity: 1, unit: 'forfait' as const, unitPrice: 18000, category: 'preparation' },
-      { id: generateId(), designation: 'Nettoyage chantier après travaux', quantity: 1, unit: 'forfait' as const, unitPrice: 5000, category: 'divers' },
-    ];
-    return {
-      ...newDoc,
-      documentType: 'attachement',
-      items: sampleItems,
-      documentNumber: generateDocumentNumber('attachement', prev.mode),
-      chantierAddress: 'Cité des Annassers, Bloc 15, 3e étage, Alger',
-      chantierType: prev.chantierType || 'Appartement',
-      chantierSurface: prev.chantierSurface || 85,
-      notes: prev.notes || 'Travaux conformes au devis initial. Réception effectuée sans réserves.',
-    };
-  }
-  return newDoc;
-}); setShowTypeMenu(false); }}
+                  <button key={t} onClick={() => { updateDoc('documentType', t); setShowTypeMenu(false); }}
                     className={cn('w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition min-h-[36px]', doc.documentType === t ? 'bg-blue-600/20 text-blue-400' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
                     {t === 'devis' ? <FileText size={14} /> : t === 'facture' ? <Receipt size={14} /> : t === 'proforma' ? <ClipboardList size={14} /> : t === 'bc' ? <FileStack size={14} /> : t === 'br' ? <Package size={14} /> : t === 'intervention' ? <Wrench size={14} /> : <FileText size={14} />}
                     {tp(DOC_TYPE_PREVIEW_LABELS[t] ?? 'docTypeQuote')}

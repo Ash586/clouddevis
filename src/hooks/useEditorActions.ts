@@ -128,8 +128,8 @@ export function useEditorActions(deps: EditorActionsDeps) {
   const resetDoc = useCallback(() => {
     localStorage.removeItem(LS_KEY);
     setDocId(null);
-    setDoc(createEmptyDoc(mode as 'artisan' | 'entreprise'));
-  }, [mode, setDocId, setDoc]);
+    setDoc(createEmptyDoc(mode as 'artisan' | 'entreprise', doc.documentType));
+  }, [mode, doc.documentType, setDocId, setDoc]);
 
   const saveDoc = useCallback(async () => {
     setSaving(true);

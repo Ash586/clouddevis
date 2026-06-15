@@ -1,10 +1,10 @@
 'use client';
 import { useEditorState } from './useEditorState';
 import { useEditorActions } from './useEditorActions';
-import type { UserMode } from '@/types';
+import type { UserMode, DocumentType } from '@/types';
 
-export function useEditor(initialMode?: UserMode, initialDocId?: string) {
-  const state = useEditorState(initialMode, initialDocId);
+export function useEditor(initialMode?: UserMode, initialDocId?: string, initialType?: DocumentType) {
+  const state = useEditorState(initialMode, initialDocId, initialType);
   const actions = useEditorActions({
     doc: state.doc,
     setDoc: state.setDoc,
