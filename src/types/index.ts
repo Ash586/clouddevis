@@ -179,6 +179,15 @@ export interface DocumentState {
   validityDays?: number;
   reference?: string;
   showWatermark?: boolean;
+
+  // Attachement signature fields
+  sigClientNameFr?: string;
+  sigClientRole?: string;
+  sigClientNameAr?: string;
+  sigCompanyNameFr?: string;
+  sigDirectionNameFr?: string;
+  sigDirectionRole?: string;
+  sigDirectionNameAr?: string;
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {

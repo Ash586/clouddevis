@@ -86,14 +86,24 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
 
   if (docType === 'attachement') {
     base.items = [
-      { id: generateId(), designation: 'Fourniture et application de peinture acrylique mate', quantity: 120, unit: 'm2', unitPrice: 850, category: 'peinture' },
-      { id: generateId(), designation: 'Enduit de lissage des murs et plafonds', quantity: 85, unit: 'm2', unitPrice: 320, category: 'enduit' },
-      { id: generateId(), designation: 'Ponçage et préparation des surfaces', quantity: 1, unit: 'forfait', unitPrice: 18000, category: 'preparation' },
-      { id: generateId(), designation: 'Nettoyage chantier après travaux', quantity: 1, unit: 'forfait', unitPrice: 5000, category: 'divers' },
+      { id: generateId(), designation: 'Tuyau cuivre Ø28mm', quantity: 4.5, unit: 'm2', unitPrice: 3200, category: 'materiaux' },
+      { id: generateId(), designation: 'Tuyau cuivre Ø22mm', quantity: 4.5, unit: 'm2', unitPrice: 2600, category: 'materiaux' },
+      { id: generateId(), designation: 'Tuyau cuivre Ø12mm', quantity: 16.5, unit: 'm2', unitPrice: 1400, category: 'materiaux' },
+      { id: generateId(), designation: 'Raccord à sertir Ø12mm', quantity: 10, unit: 'u', unitPrice: 450, category: 'materiaux' },
+      { id: generateId(), designation: 'Tuyau PPR Ø25mm', quantity: 4.0, unit: 'm2', unitPrice: 800, category: 'materiaux' },
+      { id: generateId(), designation: 'Tuyau PPR Ø20mm', quantity: 3.0, unit: 'm2', unitPrice: 600, category: 'materiaux' },
+      { id: generateId(), designation: 'Colle PPR Ø25mm', quantity: 2, unit: 'u', unitPrice: 350, category: 'materiaux' },
+      { id: generateId(), designation: 'Colle PPR Ø20mm', quantity: 2, unit: 'u', unitPrice: 280, category: 'materiaux' },
+      { id: generateId(), designation: 'Raccord à souder Ø28mm', quantity: 1, unit: 'u', unitPrice: 1200, category: 'materiaux' },
+      { id: generateId(), designation: 'Raccord à souder Ø22mm', quantity: 1, unit: 'u', unitPrice: 900, category: 'materiaux' },
+      { id: generateId(), designation: 'Té à souder Ø28mm', quantity: 2, unit: 'u', unitPrice: 1800, category: 'materiaux' },
+      { id: generateId(), designation: 'Coudé à souder 90° Ø28mm', quantity: 3, unit: 'u', unitPrice: 1500, category: 'materiaux' },
+      { id: generateId(), designation: 'Main-d\'œuvre plomberie', quantity: 8, unit: 'j', unitPrice: 5000, category: 'main_oeuvre' },
+      { id: generateId(), designation: 'Transport matériaux', quantity: 1, unit: 'forfait', unitPrice: 8000, category: 'transport' },
     ];
-    base.chantierAddress = 'Cité des Annassers, Bloc 15, 3e étage, Alger';
+    base.chantierAddress = 'Résidence Les Oliviers, Bloc 3, 2e étage, Alger';
     base.chantierType = 'Appartement';
-    base.chantierSurface = 85;
+    base.chantierSurface = 120;
     base.notes = 'Travaux conformes au devis initial. Réception effectuée sans réserves.';
   }
 

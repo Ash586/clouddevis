@@ -325,9 +325,9 @@ export function generateAttachementHTML(params: {
   design: DocTypeDesign;
 }) {
   const { doc, sf, bv, vb, tc, tp, design } = params;
-  const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  const s = (v: string) => escHtml(v);
-  const A = { navy: '#1A3A6B', navyLight: '#EEF3FB', navyMid: '#2E60B0', gold: '#C4A35A', green: '#0B3D2E', paperBg: '#F9F8F5', border: '#E4DED5', dark: '#1A1A1A' };
+  const escHtml = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const e = (v: string) => escHtml(v);
+  const A = { navy:'#1A3A6B', navyLight:'#EEF3FB', navyMid:'#2E60B0', gold:'#C4A35A', green:'#0B3D2E', beige:'#C8C3BA', paperBg:'#F9F8F5', border:'#E4DED5', dark:'#1A1A1A' };
   const isEnt = doc.mode === 'entreprise';
   const catOrder = ['preparation','peinture','finition','revetement','facade','enduit','main_oeuvre','materiaux','transport','divers'];
 
@@ -342,71 +342,90 @@ export function generateAttachementHTML(params: {
   const tbody: string[] = [];
   for (const item of uncategorized) {
     rowIdx++;
-    tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4">
-      <td class="c" style="padding:7px 8px;font-family:'Courier New',monospace;font-size:10px;color:#AAA;width:36px">${String(rowIdx).padStart(2,'0')}</td>
-      <td style="padding:7px 8px;font-weight:500;color:#1A1A1A;font-size:12.5px">${escHtml(item.designation)}</td>
-      <td class="c" style="padding:7px 8px;width:52px"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:1px 7px;border-radius:3px">${unitLabelsMap[item.unit]??item.unit}</span></td>
-      <td class="c" style="padding:7px 8px;width:80px;font-family:'Courier New',monospace;font-weight:500;color:#1A1A1A">${item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+    const isEven = rowIdx % 2 === 0;
+    tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4;background:${isEven?'#FAFAF8':'transparent'}">
+      <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#AAA;width:36px;text-align:center">${String(rowIdx).padStart(2,'0')}</td>
+      <td style="padding:9px 10px;font-weight:500;color:#1A1A1A;font-size:12.5px;line-height:1.35">${e(item.designation)}</td>
+      <td style="padding:9px 10px;width:52px;text-align:center"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:2px 10px;border-radius:3px;letter-spacing:0.04em">${unitLabelsMap[item.unit]??item.unit}</span></td>
+      <td style="padding:9px 10px;width:80px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:500;color:#1A1A1A">${item.quantity > 0 ? item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2}) : '<span style="color:#CCC;font-style:italic;font-size:10px">&mdash;</span>'}</td>
     </tr>`);
   }
   for (const cat of catOrder) {
     const items = grouped[cat]; if (!items) continue;
     const label = catLabelsMap[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
-    tbody.push(`<tr style="background:${A.navyLight}"><td colspan="4" style="padding:5px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}">${escHtml(label)}</td></tr>`);
+    tbody.push(`<tr style="background:${A.navyLight}"><td colspan="4" style="padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}">${e(label)}</td></tr>`);
     for (const item of items) {
       rowIdx++;
-      tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4">
-        <td class="c" style="padding:7px 8px;font-family:'Courier New',monospace;font-size:10px;color:#AAA;width:36px">${String(rowIdx).padStart(2,'0')}</td>
-        <td style="padding:7px 8px;font-weight:500;color:#1A1A1A;font-size:12.5px">${escHtml(item.designation)}</td>
-        <td class="c" style="padding:7px 8px;width:52px"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:1px 7px;border-radius:3px">${unitLabelsMap[item.unit]??item.unit}</span></td>
-        <td class="c" style="padding:7px 8px;width:80px;font-family:'Courier New',monospace;font-weight:500;color:#1A1A1A">${item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      const isEven = rowIdx % 2 === 0;
+      tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4;background:${isEven?'#FAFAF8':'transparent'}">
+        <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#AAA;width:36px;text-align:center">${String(rowIdx).padStart(2,'0')}</td>
+        <td style="padding:9px 10px;font-weight:500;color:#1A1A1A;font-size:12.5px;line-height:1.35">${e(item.designation)}</td>
+        <td style="padding:9px 10px;width:52px;text-align:center"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:2px 10px;border-radius:3px;letter-spacing:0.04em">${unitLabelsMap[item.unit]??item.unit}</span></td>
+        <td style="padding:9px 10px;width:80px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:500;color:#1A1A1A">${item.quantity > 0 ? item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2}) : '<span style="color:#CCC;font-style:italic;font-size:10px">&mdash;</span>'}</td>
       </tr>`);
     }
   }
 
+  const clientNameFr = e(doc.sigClientNameFr || doc.clientInfo.name || '—');
+  const clientNameAr = e(doc.sigClientNameAr || '');
+  const clientRole = e(doc.sigClientRole || '');
+  const companyNameFr = e(doc.sigCompanyNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : '—'));
+  const directionNameFr = e(doc.sigDirectionNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : 'Validation Direction'));
+  const directionRole = e(doc.sigDirectionRole || '');
+  const companyInitials = isEnt && doc.companyInfo ? e(doc.companyInfo.name.split(' ').slice(0,2).join(' ').substring(0,12)) : 'Entr.';
+
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Attachement des Travaux - ${s(doc.documentNumber)}</title>
+<html><head><meta charset="utf-8"><title>Attachement des Travaux - ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Helvetica,Arial,sans-serif;color:#1A1A1A;font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:190mm;margin:0 auto;min-height:100vh;background:#F9F8F5;display:flex;flex-direction:column}
+body{font-family:'Inter',Helvetica,Arial,sans-serif;color:#1A1A1A;font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:190mm;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
 .accent-bar{height:4px;background:linear-gradient(90deg,${A.navy} 0%,${A.navyMid} 60%,${A.gold} 100%)}
 .body{padding:28px 44px;flex:1}
 .co-frame{border:2px solid #1A1A1A;padding:14px 20px;text-align:center;margin-bottom:14px}
-.co-frame .nm{font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.35;color:#1A1A1A}
+.co-frame .nm{font-family:'Source Serif 4',Georgia,serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.35;color:#1A1A1A}
 .co-frame .ad{font-size:12px;color:#444;margin-top:4px}
-.co-frame .mr{display:flex;justify-content:center;gap:24px;font-size:11px;color:#666;font-family:'Courier New',monospace;margin-top:6px;flex-wrap:wrap}
-.co-frame .mr b{font-family:Inter,sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:${A.navy}}
+.co-frame .mr{display:flex;justify-content:center;gap:24px;font-size:11px;color:#666;font-family:'JetBrains Mono',monospace;margin-top:6px;flex-wrap:wrap}
+.co-frame .mr b{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:${A.navy}}
 .doc-title{text-align:center;padding:14px 0 6px}
-.doc-title h1{font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:700;color:#1A1A1A;text-transform:uppercase;letter-spacing:0.1em;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;display:inline-block;margin-bottom:8px}
-.doc-title .dr{display:flex;justify-content:center;align-items:center;gap:20px;font-size:11px;color:#666;font-family:'Courier New',monospace;margin-bottom:6px}
-.doc-title .dr b{font-family:Inter,sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:${A.navy}}
+.doc-title h1{font-family:'Source Serif 4',Georgia,serif;font-size:18px;font-weight:700;color:#1A1A1A;text-transform:uppercase;letter-spacing:0.1em;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;display:inline-block;margin-bottom:10px}
+.doc-title .dr{display:flex;justify-content:center;align-items:center;gap:20px;font-size:11px;color:#666;font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.doc-title .dr b{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:${A.navy}}
 .doc-title .dr .s{color:#CCC}
-.doc-title .lo{font-size:12px;color:#555;font-style:italic;padding:6px 20px;border:0.5px solid #E4DED5;border-radius:4px;background:#F9F8F5;display:inline-block;margin-bottom:2px}
-.items-wrap{border-bottom:1px solid #E4DED5;margin-top:10px}
-table.items{width:100%;border-collapse:collapse;font-size:12.5px}
+.doc-title .lo{font-size:12px;color:#555;font-style:italic;padding:8px 20px;border:0.5px solid #E4DED5;border-radius:4px;background:#F9F8F5;display:inline-block;margin-bottom:4px}
+.items-wrap{border-bottom:1px solid #E4DED5;margin-top:14px}
+table.items{width:100%;border-collapse:collapse;font-size:12.5px;font-family:'Inter',sans-serif}
 table.items thead tr{background:${A.navy}}
-table.items thead th{padding:7px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#EEF3FB;white-space:nowrap}
-table.items thead th.c{text-align:center}
-table.items thead th.l{text-align:left}
-table.items tbody tr.cat-row td{padding:5px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}}
-.obs-section{padding:12px 0;border-bottom:1px solid #E4DED5}
-.obs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:4px}
-.obs-box{background:#F9F8F5;border:0.5px solid #E4DED5;border-left:2px solid ${A.navy};border-radius:0 4px 4px 0;padding:8px 12px;font-size:12px;color:#444;font-style:italic;line-height:1.6}
-.cert-band{margin-top:12px;background:${A.navyLight};border:0.5px solid #B5D4F4;border-radius:4px;padding:8px 14px;font-size:12px;color:${A.navy};display:flex;align-items:center;gap:10px}
+table.items thead th{padding:9px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#EEF3FB;white-space:nowrap}
+table.items thead th:nth-child(1){text-align:center;width:36px}
+table.items thead th:nth-child(2){text-align:left}
+table.items thead th:nth-child(3){text-align:center;width:52px}
+table.items thead th:nth-child(4){text-align:center;width:80px}
+table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}}
+.obs-section{padding:14px 0;border-bottom:1px solid #E4DED5}
+.obs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:6px}
+.obs-box{background:#F9F8F5;border:0.5px solid #E4DED5;border-left:2px solid ${A.navy};border-radius:0 4px 4px 0;padding:10px 14px;font-size:12px;color:#444;font-style:italic;line-height:1.6;min-height:40px}
+.cert-band{margin:16px 0;background:${A.navyLight};border:0.5px solid #B5D4F4;border-radius:4px;padding:10px 16px;font-size:12px;color:${A.navy};display:flex;align-items:center;gap:10px}
 .cert-band .ct{line-height:1.55}
 .cert-band .ct b{font-weight:600}
-.sig-grid{display:grid;grid-template-columns:1fr 1fr;padding:16px 44px 0;gap:0}
-.sig-col-l{border-right:0.5px dashed #C8C2B5;padding-right:28px;padding-bottom:14px}
-.sig-col-r{padding-left:28px;padding-bottom:14px;text-align:right}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;padding:20px 0 0;gap:0}
+.sig-col-l{border-right:0.5px dashed #C8C2B5;padding-right:28px;padding-bottom:16px}
+.sig-col-r{padding-left:28px;padding-bottom:16px;text-align:right}
 .sig-ey{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy};margin-bottom:2px}
-.sig-sub{font-size:11px;color:#888;margin-bottom:8px}
-.sig-space{height:50px;border-bottom:0.5px solid #C8C2B5;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#CCC;font-size:11px;font-style:italic}
-.cachet{width:54px;height:54px;border-radius:50%;border:1.5px solid #C8C2B5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:600;text-transform:uppercase;text-align:center;color:#666;line-height:1.3}
-.sig-bot{border-top:0.5px dashed #C8C2B5;margin:0 44px;padding:14px 0 20px;text-align:center}
+.sig-sub{font-size:11px;color:#888;margin-bottom:10px}
+.sig-detail{font-size:12px;color:#555;font-style:italic;margin-bottom:4px;line-height:1.5}
+.sig-space{height:56px;border-bottom:0.5px solid #C8C2B5;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#DDD;font-size:11px;font-style:italic}
+.cachet{width:62px;height:62px;border-radius:50%;border:1.5px solid ${A.green};display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:600;text-transform:uppercase;text-align:center;color:${A.green};line-height:1.4}
+.cachet-company{border-color:${A.navy};color:${A.navy}}
+.sig-name{font-size:12px;color:#333;font-weight:500;margin-top:6px}
+.sig-role{font-size:10px;color:#888;margin-top:2px;line-height:1.4}
+.sig-bot{border-top:0.5px dashed #C8C2B5;margin:0 44px;padding:18px 0 24px;text-align:center}
 .sig-bot .sig-ey{color:${A.navy}}
-.doc-foot{background:#F9F8F5;border-top:1px solid #E4DED5;padding:8px 44px;font-size:10px;color:#999;text-align:center;font-family:'Courier New',monospace;line-height:1.8}
-.doc-foot strong{font-family:Inter,sans-serif;color:#777}
+.cachet-bot{width:70px;height:70px}
+.doc-foot{background:#F9F8F5;border-top:1px solid #E4DED5;padding:10px 44px;font-size:10px;color:#999;text-align:center;font-family:'JetBrains Mono',monospace;line-height:1.8}
+.doc-foot strong{font-family:'Inter',sans-serif;color:#777}
 @media print{.page{box-shadow:none}}
 </style></head><body>
 <div class="page">
@@ -414,34 +433,34 @@ table.items tbody tr.cat-row td{padding:5px 8px;font-size:10px;font-weight:600;t
 <div class="body">
   ${isEnt && doc.companyInfo ? `
   <div class="co-frame">
-    <div class="nm">${s(doc.companyInfo.name)}</div>
-    ${doc.companyInfo.address ? `<div class="ad">${s(doc.companyInfo.address)}</div>` : ''}
+    <div class="nm">${e(doc.companyInfo.name)}</div>
+    ${doc.companyInfo.address ? `<div class="ad">${e(doc.companyInfo.address)}</div>` : ''}
     <div class="mr">
-      ${doc.companyInfo.taxIds.rc ? `<span><b>RC</b> ${s(doc.companyInfo.taxIds.rc)}</span>` : ''}
-      ${doc.companyInfo.taxIds.nif ? `<span><b>N.I.F.</b> ${s(doc.companyInfo.taxIds.nif)}</span>` : ''}
-      ${doc.companyInfo.taxIds.nis ? `<span><b>N.I.S.</b> ${s(doc.companyInfo.taxIds.nis)}</span>` : ''}
+      ${doc.companyInfo.taxIds.rc ? `<span><b>RC</b> ${e(doc.companyInfo.taxIds.rc)}</span>` : ''}
+      ${doc.companyInfo.taxIds.nif ? `<span><b>N.I.F.</b> ${e(doc.companyInfo.taxIds.nif)}</span>` : ''}
+      ${doc.companyInfo.taxIds.nis ? `<span><b>N.I.S.</b> ${e(doc.companyInfo.taxIds.nis)}</span>` : ''}
     </div>
   </div>` : ''}
 
   <div class="doc-title">
     <h1>Attachement des Travaux</h1>
     <div class="dr">
-      ${sf('docNumber') ? `<b>Réf.</b> ${s(doc.documentNumber)}` : ''}
+      ${sf('docNumber') ? `<b>Réf.</b> ${e(doc.documentNumber)}` : ''}
       ${sf('docNumber') && sf('issueDate') ? `<span class="s">·</span>` : ''}
       ${sf('issueDate') ? `<b>Date</b> ${doc.date}` : ''}
-      ${doc.bcRef ? `<span class="s">·</span><b>BC lié</b> ${s(doc.bcRef)}` : ''}
+      ${doc.bcRef ? `<span class="s">·</span><b>BC lié</b> ${e(doc.bcRef)}` : ''}
     </div>
-    ${doc.chantierAddress ? `<div class="lo">Réalisé au niveau ${s(doc.chantierAddress)}</div>` : ''}
+    ${doc.chantierAddress ? `<div class="lo">Réalisé au niveau ${e(doc.chantierAddress)}</div>` : ''}
   </div>
 
   ${doc.items.length ? `
   <div class="items-wrap">
     <table class="items">
       <thead><tr>
-        <th class="c" style="width:36px">N°</th>
-        <th class="l">Désignation des ouvrages</th>
-        <th class="c" style="width:52px">Unité</th>
-        <th class="c" style="width:80px">Quantité</th>
+        <th style="width:36px">N°</th>
+        <th>Désignation des ouvrages</th>
+        <th style="width:52px">Unité</th>
+        <th style="width:80px">Quantité</th>
       </tr></thead>
       <tbody>${tbody.join('')}</tbody>
     </table>
@@ -450,42 +469,50 @@ table.items tbody tr.cat-row td{padding:5px 8px;font-size:10px;font-weight:600;t
   ${sf('notes') && doc.notes ? `
   <div class="obs-section">
     <div class="obs-label">Observations / Réserves</div>
-    <div class="obs-box">${s(doc.notes)}</div>
+    <div class="obs-box">${e(doc.notes)}</div>
   </div>` : ''}
 
   <div class="cert-band">
     <span style="font-size:16px;flex-shrink:0">&#10003;</span>
-    <div class="ct"><b>Attestation :</b> Le soussigné certifie que les travaux ci-dessus ont été réalisés et réceptionnés conformément aux quantités indiquées${doc.chantierAddress ? ` au niveau ${s(doc.chantierAddress)}` : ''}.</div>
+    <div class="ct"><b>Attestation :</b> Le soussigné certifie que les travaux ci-dessus ont été réalisés et réceptionnés conformément aux quantités indiquées${doc.chantierAddress ? ` au niveau ${e(doc.chantierAddress)}` : ''}.</div>
   </div>
 </div>
 
-<div>
+<div style="padding:0 44px">
   <div class="sig-grid">
     <div class="sig-col-l">
       <div class="sig-ey">Le maître d'ouvrage</div>
-      <div class="sig-sub">${doc.clientInfo.name ? s(doc.clientInfo.name) : 'Client'}</div>
+      <div class="sig-sub">${e(doc.clientInfo.name || '—')}</div>
+      ${clientNameAr || clientRole ? `<div class="sig-detail">${clientNameAr ? clientNameAr+'<br>' : ''}${clientRole}</div>` : ''}
       <div class="sig-space">Signature &amp; cachet</div>
-      <div class="cachet" style="margin:0 auto">Cachet<br>Client</div>
+      <div class="cachet" style="margin:0 auto">${companyInitials}</div>
+      <div class="sig-name">${clientNameFr}</div>
+      ${clientRole ? `<div class="sig-role">${clientRole}</div>` : ''}
     </div>
     <div class="sig-col-r">
       <div class="sig-ey" style="color:${A.green}">L'Entreprise</div>
-      <div class="sig-sub">${isEnt && doc.companyInfo ? s(doc.companyInfo.name) : 'Entreprise'}</div>
+      <div class="sig-sub">${isEnt && doc.companyInfo ? e(doc.companyInfo.name) : '—'}</div>
+      ${companyNameFr !== e(doc.companyInfo?.name || '') ? `<div class="sig-detail">${companyNameFr}</div>` : ''}
       <div class="sig-space">Signature &amp; cachet</div>
-      <div class="cachet" style="margin:0 0 0 auto">Cachet<br>Entr.</div>
+      <div class="cachet cachet-company" style="margin:0 0 6px auto">${companyInitials}</div>
+      <div class="sig-name">${companyNameFr}</div>
     </div>
   </div>
   <div class="sig-bot">
-    <div class="sig-ey">Validation Direction</div>
+    <div class="sig-ey" style="color:${A.green}">${isEnt && doc.companyInfo ? e(doc.companyInfo.name) : 'Validation Direction'}</div>
+    ${directionRole ? `<div style="font-size:10px;color:#888;margin-top:3px;margin-bottom:12px;line-height:1.4">${directionRole}</div>` : ''}
     <div style="display:inline-block;text-align:center">
-      <div class="sig-space" style="width:180px;margin:0 auto 6px">Signature &amp; cachet officiel</div>
-      <div class="cachet" style="margin:0 auto 6px">Cachet<br>Dir.</div>
+      <div class="sig-space" style="width:200px;margin:0 auto 8px">Signature &amp; cachet officiel</div>
+      <div class="cachet cachet-bot" style="margin:0 auto 6px">${companyInitials}</div>
+      <div class="sig-name">${directionNameFr}</div>
+      ${directionRole ? `<div class="sig-role">${directionRole}</div>` : ''}
     </div>
   </div>
   <div class="doc-foot">
-    <strong>Réf. :</strong> ${s(doc.documentNumber)}
-    ${doc.bcRef ? `<span style="margin:0 6px">·</span><strong>BC lié :</strong> ${s(doc.bcRef)}` : ''}
+    <strong>Réf. :</strong> ${e(doc.documentNumber)}
+    ${doc.bcRef ? `<span style="margin:0 6px">·</span><strong>BC lié :</strong> ${e(doc.bcRef)}` : ''}
     <span style="margin:0 6px">·</span><strong>Date :</strong> ${doc.date}
-    ${doc.companyInfo?.taxIds?.rc ? `<span style="margin:0 6px">·</span><strong>RC :</strong> ${s(doc.companyInfo.taxIds.rc)}` : ''}
+    ${doc.companyInfo?.taxIds?.rc ? `<span style="margin:0 6px">·</span><strong>RC :</strong> ${e(doc.companyInfo.taxIds.rc)}` : ''}
     <br>Document généré par <strong>CloudDevis</strong>
   </div>
 </div>
