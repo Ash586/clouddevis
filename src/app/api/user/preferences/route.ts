@@ -4,6 +4,14 @@ import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
 
+const VALID_DOC_TYPES = ['devis', 'proforma', 'bc', 'br', 'facture', 'intervention', 'attachement'];
+
+function isNewFormat(fields: unknown): fields is Record<string, Record<string, string[]>> {
+  if (!fields || typeof fields !== 'object') return false;
+  const keys = Object.keys(fields);
+  return keys.some(k => VALID_DOC_TYPES.includes(k));
+}
+
 export async function GET() {
   try {
     const session = await getSession();
@@ -15,7 +23,20 @@ export async function GET() {
     });
 
     const settings = (user?.settings as Record<string, unknown> | null) ?? {};
-    return NextResponse.json({ fields: settings.fieldPreferences ?? null });
+    let fieldPreferences = settings.fieldPreferences ?? null;
+
+    // 🧪 ترحيل: إذا كان التنسيق قديماً (مسطح) → نحوله للجديد
+    if (fieldPreferences && !isNewFormat(fieldPreferences)) {
+      const oldPrefs = fieldPreferences as Record<string, string[]>;
+      fieldPreferences = { devis: oldPrefs };
+      // حفظ الترحيل
+      await prisma.user.update({
+        where: { id: session.userId },
+        data: { settings: { ...settings, fieldPreferences } as unknown as Prisma.InputJsonValue },
+      });
+    }
+
+    return NextResponse.json({ fields: fieldPreferences });
   } catch (error) {
     logger.error('GET /api/user/preferences', { error: String(error) });
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
@@ -28,7 +49,7 @@ export async function PUT(request: Request) {
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
 
     const body = await request.json();
-    const fields: Record<string, string[]> = body.fields;
+    const fields: Record<string, Record<string, string[]>> = body.fields;
 
     if (!fields || typeof fields !== 'object') {
       return NextResponse.json({ error: 'fields must be an object' }, { status: 400 });

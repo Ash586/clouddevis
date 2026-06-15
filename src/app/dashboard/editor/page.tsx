@@ -14,7 +14,7 @@ import { useToast } from '@/components/ui/toast';
 import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
-import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS } from '@/types';
+import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
@@ -50,7 +50,7 @@ function EditorContent() {
   const tp = useTranslations('preview');
   const tc = useTranslations('common');
 
-  const [fieldPrefs, setFieldPrefs] = useState<Record<string, string[]> | null>(null);
+  const [fieldPrefs, setFieldPrefs] = useState<Record<string, Record<string, string[]>> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [customSections, setCustomSections] = useState<CustomSectionDef[]>([]);
   const [showSectionCreator, setShowSectionCreator] = useState(false);
@@ -121,7 +121,7 @@ function EditorContent() {
       .then(r => r.ok ? r.json() : { fields: null })
       .then(data => {
         if (data.fields && typeof data.fields === 'object') {
-          setFieldPrefs(data.fields as Record<string, string[]>);
+          setFieldPrefs(data.fields as Record<string, Record<string, string[]>>);
         } else {
           setShowCustomizer(true);
         }
@@ -147,9 +147,15 @@ function EditorContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // حقل preferences: FieldPrefs[documentType][section] = fieldId[]
+  // عند عدم وجود تفضيلات محفوظة، نستخدم DOC_TYPE_DEFAULT_FIELDS
+  const docType = doc.documentType as keyof typeof DOC_TYPE_DEFAULT_FIELDS;
+  const defaultsForType = DOC_TYPE_DEFAULT_FIELDS[docType] ?? {};
+  const userPrefsForType = fieldPrefs?.[doc.documentType] as Record<string, string[]> | undefined;
+
   const prefFields: Record<string, string[]> = {
-    ...Object.fromEntries(DEFAULT_SECTION_ORDER.map(s => [s, fieldPrefs?.[s] ?? [...SECTION_FIELDS[s]]])),
-    ...Object.fromEntries(customSections.map(cs => [cs.id, fieldPrefs?.[cs.id] ?? cs.fields.map(f => f.id)])),
+    ...Object.fromEntries(DEFAULT_SECTION_ORDER.map(s => [s, userPrefsForType?.[s] ?? defaultsForType[s] ?? [...SECTION_FIELDS[s]]])),
+    ...Object.fromEntries(customSections.map(cs => [cs.id, userPrefsForType?.[cs.id] ?? cs.fields.map(f => f.id)])),
   };
   const hiddenFields = new Set<string>();
   for (const section of ALL_SECTIONS) {
@@ -170,12 +176,14 @@ function EditorContent() {
   }
 
   async function savePreferences(fields: Record<string, string[]>) {
-    setFieldPrefs(fields);
+    // حفظ التفضيلات لكل نوع وثيقة على حدة
+    const allPrefs = { ...(fieldPrefs || {}), [doc.documentType]: fields };
+    setFieldPrefs(allPrefs);
     setShowCustomizer(false);
     await fetch('/api/user/preferences', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields }),
+      body: JSON.stringify({ fields: allPrefs }),
     });
   }
 
@@ -937,7 +945,12 @@ function EditorContent() {
             <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-slate-300" /></div>
             <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h3 className="text-[16px] font-bold text-slate-800 tracking-tight">{te('customizeTitle')}</h3>
+                <h3 className="text-[16px] font-bold text-slate-800 tracking-tight">
+                  {te('customizeTitle')}
+                  <span className="ml-2 text-[11px] font-semibold text-white bg-blue-600 px-2 py-0.5 rounded-md align-middle uppercase">
+                    {doc.documentType === 'devis' ? te('documentTypeQuote') : doc.documentType === 'facture' ? te('documentTypeInvoice') : doc.documentType}
+                  </span>
+                </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">{te('customizeSubtitle') || 'Cliquez sur une catégorie pour voir les champs'}</p>
               </div>
               <button onClick={() => setShowCustomizer(false)} className="text-slate-400 hover:text-slate-600 p-1 -mr-1">✕</button>
@@ -1063,15 +1076,17 @@ function EditorContent() {
                                   <input type="checkbox" checked={!isHidden} onChange={() => {
                                     setFieldPrefs(prev => {
                                       const current = { ...prev };
+                                      const currentTypePrefs = { ...(current[doc.documentType] as Record<string, string[]> ?? {}) };
                                       for (const section of ALL_SECTIONS) {
                                         const sectionFields = SECTION_FIELDS[section] ?? customSections.find(c => c.id === section)?.fields.map(f => f.id) ?? [];
                                         if (sectionFields.includes(fieldId)) {
-                                          const visible = [...(current[section] ?? sectionFields)];
+                                          const visible = [...(currentTypePrefs[section] ?? sectionFields)];
                                           if (isHidden) { if (!visible.includes(fieldId)) visible.push(fieldId); }
                                           else { const idx = visible.indexOf(fieldId); if (idx >= 0) visible.splice(idx, 1); }
-                                          current[section] = visible;
+                                          currentTypePrefs[section] = visible;
                                         }
                                       }
+                                      current[doc.documentType] = currentTypePrefs;
                                       return current;
                                     });
                                   }} className="w-3.5 h-3.5 rounded text-emerald-600" />
@@ -1099,7 +1114,19 @@ function EditorContent() {
                               <button onClick={async () => {
                                 await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
                                 setCustomSections(prev => prev.filter(c => c.id !== cs.id));
-                                setFieldPrefs(prev => { const rest = Object.fromEntries(Object.entries(prev ?? {}).filter(([k]) => k !== cs.id)); return rest; });
+                                setFieldPrefs(prev => {
+                                  if (!prev) return prev;
+                                  const updated = { ...prev };
+                                  for (const docType of Object.keys(updated)) {
+                                    const typePrefs = updated[docType] as Record<string, string[]> | undefined;
+                                    if (typePrefs && typePrefs[cs.id]) {
+                                      const rest = { ...typePrefs };
+                                      delete rest[cs.id];
+                                      updated[docType] = rest;
+                                    }
+                                  }
+                                  return updated;
+                                });
                                 setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
                               }} className="text-red-400 hover:text-red-600 ml-1">✕</button>
                               <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-600 ml-0.5">✎</button>
@@ -1126,14 +1153,14 @@ function EditorContent() {
                     if (cs) return [s, cs.fields.map(f => f.id)];
                     return [s, []];
                   }));
-                  setFieldPrefs(all);
+                  setFieldPrefs(prev => ({ ...(prev ?? {}), [doc.documentType]: all }));
                 }} className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 px-2.5 py-1.5 rounded-lg hover:bg-emerald-50 transition">{te('selectAll')}</button>
                 <button onClick={() => {
                   const none = Object.fromEntries(ALL_SECTIONS.map(s => [s, []]));
-                  setFieldPrefs(none);
+                  setFieldPrefs(prev => ({ ...(prev ?? {}), [doc.documentType]: none }));
                 }} className="text-[11px] font-semibold text-red-500 hover:text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition">{te('deselectAll')}</button>
               </div>
-              <button onClick={() => savePreferences(fieldPrefs ?? Object.fromEntries(ALL_SECTIONS.map(s => {
+              <button onClick={() => savePreferences(fieldPrefs?.[doc.documentType] ?? Object.fromEntries(ALL_SECTIONS.map(s => {
                 if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];
                 const cs = customSections.find(c => c.id === s);
                 if (cs) return [s, cs.fields.map(f => f.id)];

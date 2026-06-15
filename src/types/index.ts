@@ -183,17 +183,90 @@ export interface DocumentState {
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
   design: ['logo', 'logoPosition'],
-  general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
+  general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
   devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
   mode: ['businessMode'],
-  client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone', 'clientEmail'],
-  chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection'],
-  materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty'],
-  prestations: ['itemsTable'],
+  client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+  chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
+  materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+  prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
   remise: ['remiseType', 'remiseValue', 'remiseReason'],
-  garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes'],
-  paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban'],
-  notes: ['notes'],
+  garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
+  paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+  notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+};
+
+/**
+ * الحقول الافتراضية لكل نوع وثيقة.
+ * عند اختيار المستخدم لنوع الوثيقة، تظهر هذه الحقول فقط تلقائياً.
+ * يمكن للمستخدم إضافة/إخفاء حقول من نافذة Customize.
+ */
+export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string[]>> = {
+  devis: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+    devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
+    mode: ['businessMode'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+    chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
+    materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+    remise: ['remiseType', 'remiseValue', 'remiseReason'],
+    garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
+    paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  },
+  facture: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+    mode: ['businessMode'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+    remise: ['remiseType', 'remiseValue', 'remiseReason'],
+    paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  },
+  proforma: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
+    mode: ['businessMode'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone', 'clientEmail'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+    remise: ['remiseType', 'remiseValue', 'remiseReason'],
+    paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  },
+  bc: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate', 'validUntil'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
+    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  },
+  br: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate'],
+    client: ['clientName', 'clientAddress'],
+    materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+    notes: ['notes'],
+  },
+  intervention: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate'],
+    client: ['clientName', 'clientAddress', 'clientPhone'],
+    chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierResponsable'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+    garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
+    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  },
+  attachement: {
+    design: ['logo', 'logoPosition'],
+    general: ['docNumber', 'issueDate'],
+    chantier: ['chantierAddress', 'chantierType', 'chantierSurface'],
+    materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
+    notes: ['notes'],
+  },
 };
 
 export const UNIT_OPTIONS: { value: UnitMeasure; labelKey: string }[] = [
