@@ -55,6 +55,8 @@ const TYPE_COLORS: Record<string, string> = {
   PROFORMA: 'bg-purple-100 text-purple-700',
   BC: 'bg-amber-100 text-amber-700',
   BR: 'bg-teal-100 text-teal-700',
+  INTERVENTION: 'bg-rose-100 text-rose-700',
+  ATTACHEMENT: 'bg-indigo-100 text-indigo-700',
 };
 
 const PERIODS: { value: Period; labelKey: string }[] = [

@@ -35,6 +35,7 @@ const QUICK_DOCS = [
   { type: 'proforma', icon: ClipboardList, color: 'purple' },
   { type: 'bon_commande', icon: FileStack, color: 'amber' },
   { type: 'intervention', icon: Wrench, color: 'teal' },
+  { type: 'attachement', icon: FilePen, color: 'indigo' },
 ] as const;
 
 const QUICK_DOC_COLORS: Record<string, string> = {
@@ -43,6 +44,7 @@ const QUICK_DOC_COLORS: Record<string, string> = {
   purple: 'bg-purple-400/10 text-purple-400 hover:bg-purple-400/20',
   amber: 'bg-amber-400/10 text-amber-400 hover:bg-amber-400/20',
   teal: 'bg-teal-400/10 text-teal-400 hover:bg-teal-400/20',
+  indigo: 'bg-indigo-400/10 text-indigo-400 hover:bg-indigo-400/20',
 };
 
 const DOCUMENT_TYPES = [

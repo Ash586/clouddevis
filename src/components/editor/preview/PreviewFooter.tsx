@@ -2,6 +2,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import type { DocumentState } from '@/types';
+import type { DocTypeDesign } from '@/lib/documentDesign';
 import { formatCurrency } from '@/lib/calculations';
 
 interface FooterProps {
@@ -16,13 +17,14 @@ interface FooterProps {
     netAPayer: number;
     totalInWords: string;
   };
+  design: DocTypeDesign;
   vb: (block: string) => boolean;
   bv: (...fieldIds: string[]) => boolean;
   sf: (fieldId: string) => boolean;
   highlight?: boolean;
 }
 
-export function PreviewFooter({ doc, results, vb, bv, sf, highlight = false }: FooterProps) {
+export function PreviewFooter({ doc, results, design, vb, bv, sf, highlight = false }: FooterProps) {
   const t = useTranslations('preview');
   const tcommon = useTranslations('common');
 
@@ -102,7 +104,7 @@ export function PreviewFooter({ doc, results, vb, bv, sf, highlight = false }: F
                 <span className="font-medium text-red-500">-{formatCurrency(results.acompte, tcommon('currency'))}</span>
               </div>
             )}
-            <div className="flex justify-between p-3 rounded-lg bg-gradient-to-r from-slate-800 to-slate-700 text-white mt-2">
+            <div className="flex justify-between p-3 rounded-lg text-white mt-2" style={{ background: `linear-gradient(to right, ${design.gradientFrom}, ${design.gradientTo})` }}>
               <span className="text-[11px] font-bold uppercase tracking-wider">{t('netToPay')}</span>
               <span className="text-base font-black">{formatCurrency(results.netAPayer, tcommon('currency'))}</span>
             </div>

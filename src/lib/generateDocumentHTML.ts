@@ -1,8 +1,10 @@
 import type { LineItem, DocumentState, CalculationResult, CustomSectionDef } from '@/types';
+import type { DocTypeDesign } from '@/lib/documentDesign';
 
 export function generateDocumentHTML(params: {
   isEnt: boolean;
   docTypeLabel: string;
+  design: DocTypeDesign;
   vb: (block: string) => boolean;
   sf: (fieldId: string) => boolean;
   bv: (...fieldIds: string[]) => boolean;
@@ -32,7 +34,7 @@ export function generateDocumentHTML(params: {
   validityDays?: number;
   reference?: string;
 }) {
-  const { isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency, companyTagline, companyCapital, rcNumber, nisNumber, aiNumber, rib, bankName, bankAgency, ccpNumber, validityDays, reference } = params;
+  const { isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency, companyTagline, companyCapital, rcNumber, nisNumber, aiNumber, rib, bankName, bankAgency, ccpNumber, validityDays, reference } = params;
 
   const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 
@@ -57,14 +59,14 @@ export function generateDocumentHTML(params: {
     ${S('.header','display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px')}
     ${S('.header .brand','display:flex;align-items:flex-start;gap:12px')}
     ${S('.header .brand .logo','max-width:120px;max-height:60px;object-fit:contain')}
-    ${S('.header .brand h1','font-size:26px;font-weight:900;color:#1e3a5f;letter-spacing:-0.5px;margin:0;text-transform:uppercase')}
+    ${S('.header .brand h1','font-size:26px;font-weight:900;color:'+design.primaryDark+';letter-spacing:-0.5px;margin:0;text-transform:uppercase')}
     ${S('.header .brand .sub','font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:1px')}
     ${S('.header .meta-logo','text-align:right;margin-bottom:6px')}
     ${S('.header .meta-logo img','max-width:120px;max-height:60px;object-fit:contain')}
     ${S('.header .meta','text-align:right')}
-    ${S('.header .meta .num','font-size:18px;font-weight:900;color:#1e3a5f;margin-bottom:4px')}
+    ${S('.header .meta .num','font-size:18px;font-weight:900;color:'+design.primaryDark+';margin-bottom:4px')}
     ${S('.header .meta .line','font-size:10px;color:#64748b;margin:1px 0')}
-    ${S('.hr','height:2px;background:linear-gradient(to right,#1e3a5f,#e2e8f0);margin-bottom:24px;border:none')}
+    ${S('.hr','height:2px;background:linear-gradient(to right,'+design.primaryHex+',#e2e8f0);margin-bottom:24px;border:none')}
     ${S('.info-grid','display:flex;gap:30px;margin-bottom:24px')}
     ${S('.info-grid .col','flex:1')}
     ${S('.info-grid .col .ttl','font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px')}
@@ -76,7 +78,7 @@ export function generateDocumentHTML(params: {
     ${S('.section-box p','font-size:10px;margin:1px 0;line-height:1.5')}
     ${S('.section-box p .lb','font-weight:600;color:#475569')}
     ${S('table.items','width:100%;border-collapse:collapse;margin:18px 0 20px')}
-    ${S('table.items thead th','padding:6px 4px;font-size:8px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;background:#f8fafc;border-bottom:2px solid #1e3a5f')}
+    ${S('table.items thead th','padding:6px 4px;font-size:8px;font-weight:800;color:'+design.primaryHex+';text-transform:uppercase;letter-spacing:1px;background:'+design.primaryLight+';border-bottom:2px solid '+design.primaryHex)}
     ${S('table.items thead th:first-child','text-align:center;width:22px')}
     ${S('table.items thead th:nth-child(2)','text-align:left')}
     ${S('table.items thead th:nth-child(3)','text-align:center;width:32px')}
@@ -95,11 +97,12 @@ export function generateDocumentHTML(params: {
     ${S('.totals-table .ttr td','padding:4px 0 1px;font-size:8px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px')}
     ${S('.totals-table .sep td','padding:0;height:1px;background:#e2e8f0')}
     ${S('.totals-table .disc td.val','color:#ef4444')}
-    ${S('.totals-table .grand td','padding-top:8px;border-top:2px solid #1e3a5f')}
-    ${S('.totals-table .grand .lbl','font-size:11px;font-weight:800;color:#1e3a5f;text-transform:uppercase')}
-    ${S('.totals-table .grand .val','font-size:16px;font-weight:900;color:#1e3a5f')}
+    ${S('.totals-table .grand td','padding-top:8px;border-top:2px solid '+design.primaryHex)}
+    ${S('.totals-table .grand .lbl','font-size:11px;font-weight:800;color:'+design.primaryDark+';text-transform:uppercase')}
+    ${S('.totals-table .grand .val','font-size:16px;font-weight:900;color:'+design.primaryDark)}
     ${S('.totals-table .inwords','font-size:8px;font-style:italic;color:#94a3b8;text-align:right;padding-top:3px')}
-    ${S('.signature','margin-top:20px;padding-top:14px;border-top:1.5px solid #1e293b;display:flex;justify-content:space-between;align-items:flex-end')}
+    ${S('.top-bar','height:12px;background:'+design.primaryHex+';margin-bottom:0')}
+    ${S('.signature','margin-top:20px;padding-top:14px;border-top:1.5px solid '+design.primaryHex+';display:flex;justify-content:space-between;align-items:flex-end')}
     ${S('.signature .loc','font-size:9px;color:#64748b;font-weight:500')}
     ${S('.signature .stamp','text-align:right')}
     ${S('.signature .stamp .lbl2','font-size:8px;color:#94a3b8;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px')}
@@ -124,7 +127,7 @@ export function generateDocumentHTML(params: {
   for (const cat of catOrder) {
     const items = grouped[cat]; if (!items) continue;
     const label = catLabels[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
-    tbody.push(`<tr><td colspan="6" style="padding:10px 4px 3px;border:none"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#1e3a5f">` + label + `</div></td></tr>`);
+    tbody.push(`<tr><td colspan="6" style="padding:10px 4px 3px;border:none"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:` + design.accent + `">` + label + `</div></td></tr>`);
     for (const item of items) { idx++; tbody.push(itemRow(item, idx)); }
   }
 
@@ -132,6 +135,8 @@ export function generateDocumentHTML(params: {
 <html><head><meta charset="utf-8"><title>` + docTypeLabel + ` - ` + s(doc.documentNumber) + `</title>
 <style>` + css + `</style></head><body>
 <div class="page">
+
+<div class="top-bar"></div>
 
 <div class="top-section">
   <div class="header">
@@ -297,5 +302,194 @@ export function generateDocumentHTML(params: {
 <script>
 window.onload=function(){setTimeout(function(){window.print();},300);};
 </script>
+</body></html>`;
+}
+
+const catLabelsMap: Record<string, string> = {
+  preparation: 'Préparation', peinture: 'Peinture', finition: 'Finition',
+  revetement: 'Revêtement', facade: 'Façade', enduit: 'Enduit',
+  main_oeuvre: 'Main d\'Œuvre', materiaux: 'Matériaux', transport: 'Transport',
+  divers: 'Divers',
+};
+const unitLabelsMap: Record<string, string> = { u:'U', h:'H', j:'J', m2:'M²', m3:'M³', ml:'ML', kg:'KG', forfait:'Forfait' };
+
+export function generateAttachementHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+}) {
+  const { doc, sf, bv, vb, tc, tp, design } = params;
+  const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const s = (v: string) => escHtml(v);
+  const A = { navy: '#1A3A6B', navyLight: '#EEF3FB', navyMid: '#2E60B0', gold: '#C4A35A', green: '#0B3D2E', paperBg: '#F9F8F5', border: '#E4DED5', dark: '#1A1A1A' };
+  const isEnt = doc.mode === 'entreprise';
+  const catOrder = ['preparation','peinture','finition','revetement','facade','enduit','main_oeuvre','materiaux','transport','divers'];
+
+  const grouped: Record<string, typeof doc.items> = {};
+  const uncategorized: typeof doc.items = [];
+  for (const item of doc.items) {
+    if (item.category) { if (!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); }
+    else { uncategorized.push(item); }
+  }
+
+  let rowIdx = 0;
+  const tbody: string[] = [];
+  for (const item of uncategorized) {
+    rowIdx++;
+    tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4">
+      <td class="c" style="padding:7px 8px;font-family:'Courier New',monospace;font-size:10px;color:#AAA;width:36px">${String(rowIdx).padStart(2,'0')}</td>
+      <td style="padding:7px 8px;font-weight:500;color:#1A1A1A;font-size:12.5px">${escHtml(item.designation)}</td>
+      <td class="c" style="padding:7px 8px;width:52px"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:1px 7px;border-radius:3px">${unitLabelsMap[item.unit]??item.unit}</span></td>
+      <td class="c" style="padding:7px 8px;width:80px;font-family:'Courier New',monospace;font-weight:500;color:#1A1A1A">${item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+    </tr>`);
+  }
+  for (const cat of catOrder) {
+    const items = grouped[cat]; if (!items) continue;
+    const label = catLabelsMap[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+    tbody.push(`<tr style="background:${A.navyLight}"><td colspan="4" style="padding:5px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}">${escHtml(label)}</td></tr>`);
+    for (const item of items) {
+      rowIdx++;
+      tbody.push(`<tr style="border-bottom:0.5px solid #EDEAE4">
+        <td class="c" style="padding:7px 8px;font-family:'Courier New',monospace;font-size:10px;color:#AAA;width:36px">${String(rowIdx).padStart(2,'0')}</td>
+        <td style="padding:7px 8px;font-weight:500;color:#1A1A1A;font-size:12.5px">${escHtml(item.designation)}</td>
+        <td class="c" style="padding:7px 8px;width:52px"><span style="display:inline-block;background:${A.navyLight};color:${A.navy};font-size:10px;font-weight:600;padding:1px 7px;border-radius:3px">${unitLabelsMap[item.unit]??item.unit}</span></td>
+        <td class="c" style="padding:7px 8px;width:80px;font-family:'Courier New',monospace;font-weight:500;color:#1A1A1A">${item.quantity.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      </tr>`);
+    }
+  }
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Attachement des Travaux - ${s(doc.documentNumber)}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Helvetica,Arial,sans-serif;color:#1A1A1A;font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:190mm;margin:0 auto;min-height:100vh;background:#F9F8F5;display:flex;flex-direction:column}
+.accent-bar{height:4px;background:linear-gradient(90deg,${A.navy} 0%,${A.navyMid} 60%,${A.gold} 100%)}
+.body{padding:28px 44px;flex:1}
+.co-frame{border:2px solid #1A1A1A;padding:14px 20px;text-align:center;margin-bottom:14px}
+.co-frame .nm{font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.35;color:#1A1A1A}
+.co-frame .ad{font-size:12px;color:#444;margin-top:4px}
+.co-frame .mr{display:flex;justify-content:center;gap:24px;font-size:11px;color:#666;font-family:'Courier New',monospace;margin-top:6px;flex-wrap:wrap}
+.co-frame .mr b{font-family:Inter,sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:${A.navy}}
+.doc-title{text-align:center;padding:14px 0 6px}
+.doc-title h1{font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:700;color:#1A1A1A;text-transform:uppercase;letter-spacing:0.1em;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;display:inline-block;margin-bottom:8px}
+.doc-title .dr{display:flex;justify-content:center;align-items:center;gap:20px;font-size:11px;color:#666;font-family:'Courier New',monospace;margin-bottom:6px}
+.doc-title .dr b{font-family:Inter,sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:${A.navy}}
+.doc-title .dr .s{color:#CCC}
+.doc-title .lo{font-size:12px;color:#555;font-style:italic;padding:6px 20px;border:0.5px solid #E4DED5;border-radius:4px;background:#F9F8F5;display:inline-block;margin-bottom:2px}
+.items-wrap{border-bottom:1px solid #E4DED5;margin-top:10px}
+table.items{width:100%;border-collapse:collapse;font-size:12.5px}
+table.items thead tr{background:${A.navy}}
+table.items thead th{padding:7px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#EEF3FB;white-space:nowrap}
+table.items thead th.c{text-align:center}
+table.items thead th.l{text-align:left}
+table.items tbody tr.cat-row td{padding:5px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy}}
+.obs-section{padding:12px 0;border-bottom:1px solid #E4DED5}
+.obs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:4px}
+.obs-box{background:#F9F8F5;border:0.5px solid #E4DED5;border-left:2px solid ${A.navy};border-radius:0 4px 4px 0;padding:8px 12px;font-size:12px;color:#444;font-style:italic;line-height:1.6}
+.cert-band{margin-top:12px;background:${A.navyLight};border:0.5px solid #B5D4F4;border-radius:4px;padding:8px 14px;font-size:12px;color:${A.navy};display:flex;align-items:center;gap:10px}
+.cert-band .ct{line-height:1.55}
+.cert-band .ct b{font-weight:600}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;padding:16px 44px 0;gap:0}
+.sig-col-l{border-right:0.5px dashed #C8C2B5;padding-right:28px;padding-bottom:14px}
+.sig-col-r{padding-left:28px;padding-bottom:14px;text-align:right}
+.sig-ey{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${A.navy};margin-bottom:2px}
+.sig-sub{font-size:11px;color:#888;margin-bottom:8px}
+.sig-space{height:50px;border-bottom:0.5px solid #C8C2B5;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#CCC;font-size:11px;font-style:italic}
+.cachet{width:54px;height:54px;border-radius:50%;border:1.5px solid #C8C2B5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:600;text-transform:uppercase;text-align:center;color:#666;line-height:1.3}
+.sig-bot{border-top:0.5px dashed #C8C2B5;margin:0 44px;padding:14px 0 20px;text-align:center}
+.sig-bot .sig-ey{color:${A.navy}}
+.doc-foot{background:#F9F8F5;border-top:1px solid #E4DED5;padding:8px 44px;font-size:10px;color:#999;text-align:center;font-family:'Courier New',monospace;line-height:1.8}
+.doc-foot strong{font-family:Inter,sans-serif;color:#777}
+@media print{.page{box-shadow:none}}
+</style></head><body>
+<div class="page">
+<div class="accent-bar"></div>
+<div class="body">
+  ${isEnt && doc.companyInfo ? `
+  <div class="co-frame">
+    <div class="nm">${s(doc.companyInfo.name)}</div>
+    ${doc.companyInfo.address ? `<div class="ad">${s(doc.companyInfo.address)}</div>` : ''}
+    <div class="mr">
+      ${doc.companyInfo.taxIds.rc ? `<span><b>RC</b> ${s(doc.companyInfo.taxIds.rc)}</span>` : ''}
+      ${doc.companyInfo.taxIds.nif ? `<span><b>N.I.F.</b> ${s(doc.companyInfo.taxIds.nif)}</span>` : ''}
+      ${doc.companyInfo.taxIds.nis ? `<span><b>N.I.S.</b> ${s(doc.companyInfo.taxIds.nis)}</span>` : ''}
+    </div>
+  </div>` : ''}
+
+  <div class="doc-title">
+    <h1>Attachement des Travaux</h1>
+    <div class="dr">
+      ${sf('docNumber') ? `<b>Réf.</b> ${s(doc.documentNumber)}` : ''}
+      ${sf('docNumber') && sf('issueDate') ? `<span class="s">·</span>` : ''}
+      ${sf('issueDate') ? `<b>Date</b> ${doc.date}` : ''}
+      ${doc.bcRef ? `<span class="s">·</span><b>BC lié</b> ${s(doc.bcRef)}` : ''}
+    </div>
+    ${doc.chantierAddress ? `<div class="lo">Réalisé au niveau ${s(doc.chantierAddress)}</div>` : ''}
+  </div>
+
+  ${doc.items.length ? `
+  <div class="items-wrap">
+    <table class="items">
+      <thead><tr>
+        <th class="c" style="width:36px">N°</th>
+        <th class="l">Désignation des ouvrages</th>
+        <th class="c" style="width:52px">Unité</th>
+        <th class="c" style="width:80px">Quantité</th>
+      </tr></thead>
+      <tbody>${tbody.join('')}</tbody>
+    </table>
+  </div>` : ''}
+
+  ${sf('notes') && doc.notes ? `
+  <div class="obs-section">
+    <div class="obs-label">Observations / Réserves</div>
+    <div class="obs-box">${s(doc.notes)}</div>
+  </div>` : ''}
+
+  <div class="cert-band">
+    <span style="font-size:16px;flex-shrink:0">&#10003;</span>
+    <div class="ct"><b>Attestation :</b> Le soussigné certifie que les travaux ci-dessus ont été réalisés et réceptionnés conformément aux quantités indiquées${doc.chantierAddress ? ` au niveau ${s(doc.chantierAddress)}` : ''}.</div>
+  </div>
+</div>
+
+<div>
+  <div class="sig-grid">
+    <div class="sig-col-l">
+      <div class="sig-ey">Le maître d'ouvrage</div>
+      <div class="sig-sub">${doc.clientInfo.name ? s(doc.clientInfo.name) : 'Client'}</div>
+      <div class="sig-space">Signature &amp; cachet</div>
+      <div class="cachet" style="margin:0 auto">Cachet<br>Client</div>
+    </div>
+    <div class="sig-col-r">
+      <div class="sig-ey" style="color:${A.green}">L'Entreprise</div>
+      <div class="sig-sub">${isEnt && doc.companyInfo ? s(doc.companyInfo.name) : 'Entreprise'}</div>
+      <div class="sig-space">Signature &amp; cachet</div>
+      <div class="cachet" style="margin:0 0 0 auto">Cachet<br>Entr.</div>
+    </div>
+  </div>
+  <div class="sig-bot">
+    <div class="sig-ey">Validation Direction</div>
+    <div style="display:inline-block;text-align:center">
+      <div class="sig-space" style="width:180px;margin:0 auto 6px">Signature &amp; cachet officiel</div>
+      <div class="cachet" style="margin:0 auto 6px">Cachet<br>Dir.</div>
+    </div>
+  </div>
+  <div class="doc-foot">
+    <strong>Réf. :</strong> ${s(doc.documentNumber)}
+    ${doc.bcRef ? `<span style="margin:0 6px">·</span><strong>BC lié :</strong> ${s(doc.bcRef)}` : ''}
+    <span style="margin:0 6px">·</span><strong>Date :</strong> ${doc.date}
+    ${doc.companyInfo?.taxIds?.rc ? `<span style="margin:0 6px">·</span><strong>RC :</strong> ${s(doc.companyInfo.taxIds.rc)}` : ''}
+    <br>Document généré par <strong>CloudDevis</strong>
+  </div>
+</div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
 </body></html>`;
 }

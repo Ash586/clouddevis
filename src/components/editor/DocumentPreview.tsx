@@ -6,6 +6,8 @@ import { formatCurrency } from '@/lib/calculations';
 import { PreviewHeader } from './preview/PreviewHeader';
 import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
+import { PreviewAttachement } from './preview/PreviewAttachement';
+import { getDesign } from '@/lib/documentDesign';
 
 export type PreviewFocus = 'header' | 'client' | 'items' | 'totals' | 'payment' | null;
 
@@ -30,6 +32,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     main_oeuvre: tcat('main_oeuvre'), materiaux: tcat('materiaux'), transport: tcat('transport'),
     divers: tcat('divers'), services: tcat('services'),
   };
+  const design = getDesign(doc.documentType);
   const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
   const hf = new Set(hiddenFields ?? []);
   const sf = (fieldId: string) => !hf.has(fieldId);
@@ -48,18 +51,22 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
 
   const categoryOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
+  if (doc.documentType === 'attachement') {
+    return <PreviewAttachement doc={doc} sf={sf} bv={bv} vb={vb} t={t} tu={tu} design={design} highlight={previewFocus} />;
+  }
+
   return (
-    <div id="print-area" className={`w-[21cm] min-h-[29.7cm] bg-white p-10 flex flex-col justify-between shadow-md print:shadow-none border-t-[12px] border-slate-800 relative ${showGrid ? 'print:grid' : ''}`}>
+    <div id="print-area" className={`w-[21cm] min-h-[29.7cm] bg-white p-10 flex flex-col justify-between shadow-md print:shadow-none relative ${showGrid ? 'print:grid' : ''}`} style={{ borderTop: `12px solid ${design.borderColor}` }}>
       {showGrid && <div className="absolute inset-0 pointer-events-none print:hidden" style={{ backgroundImage: 'linear-gradient(rgba(200,200,200,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(200,200,200,0.15) 1px, transparent 1px)', backgroundSize: '10px 10px' }} />}
       <div>
-        <PreviewHeader doc={doc} sf={sf} bv={bv} vb={vb} t={t} highlight={previewFocus === 'header'} />
+        <PreviewHeader doc={doc} design={design} sf={sf} bv={bv} vb={vb} t={t} highlight={previewFocus === 'header'} />
         <PreviewMetaSections doc={doc} sf={sf} vb={vb} bv={bv} t={t} highlight={previewFocus === 'client'} />
 
         {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
           <div className={`mb-6 rounded-lg transition-all duration-700 print:rounded-none ${previewFocus === 'items' ? 'ring-2 ring-blue-400/50 bg-blue-50/40 p-2 -m-2' : ''}`}>
           <table className="w-full text-left text-[10px] border-collapse">
             <thead>
-              <tr className="border-b-2 border-slate-800 text-slate-500 text-[8px] font-black uppercase tracking-wider">
+              <tr style={{ borderBottom: `2px solid ${design.primaryHex}`, color: design.primaryHex }} className="text-[8px] font-black uppercase tracking-wider">
                 <th className="pb-2 pr-2 w-8">{t('tableHash')}</th>
                 <th className="pb-2">{t('tableDescription')}</th>
                 <th className="pb-2 text-center w-12">{t('tableQty')}</th>
@@ -93,7 +100,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
                   rows.push(
                     <tr key={'h-'+cat}>
                       <td colSpan={5} className="pt-3 pb-1.5">
-                        <div className="text-[9px] font-black uppercase tracking-wider text-blue-600">{catLabel}</div>
+                        <div className="text-[9px] font-black uppercase tracking-wider" style={{ color: design.accent }}>{catLabel}</div>
                       </td>
                     </tr>
                   );
@@ -163,7 +170,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
         })}
       </div>
 
-      <PreviewFooter doc={doc} results={results} vb={vb} bv={bv} sf={sf} highlight={previewFocus === 'totals' || previewFocus === 'payment'} />
+      <PreviewFooter doc={doc} results={results} design={design} vb={vb} bv={bv} sf={sf} highlight={previewFocus === 'totals' || previewFocus === 'payment'} />
     </div>
   );
 }

@@ -34,6 +34,8 @@ const TYPE_LABELS: Record<string, string> = {
   PROFORMA: 'Proforma',
   BC: 'BC',
   BR: 'BR',
+  INTERVENTION: 'Intervention',
+  ATTACHEMENT: 'Attachement',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -42,6 +44,8 @@ const TYPE_COLORS: Record<string, string> = {
   PROFORMA: 'bg-purple-100 text-purple-700',
   BC: 'bg-amber-100 text-amber-700',
   BR: 'bg-teal-100 text-teal-700',
+  INTERVENTION: 'bg-rose-100 text-rose-700',
+  ATTACHEMENT: 'bg-indigo-100 text-indigo-700',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -182,6 +186,8 @@ export default function DocumentsPage() {
                       <option value="PROFORMA">Proforma</option>
                       <option value="BC">BC</option>
                       <option value="BR">BR</option>
+                      <option value="INTERVENTION">Intervention</option>
+                      <option value="ATTACHEMENT">Attachement</option>
                     </select>
                   </div>
                   <div>

@@ -12,7 +12,8 @@ import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency } from '@/lib/calculations';
-import { generateDocumentHTML } from '@/lib/generateDocumentHTML';
+import { generateDocumentHTML, generateAttachementHTML } from '@/lib/generateDocumentHTML';
+import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode } from '@/types';
@@ -210,26 +211,29 @@ function EditorContent() {
     }
     const catOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
-    const html = generateDocumentHTML({
-      isEnt, docTypeLabel, vb, sf, bv, catLabels, paymentLabels, unitLabels,
-      grouped, uncategorized, catOrder, doc, results,
-      tc: (k: string) => tc(k),
-      tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
-      te: (k: string) => te(k),
-      tu: (k: string) => tu(k),
-      customSections, currency: tc('currency'),
-      companyTagline: doc.companyTagline,
-      companyCapital: doc.companyCapital,
-      rcNumber: doc.rcNumber,
-      nisNumber: doc.nisNumber,
-      aiNumber: doc.aiNumber,
-      rib: doc.rib,
-      bankName: doc.bankName,
-      bankAgency: doc.bankAgency,
-      ccpNumber: doc.ccpNumber,
-      validityDays: doc.validityDays,
-      reference: doc.reference,
-    });
+    const design = getDesign(doc.documentType);
+    const html = doc.documentType === 'attachement'
+      ? generateAttachementHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+      : generateDocumentHTML({
+        isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels,
+        grouped, uncategorized, catOrder, doc, results,
+        tc: (k: string) => tc(k),
+        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
+        te: (k: string) => te(k),
+        tu: (k: string) => tu(k),
+        customSections, currency: tc('currency'),
+        companyTagline: doc.companyTagline,
+        companyCapital: doc.companyCapital,
+        rcNumber: doc.rcNumber,
+        nisNumber: doc.nisNumber,
+        aiNumber: doc.aiNumber,
+        rib: doc.rib,
+        bankName: doc.bankName,
+        bankAgency: doc.bankAgency,
+        ccpNumber: doc.ccpNumber,
+        validityDays: doc.validityDays,
+        reference: doc.reference,
+      });
 
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);

@@ -31,6 +31,8 @@ const TYPE_OPTIONS = [
   { value: 'PROFORMA', label: 'Proforma' },
   { value: 'BC', label: 'Bon de Commande' },
   { value: 'BR', label: 'Bon de Réception' },
+  { value: 'INTERVENTION', label: 'Intervention' },
+  { value: 'ATTACHEMENT', label: 'Attachement' },
 ];
 
 const MODE_OPTIONS = [
@@ -44,6 +46,8 @@ const TYPE_BADGE_VARIANT: Record<string, 'default' | 'info' | 'success' | 'warni
   PROFORMA: 'warning',
   BC: 'default',
   BR: 'danger',
+  INTERVENTION: 'warning',
+  ATTACHEMENT: 'info',
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -52,6 +56,8 @@ const TYPE_LABEL: Record<string, string> = {
   PROFORMA: 'Proforma',
   BC: 'Bon de Commande',
   BR: 'Bon de Réception',
+  INTERVENTION: 'Intervention',
+  ATTACHEMENT: 'Attachement',
 };
 
 export default function TemplatesPage() {

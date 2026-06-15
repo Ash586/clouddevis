@@ -9,7 +9,7 @@ import {
   FileText, CreditCard, Users, RefreshCw, FileStack,
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
   Search, Trash2, ChevronRight, Clock, TrendingUp,
-  Hammer, ClipboardList, Receipt, Eye, FileEdit,
+  Hammer, ClipboardList, Receipt, Eye, FileEdit, FilePen,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -59,9 +59,10 @@ const QUICK_CREATE_TYPES = [
   { type: 'facture', labelKey: 'facture', icon: Receipt, color: 'green', borderColor: 'border-[rgba(0,149,77,0.3)]', bgColor: 'bg-[rgba(0,149,77,0.05)] hover:bg-[rgba(0,149,77,0.1)]', textColor: 'text-[var(--green-3)]' },
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList, color: 'purple', borderColor: 'border-purple-400/30', bgColor: 'bg-purple-400/5 hover:bg-purple-400/10', textColor: 'text-purple-400' },
   { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack, color: 'amber', borderColor: 'border-amber-400/30', bgColor: 'bg-amber-400/5 hover:bg-amber-400/10', textColor: 'text-amber-400' },
+  { type: 'attachement', labelKey: 'attachement', icon: FilePen, color: 'indigo', borderColor: 'border-indigo-400/30', bgColor: 'bg-indigo-400/5 hover:bg-indigo-400/10', textColor: 'text-indigo-400' },
 ];
 
-const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC'] as const;
+const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'INTERVENTION', 'ATTACHEMENT'] as const;
 
 const DOC_TYPE_BADGE: Record<string, { bg: string; text: string; border: string }> = {
   DEVIS: { bg: 'bg-blue-400/10', text: 'text-blue-400', border: 'border-blue-400/20' },
@@ -177,7 +178,7 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
             <qd.icon size={20} className={qd.textColor} />
             <div className="text-start">
               <div className={`text-sm font-bold ${qd.textColor}`}>{t(`docTypes.${qd.labelKey}`)}</div>
-              <div className="text-[10px] text-[var(--sand-muted)]">{stats.typeBreakdown?.[qd.type === 'bon_commande' ? 'BC' : qd.type === 'facture' ? 'FACTURE' : qd.type === 'proforma' ? 'PROFORMA' : 'DEVIS'] || 0} {t('created')}</div>
+              <div className="text-[10px] text-[var(--sand-muted)]">{stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0} {t('created')}</div>
             </div>
           </button>
         ))}
