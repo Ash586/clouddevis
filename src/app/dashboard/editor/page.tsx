@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
   Grid3X3, Trash2, Plus, MoreHorizontal,
   ChevronDown, Building2, Receipt, BadgeCheck,
-  CircleDollarSign, ScrollText, Briefcase, ClipboardList,
+  CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench,
 } from 'lucide-react';
 
 function EditorContent() {
@@ -61,6 +61,8 @@ function EditorContent() {
   const [previewFocus, setPreviewFocus] = useState<PreviewFocus>(null);
   const [mobileTab, setMobileTab] = useState<'editor' | 'preview' | 'totals'>('editor');
   const [showGrid, setShowGrid] = useState(false);
+  const [showSectionNav, setShowSectionNav] = useState(false);
+  const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -767,13 +769,23 @@ function EditorContent() {
           <button onClick={() => router.push('/dashboard')} className="shrink-0 p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={16} className="rotate-180" />
           </button>
-          <div className="flex gap-0.5 bg-[var(--navy-4)] p-0.5 rounded-lg shrink-0">
-            {(['devis', 'facture'] as const).map(t => (
-              <button key={t} onClick={() => updateDoc('documentType', t)}
-                className={cn('px-2.5 py-1 text-[9px] font-black rounded-md uppercase tracking-wider transition-all min-w-[48px] text-center', doc.documentType === t ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
-                {t === 'facture' ? te('documentTypeInvoice') : te('documentTypeQuote')}
-              </button>
-            ))}
+          <div className="relative shrink-0">
+            <button onClick={() => setShowTypeMenu(v => !v)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--navy-4)] rounded-lg text-[10px] font-black uppercase tracking-wider transition min-w-[80px] text-center text-blue-400 hover:bg-[var(--navy-3)]">
+              {doc.documentType === 'devis' ? te('documentTypeQuote') : doc.documentType === 'facture' ? te('documentTypeInvoice') : doc.documentType}
+              <ChevronDown size={12} />
+            </button>
+            {showTypeMenu && (
+              <div className="absolute top-full left-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[170px]">
+                {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
+                  <button key={t} onClick={() => { updateDoc('documentType', t); setShowTypeMenu(false); }}
+                    className={cn('w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition min-h-[36px]', doc.documentType === t ? 'bg-blue-600/20 text-blue-400' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                    {t === 'devis' ? <FileText size={14} /> : t === 'facture' ? <Receipt size={14} /> : t === 'proforma' ? <ClipboardList size={14} /> : t === 'bc' ? <FileStack size={14} /> : t === 'br' ? <Package size={14} /> : t === 'intervention' ? <Wrench size={14} /> : <FileText size={14} />}
+                    {t === 'devis' ? tp('docTypeQuote') : t === 'facture' ? tp('docTypeInvoice') : t === 'proforma' ? tp('docTypeProforma') : t === 'bc' ? tp('docTypeOrder') : t === 'br' ? tp('docTypeBR') : t === 'intervention' ? "Intervention" : "Attachement"}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Center: Save status */}
@@ -840,8 +852,9 @@ function EditorContent() {
         {/* ═══════════════ MAIN AREA ═══════════════ */}
         <div className="flex-1 flex overflow-hidden min-h-0">
 
-          {/* ──── LEFT RAIL (desktop) ──── */}
-          <nav className="hidden lg:flex flex-col items-center gap-0.5 py-2 px-1 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[60px] shrink-0 overflow-y-auto">
+          {/* ──── LEFT RAIL (desktop, hidden by default) ──── */}
+          {showSectionNav && (
+            <nav className="hidden lg:flex flex-col items-center gap-0.5 py-2 px-1 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[60px] shrink-0 overflow-y-auto">
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
@@ -852,8 +865,7 @@ function EditorContent() {
                 </button>
               );
             })}
-          </nav>
-
+          </nav>)}
           {/* ──── EDITOR PANEL ──── */}
           <div className={cn('flex-1 flex flex-col min-w-0', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
             {/* Validation errors banner */}
@@ -863,9 +875,24 @@ function EditorContent() {
                 <button onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
               </div>
             )}
-            {/* Scrollable section area */}
+            {/* Scrollable section area - shows all sections when nav hidden, one section when nav visible */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
-              {renderSection(activeSection)}
+              {showSectionNav ? renderSection(activeSection) : (
+                <>
+                  {DEFAULT_SECTION_ORDER.filter(s => {
+                    const sectionFields = SECTION_FIELDS[s];
+                    if (!sectionFields) return false;
+                    return sectionFields.some(f => !hiddenFields.has(f));
+                  }).map(s => (
+                    <div key={s} className="scroll-mt-16">{renderSection(s)}</div>
+                  ))}
+                  {customSections.map(cs => {
+                    const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
+                    if (!hasVisible) return null;
+                    return <div key={cs.id} className="scroll-mt-16">{renderSection(cs.id)}</div>;
+                  })}
+                </>
+              )}
             </div>
             {/* ──── BOTTOM TOTALS BAR ──── */}
             <div className="shrink-0 border-t border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2 flex items-center gap-3 overflow-x-auto">
@@ -1145,7 +1172,12 @@ function EditorContent() {
               )}
             </div>
             <div className="px-5 py-3 border-t border-slate-200 flex items-center justify-between bg-slate-50">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                  <input type="checkbox" checked={showSectionNav} onChange={() => setShowSectionNav(v => !v)} className="w-3.5 h-3.5 rounded text-emerald-600" />
+                  <span className="text-[10px] font-medium text-slate-600">{'Navigateur sections' || te('showSectionNav')}</span>
+                </label>
+                <div className="w-px h-4 bg-slate-200" />
                 <button onClick={() => {
                   const all = Object.fromEntries(ALL_SECTIONS.map(s => {
                     if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];
