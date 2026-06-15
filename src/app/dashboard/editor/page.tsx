@@ -11,7 +11,7 @@ import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, generateDocumentNumber, generateId } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
@@ -50,6 +50,25 @@ function EditorContent() {
   const tu = useTranslations('preview.units');
   const tp = useTranslations('preview');
   const tc = useTranslations('common');
+
+  const DOC_TYPE_EDITOR_LABELS: Record<string, string> = {
+    devis: 'documentTypeQuote',
+    facture: 'documentTypeInvoice',
+    proforma: 'documentTypeProforma',
+    bc: 'documentTypeBC',
+    br: 'documentTypeBR',
+    intervention: 'documentTypeIntervention',
+    attachement: 'documentTypeAttachement',
+  };
+  const DOC_TYPE_PREVIEW_LABELS: Record<string, string> = {
+    devis: 'docTypeQuote',
+    facture: 'docTypeInvoice',
+    proforma: 'docTypeProforma',
+    bc: 'docTypeOrder',
+    br: 'docTypeBR',
+    intervention: 'docTypeIntervention',
+    attachement: 'docTypeAttachement',
+  };
 
   const [fieldPrefs, setFieldPrefs] = useState<Record<string, Record<string, string[]>> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -195,7 +214,7 @@ function EditorContent() {
   const handleDownload = async () => {
     await saveDoc();
     const isEnt = doc.mode === 'entreprise';
-    const docTypeLabel = doc.documentType === 'devis' ? tp('docTypeQuote') : doc.documentType === 'facture' ? tp('docTypeInvoice') : tp('docTypeProforma');
+    const docTypeLabel = tp(DOC_TYPE_PREVIEW_LABELS[doc.documentType] ?? 'docTypeQuote');
     const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
     const hf = new Set(hiddenFields);
     const sf = (fieldId: string) => !hf.has(fieldId);
@@ -776,16 +795,37 @@ function EditorContent() {
           <div className="relative shrink-0">
             <button onClick={() => setShowTypeMenu(v => !v)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--navy-4)] rounded-lg text-[10px] font-black uppercase tracking-wider transition min-w-[80px] text-center text-blue-400 hover:bg-[var(--navy-3)]">
-              {doc.documentType === 'devis' ? te('documentTypeQuote') : doc.documentType === 'facture' ? te('documentTypeInvoice') : doc.documentType}
+                    {te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}
               <ChevronDown size={12} />
             </button>
             {showTypeMenu && (
               <div className="absolute top-full left-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[170px]">
                 {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
-                  <button key={t} onClick={() => { updateDoc('documentType', t); setShowTypeMenu(false); }}
+                  <button key={t} onClick={() => { setDoc(prev => {
+  const newDoc = { ...prev, documentType: t as DocumentState['documentType'] };
+  if (t === 'attachement' && !prev.items.length) {
+    const sampleItems = [
+      { id: generateId(), designation: 'Fourniture et application de peinture acrylique mate', quantity: 120, unit: 'm2' as const, unitPrice: 850, category: 'peinture' },
+      { id: generateId(), designation: 'Enduit de lissage des murs et plafonds', quantity: 85, unit: 'm2' as const, unitPrice: 320, category: 'enduit' },
+      { id: generateId(), designation: 'Ponçage et préparation des surfaces', quantity: 1, unit: 'forfait' as const, unitPrice: 18000, category: 'preparation' },
+      { id: generateId(), designation: 'Nettoyage chantier après travaux', quantity: 1, unit: 'forfait' as const, unitPrice: 5000, category: 'divers' },
+    ];
+    return {
+      ...newDoc,
+      documentType: 'attachement',
+      items: sampleItems,
+      documentNumber: generateDocumentNumber('attachement', prev.mode),
+      chantierAddress: 'Cité des Annassers, Bloc 15, 3e étage, Alger',
+      chantierType: prev.chantierType || 'Appartement',
+      chantierSurface: prev.chantierSurface || 85,
+      notes: prev.notes || 'Travaux conformes au devis initial. Réception effectuée sans réserves.',
+    };
+  }
+  return newDoc;
+}); setShowTypeMenu(false); }}
                     className={cn('w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition min-h-[36px]', doc.documentType === t ? 'bg-blue-600/20 text-blue-400' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
                     {t === 'devis' ? <FileText size={14} /> : t === 'facture' ? <Receipt size={14} /> : t === 'proforma' ? <ClipboardList size={14} /> : t === 'bc' ? <FileStack size={14} /> : t === 'br' ? <Package size={14} /> : t === 'intervention' ? <Wrench size={14} /> : <FileText size={14} />}
-                    {t === 'devis' ? tp('docTypeQuote') : t === 'facture' ? tp('docTypeInvoice') : t === 'proforma' ? tp('docTypeProforma') : t === 'bc' ? tp('docTypeOrder') : t === 'br' ? tp('docTypeBR') : t === 'intervention' ? "Intervention" : "Attachement"}
+                    {tp(DOC_TYPE_PREVIEW_LABELS[t] ?? 'docTypeQuote')}
                   </button>
                 ))}
               </div>
@@ -979,7 +1019,7 @@ function EditorContent() {
                 <h3 className="text-[16px] font-bold text-slate-800 tracking-tight">
                   {te('customizeTitle')}
                   <span className="ml-2 text-[11px] font-semibold text-white bg-blue-600 px-2 py-0.5 rounded-md align-middle uppercase">
-                    {doc.documentType === 'devis' ? te('documentTypeQuote') : doc.documentType === 'facture' ? te('documentTypeInvoice') : doc.documentType}
+              {te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}
                   </span>
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">{te('customizeSubtitle') || 'Cliquez sur une catégorie pour voir les champs'}</p>

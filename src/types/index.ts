@@ -262,6 +262,7 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
   attachement: {
     design: ['logo', 'logoPosition'],
     general: ['docNumber', 'issueDate'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone'],
     chantier: ['chantierAddress', 'chantierType', 'chantierSurface'],
     materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
     prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
