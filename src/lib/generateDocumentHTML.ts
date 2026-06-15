@@ -372,7 +372,6 @@ export function generateAttachementHTML(params: {
   const companyNameFr = e(doc.sigCompanyNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : '—'));
   const directionNameFr = e(doc.sigDirectionNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : 'Validation Direction'));
   const directionRole = e(doc.sigDirectionRole || '');
-  const companyInitials = isEnt && doc.companyInfo ? e(doc.companyInfo.name.split(' ').slice(0,2).join(' ').substring(0,12)) : 'Entr.';
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Attachement des Travaux - ${e(doc.documentNumber)}</title>
@@ -417,13 +416,10 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
 .sig-sub{font-size:11px;color:#888;margin-bottom:10px}
 .sig-detail{font-size:12px;color:#555;font-style:italic;margin-bottom:4px;line-height:1.5}
 .sig-space{height:56px;border-bottom:0.5px solid #C8C2B5;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#DDD;font-size:11px;font-style:italic}
-.cachet{width:62px;height:62px;border-radius:50%;border:1.5px solid ${A.green};display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:600;text-transform:uppercase;text-align:center;color:${A.green};line-height:1.4}
-.cachet-company{border-color:${A.navy};color:${A.navy}}
 .sig-name{font-size:12px;color:#333;font-weight:500;margin-top:6px}
 .sig-role{font-size:10px;color:#888;margin-top:2px;line-height:1.4}
 .sig-bot{border-top:0.5px dashed #C8C2B5;margin:0 44px;padding:18px 0 24px;text-align:center}
 .sig-bot .sig-ey{color:${A.navy}}
-.cachet-bot{width:70px;height:70px}
 .doc-foot{background:#F9F8F5;border-top:1px solid #E4DED5;padding:10px 44px;font-size:10px;color:#999;text-align:center;font-family:'JetBrains Mono',monospace;line-height:1.8}
 .doc-foot strong{font-family:'Inter',sans-serif;color:#777}
 @media print{.page{box-shadow:none}}
@@ -484,8 +480,7 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
       <div class="sig-ey">Le maître d'ouvrage</div>
       <div class="sig-sub">${e(doc.clientInfo.name || '—')}</div>
       ${clientNameAr || clientRole ? `<div class="sig-detail">${clientNameAr ? clientNameAr+'<br>' : ''}${clientRole}</div>` : ''}
-      <div class="sig-space">Signature &amp; cachet</div>
-      <div class="cachet" style="margin:0 auto">${companyInitials}</div>
+      <div class="sig-space">Signature</div>
       <div class="sig-name">${clientNameFr}</div>
       ${clientRole ? `<div class="sig-role">${clientRole}</div>` : ''}
     </div>
@@ -493,8 +488,7 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
       <div class="sig-ey" style="color:${A.green}">L'Entreprise</div>
       <div class="sig-sub">${isEnt && doc.companyInfo ? e(doc.companyInfo.name) : '—'}</div>
       ${companyNameFr !== e(doc.companyInfo?.name || '') ? `<div class="sig-detail">${companyNameFr}</div>` : ''}
-      <div class="sig-space">Signature &amp; cachet</div>
-      <div class="cachet cachet-company" style="margin:0 0 6px auto">${companyInitials}</div>
+      <div class="sig-space">Signature</div>
       <div class="sig-name">${companyNameFr}</div>
     </div>
   </div>
@@ -503,7 +497,6 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
     ${directionRole ? `<div style="font-size:10px;color:#888;margin-top:3px;margin-bottom:12px;line-height:1.4">${directionRole}</div>` : ''}
     <div style="display:inline-block;text-align:center">
       <div class="sig-space" style="width:200px;margin:0 auto 8px">Signature &amp; cachet officiel</div>
-      <div class="cachet cachet-bot" style="margin:0 auto 6px">${companyInitials}</div>
       <div class="sig-name">${directionNameFr}</div>
       ${directionRole ? `<div class="sig-role">${directionRole}</div>` : ''}
     </div>

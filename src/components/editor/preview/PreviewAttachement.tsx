@@ -202,10 +202,7 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
               {doc.sigClientRole}
             </div>
           )}
-          <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic' }}>Signature &amp; cachet</div>
-          <div style={{ width: 62, height: 62, borderRadius: '50%', border: `1.5px solid ${A.green}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center', color: A.green, margin: '0 auto 6px', lineHeight: 1.4 }}>
-            {doc.clientInfo.name ? doc.clientInfo.name.split(' ').slice(0, 2).join(' ').substring(0, 12) : 'Client'}
-          </div>
+          <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic' }}>Signature</div>
           {(doc.sigClientNameFr || doc.clientInfo.name) && (
             <div style={{ fontSize: 12, color: '#333', fontWeight: 500 }}>{doc.sigClientNameFr || doc.clientInfo.name}</div>
           )}
@@ -223,10 +220,7 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
               {doc.sigCompanyNameFr}
             </div>
           )}
-          <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic' }}>Signature &amp; cachet</div>
-          <div style={{ width: 62, height: 62, borderRadius: '50%', border: `1.5px solid ${A.navy}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center', color: A.navy, margin: '0 0 6px auto', lineHeight: 1.4 }}>
-            {isEnt && doc.companyInfo ? doc.companyInfo.name.split(' ').slice(0, 2).join(' ').substring(0, 12) : 'Entr.'}
-          </div>
+          <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic' }}>Signature</div>
           {(doc.sigCompanyNameFr || (isEnt && doc.companyInfo?.name)) && (
             <div style={{ fontSize: 12, color: '#333', fontWeight: 500 }}>{doc.sigCompanyNameFr || (isEnt && doc.companyInfo?.name)}</div>
           )}
@@ -243,9 +237,6 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
         )}
         <div style={{ display: 'inline-block', textAlign: 'center' }}>
           <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', width: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic', margin: '0 auto 8px' }}>Signature &amp; cachet officiel</div>
-          <div style={{ width: 70, height: 70, borderRadius: '50%', border: `1.5px solid ${A.green}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center', color: A.green, margin: '0 auto 6px', lineHeight: 1.4 }}>
-            {isEnt && doc.companyInfo ? doc.companyInfo.name.split(' ').slice(0, 2).join(' ').substring(0, 10) : 'Dir.'}
-          </div>
           {(doc.sigDirectionNameFr || (isEnt && doc.companyInfo?.name)) && (
             <div style={{ fontSize: 12, color: '#333', fontWeight: 500 }}>{doc.sigDirectionNameFr || (isEnt && doc.companyInfo?.name)}</div>
           )}
