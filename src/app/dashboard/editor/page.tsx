@@ -999,7 +999,7 @@ function EditorContent() {
                     const res = await fetch('/api/user/custom-sections');
                     const data = await res.json();
                     setCustomSections(data.sections ?? []);
-                    setFieldPrefs(prev => { const b = prev ?? {}; const dt = doc.documentType; return { ...b, [dt]: { ...(b[dt] ?? {}), [section.id]: section.fields.map(f => f.id) } }; });
+                    setFieldPrefs(prev => { const b = prev ?? {} as Record<string, Record<string, string[]>>; const dt = doc.documentType; const curr: Record<string, string[]> = b[dt] ?? {}; curr[section.id] = section.fields.map(f => f.id); return { ...b, [dt]: curr }; });
                     setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.includes(section.id) ? prev.sectionOrder : [...prev.sectionOrder, section.id] }));
                     setShowSectionCreator(false);
                     setEditingSection(null);
