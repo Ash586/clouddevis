@@ -79,6 +79,9 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
             {doc.companyInfo.taxIds.nis && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><b style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: A.navy }}>N.I.S.</b> {doc.companyInfo.taxIds.nis}</span>
             )}
+            {doc.companyPhone && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><b style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: A.navy }}>T&#233;l.</b> {doc.companyPhone}</span>
+            )}
           </div>
         </div>
       )}
@@ -195,7 +198,12 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
         {/* Left: Client / Maitre d'ouvrage */}
         <div style={{ paddingBottom: 16, borderRight: '0.5px dashed #C8C2B5', paddingRight: 28 }}>
           <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: A.navy, marginBottom: 2 }}>Le ma&#238;tre d'ouvrage</div>
-          <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>{doc.clientInfo.name || '\u2014'}</div>
+          {doc.sigClientSubtitle && (
+            <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>{doc.sigClientSubtitle}</div>
+          )}
+          {!doc.sigClientSubtitle && (
+            <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>{doc.clientInfo.name || '\u2014'}</div>
+          )}
           {(doc.sigClientNameAr || doc.sigClientRole) && (
             <div style={{ fontSize: 12, color: '#555', fontStyle: 'italic', marginBottom: 4, lineHeight: 1.5 }}>
               {doc.sigClientNameAr && <>{doc.sigClientNameAr}<br /></>}
@@ -203,11 +211,11 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
             </div>
           )}
           <div style={{ height: 56, borderBottom: '0.5px solid #C8C2B5', marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DDD', fontSize: 11, fontStyle: 'italic' }}>Signature</div>
+          {doc.sigClientRoleFr && (
+            <div style={{ fontSize: 10, color: '#888', lineHeight: 1.4 }}>{doc.sigClientRoleFr}</div>
+          )}
           {(doc.sigClientNameFr || doc.clientInfo.name) && (
             <div style={{ fontSize: 12, color: '#333', fontWeight: 500 }}>{doc.sigClientNameFr || doc.clientInfo.name}</div>
-          )}
-          {doc.sigClientRole && (
-            <div style={{ fontSize: 10, color: '#888', marginTop: 2, lineHeight: 1.4 }}>{doc.sigClientRole}</div>
           )}
         </div>
 

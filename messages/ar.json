@@ -318,7 +318,8 @@
       "remise": "الخصم",
       "garanties": "الضمانات",
       "paiement": "الدفع والتسوية",
-      "notes": "ملاحظات"
+      "notes": "ملاحظات",
+      "signature": "التوقيع"
     },
     "customize": "إظهار / إخفاء",
     "customizeTitle": "ما تريد رؤيته",
@@ -395,7 +396,17 @@
       "paymentModeReglement": "طريقة السداد",
       "mentionsLegales": "الإشارات القانونية",
       "conditionsGenerales": "الشروط العامة",
-      "notes": "ملاحظات"
+      "notes": "ملاحظات",
+      "companyPhone": "هاتف المؤسسة",
+      "sigClientSubtitle": "العنوان الفرعي للعميل (عربي)",
+      "sigClientNameFr": "اسم العميل (فرنسية)",
+      "sigClientRole": "دور العميل (عربي)",
+      "sigClientRoleFr": "دور العميل (فرنسية)",
+      "sigClientNameAr": "اسم العميل (عربي)",
+      "sigCompanyNameFr": "اسم المؤسسة (فرنسية)",
+      "sigDirectionNameFr": "المديرية (الاسم)",
+      "sigDirectionRole": "المديرية (الدور)",
+      "sigDirectionNameAr": "المديرية (الاسم بالعربية)"
     },
     "general": {
       "docNumber": "رقم المستند",

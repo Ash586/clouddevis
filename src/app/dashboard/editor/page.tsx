@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
   Grid3X3, Trash2, Plus, MoreHorizontal,
   ChevronDown, Building2, Receipt, BadgeCheck,
-  CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench,
+  CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench, Pen,
 } from 'lucide-react';
 
 function EditorContent() {
@@ -1106,6 +1106,13 @@ function EditorContent() {
                       label: 'Notes',
                       color: 'bg-gray-50 text-gray-700 border-gray-100',
                       fields: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+                    },
+                    {
+                      id: 'signature',
+                      icon: <Pen size={16} />,
+                      label: te('sections.signature') || 'Signature',
+                      color: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+                      fields: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
                     },
                   ] as const).map(group => {
                     const visibleCount = group.fields.filter(f => !hiddenFields.has(f)).length;

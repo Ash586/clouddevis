@@ -366,9 +366,11 @@ export function generateAttachementHTML(params: {
     }
   }
 
+  const clientSubtitle = e(doc.sigClientSubtitle || '');
   const clientNameFr = e(doc.sigClientNameFr || doc.clientInfo.name || '—');
   const clientNameAr = e(doc.sigClientNameAr || '');
   const clientRole = e(doc.sigClientRole || '');
+  const clientRoleFr = e(doc.sigClientRoleFr || '');
   const companyNameFr = e(doc.sigCompanyNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : '—'));
   const directionNameFr = e(doc.sigDirectionNameFr || (isEnt && doc.companyInfo ? doc.companyInfo.name : 'Validation Direction'));
   const directionRole = e(doc.sigDirectionRole || '');
@@ -435,6 +437,7 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
       ${doc.companyInfo.taxIds.rc ? `<span><b>RC</b> ${e(doc.companyInfo.taxIds.rc)}</span>` : ''}
       ${doc.companyInfo.taxIds.nif ? `<span><b>N.I.F.</b> ${e(doc.companyInfo.taxIds.nif)}</span>` : ''}
       ${doc.companyInfo.taxIds.nis ? `<span><b>N.I.S.</b> ${e(doc.companyInfo.taxIds.nis)}</span>` : ''}
+      ${doc.companyPhone ? `<span><b>Tél.</b> ${e(doc.companyPhone)}</span>` : ''}
     </div>
   </div>` : ''}
 
@@ -478,11 +481,11 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
   <div class="sig-grid">
     <div class="sig-col-l">
       <div class="sig-ey">Le maître d'ouvrage</div>
-      <div class="sig-sub">${e(doc.clientInfo.name || '—')}</div>
+      ${clientSubtitle ? `<div class="sig-sub">${clientSubtitle}</div>` : `<div class="sig-sub">${e(doc.clientInfo.name || '—')}</div>`}
       ${clientNameAr || clientRole ? `<div class="sig-detail">${clientNameAr ? clientNameAr+'<br>' : ''}${clientRole}</div>` : ''}
       <div class="sig-space">Signature</div>
+      ${clientRoleFr ? `<div class="sig-role">${clientRoleFr}</div>` : ''}
       <div class="sig-name">${clientNameFr}</div>
-      ${clientRole ? `<div class="sig-role">${clientRole}</div>` : ''}
     </div>
     <div class="sig-col-r">
       <div class="sig-ey" style="color:${A.green}">L'Entreprise</div>

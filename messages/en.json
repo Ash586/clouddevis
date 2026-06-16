@@ -318,7 +318,8 @@
       "remise": "Discount",
       "garanties": "Guarantees",
       "paiement": "Payment & Settlement",
-      "notes": "Notes"
+      "notes": "Notes",
+      "signature": "Signature"
     },
     "customize": "Show / Hide",
     "customizeTitle": "What you want to see",
@@ -395,7 +396,17 @@
       "paymentModeReglement": "Payment mode",
       "mentionsLegales": "Legal mentions",
       "conditionsGenerales": "General conditions",
-      "notes": "Notes"
+      "notes": "Notes",
+      "companyPhone": "Company phone",
+      "sigClientSubtitle": "Client subtitle (Arabic)",
+      "sigClientNameFr": "Client name (French)",
+      "sigClientRole": "Client role (Arabic)",
+      "sigClientRoleFr": "Client role (French)",
+      "sigClientNameAr": "Client name (Arabic)",
+      "sigCompanyNameFr": "Company name (French)",
+      "sigDirectionNameFr": "Direction (Name)",
+      "sigDirectionRole": "Direction (Role)",
+      "sigDirectionNameAr": "Direction (Arabic name)"
     },
     "general": {
       "docNumber": "Document No.",

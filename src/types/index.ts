@@ -98,7 +98,7 @@ export type SectionId = string;
 
 export const DEFAULT_SECTION_ORDER: string[] = [
   'design', 'general', 'devis', 'mode', 'client', 'chantier', 'materiaux',
-  'prestations', 'remise', 'garanties', 'paiement', 'notes',
+  'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature',
 ];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
@@ -114,6 +114,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   garanties: 'Warranties',
   paiement: 'Payment',
   notes: 'Notes',
+  signature: 'Signature',
 };
 
 export interface CalculationResult {
@@ -180,14 +181,19 @@ export interface DocumentState {
   reference?: string;
   showWatermark?: boolean;
 
-  // Attachement signature fields
+  // Attachement signature fields (left column only)
+  sigClientSubtitle?: string;
   sigClientNameFr?: string;
   sigClientRole?: string;
+  sigClientRoleFr?: string;
   sigClientNameAr?: string;
   sigCompanyNameFr?: string;
   sigDirectionNameFr?: string;
   sigDirectionRole?: string;
   sigDirectionNameAr?: string;
+
+  // Company phone
+  companyPhone?: string;
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
@@ -203,6 +209,7 @@ export const SECTION_FIELDS: Record<SectionId, string[]> = {
   garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
   paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
   notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+  signature: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
 };
 
 /**
@@ -276,6 +283,7 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
     prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
     notes: ['notes'],
+    signature: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
   },
 };
 
