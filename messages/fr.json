@@ -486,6 +486,7 @@
     },
     "prestations": {
       "description": "Description",
+      "subDescription": "Description (optionnel)",
       "qty": "Qté",
       "unitPrice": "P.U HT",
       "unit": "Unité",

@@ -486,6 +486,7 @@
     },
     "prestations": {
       "description": "Description",
+      "subDescription": "Description (optional)",
       "qty": "Qty",
       "unitPrice": "Unit price",
       "unit": "Unit",

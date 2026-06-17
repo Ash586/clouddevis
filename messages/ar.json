@@ -486,6 +486,7 @@
     },
     "prestations": {
       "description": "الوصف",
+      "subDescription": "الوصف (اختياري)",
       "qty": "الكمية",
       "unitPrice": "س.و غير شامل",
       "unit": "الوحدة",
