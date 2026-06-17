@@ -378,6 +378,7 @@
       "itemUnit": "Unit",
       "itemUnitPrice": "Unit price",
       "itemTvaRate": "VAT rate per line",
+      "subDescription": "Description (optional)",
       "remiseType": "Discount type",
       "remiseValue": "Discount value",
       "remiseReason": "Discount reason",

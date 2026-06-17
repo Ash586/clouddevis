@@ -53,6 +53,7 @@ export interface ClientInfo {
 export interface LineItem {
   id: string;
   designation: string;
+  description?: string;
   quantity: number;
   unit: UnitMeasure;
   unitPrice: number;

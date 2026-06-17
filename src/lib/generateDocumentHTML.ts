@@ -381,6 +381,7 @@ table.items tbody td{padding:12px;color:#161616;vertical-align:top;line-height:1
 table.items tbody td.num{text-align:center;color:#999;font-family:'JetBrains Mono',monospace;font-size:11.5px}
 table.items tbody td.c{text-align:center}
 table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
+.item-sub{font-size:10.5px;color:#888;margin-top:2px;font-style:italic}
 .bottom-section{display:grid;grid-template-columns:1fr 230px;gap:0;margin-top:6px;padding:20px 44px 22px;align-items:start}
 .rib-card{font-size:11.5px;color:#555;font-family:'JetBrains Mono',monospace;line-height:1.75;border:1px dashed ${A.beige};border-radius:5px;padding:12px 16px}
 .rib-card .rc-title{font-family:'Inter',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:${A.green};display:block;margin-bottom:6px}
@@ -461,9 +462,10 @@ ${doc.items.length ? `<div class="table-wrap">
     </tr></thead>
     <tbody>${doc.items.map((item, i) => {
       const isEven = (i+1) % 2 === 0;
-      return `<tr style="${isEven?'background:#FAFAF8':''}">
+      const isLast = i === doc.items.length - 1;
+      return `<tr style="${isEven?'background:#FAFAF8':''};border-bottom:${isLast?'2px solid '+A.dark:'1px solid '+A.border}">
         <td class="num">${String(i+1).padStart(2,'0')}</td>
-        <td>${e(item.designation)}</td>
+        <td>${e(item.designation)}${item.description ? `<div class="item-sub">${e(item.description)}</div>` : ''}</td>
         <td class="c">${item.quantity}</td>
         <td class="r">${numFmt(item.unitPrice)}</td>
         <td class="r">${numFmt(item.quantity * item.unitPrice)}</td>

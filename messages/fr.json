@@ -378,6 +378,7 @@
       "itemUnit": "Unité",
       "itemUnitPrice": "Prix unitaire",
       "itemTvaRate": "Taux TVA par ligne",
+      "subDescription": "Description (optionnel)",
       "remiseType": "Type remise",
       "remiseValue": "Valeur remise",
       "remiseReason": "Motif remise",

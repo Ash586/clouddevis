@@ -150,21 +150,27 @@ export function PreviewDevis({ doc, sf, bv, vb, t, tu, results, design, highligh
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: A.green, color: '#F5F1E8' }}>
-                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left', width: 36 }}>N°</th>
-                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>Désignation</th>
-                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', width: 50 }}>Qté</th>
+                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left', width: 36 }}>N&#176;</th>
+                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>D&#233;signation</th>
+                <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', width: 50 }}>Qt&#233;</th>
                 <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right', width: 110 }}>P.U HT</th>
                 <th style={{ padding: '10px 12px', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right', width: 115 }}>Montant HT</th>
               </tr>
             </thead>
             <tbody>
-              {doc.items.map(item => {
+              {doc.items.map((item, idx) => {
                 rowIdx++;
                 const isEven = rowIdx % 2 === 0;
+                const isLast = idx === doc.items.length - 1;
                 return (
-                  <tr key={item.id} style={{ borderBottom: `1px solid ${A.border}`, background: isEven ? '#FAFAF8' : 'transparent' }}>
+                  <tr key={item.id} style={{ borderBottom: isLast ? `2px solid ${A.dark}` : `1px solid ${A.border}`, background: isEven ? '#FAFAF8' : 'transparent' }}>
                     <td style={{ padding: '12px', textAlign: 'center', color: '#999', fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5 }}>{String(rowIdx).padStart(2, '0')}</td>
-                    <td style={{ padding: '12px', color: A.dark, lineHeight: 1.45, fontWeight: 500 }}>{item.designation}</td>
+                    <td style={{ padding: '12px', color: A.dark, lineHeight: 1.45, verticalAlign: 'top' }}>
+                      <div style={{ fontWeight: 500 }}>{item.designation}</div>
+                      {item.description && (
+                        <div style={{ fontSize: 10.5, color: '#888', marginTop: 2, fontStyle: 'italic' }}>{item.description}</div>
+                      )}
+                    </td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>{item.quantity}</td>
                     <td style={{ padding: '12px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace" }}>{numFmt(item.unitPrice)}</td>
                     <td style={{ padding: '12px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontWeight: 500 }}>{numFmt(item.quantity * item.unitPrice)}</td>

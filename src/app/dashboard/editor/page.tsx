@@ -588,6 +588,7 @@ function EditorContent() {
         return !hiddenFields.has('itemsTable') ? <CollapsibleSection title={te('sections.prestations')} sectionId="prestations" {...dragProps} {...s('table')}>
           {addingItem && <div className="bg-[var(--navy-3)] p-2 rounded-xl border space-y-1.5">
             <input type="text" placeholder={te('prestations.description')} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
+            <input type="text" placeholder={te('prestations.subDescription') || 'Description (optionnel)'} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[10px] italic text-gray-500 outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.description ?? ''} onChange={(e) => setNewItem(p => ({ ...p, description: e.target.value }))} />
             {/* Mobile: stacked rows; Desktop: 5-col grid */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-end">
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.qty')}</label>

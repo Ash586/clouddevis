@@ -378,6 +378,7 @@
       "itemUnit": "الوحدة",
       "itemUnitPrice": "سعر الوحدة",
       "itemTvaRate": "نسبة الضريبة لكل خدمة",
+      "subDescription": "الوصف (اختياري)",
       "remiseType": "نوع الخصم",
       "remiseValue": "قيمة الخصم",
       "remiseReason": "سبب الخصم",
