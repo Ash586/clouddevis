@@ -12,7 +12,7 @@ import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency } from '@/lib/calculations';
-import { generateDocumentHTML, generateAttachementHTML } from '@/lib/generateDocumentHTML';
+import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS } from '@/types';
@@ -234,6 +234,8 @@ function EditorContent() {
     const design = getDesign(doc.documentType);
     const html = doc.documentType === 'attachement'
       ? generateAttachementHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+      : doc.documentType === 'devis'
+      ? generateDevisHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : generateDocumentHTML({
         isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels,
         grouped, uncategorized, catOrder, doc, results,

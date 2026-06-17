@@ -7,6 +7,7 @@ import { PreviewHeader } from './preview/PreviewHeader';
 import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
 import { PreviewAttachement } from './preview/PreviewAttachement';
+import { PreviewDevis } from './preview/PreviewDevis';
 import { getDesign } from '@/lib/documentDesign';
 
 export type PreviewFocus = 'header' | 'client' | 'items' | 'totals' | 'payment' | null;
@@ -53,6 +54,10 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
 
   if (doc.documentType === 'attachement') {
     return <PreviewAttachement doc={doc} sf={sf} bv={bv} vb={vb} t={t} tu={tu} design={design} highlight={previewFocus} />;
+  }
+
+  if (doc.documentType === 'devis') {
+    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tu={tu} results={results} design={design} highlight={previewFocus} />;
   }
 
   return (

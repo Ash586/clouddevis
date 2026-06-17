@@ -180,6 +180,8 @@ export interface DocumentState {
   validityDays?: number;
   reference?: string;
   showWatermark?: boolean;
+  objet?: string;
+  docCity?: string;
 
   // Attachement signature fields (left column only)
   sigClientSubtitle?: string;
@@ -198,7 +200,7 @@ export interface DocumentState {
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
   design: ['logo', 'logoPosition'],
-  general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+  general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle', 'objet', 'docCity'],
   devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
   mode: ['businessMode'],
   client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],

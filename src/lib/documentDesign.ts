@@ -13,14 +13,14 @@ export interface DocTypeDesign {
 
 const DESIGNS: Record<DocumentType, DocTypeDesign> = {
   devis: {
-    primary: 'blue-700',
-    primaryHex: '#1d4ed8',
-    primaryLight: '#dbeafe',
-    primaryDark: '#1e3a5f',
-    borderColor: '#1d4ed8',
-    gradientFrom: '#1e40af',
-    gradientTo: '#2563eb',
-    accent: '#3b82f6',
+    primary: 'green-900',
+    primaryHex: '#0B3D2E',
+    primaryLight: '#F7F5F0',
+    primaryDark: '#161616',
+    borderColor: '#0B3D2E',
+    gradientFrom: '#0B3D2E',
+    gradientTo: '#C4A35A',
+    accent: '#C4A35A',
   },
   facture: {
     primary: 'emerald-700',

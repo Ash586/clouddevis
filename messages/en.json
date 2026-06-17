@@ -397,6 +397,8 @@
       "mentionsLegales": "Legal mentions",
       "conditionsGenerales": "General conditions",
       "notes": "Notes",
+      "objet": "Quote subject",
+      "docCity": "City",
       "companyPhone": "Company phone",
       "sigClientSubtitle": "Client subtitle (Arabic)",
       "sigClientNameFr": "Client name (French)",
