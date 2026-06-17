@@ -597,22 +597,22 @@ function EditorContent() {
           {addingItem && <div className="bg-[var(--navy-3)] p-2 rounded-xl border space-y-1.5">
             <input type="text" placeholder={te('prestations.description')} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
             <input type="text" placeholder={te('prestations.subDescription') || 'Description (optionnel)'} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[10px] italic text-gray-500 outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.description ?? ''} onChange={(e) => setNewItem(p => ({ ...p, description: e.target.value }))} />
-            {/* Mobile: stacked rows; Desktop: 5-col grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 items-end">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.qty')}</label>
-                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unit')}</label>
-                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as UnitMeasure }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as UnitMeasure }))}>
                   {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}</select></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unitPrice')}</label>
-                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
+                <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.category')}</label>
-                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)] min-h-[44px] sm:min-h-0" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
+                <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
                   <option value="">{te('prestations.noCategory')}</option>
                   {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
-              <div className="flex justify-center gap-1 col-span-2 sm:col-span-1">
-                <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="bg-green-600 text-white text-[11px] font-bold px-3 py-2 min-h-[44px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 w-full sm:w-auto"><Plus size={14} /><span>Ajouter</span></button>
-                <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-3 py-2 min-h-[44px] rounded-lg hover:bg-red-600 flex items-center justify-center"><Trash2 size={14} /></button></div>
+            </div>
+            <div className="flex gap-1.5">
+              <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="flex-1 sm:flex-none bg-green-600 text-white text-[11px] font-bold px-4 py-2 min-h-[44px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"><Plus size={14} /><span>Ajouter</span></button>
+              <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-4 py-2 min-h-[44px] rounded-lg hover:bg-red-600 flex items-center justify-center"><Trash2 size={14} /></button>
             </div>
             {newItem.designation && newItem.unitPrice > 0 && (
               <div className="flex items-center justify-between px-2 py-1 bg-[var(--green-glow)] rounded-lg border border-blue-100">
