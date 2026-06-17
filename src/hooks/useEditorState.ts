@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { DocumentState, LineItem, UserMode, WizardStep, DocumentType } from '@/types';
 import { DEFAULT_SECTION_ORDER } from '@/types';
 import { calculateDocument, generateDocumentNumber, formatDateISO, generateId } from '@/lib/calculations';
@@ -126,7 +126,23 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
   const [step, setStep] = useState<WizardStep>(1);
   const [addingItem, setAddingItem] = useState(false);
   const [newItem, setNewItem] = useState<LineItem>({ id: '', designation: '', quantity: 1, unit: 'u', unitPrice: 0, category: '' });
-  const [mode, setMode] = useState<UserMode>(initialMode ?? 'artisan');
+  const [mode, setModeState] = useState<UserMode>(initialMode ?? 'artisan');
+  const setMode = useCallback((newMode: UserMode) => {
+    setModeState(newMode);
+    setDoc(prev => {
+      if (prev.mode === newMode) return prev;
+      return {
+        ...prev,
+        mode: newMode,
+        companyInfo: newMode === 'entreprise'
+          ? prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }
+          : undefined,
+        artisanInfo: newMode === 'artisan'
+          ? prev.artisanInfo ?? { name: '', address: '', phone: '' }
+          : undefined,
+      };
+    });
+  }, [setDoc]);
   const [saving, setSaving] = useState(false);
   const [docId, setDocId] = useState<string | null>(initialDocId ?? null);
 

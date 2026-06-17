@@ -57,7 +57,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
   }
 
   if (doc.documentType === 'devis') {
-    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tu={tu} results={results} design={design} highlight={previewFocus} />;
+    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} results={results} design={design} highlight={previewFocus} />;
   }
 
   return (

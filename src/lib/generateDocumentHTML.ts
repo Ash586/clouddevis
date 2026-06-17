@@ -326,13 +326,13 @@ export function generateDevisHTML(params: {
 }) {
   const { doc, sf, results, tc, tp, currency, design } = params;
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  const A = { green:'#0B3D2E', greenLight:'#F1F7F3', gold:'#C4A35A', goldLight:'#F2EFE8', dark:'#161616', paperBg:'#F9F8F5', beige:'#E0DAD0', border:'#ECE7DD', cream:'#FFFBF3' };
+  const A = { green:'#0B3D2E', gold:'#C4A35A', dark:'#161616', border:'#E4E0D8', cream:'#FFFBF3' };
   const isEnt = doc.mode === 'entreprise';
   const companyName = isEnt && doc.companyInfo ? e(doc.companyInfo.name) : '';
   const companyAddr = isEnt && doc.companyInfo ? e(doc.companyInfo.address || '') : '';
   const numFmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
-
   const totalInWords = e(results.totalInWords || '');
+  const PX = 36;
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Devis N° ${e(doc.documentNumber)}</title>
@@ -342,68 +342,66 @@ export function generateDevisHTML(params: {
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',Helvetica,Arial,sans-serif;color:#161616;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:190mm;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
-.accent-top{height:5px;background:linear-gradient(90deg,${A.green} 0%,${A.gold} 100%)}
-.doc-header{display:grid;grid-template-columns:1fr auto;gap:20px;padding:32px 44px 22px;border-bottom:2px solid ${A.dark}}
-.co-name{font-family:'Source Serif 4',Georgia,serif;font-size:24px;font-weight:700;color:${A.green};letter-spacing:0.01em;margin-bottom:5px}
-.co-activity{font-size:12px;color:#555;line-height:1.55;margin-bottom:4px}
-.co-capital{font-size:11px;color:#777;font-style:italic;margin-bottom:12px}
-.co-meta{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:11px;font-family:'JetBrains Mono',monospace;color:#444}
-.co-meta .mk{font-weight:600;color:${A.green};font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:0.05em}
-.seal-zone{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:130px}
-.seal-circle{width:96px;height:96px;border:2.5px solid ${A.gold};border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8A6D2E;transform:rotate(-8deg)}
-.seal-circle .sc-top{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
-.seal-circle .sc-main{font-size:15px;font-weight:700;color:${A.green};margin:3px 0}
-.seal-circle .sc-bottom{font-size:9px;color:#999}
-.devis-num-box{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#555;line-height:1.6}
-.devis-num-box strong{display:block;color:${A.green};font-family:'Inter',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:2px}
-.title-row{display:flex;justify-content:space-between;align-items:center;padding:20px 44px 16px}
-.doc-title{font-family:'Source Serif 4',Georgia,serif;font-size:27px;font-weight:700;color:#161616;text-transform:uppercase;letter-spacing:0.04em}
-.doc-title .num-part{color:${A.green}}
-.date-pill{background:${A.goldLight};border:1px solid ${A.beige};border-radius:999px;padding:6px 16px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#555}
-.date-pill strong{color:${A.green};font-family:'Inter',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;margin-right:6px}
-.info-section{padding:0 44px 16px}
-.client-line{display:flex;align-items:baseline;gap:10px;font-size:14.7px;margin-bottom:10px}
-.client-line .cl-label{font-size:11px;font-weight:700;color:${A.green};text-transform:uppercase;letter-spacing:0.08em}
-.client-line .cl-value{font-weight:700;color:${A.dark};border-bottom:1.5px solid ${A.gold};padding-bottom:2px}
-.objet-box{background:#F7F5F0;border-left:3px solid ${A.green};border-radius:0 6px 6px 0;padding:12px 16px;font-size:13px;color:#333;line-height:1.55}
-.objet-box strong{color:${A.green};text-transform:uppercase;font-size:11px;letter-spacing:0.06em;display:block;margin-bottom:3px}
-.table-wrap{padding:18px 44px 0}
-table.items{width:100%;border-collapse:collapse;font-size:13px}
+.accent-top{height:3px;background:${A.green}}
+.doc-header{display:grid;grid-template-columns:1fr auto;gap:20px;padding:${PX-4}px ${PX}px ${PX-14}px;border-bottom:1px solid ${A.border}}
+.co-name{font-family:'Source Serif 4',Georgia,serif;font-size:22px;font-weight:700;color:#161616;letter-spacing:-0.01em;margin-bottom:2px}
+.co-activity{font-size:11.5px;color:#666;line-height:1.5;margin-bottom:2px}
+.co-capital{font-size:10.5px;color:#777;margin-bottom:8px}
+.co-meta{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:10.5px;font-family:'JetBrains Mono',monospace;color:#555}
+.co-meta .mk{font-weight:600;color:${A.green};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;font-family:'Inter',sans-serif}
+.seal-zone{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:130px}
+.seal-circle{width:90px;height:90px;border:2px solid ${A.gold};border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8A6D2E}
+.seal-circle .sc-top{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em}
+.seal-circle .sc-main{font-size:13px;font-weight:700;color:${A.green};margin:2px 0}
+.seal-circle .sc-bottom{font-size:8px;color:#999}
+.devis-num-box{text-align:center;font-size:10.5px;color:#555;line-height:1.5}
+.devis-num-box strong{display:block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:${A.green};margin-bottom:1px}
+.title-row{display:flex;justify-content:space-between;align-items:center;padding:${PX-12}px ${PX}px ${PX-18}px}
+.doc-title{font-size:22px;font-weight:700;color:#161616;text-transform:uppercase;letter-spacing:0.03em}
+.doc-title .num-part{font-weight:800;color:${A.green}}
+.date-part{color:#666;font-size:12px;font-family:'JetBrains Mono',monospace}
+.date-part strong{font-weight:600;color:${A.green};font-size:9px;text-transform:uppercase;letter-spacing:0.05em;margin-right:6px}
+.info-section{padding:0 ${PX}px ${PX-20}px}
+.client-line{display:flex;align-items:baseline;gap:8px;font-size:14px;margin-bottom:10px}
+.client-line .cl-label{font-size:10px;font-weight:700;color:${A.green};text-transform:uppercase;letter-spacing:0.08em}
+.client-line .cl-value{font-weight:600;color:#161616}
+.objet-box{border-left:3px solid ${A.green};padding:10px 14px;font-size:12.5px;color:#444;line-height:1.5;background:#F8F7F4}
+.objet-box strong{color:${A.green};text-transform:uppercase;font-size:10px;letter-spacing:0.06em;display:block;margin-bottom:2px}
+.table-wrap{padding:0 ${PX}px}
+table.items{width:100%;border-collapse:collapse;font-size:12px}
 table.items thead tr{background:${A.green};color:#F5F1E8}
-table.items thead th{padding:10px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.06em}
+table.items thead th{padding:8px 10px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.06em}
 table.items thead th.l{text-align:left}
 table.items thead th.c{text-align:center}
 table.items thead th.r{text-align:right}
-table.items tbody tr{border-bottom:1px solid ${A.border}}
-table.items tbody tr:nth-child(even){background:#FAFAF8}
-table.items tbody tr:last-child{border-bottom:2px solid ${A.dark}}
-table.items tbody td{padding:12px;color:#161616;vertical-align:top;line-height:1.45}
-table.items tbody td.num{text-align:center;color:#999;font-family:'JetBrains Mono',monospace;font-size:11.5px}
+table.items tbody tr{border-bottom:0.5px solid ${A.border}}
+table.items tbody tr:last-child{border-bottom:1.5px solid ${A.dark}}
+table.items tbody td{padding:9px 10px;color:#161616;vertical-align:top;line-height:1.4}
+table.items tbody td.num{text-align:center;color:#AAA;font-family:'JetBrains Mono',monospace;font-size:11px}
 table.items tbody td.c{text-align:center}
 table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
-.item-sub{font-size:10.5px;color:#888;margin-top:2px;font-style:italic}
-.bottom-section{display:grid;grid-template-columns:1fr 230px;gap:0;margin-top:6px;padding:20px 44px 22px;align-items:start}
-.rib-card{font-size:11.5px;color:#555;font-family:'JetBrains Mono',monospace;line-height:1.75;border:1px dashed ${A.beige};border-radius:5px;padding:12px 16px}
-.rib-card .rc-title{font-family:'Inter',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:${A.green};display:block;margin-bottom:6px}
-.totals-card{padding-left:24px}
-.total-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid ${A.border};font-size:13.5px}
-.total-row .tl{color:#555}
+.item-sub{font-size:10px;color:#999;margin-top:1px;font-style:italic}
+.bottom-section{display:grid;grid-template-columns:1fr 220px;gap:0;margin-top:4px;padding:${PX-14}px ${PX}px ${PX-14}px;align-items:start}
+.rib-area{font-size:11px;color:#555;font-family:'JetBrains Mono',monospace;line-height:1.7;padding:10px 0}
+.rib-area .rc-title{font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:${A.green};display:block;margin-bottom:4px}
+.totals-card{}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:0.5px solid ${A.border};font-size:12.5px}
+.total-row .tl{color:#666}
 .total-row .tv{font-family:'JetBrains Mono',monospace;font-weight:500;color:#161616}
-.total-row.grand{border-bottom:none;border-top:2.5px solid ${A.dark};padding-top:11px;margin-top:4px}
-.total-row.grand .tl{font-weight:700;font-size:14.7px;color:#161616;text-transform:uppercase;letter-spacing:0.03em}
-.total-row.grand .tv{font-size:19px;font-weight:700;color:${A.green}}
-.montant-section{padding:0 44px 22px}
-.montant-box{border:1px solid ${A.beige};border-radius:5px;background:${A.cream};padding:13px 18px;font-size:13px;line-height:1.6;color:#333}
-.montant-box strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:${A.green};margin-bottom:5px}
+.total-row.grand{border-bottom:none;border-top:2px solid ${A.dark};padding-top:8px;margin-top:2px}
+.total-row.grand .tl{font-weight:700;font-size:13px;color:#161616;text-transform:uppercase}
+.total-row.grand .tv{font-size:17px;font-weight:700;color:${A.green}}
+.montant-section{padding:0 ${PX}px ${PX-14}px}
+.montant-box{border:0.5px solid ${A.border};padding:11px 16px;font-size:12px;line-height:1.55;color:#444;background:${A.cream}}
+.montant-box strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:${A.green};margin-bottom:4px}
 .montant-box em{font-style:italic}
-.sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px 44px 32px;border-top:1px solid ${A.border}}
+.sig-section{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:${PX-12}px ${PX}px ${PX-4}px;border-top:1px solid ${A.border}}
 .sig-block{text-align:center}
-.sig-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${A.green};margin-bottom:8px}
-.sig-area{height:76px;border-bottom:1.5px solid #C8C2B5;display:flex;align-items:center;justify-content:center;color:#DDD;font-size:11px;font-style:italic;margin-bottom:8px}
-.gerant-seal{width:88px;height:88px;border:2px solid ${A.green};border-radius:50%;margin:0 auto 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:${A.green};font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:center;line-height:1.45}
-.sig-name{font-size:12.5px;color:#333;font-weight:600}
-.sig-role{font-size:11px;color:#888;margin-top:1px}
-.doc-footer{background:#F7F5F0;border-top:1px solid ${A.border};padding:13px 44px;font-size:10.5px;color:#999;text-align:center;line-height:1.85;font-family:'JetBrains Mono',monospace}
+.sig-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${A.green};margin-bottom:6px}
+.sig-area{height:60px;border-bottom:1px solid ${A.border};display:flex;align-items:center;justify-content:center;color:#CCC;font-size:10px;margin-bottom:6px}
+.gerant-seal{width:80px;height:80px;border:1.5px solid ${A.green};border-radius:50%;margin:0 auto 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:${A.green};font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:center;line-height:1.4}
+.sig-name{font-size:12px;color:#333;font-weight:600}
+.doc-footer{background:#F8F7F4;border-top:0.5px solid ${A.border};padding:10px 36px;font-size:10px;color:#999;text-align:center;line-height:1.7;font-family:'JetBrains Mono',monospace}
 .doc-footer strong{color:#777;font-family:'Inter',sans-serif}
 @media print{.page{box-shadow:none}}
 </style></head><body>
@@ -419,7 +417,7 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
       ${doc.companyInfo.taxIds.rc ? `<span class="mk">R.C.</span><span>${e(doc.companyInfo.taxIds.rc)}</span>` : ''}
       ${doc.companyInfo.taxIds.nis ? `<span class="mk">N.I.S.</span><span>${e(doc.companyInfo.taxIds.nis)}</span>` : ''}
       ${doc.companyInfo.taxIds.nif ? `<span class="mk">N.I.F.</span><span>${e(doc.companyInfo.taxIds.nif)}</span>` : ''}
-      ${doc.companyInfo.taxIds.ai ? `<span class="mk">N° Article</span><span>${e(doc.companyInfo.taxIds.ai)}</span>` : ''}
+      ${doc.companyInfo.taxIds.ai ? `<span class="mk">N° A.I.</span><span>${e(doc.companyInfo.taxIds.ai)}</span>` : ''}
     </div>` : ''}
   </div>
   <div class="seal-zone">
@@ -437,7 +435,7 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
 
 <div class="title-row">
   <div class="doc-title">Devis <span class="num-part">N° ${e(doc.documentNumber)}</span></div>
-  <div class="date-pill"><strong>Date</strong>${doc.date}</div>
+  <div class="date-part"><strong>Date</strong>${doc.date}</div>
 </div>
 
 <div class="info-section">
@@ -454,16 +452,15 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
 ${doc.items.length ? `<div class="table-wrap">
   <table class="items">
     <thead><tr>
-      <th class="l" style="width:36px">N°</th>
+      <th class="l" style="width:32px">N°</th>
       <th class="l">Désignation</th>
-      <th class="c" style="width:50px">Qté</th>
-      <th class="r" style="width:110px">P.U HT</th>
-      <th class="r" style="width:115px">Montant HT</th>
+      <th class="c" style="width:48px">Qté</th>
+      <th class="r" style="width:100px">P.U HT</th>
+      <th class="r" style="width:105px">Montant HT</th>
     </tr></thead>
     <tbody>${doc.items.map((item, i) => {
-      const isEven = (i+1) % 2 === 0;
       const isLast = i === doc.items.length - 1;
-      return `<tr style="${isEven?'background:#FAFAF8':''};border-bottom:${isLast?'2px solid '+A.dark:'1px solid '+A.border}">
+      return `<tr style="border-bottom:${isLast?'1.5px solid '+A.dark:'0.5px solid '+A.border}">
         <td class="num">${String(i+1).padStart(2,'0')}</td>
         <td>${e(item.designation)}${item.description ? `<div class="item-sub">${e(item.description)}</div>` : ''}</td>
         <td class="c">${item.quantity}</td>
@@ -475,7 +472,7 @@ ${doc.items.length ? `<div class="table-wrap">
 </div>` : ''}
 
 <div class="bottom-section">
-  ${doc.paymentDetails.iban ? `<div class="rib-card">
+  ${doc.paymentDetails.iban ? `<div class="rib-area">
     <span class="rc-title">Coordonnées bancaires</span>
     RIB N° ${e(doc.paymentDetails.iban)}<br>
     ${doc.bankName ? e(doc.bankName) : ''}${doc.bankAgency ? ' — '+e(doc.bankAgency) : ''}<br>
@@ -499,7 +496,7 @@ ${doc.items.length ? `<div class="table-wrap">
 
 ${totalInWords ? `<div class="montant-section">
   <div class="montant-box">
-    <strong>Le présent devis est arrêté à la somme de</strong>
+    <strong>Arrêté à la somme de</strong>
     <em>${totalInWords}</em>
   </div>
 </div>` : ''}
@@ -507,11 +504,11 @@ ${totalInWords ? `<div class="montant-section">
 <div class="sig-section">
   <div class="sig-block">
     <div class="sig-label">Le Client</div>
-    <div class="sig-area">Signature &amp; cachet</div>
+    <div class="sig-area">Signature & cachet</div>
     <div class="sig-name">Bon pour accord</div>
   </div>
   <div class="sig-block">
-    <div class="sig-label">Cachet &amp; Signature</div>
+    <div class="sig-label">Cachet & Signature</div>
     ${companyName ? `<div class="gerant-seal">
       EURL<br>${companyName.split(' ').slice(0,2).join(' ')}<br>Gérant
     </div>` : ''}
@@ -521,7 +518,7 @@ ${totalInWords ? `<div class="montant-section">
 
 <div class="doc-footer">
   ${companyAddr ? `<strong>Siège Social :</strong> ${companyAddr}` : ''}
-  ${doc.companyPhone ? ` <span style="margin:0 6px">·</span><strong>Tél/Fax :</strong> ${e(doc.companyPhone)}` : ''}
+  ${doc.companyPhone ? ` <span style="margin:0 6px">·</span><strong>Tél :</strong> ${e(doc.companyPhone)}` : ''}
   <br>
   ${isEnt && doc.companyInfo?.taxIds?.nif ? `<strong>N.I.F. :</strong> ${e(doc.companyInfo.taxIds.nif)}` : ''}
   ${isEnt && doc.companyInfo?.taxIds?.rc ? ` <span style="margin:0 6px">·</span><strong>R.C. :</strong> ${e(doc.companyInfo.taxIds.rc)}` : ''}
