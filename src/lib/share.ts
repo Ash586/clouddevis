@@ -60,7 +60,7 @@ function documentToPDFData(doc: Document): PDFDocumentData {
 // ── Helper: Check if Capacitor is available ───────────────────
 
 function isCapacitorAvailable(): boolean {
-  return typeof window !== 'undefined' && !!(window as any).Capacitor;
+  return typeof window !== 'undefined' && 'Capacitor' in window;
 }
 
 // ── Helper: Get Capacitor plugins ─────────────────────────────

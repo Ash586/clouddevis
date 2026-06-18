@@ -1,16 +1,9 @@
 'use client';
 
-// ============================================================
-// CloudDevis — Offline Banner
-// Amber banner at top: "Hors ligne · X modifications en attente"
-// Transitions to "Synchronisé ✓" when synced
-// ============================================================
-
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   IconWifiOff,
-  IconWifi,
   IconRefresh,
   IconCheck,
 } from '@tabler/icons-react';
@@ -26,30 +19,31 @@ interface OfflineBannerProps {
 
 export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
   const queue = useSyncStore((s) => s.queue);
-  const syncStatus = useSyncStore((s) => s.status);
   const [showSynced, setShowSynced] = useState(false);
-  const [prevOnline, setPrevOnline] = useState(isOnline);
+  const prevOnlineRef = useRef(isOnline);
 
   const pendingCount = queue.length;
 
-  // ── Detect transition from offline → online ──────────────
   useEffect(() => {
-    if (!prevOnline && isOnline) {
-      // Just came back online — show "Synced" briefly
-      setShowSynced(true);
-      const timer = setTimeout(() => setShowSynced(false), 3000);
-      return () => clearTimeout(timer);
-    }
-    setPrevOnline(isOnline);
-  }, [isOnline, prevOnline]);
+    const wasOnline = prevOnlineRef.current;
+    prevOnlineRef.current = isOnline;
 
-  // ── Don't render if online and not showing synced toast ───
+    if (!wasOnline && isOnline) {
+      const showTimer = setTimeout(() => setShowSynced(true), 0);
+      const hideTimer = setTimeout(() => setShowSynced(false), 3000);
+
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [isOnline]);
+
   if (isOnline && !showSynced) return null;
 
   return (
     <AnimatePresence mode="wait">
       {isOnline && showSynced ? (
-        /* ── Synced toast (green) ────────────────────────────── */
         <motion.div
           key="synced"
           initial={{ height: 0, opacity: 0 }}
@@ -71,7 +65,6 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
           </div>
         </motion.div>
       ) : !isOnline ? (
-        /* ── Offline banner (amber) ──────────────────────────── */
         <motion.div
           key="offline"
           initial={{ height: 0, opacity: 0 }}

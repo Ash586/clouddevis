@@ -8,6 +8,34 @@ const DB_NAME = 'clouddevis';
 
 let db: SQLiteDBConnection | null = null;
 
+export interface LocalClientRow {
+  id: string;
+  name: string;
+  nif: string | null;
+  nis: string | null;
+  rc: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  synced: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LocalDocumentRow {
+  id: string;
+  type: string;
+  number: string | null;
+  client_id: string | null;
+  client_name: string | null;
+  data: string;
+  total: number;
+  status: string;
+  synced: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export async function initDatabase(): Promise<SQLiteDBConnection> {
   if (db) return db;
 
@@ -86,13 +114,13 @@ export async function saveClient(client: {
   );
 }
 
-export async function searchClients(query: string): Promise<any[]> {
+export async function searchClients(query: string): Promise<LocalClientRow[]> {
   const db = await initDatabase();
   const result = await db.query(
     `SELECT * FROM clients WHERE name LIKE ? OR nif LIKE ? OR phone LIKE ? ORDER BY name LIMIT 20`,
     [`%${query}%`, `%${query}%`, `%${query}%`]
   );
-  return result.values ?? [];
+  return (result.values ?? []) as LocalClientRow[];
 }
 
 // Document operations
@@ -114,19 +142,19 @@ export async function saveDocument(doc: {
   );
 }
 
-export async function getDocuments(limit: number = 50): Promise<any[]> {
+export async function getDocuments(limit: number = 50): Promise<LocalDocumentRow[]> {
   const db = await initDatabase();
   const result = await db.query(
     `SELECT * FROM documents ORDER BY created_at DESC LIMIT ?`,
     [limit]
   );
-  return result.values ?? [];
+  return (result.values ?? []) as LocalDocumentRow[];
 }
 
-export async function getUnsyncedDocuments(): Promise<any[]> {
+export async function getUnsyncedDocuments(): Promise<LocalDocumentRow[]> {
   const db = await initDatabase();
   const result = await db.query(`SELECT * FROM documents WHERE synced = 0`);
-  return result.values ?? [];
+  return (result.values ?? []) as LocalDocumentRow[];
 }
 
 export async function markSynced(id: string): Promise<void> {

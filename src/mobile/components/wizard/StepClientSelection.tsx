@@ -19,7 +19,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
 import { useClientStore } from '@/stores/clientStore';
-import { ClientSchema } from '@/mobile/types/schemas';
 import type { Client } from '@/mobile/types';
 import { z } from 'zod';
 
@@ -60,7 +59,6 @@ export function StepClientSelection({
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm<NewClientFormData>({
@@ -74,8 +72,6 @@ export function StepClientSelection({
       address: '',
     },
   });
-
-  const watchedNif = watch('nif');
 
   // ── Search filtered clients ──
   const filteredClients = useMemo(() => {

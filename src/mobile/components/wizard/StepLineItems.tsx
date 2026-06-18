@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconPlus,
@@ -18,8 +18,7 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { MobileBottomSheet } from '@/components/mobile/MobileBottomSheet';
-import { Badge } from '@/components/ui/badge';
-import type { LineItem, UnitMeasure } from '@/mobile/types';
+import type { LineItem } from '@/mobile/types';
 
 // ── Item form schema ──────────────────────────────────────────
 
@@ -73,9 +72,9 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
   const [editingItem, setEditingItem] = useState<LineItem | null>(null);
 
   const {
+    control,
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm<ItemFormData>({
@@ -89,9 +88,10 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
     },
   });
 
-  const watchedQty = watch('quantity');
-  const watchedPrice = watch('unitPrice');
-  const watchedTva = watch('tvaRate');
+  const [watchedQty, watchedPrice, watchedTva] = useWatch({
+    control,
+    name: ['quantity', 'unitPrice', 'tvaRate'],
+  });
   const liveTotal = (watchedQty || 0) * (watchedPrice || 0);
 
   // ── Open sheet for new item ──

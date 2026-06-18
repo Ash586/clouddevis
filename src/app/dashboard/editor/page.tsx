@@ -23,9 +23,9 @@ import { cn } from '@/lib/utils';
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
-  Grid3X3, Trash2, Plus, MoreHorizontal,
-  ChevronDown, Building2, Receipt, BadgeCheck,
-  CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench, Pen,
+  Grid3X3, GripVertical, Trash2, Plus, EyeOff, MoreHorizontal, Grip,
+  ChevronDown, ZoomIn, ZoomOut, Ruler, Layers3, MonitorCheck,
+  Building2, Receipt, BadgeCheck, CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench, Pen,
 } from 'lucide-react';
 
 function EditorContent() {
@@ -137,6 +137,13 @@ function EditorContent() {
   }, [previewZoom]);
 
   const computedScale = previewZoom === 'fit' ? fitScale : previewZoom;
+  const previewScaleLabel = previewZoom === 'fit' ? 'Fit' : `${Math.round(previewZoom * 100)}%`;
+  const previewReadyChecks = useMemo(() => [
+    { label: 'Client', done: Boolean(doc.clientInfo.name?.trim()) },
+    { label: 'Articles', done: doc.items.length > 0 },
+    { label: 'Date', done: Boolean(doc.date) },
+  ], [doc.clientInfo.name, doc.items.length, doc.date]);
+  const completedPreviewChecks = previewReadyChecks.filter(check => check.done).length;
 
   useEffect(() => {
     if (docIdParam) return;
@@ -902,7 +909,7 @@ function EditorContent() {
             })}
           </nav>)}
           {/* ──── EDITOR PANEL ──── */}
-          <div className={cn('flex-1 flex flex-col min-w-0', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
+          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[rgba(245,237,214,0.08)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
             {/* Validation errors banner */}
             {itemErrors && (
               <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
@@ -979,21 +986,70 @@ function EditorContent() {
           )}
 
           {/* ──── PREVIEW PANEL ──── */}
-          <div className={cn('lg:flex flex-col border-l border-[rgba(245,237,214,0.08)] bg-[var(--navy-3)]/30', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
-            {/* Preview toolbar */}
-            <div className="no-print flex items-center gap-2 px-3 py-1.5 border-b border-[rgba(245,237,214,0.06)] shrink-0">
-              <div className="flex gap-0.5 bg-[var(--navy-4)] p-0.5 rounded-lg">
-                <button onClick={() => setPreviewZoom('fit')} className={cn('flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 'fit' ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}><Maximize size={10} />Ajuster</button>
-                <button onClick={() => setPreviewZoom(0.75)} className={cn('px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 0.75 ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>75%</button>
-                <button onClick={() => setPreviewZoom(1)} className={cn('px-2 py-0.5 text-[9px] font-bold rounded-md transition', previewZoom === 1 ? 'bg-blue-600 text-white' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')}>100%</button>
+          <div className={cn('lg:flex flex-1 min-w-0 flex-col bg-[#121826]', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
+            <div className="no-print shrink-0 border-b border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]/95 px-3 py-2">
+              <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--green-glow)] text-[var(--green-3)]">
+                    <MonitorCheck size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h2 className="truncate text-[12px] font-black uppercase tracking-wide text-[var(--sand)]">Preview Studio</h2>
+                      <span className="rounded-md border border-[rgba(245,237,214,0.1)] bg-[var(--navy-4)] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-[var(--sand-muted)]">A4</span>
+                    </div>
+                    <p className="truncate text-[10px] text-[var(--sand-muted)]">
+                      {doc.documentNumber || 'Document sans numero'} · {doc.items.length} ligne{doc.items.length !== 1 ? 's' : ''} · {formatCurrency(results.netAPayer, tc('currency'))}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {previewReadyChecks.map(check => (
+                    <span key={check.label} className={cn(
+                      'inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[9px] font-bold',
+                      check.done
+                        ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300'
+                        : 'border-amber-400/20 bg-amber-400/10 text-amber-300',
+                    )}>
+                      {check.done ? <Check size={10} /> : <AlertTriangle size={10} />}
+                      {check.label}
+                    </span>
+                  ))}
+                  <span className="inline-flex items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.1)] bg-[var(--navy-4)] px-2 py-1 text-[9px] font-bold text-[var(--sand-muted)]">
+                    <Layers3 size={10} />
+                    {completedPreviewChecks}/3
+                  </span>
+                </div>
               </div>
-              <button onClick={() => setShowGrid(g => !g)} className={cn('p-1.5 rounded-lg transition', showGrid ? 'text-blue-400 bg-blue-400/10' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')} title="Grid"><Grid3X3 size={13} /></button>
+
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.08)] bg-[var(--navy-4)] p-0.5">
+                  <button onClick={() => setPreviewZoom('fit')} className={cn('flex min-h-8 items-center gap-1 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 'fit' ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Ajuster"><Maximize size={11} />Fit</button>
+                  <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-8 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 0.75 ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
+                  <button onClick={() => setPreviewZoom(1)} className={cn('min-h-8 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 1 ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.08)] bg-[var(--navy-4)] px-2 py-1.5 text-[9px] font-black text-[var(--sand-muted)] sm:inline-flex">
+                    <Ruler size={11} />
+                    {previewScaleLabel}
+                  </span>
+                  <button onClick={() => setPreviewZoom(0.75)} className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-[var(--sand-muted)] transition hover:bg-[var(--navy-4)] hover:text-[var(--sand)]" title="Reduire"><ZoomOut size={14} /></button>
+                  <button onClick={() => setPreviewZoom(1)} className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-[var(--sand-muted)] transition hover:bg-[var(--navy-4)] hover:text-[var(--sand)]" title="Agrandir"><ZoomIn size={14} /></button>
+                  <button onClick={() => setShowGrid(g => !g)} className={cn('flex min-h-8 min-w-8 items-center justify-center rounded-lg transition', showGrid ? 'bg-blue-500/15 text-blue-300 ring-1 ring-blue-400/20' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={14} /></button>
+                </div>
+              </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}
-            <div id="preview-scroll" className="flex-1 overflow-auto p-2 sm:p-4 flex justify-center items-start print:p-0 print:overflow-visible">
-              <div className="print-area-wrapper origin-top transition-transform duration-200"
-                style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
-                <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} />
+            <div id="preview-scroll" className="preview-container flex-1 overflow-auto bg-[radial-gradient(circle_at_top,_rgba(42,127,111,0.14),_transparent_34%),linear-gradient(180deg,#151c2c_0%,#0f1421_100%)] p-3 sm:p-6 print:bg-white print:p-0 print:overflow-visible">
+              <div className="mx-auto flex w-max min-w-full justify-center">
+                <div className="print-area-wrapper origin-top transition-transform duration-200"
+                  style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
+                  <div className="rounded-[6px] bg-white/5 p-2 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ring-1 ring-white/10 print:p-0 print:shadow-none print:ring-0">
+                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

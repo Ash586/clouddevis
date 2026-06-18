@@ -341,7 +341,7 @@ export function TemplateFR({ data }: TemplateFRProps) {
               <Text style={styles.docDate}>Échéance: {formatDate(data.dueDate)}</Text>
             )}
             {data.validUntil && (
-              <Text style={styles.docDate}>Valide jusqu'au: {formatDate(data.validUntil)}</Text>
+              <Text style={styles.docDate}>{"Valide jusqu'au: "}{formatDate(data.validUntil)}</Text>
             )}
           </View>
         </View>
@@ -451,7 +451,7 @@ export function TemplateFR({ data }: TemplateFRProps) {
             CloudDevis — Générez vos devis et factures en quelques clics{'\n'}
             www.clouddevis.vercel.app{'\n'}
             Mentions légales : Ce document est établi conformément à la réglementation algérienne en vigueur.
-            {'\n'}Timbre fiscal conforme à l'Art. 220 du Code des Impôts Indirects (CII).
+            {'\n'}{"Timbre fiscal conforme à l'Art. 220 du Code des Impôts Indirects (CII)."}
           </Text>
         </View>
       </Page>
