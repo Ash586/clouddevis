@@ -231,6 +231,8 @@ model Document {
   customFields  Json           @default("{}")
   template      String         @default("classic")
   signature     String?
+  companyInfo   Json?          // Document-specific company info (for logo/signature override)
+  logoPosition  String?        // Logo position: left or right
   bcRef         String?        // Lien vers Bon de Commande
   brRef         String?        // Lien vers Bon de Réception
   teamId        String?

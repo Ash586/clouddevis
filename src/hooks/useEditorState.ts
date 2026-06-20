@@ -158,6 +158,21 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
           const d = data.document;
           const items = (() => { try { return JSON.parse(d.items); } catch { return []; } })();
           const customFields = (() => { try { return typeof d.customFields === 'string' ? JSON.parse(d.customFields) : (d.customFields || {}); } catch { return {}; } })();
+          const companyInfo = (() => { 
+        try { 
+          const parsed = typeof d.companyInfo === 'string' ? JSON.parse(d.companyInfo) : d.companyInfo;
+          if (parsed && typeof parsed === 'object') {
+            return { 
+              name: '', 
+              address: '', 
+              taxIds: { nif: '', rc: '', nis: '', ai: '' }, 
+              capital: '',
+              ...parsed 
+            }; 
+          }
+        } catch {} 
+        return null; 
+      })();
           setDoc(prev => ({
             ...prev,
             items,
@@ -169,6 +184,8 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
             paymentMode: d.paymentMode || prev.paymentMode,
             mode: d.mode?.toLowerCase?.() === 'entreprise' ? 'entreprise' : 'artisan',
             notes: d.notes || '',
+            companyInfo: companyInfo || prev.companyInfo,
+            logoPosition: d.logoPosition || prev.logoPosition || 'right',
           }));
         }
       })

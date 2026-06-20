@@ -28,7 +28,16 @@ export function useEditorActions(deps: EditorActionsDeps) {
   }, [setDoc]);
 
   const updateCompanyInfo = useCallback((info: Partial<CompanyInfo>) => {
-    setDoc(prev => ({ ...prev, companyInfo: prev.companyInfo ? { ...prev.companyInfo, ...info } : prev.companyInfo }));
+    setDoc(prev => ({ 
+      ...prev, 
+      companyInfo: { 
+        name: '', 
+        address: '', 
+        taxIds: { nif: '', rc: '', nis: '', ai: '' }, 
+        ...(prev.companyInfo || {}), 
+        ...info 
+      } 
+    }));
   }, [setDoc]);
 
   const updateTaxIds = useCallback((ids: Partial<CompanyInfo['taxIds']>) => {

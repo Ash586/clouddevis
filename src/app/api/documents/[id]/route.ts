@@ -83,6 +83,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
         items: JSON.stringify(items),
+        companyInfo: doc.companyInfo && typeof doc.companyInfo === 'object' && Object.keys(doc.companyInfo).length > 0 ? doc.companyInfo as object : undefined,
+        logoPosition: typeof doc.logoPosition === 'string' ? doc.logoPosition : undefined,
         customFields: JSON.stringify({
           ...(typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}),
           sectionOrder: Array.isArray(doc.sectionOrder) ? doc.sectionOrder : [],

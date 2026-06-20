@@ -16,6 +16,11 @@ const A = {
 
 const PX = 36;
 
+const TaxRow = ({ label, value }: { label: string; value: string }) =>
+  value ? (
+    <><span style={{ fontWeight: 600, color: A.green, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'Inter', sans-serif" }}>{label}</span><span>{value}</span></>
+  ) : null;
+
 interface DevProps {
   doc: DocumentState;
   sf: (fieldId: string) => boolean;
@@ -44,11 +49,6 @@ export function PreviewDevis({ doc, sf, bv, vb, t, tc, tu, results, design, high
   const numFmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const formattedDate = doc.date || new Date().toLocaleDateString('fr-DZ');
   let rowIdx = 0;
-
-  const TaxRow = ({ label, value }: { label: string; value: string }) =>
-    value ? (
-      <><span style={{ fontWeight: 600, color: A.green, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'Inter', sans-serif" }}>{label}</span><span>{value}</span></>
-    ) : null;
 
   return (
     <div id="print-area" className="w-[21cm] min-h-[29.7cm] flex flex-col shadow-md print:shadow-none relative" style={{ background: '#fff' }}>

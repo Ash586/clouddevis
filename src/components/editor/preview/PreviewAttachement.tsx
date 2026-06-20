@@ -197,7 +197,7 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '20px 44px 0', gap: 0 }}>
         {/* Left: Client / Maitre d'ouvrage */}
         <div style={{ paddingBottom: 16, borderRight: '0.5px dashed #C8C2B5', paddingRight: 28 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: A.navy, marginBottom: 2 }}>Le ma&#238;tre d'ouvrage</div>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: A.navy, marginBottom: 2 }}>Le ma&#238;tre d&apos;ouvrage</div>
           {doc.sigClientSubtitle && (
             <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>{doc.sigClientSubtitle}</div>
           )}
@@ -221,7 +221,7 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
 
         {/* Right: Company / Enterprise */}
         <div style={{ paddingBottom: 16, paddingLeft: 28, textAlign: 'right' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: A.green, marginBottom: 2 }}>L'Entreprise</div>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: A.green, marginBottom: 2 }}>L&apos;Entreprise</div>
           <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>{isEnt && doc.companyInfo ? doc.companyInfo.name : '\u2014'}</div>
           {doc.sigCompanyNameFr && (
             <div style={{ fontSize: 12, color: '#555', fontStyle: 'italic', marginBottom: 4, lineHeight: 1.5 }}>

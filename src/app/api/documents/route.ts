@@ -185,6 +185,8 @@ export async function POST(req: Request) {
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
         items: JSON.stringify(items),
+        companyInfo: doc.companyInfo && typeof doc.companyInfo === 'object' && Object.keys(doc.companyInfo).length > 0 ? doc.companyInfo as object : undefined,
+        logoPosition: typeof doc.logoPosition === 'string' ? doc.logoPosition : undefined,
         clientId: existingClientId,
         customFields: JSON.stringify({
           ...(typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}),

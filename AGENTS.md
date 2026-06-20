@@ -18,7 +18,7 @@ Full-stack invoicing SaaS (Next.js 16, PostgreSQL/Prisma, Tailwind). French prim
 - **Legal pages**: CGU, Privacy, Mentions Légales at `/legal/*` with shared layout
 - **Landing page**: Pricing section with CTA → `/pricing`, 3-column footer (Service, Légal)
 - **Draft restoration toast**: "Brouillon restauré ✓" on return from unsaved draft
-- **Logo upload**: Base64 (max 500KB), left/right position toggle, shows in preview header + PDF
+- **Logo upload**: Base64 (max 500KB), left/right position toggle, persists to document via `companyInfo` field
 - **User profile page**: 4 tabs (Info, Preferences, Security, Subscription), GET/PUT API at `/api/user/profile`
 - **Editor redesign (v1)**: Section toolbar (Items/Client/Général/Design/Paiement), items-first layout, running total in add form, mobile preview toggle, validation status bar, lighter color scheme
 - **Drag & Drop item reordering**: Replaced ▲▼ buttons with HTML5 drag handles (⠿), visual feedback (opacity + highlight), drag-to-reorder
@@ -33,6 +33,11 @@ Full-stack invoicing SaaS (Next.js 16, PostgreSQL/Prisma, Tailwind). French prim
 
 ### 📌 Next Steps
 1. Push to origin/main when authorized
+
+### 🔧 Recent Fixes
+- Fixed 6 ESLint errors: moved `TaxRow` component outside render in `PreviewDevis.tsx`, escaped apostrophes in `PreviewAttachement.tsx`
+- Added `companyInfo` field to Document model for logo/signature persistence
+- Updated document API to save/load `companyInfo` (including logo) with Base64 data
 
 ## Key Decisions
 - **Section ID `prestations` forced first** in editor regardless of `sectionOrder`
