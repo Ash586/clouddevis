@@ -42,6 +42,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} dir={dir} data-theme={theme ?? 'dark'} suppressHydrationWarning className={inter.variable}>
       <body className="min-h-screen antialiased flex flex-col">
+        <noscript>
+          <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif', background: '#0B0F1A', color: '#F5EDD6' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>JavaScript requis</h2>
+            <p style={{ fontSize: '0.875rem', opacity: 0.7 }}>
+              Pour une expérience optimale, veuillez activer JavaScript dans votre navigateur.
+              <br />CloudDevis nécessite JavaScript pour le rendu en temps réel de vos documents.
+            </p>
+          </div>
+        </noscript>
         <ThemeProvider initialTheme={theme ?? 'dark'}>
           <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
         </ThemeProvider>

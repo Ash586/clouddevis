@@ -44,7 +44,7 @@ function EditorContent() {
     setChantierField, setMateriauxField, setGarantieField,
     toggleBlock, isBlockVisible,
     handleAddItem, handleRemoveItem, moveItem, moveSection, startNewItem, saveDoc,
-    updateCustomField,
+    updateCustomField, docLoading,
   } = useEditor(modeParam ?? 'artisan', docIdParam ?? undefined, typeParam ?? undefined);
 
   const te = useTranslations('editor');
@@ -382,17 +382,19 @@ function EditorContent() {
     switch (id) {
       case 'design':
         return <CollapsibleSection title={te('sections.design')} sectionId="design" {...dragProps} {...s()}>
-          {!hiddenFields.has('logo') && <div className="space-y-2">
+          {mode === 'entreprise' && !hiddenFields.has('logo') && <div className="space-y-2">
             <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)]">
               <input type="file" accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   if (file.size > 500 * 1024) { showToast('Logo max 500 Ko', 'error'); return; }
+                  showToast('Encodage du logo…', 'info');
                   const reader = new FileReader();
                   reader.onload = (ev) => {
                     const dataUrl = ev.target?.result as string;
                     updateCompanyInfo({ logo: dataUrl });
+                    showToast('Logo ajouté avec succès', 'success');
                   };
                   reader.readAsDataURL(file);
                 }}
@@ -804,6 +806,15 @@ function EditorContent() {
   return (
     <TrialGate>
       <div className="h-screen flex flex-col bg-[var(--navy)] text-[var(--sand)] font-sans print:bg-white overflow-hidden">
+
+        {docLoading && (
+          <div className="absolute inset-0 z-[200] flex items-center justify-center bg-[var(--navy)]/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 size={32} className="animate-spin text-[var(--green-3)]" />
+              <span className="text-sm text-[var(--sand-muted)]">Chargement du document…</span>
+            </div>
+          </div>
+        )}
 
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
         <div className="no-print h-11 flex items-center px-3 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.08)] z-50 shrink-0 gap-2">

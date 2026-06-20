@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
@@ -19,6 +20,7 @@ interface DocSummary {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [docs, setDocs] = useState<DocSummary[]>([]);
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
@@ -75,6 +77,18 @@ export default function DashboardPage() {
             mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
           />
         </TrialGate>
+
+        {/* Mobile FAB — hidden on md+ */}
+        <div className="md:hidden fixed bottom-20 right-4 z-50 flex flex-col items-end gap-2">
+          <button
+            onClick={() => router.push('/dashboard/editor')}
+            className="w-14 h-14 rounded-full bg-[var(--green)] text-white shadow-lg shadow-[var(--green-glow)] flex items-center justify-center text-2xl font-bold active:scale-95 transition-transform"
+            title="Nouveau document"
+          >
+            +
+          </button>
+        </div>
+
       </div>
     </div>
     </div>

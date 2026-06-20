@@ -229,6 +229,14 @@ export default function DocumentsPage() {
 
               {/* Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <Card key={i} className="text-center animate-pulse">
+                      <div className="h-7 w-16 bg-slate-200 rounded mx-auto mb-1" />
+                      <div className="h-3 w-20 bg-slate-100 rounded mx-auto" />
+                    </Card>
+                  ))
+                ) : (<>
                 <Card className="text-center">
                   <p className="text-2xl font-black text-slate-900">{totalDocs}</p>
                   <p className="text-xs text-slate-500 font-semibold">{t('totalDocs')}</p>
@@ -245,6 +253,7 @@ export default function DocumentsPage() {
                   <p className="text-2xl font-black text-slate-900">{statusBreakdown['DELIVERED'] || 0}</p>
                   <p className="text-xs text-slate-500 font-semibold">{tc('delivered')}</p>
                 </Card>
+                </>)}
               </div>
 
               {/* Desktop Table */}
@@ -263,7 +272,17 @@ export default function DocumentsPage() {
                   </thead>
                   <tbody>
                     {loading ? (
-                      <tr><td colSpan={7} className="py-8 text-center text-slate-400">{tc('loading')}</td></tr>
+                      Array.from({ length: 5 }).map((_, i) => (
+                        <tr key={i} className="border-b border-slate-50 animate-pulse">
+                          <td className="py-3 px-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-16 bg-slate-200 rounded-full" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-28 bg-slate-200 rounded" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-slate-200 rounded ml-auto" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-14 bg-slate-200 rounded-full" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-slate-200 rounded ml-auto" /></td>
+                        </tr>
+                      ))
                     ) : docs.length === 0 ? (
                       <tr><td colSpan={7} className="py-8 text-center text-slate-400">{t('noDocs')}</td></tr>
                     ) : docs.map(doc => (
@@ -326,7 +345,16 @@ export default function DocumentsPage() {
               {/* Mobile Cards */}
               <div className="md:hidden space-y-3">
                 {loading ? (
-                  <Card className="py-8 text-center text-slate-400">{tc('loading')}</Card>
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <Card key={i} className="p-3 space-y-3 animate-pulse">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1.5"><div className="h-4 w-24 bg-slate-200 rounded" /><div className="h-3 w-20 bg-slate-100 rounded" /></div>
+                        <div className="h-5 w-16 bg-slate-200 rounded-full" />
+                      </div>
+                      <div className="flex items-center justify-between"><div className="h-4 w-16 bg-slate-200 rounded-full" /><div className="h-4 w-20 bg-slate-200 rounded" /></div>
+                      <div className="flex items-center justify-between"><div className="h-3 w-20 bg-slate-100 rounded" /><div className="flex gap-1"><div className="h-8 w-8 bg-slate-200 rounded-lg" /><div className="h-8 w-8 bg-slate-200 rounded-lg" /><div className="h-8 w-8 bg-slate-200 rounded-lg" /></div></div>
+                    </Card>
+                  ))
                 ) : docs.length === 0 ? (
                   <Card className="py-8 text-center text-slate-400">{t('noDocs')}</Card>
                 ) : docs.map(doc => (

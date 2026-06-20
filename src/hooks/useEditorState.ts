@@ -145,12 +145,14 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
   }, [setDoc]);
   const [saving, setSaving] = useState(false);
   const [docId, setDocId] = useState<string | null>(initialDocId ?? null);
+  const [docLoading, setDocLoading] = useState(!!initialDocId);
 
   const results = useMemo(() => calculateDocument(doc), [doc]);
 
   // Load document from API by ID
   useEffect(() => {
     if (!initialDocId) return;
+    setDocLoading(true);
     fetch(`/api/documents/${initialDocId}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -189,7 +191,8 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
           }));
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setDocLoading(false));
   }, [initialDocId]);
 
   // Auto-save to localStorage
@@ -208,6 +211,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
     newItem, setNewItem,
     saving, setSaving,
     docId, setDocId,
+    docLoading,
     results,
     draftRestored, setDraftRestored,
   };

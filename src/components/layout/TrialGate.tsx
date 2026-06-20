@@ -40,6 +40,16 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
   const isTrial = user.subscriptionStatus === 'TRIAL';
   const isFree = user.subscriptionStatus === 'FREE' || user.subscriptionStatus === 'EXPIRED';
 
+  const trialEndDate = user.trialStartAt
+    ? new Date(new Date(user.trialStartAt).getTime() + 7 * 86400000)
+    : null;
+  const trialEndDateStr = trialEndDate
+    ? trialEndDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : null;
+  const trialDaysLeft = trialEndDate
+    ? Math.max(0, Math.ceil((trialEndDate.getTime() - Date.now()) / 86400000))
+    : 7;
+
   return (
     <>
       {isTrial ? (
@@ -47,8 +57,11 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
           <div className="bg-amber-400/10 border-b border-amber-400/20 px-4 py-2">
             <div className="max-w-4xl mx-auto flex items-center gap-3 flex-wrap">
               <span className="text-xs font-medium text-amber-400">
-                {s('trialBanner') || 'Période d\'essai — 7 jours'}&ensp;
-                <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Souscrire'}</button>
+                {trialEndDateStr
+                  ? `Essai gratuit — ${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''} (se termine le ${trialEndDateStr})`
+                  : (s('trialBanner') || 'Période d\'essai — 7 jours')}
+                &ensp;
+                <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Passer à un forfait payant'}</button>
               </span>
             </div>
           </div>
