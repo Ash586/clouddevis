@@ -9,6 +9,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const { id } = await params;
+    const member = await prisma.teamMember.findUnique({
+      where: { teamId_userId: { teamId: id, userId: session.userId } },
+    });
+    if (!member) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
     const members = await prisma.teamMember.findMany({
       where: { teamId: id },
       include: { user: { select: { id: true, name: true, email: true } } },

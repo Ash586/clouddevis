@@ -43,7 +43,23 @@ export async function POST(_req: Request, { params }: { params: Promise<{ token:
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   try {
+    const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+
     const { token } = await params;
+    const invite = await prisma.teamInvite.findUnique({
+      where: { token },
+      include: { team: true },
+    });
+    if (!invite) return NextResponse.json({ error: 'Invite not found' }, { status: 404 });
+
+    const member = await prisma.teamMember.findUnique({
+      where: { teamId_userId: { teamId: invite.teamId, userId: session.userId } },
+    });
+    if (!member || (member.role !== 'OWNER' && member.role !== 'ADMIN')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     await prisma.teamInvite.delete({ where: { token } });
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -152,8 +152,8 @@ export function generateDocumentHTML(params: {
       <div class="meta">
         ` + (sf('docNumber') ? `<div class="num">` + s(doc.documentNumber) + `</div>` : '') + `
         ` + (reference ? `<div class="line">Réf: ` + s(reference) + `</div>` : '') + `
-        ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + doc.date + `</div>` : '') + `
-        ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + doc.validUntil + `</div>` : '') + `
+        ` + (sf('issueDate') ? `<div class="line">${tp('issueDate')} ` + s(doc.date) + `</div>` : '') + `
+        ` + (sf('validUntil') && doc.validUntil ? `<div class="line">${tp('validUntil')} ` + s(doc.validUntil) + `</div>` : '') + `
         ` + (sf('orderRef') && doc.bcRef ? `<div class="line">${tp('orderRef')} ` + s(doc.bcRef) + `</div>` : '') + `
       </div>
     </div>
@@ -282,13 +282,13 @@ export function generateDocumentHTML(params: {
         ` + (results.acompte > 0 ? `<tr class="disc"><td class="lbl">${tp('depositPaid')}</td><td class="val">-` + fmt(results.acompte) + ` ${currency}</td></tr>` : '') + `
         <tr class="grand"><td class="lbl">${tp('netToPay')}</td><td class="val">` + fmt(results.netAPayer) + ` ${currency}</td></tr>
       </table>
-      <div class="inwords">` + results.totalInWords + `</div>
+      <div class="inwords">` + s(results.totalInWords) + `</div>
     </div>
   </div>
 
   ` + (vb('signature') ? `
   <div class="signature">
-    <div class="loc">${tp('signatureLine', { city: doc.companyInfo?.address?.split(',')[0] ?? '________', date: doc.date })}</div>
+    <div class="loc">${tp('signatureLine', { city: s(doc.companyInfo?.address?.split(',')[0] ?? '________'), date: s(doc.date) })}</div>
     <div class="stamp">
       <div class="lbl2">${tp('signatureLabel')}</div>
       <div class="box">` + (doc.companyInfo?.signature ? `<img src="` + s(doc.companyInfo.signature) + `" style="max-width:100%;max-height:100%"/>` : tp('signatureStamp')) + `</div>

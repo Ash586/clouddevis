@@ -42,6 +42,9 @@ export async function POST(req: Request) {
       },
     });
 
+    const escHtml = (str: string) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeName = escHtml(user.name || '');
+
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/auth/reset-password?token=${token}`;
 
     // Send reset email
@@ -52,7 +55,7 @@ export async function POST(req: Request) {
       html: `
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2 style="color: #0B0F1A;">Réinitialisation de mot de passe</h2>
-          <p>Bonjour ${user.name},</p>
+          <p>Bonjour ${safeName},</p>
           <p>Vous avez demandé la réinitialisation de votre mot de passe sur ${appName}.</p>
           <p>Ce lien expirera dans <strong>1 heure</strong>.</p>
           <a href="${resetUrl}" style="display: inline-block; background: #006233; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 16px 0;">

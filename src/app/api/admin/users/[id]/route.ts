@@ -3,6 +3,10 @@ import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { handleReferralConversion } from '@/lib/partner';
+import { hasPermission } from '@/lib/admin/permissions';
+
+const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
+const VALID_MODES = ['ARTISAN', 'ENTREPRISE'];
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -34,6 +38,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'users:write')) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
 
     const { id } = await params;
     const body = await req.json();
@@ -43,8 +50,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const updateData: Record<string, unknown> = {};
-    if (subscriptionStatus) updateData.subscriptionStatus = subscriptionStatus;
-    if (mode) updateData.mode = mode;
+    if (subscriptionStatus) {
+      if (!VALID_SUBSCRIPTION_STATUSES.includes(subscriptionStatus)) {
+        return NextResponse.json({ error: 'Invalid subscription status' }, { status: 400 });
+      }
+      updateData.subscriptionStatus = subscriptionStatus;
+    }
+    if (mode) {
+      if (!VALID_MODES.includes(mode)) {
+        return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
+      }
+      updateData.mode = mode;
+    }
 
     const updated = await prisma.user.update({ where: { id }, data: updateData });
 
@@ -75,6 +92,9 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    if (!hasPermission(session.role, 'users:delete')) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
 
     const { id } = await params;
     const user = await prisma.user.findUnique({ where: { id } });

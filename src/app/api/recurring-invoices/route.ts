@@ -57,7 +57,7 @@ export async function PATCH(req: Request) {
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const body = await req.json();
-    const { id, ...updateData } = body;
+    const { id, name, documentType, frequency, nextDate, template, settings } = body;
 
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
@@ -65,12 +65,17 @@ export async function PATCH(req: Request) {
     if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     if (invoice.userId !== session.userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
+    const updateData: Record<string, unknown> = {};
+    if (name !== undefined) updateData.name = name;
+    if (documentType !== undefined) updateData.documentType = documentType;
+    if (frequency !== undefined) updateData.frequency = frequency;
+    if (nextDate !== undefined) updateData.nextDate = new Date(nextDate);
+    if (template !== undefined) updateData.template = template;
+    if (settings !== undefined) updateData.settings = settings;
+
     const updated = await prisma.recurringInvoice.update({
       where: { id },
-      data: {
-        ...updateData,
-        nextDate: updateData.nextDate ? new Date(updateData.nextDate) : undefined,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ invoice: updated });

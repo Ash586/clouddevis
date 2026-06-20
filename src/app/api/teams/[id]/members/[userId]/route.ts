@@ -3,6 +3,8 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
+const VALID_ROLES = ['MEMBER', 'ADMIN', 'OWNER'];
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   try {
     const session = await getSession();
@@ -10,6 +12,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const { id, userId } = await params;
     const { role } = await req.json();
+
+    if (!role || !VALID_ROLES.includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+    }
 
     const currentMember = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId: id, userId: session.userId } },

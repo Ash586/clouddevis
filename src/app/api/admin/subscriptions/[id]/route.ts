@@ -3,6 +3,8 @@ import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
+const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
+
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
@@ -52,7 +54,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     const updateData: Record<string, unknown> = {};
-    if (subscriptionStatus) updateData.subscriptionStatus = subscriptionStatus;
+    if (subscriptionStatus) {
+      if (!VALID_SUBSCRIPTION_STATUSES.includes(subscriptionStatus)) {
+        return NextResponse.json({ error: 'Invalid subscription status' }, { status: 400 });
+      }
+      updateData.subscriptionStatus = subscriptionStatus;
+    }
     if (subscriptionEndAt) updateData.subscriptionEndAt = new Date(subscriptionEndAt);
     if (trialStartAt) updateData.trialStartAt = new Date(trialStartAt);
 

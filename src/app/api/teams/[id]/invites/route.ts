@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
 
+const VALID_INVITE_ROLES = ['MEMBER', 'ADMIN'];
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
@@ -13,6 +15,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const { email, role } = await req.json();
 
     if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+
+    const inviteRole = role && VALID_INVITE_ROLES.includes(role) ? role : 'MEMBER';
 
     const member = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId: id, userId: session.userId } },
@@ -40,7 +44,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         teamId: id,
         email: email.toLowerCase().trim(),
         token,
-        role: role || 'MEMBER',
+        role: inviteRole,
         expiresAt,
       },
     });

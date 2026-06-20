@@ -16,7 +16,6 @@ export async function sendEmail({ to, subject, html }: SendEmailParams): Promise
 
   if (!apiKey) {
     logger.warn('RESEND_API_KEY not configured — email not sent', { to, subject });
-    console.log(`[EMAIL] To: ${to}\nSubject: ${subject}\n${html}\n`);
     return false;
   }
 

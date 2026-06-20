@@ -3,6 +3,9 @@ import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { EnterpriseRequestStatus } from '@prisma/client';
+import { hasPermission } from '@/lib/admin/permissions';
+
+const VALID_REQUEST_STATUSES = ['PENDING', 'APPROVED', 'REJECTED'];
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -30,10 +33,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    if (!hasPermission(session.role, 'subscriptions:write')) {
+      return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
+    }
 
     const { id } = await params;
     const body = await req.json();
     const { status, notes } = body as { status?: string; notes?: string };
+
+    if (status && !VALID_REQUEST_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
+    }
 
     const updateData: { status?: EnterpriseRequestStatus; notes?: string; handledBy?: { connect: { id: string } }; handledAt?: Date } = {};
     if (status) updateData.status = status as EnterpriseRequestStatus;

@@ -156,8 +156,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ provide
 
     const referralCode = cookies['oauth_referral'] || '';
     const savedRedirect = cookies['oauth_redirect'] || '/dashboard';
+    const safeRedirect = savedRedirect.startsWith('/dashboard') || savedRedirect.startsWith('/auth') ? savedRedirect : '/dashboard';
 
-    const redirect = NextResponse.redirect(new URL(savedRedirect, _req.url));
+    const redirect = NextResponse.redirect(new URL(safeRedirect, _req.url));
     redirect.cookies.delete('oauth_state');
     redirect.cookies.delete('oauth_referral');
     redirect.cookies.delete('oauth_redirect');

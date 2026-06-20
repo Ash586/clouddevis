@@ -50,6 +50,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const { id } = await params;
+    const document = await prisma.document.findUnique({ where: { id } });
+    if (!document) return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    if (document.userId !== session.userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
     const shares = await prisma.documentShare.findMany({
       where: { documentId: id },
       include: {
