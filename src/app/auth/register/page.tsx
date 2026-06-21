@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Hammer, Truck, Sparkles, Hotel, Wrench, Heart, BookOpen, Building, Bus, Palette, Wheat, Scale, Monitor, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { track, AUTH_EVENTS } from '@/lib/analytics';
 
 const SECTORS = [
   { value: 'btp', label: 'BTP', Icon: Hammer },
@@ -50,6 +51,10 @@ function RegisterForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    track(AUTH_EVENTS.SIGNUP_STARTED, { mode, sector });
+  }, []);
+
   const totalSteps = mode === 'entreprise' ? 3 : 2;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -76,6 +81,7 @@ function RegisterForm() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Échec d\'inscription'); return; }
+      track(AUTH_EVENTS.SIGNUP_COMPLETED, { mode, sector, country });
       if (intentPartner) {
         router.push('/dashboard/partner/apply');
       } else {

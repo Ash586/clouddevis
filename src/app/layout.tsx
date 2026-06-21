@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import './rtl.css';
 import './landing.css';
@@ -7,6 +8,7 @@ import { I18nClientProvider } from '@/contexts/I18nClientProvider';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { PageViewTracker } from '@/components/tracking/PageViewTracker';
 import { cookies } from 'next/headers';
+import { PLAUSIBLE_DOMAIN } from '@/lib/analytics';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
 
@@ -54,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider initialTheme={theme ?? 'dark'}>
           <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
         </ThemeProvider>
+        <Script defer data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.tagged-events.js" strategy="afterInteractive" />
       </body>
     </html>
   );

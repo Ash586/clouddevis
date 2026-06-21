@@ -76,7 +76,7 @@ export function Navbar() {
 
               <button
                 onClick={toggleTheme}
-                className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[#4DCA8A] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
+                className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[var(--green-3)] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
                 title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
                 aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
               >

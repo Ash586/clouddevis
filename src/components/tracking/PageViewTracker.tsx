@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
+import { track, loadPlausible } from '@/lib/analytics';
 
 export function PageViewTracker() {
   const pathname = usePathname();
@@ -11,11 +12,17 @@ export function PageViewTracker() {
   const lastPath = useRef('');
 
   useEffect(() => {
+    // Load Plausible on first mount
+    loadPlausible();
+
     // Skip tracking for API routes, static assets, and admin pages
     if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.startsWith('/admin')) return;
     // Skip duplicate path tracking
     if (pathname === lastPath.current) return;
     lastPath.current = pathname;
+
+    // Fire Plausible pageview
+    track('pageview', { path: pathname });
 
     // Use sendBeacon for reliable fire-and-forget tracking
     const payload = {

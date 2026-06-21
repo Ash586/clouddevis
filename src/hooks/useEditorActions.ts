@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import type { DocumentState, LineItem, BlockId, ClientInfo, CompanyInfo, ArtisanInfo, DiscountInfo, StampDutyConfig, PaymentDetails } from '@/types';
 import { generateId } from '@/lib/calculations';
 import { LS_KEY, createEmptyDoc } from './useEditorState';
+import { track, DOC_EVENTS } from '@/lib/analytics';
 
 interface EditorActionsDeps {
   doc: DocumentState;
@@ -148,6 +149,10 @@ export function useEditorActions(deps: EditorActionsDeps) {
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) });
       if (!res.ok) { const body = await res.text(); throw new Error(`Save failed (${res.status}): ${body}`); }
       const data = await res.json();
+      if (method === 'POST') {
+        track(DOC_EVENTS.DOCUMENT_CREATED, { type: doc.documentType, mode: doc.mode });
+        track(DOC_EVENTS.FIRST_INVOICE_CREATED, { type: doc.documentType, mode: doc.mode });
+      }
       setDocId(data.id);
       localStorage.removeItem(LS_KEY);
       return data;

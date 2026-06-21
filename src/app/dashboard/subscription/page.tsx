@@ -10,6 +10,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { useToast } from '@/components/ui/toast';
 import { PLANS, PLAN_ORDER, formatPrice } from '@/lib/pricing';
+import { track, UPGRADE_EVENTS } from '@/lib/analytics';
 
 interface SubscriptionData {
   status: string;
@@ -50,7 +51,12 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState<string | null>(null);
 
+  useEffect(() => {
+    track(UPGRADE_EVENTS.PRICING_PAGE_VIEWED);
+  }, []);
+
   const handleSubscribe = async (planId: string) => {
+    track(UPGRADE_EVENTS.UPGRADE_BUTTON_CLICKED, { plan: planId });
     setSubscribing(planId);
     try {
       const res = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ planId }) });

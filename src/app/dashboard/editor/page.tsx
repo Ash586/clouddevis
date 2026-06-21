@@ -19,7 +19,8 @@ import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, 
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
-  import {
+import { track } from '@/lib/analytics';
+import {
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
@@ -221,6 +222,7 @@ function EditorContent() {
 
   const handleDownload = async () => {
     await saveDoc();
+    track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
     const isEnt = doc.mode === 'entreprise';
     const docTypeLabel = tp(DOC_TYPE_PREVIEW_LABELS[doc.documentType] ?? 'docTypeQuote');
     const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);

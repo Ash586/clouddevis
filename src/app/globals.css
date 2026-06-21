@@ -23,10 +23,10 @@
 }
 
 /* ═══════════════════════════════════════
-   NEW DESIGN TOKENS (CloudDevis Navy Theme)
+   DESIGN TOKENS (Navy Theme)
 ═══════════════════════════════════════ */
 :root {
-  /* Colors */
+  /* ── Colors ── */
   --navy:      #0B0F1A;
   --navy-2:    #111827;
   --navy-3:    #1C2537;
@@ -44,54 +44,114 @@
   --teal:      #2A7F6F;
   --teal-bg:   rgba(42,127,111,0.12);
   --stamp-red: #E8542E;
+  --green-bg:  rgba(0,149,77,0.1);
+  --red-bg:    rgba(232,84,46,0.1);
+  --blue-bg:   rgba(74,158,255,0.1);
+
+  /* Border helpers */
+  --border:    rgba(245,237,214,0.08);
+  --border-2:  rgba(245,237,214,0.14);
   
-  /* Semantic Variables (Mapped to App Components) */
-  --cd-primary: 0 98 51;        /* green-800 (Custom) */
-  --cd-primary-hover: 0 122 64; /* green-700 */
-  --cd-surface: 11 15 26;       /* navy */
-  --cd-surface-card: 17 24 39;  /* navy-2 */
-  --cd-text: 245 237 214;       /* sand */
-  --cd-text-secondary: 168 157 133; /* sand-muted */
-  --cd-border: 245 237 214 / 0.08; /* sand with low opacity */
+  /* ── Typography Scale ── */
+  --text-xs:   10px;
+  --text-sm:   12px;
+  --text-base: 14px;
+  --text-lg:   16px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+  --text-5xl:  48px;
+  --text-6xl:  60px;
+
+  --leading-none: 1;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.12em;
+
+  /* ── Spacing (8px Grid) ── */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-14:  56px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-28:  112px;
+
+  /* ── Radius ── */
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg:   0 8px 30px rgba(0,0,0,0.4);
+  --shadow-xl:   0 16px 48px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 24px rgba(0,122,64,0.3);
+
+  /* ── Semantic Variables ── */
+  --cd-primary: 0 98 51;
+  --cd-primary-hover: 0 122 64;
+  --cd-surface: 11 15 26;
+  --cd-surface-card: 17 24 39;
+  --cd-text: 245 237 214;
+  --cd-text-secondary: 168 157 133;
+  --cd-border: 245 237 214 / 0.08;
   --cd-success: 16 185 129;
   --cd-warning: 245 158 11;
   --cd-danger: 239 68 68;
-  --cd-radius: 12px;
-  --cd-radius-lg: 16px;
+  --cd-radius: var(--radius-lg);
+  --cd-radius-lg: var(--radius-xl);
 }
 
 /* ═══════════════════════════════════════
-   LIGHT THEME (Paper/Cream — inspired by CloudDevis redesign)
+   LIGHT THEME (Paper/Cream)
 ═════════════════════════════════════ */
 :root[data-theme="light"] {
-  /* Base — Paper/Cream */
   --navy:      #F5F1E8;
   --navy-2:    #FFFFFF;
   --navy-3:    #ECE5D4;
   --navy-4:    #E0D8C8;
-
-  /* Text — Dark ink on light paper */
   --sand:      #1A1A1A;
   --sand-2:    #2D2D2D;
   --sand-muted:#6C757D;
-
-  /* Brand — Dark green primary */
   --green:     #0B3D2E;
   --green-2:   #14533F;
   --green-3:   #1A6B4E;
   --green-glow:rgba(20,83,63,0.15);
-
-  /* Accent */
   --gold:      #C4A35A;
   --gold-2:    #D4B874;
   --gold-bg:   rgba(196,163,90,0.12);
   --teal:      #1E7D6D;
   --teal-bg:   rgba(30,125,109,0.12);
-
-  /* Alert red — stamp-red from design */
   --stamp-red: #E8542E;
 
-  /* Semantic */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:   0 8px 30px rgba(0,0,0,0.1);
+  --shadow-xl:   0 16px 48px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 24px rgba(20,83,63,0.2);
+
   --cd-primary: 11 61 46;
   --cd-primary-hover: 20 83 63;
   --cd-surface: 245 241 232;
@@ -102,8 +162,8 @@
   --cd-success: 20 185 129;
   --cd-warning: 245 158 11;
   --cd-danger: 232 84 46;
-  --cd-radius: 12px;
-  --cd-radius-lg: 16px;
+  --cd-radius: var(--radius-lg);
+  --cd-radius-lg: var(--radius-xl);
 }
 
 body {

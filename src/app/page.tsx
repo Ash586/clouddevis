@@ -32,10 +32,10 @@ export default function HomePage() {
                   <li><a href="#pricing">Tarifs</a></li>
                   <li><a href="#faq">FAQ</a></li>
                 </ul>
-                 <div className="nav-cta">
-                   <Link href="/auth/login" className="btn btn-ghost">Se connecter à mon tableau de bord</Link>
-                   <Link href="/auth/register" className="btn btn-primary">Commencer gratuitement</Link>
-                 </div>
+                <div className="nav-cta">
+                  <Link href="/auth/login" className="btn btn-ghost">Se connecter à mon tableau de bord</Link>
+                  <Link href="/auth/register" className="btn btn-primary" data-plausible="CTA Click" data-event-location="nav" data-event-label="Commencer gratuitement">Commencer gratuitement</Link>
+                </div>
               </div>
             </div>
           </nav>
@@ -47,34 +47,34 @@ export default function HomePage() {
                 <div>
                   <div className="hero-eyebrow">
                     <span className="badge badge-green">
-                      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#4DCA8A" /></svg>
+                      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="var(--green-3)" /></svg>
                       Conforme DGI Algérie
                     </span>
                     <span className="badge badge-gold">Gratuit pour démarrer</span>
                   </div>
-                   <h1 className="hero-title">
+                    <h1 className="hero-title">
                      Vos devis & factures conformes en 2 minutes – zéro erreur, zéro stress
                    </h1>
                    <p className="hero-sub">
                      Arrêtez de perdre du temps et de l’argent à cause de devis non conformes : CloudDevis vérifie NIF, RC, TVA et Timbre Fiscal pour vous, dès la première saisie.
                    </p>
                    <div className="hero-ctas">
-                     <Link href="/auth/register" className="btn btn-primary btn-lg">
+                     <Link href="/auth/register" className="btn btn-primary btn-lg" data-plausible="CTA Click" data-event-location="hero" data-event-label="Créer mon devis conforme maintenant">
                        Créer mon devis conforme maintenant
                      </Link>
                    </div>
                   {/* Trust items — horizontal scroll chips on mobile */}
                   <div className="hero-trust-mobile">
                     <div className="trust-item">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4DCA8A" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#4DCA8A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="var(--green-3)" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="var(--green-3)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       Aucune carte requise
                     </div>
                     <div className="trust-item">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4DCA8A" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#4DCA8A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="var(--green-3)" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="var(--green-3)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       5 documents/mois offerts
                     </div>
                     <div className="trust-item">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4DCA8A" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="#4DCA8A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="var(--green-3)" strokeWidth="1.5"/><path d="M5 8l2 2 4-4" stroke="var(--green-3)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       Support en Arabe &amp; Français
                     </div>
                   </div>
@@ -83,11 +83,11 @@ export default function HomePage() {
                 {/* Desktop hero visual */}
                 <div className="hero-visual hero-visual-desktop">
                   <div className="glow-chip chip-1">
-                    <div className="chip-dot" style={{ background: '#4DCA8A', boxShadow: '0 0 6px #4DCA8A' }}></div>
+                    <div className="chip-dot" style={{ background: 'var(--green-3)', boxShadow: '0 0 6px var(--green-3)' }}></div>
                     TVA calculée automatiquement
                   </div>
                   <div className="glow-chip chip-2">
-                    <div className="chip-dot" style={{ background: '#F0C864', boxShadow: '0 0 6px #F0C864' }}></div>
+                    <div className="chip-dot" style={{ background: 'var(--gold-2)', boxShadow: '0 0 6px var(--gold-2)' }}></div>
                     PDF généré en 1 clic
                   </div>
                   <div className="doc-preview">
@@ -389,7 +389,7 @@ export default function HomePage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={p.href} className={`btn price-cta ${p.ghost ? 'btn-ghost' : 'btn-primary'}`}>{p.cta}</Link>
+                    <Link href={p.href} className={`btn price-cta ${p.ghost ? 'btn-ghost' : 'btn-primary'}`} data-plausible="CTA Click" data-event-location={`pricing_${p.plan.toLowerCase()}`} data-event-label={p.cta}>{p.cta}</Link>
                   </div>
                 ))}
               </div>
@@ -418,7 +418,7 @@ export default function HomePage() {
                   Rejoignez 800+ entreprises algériennes qui génèrent leurs documents fiscaux sans stress.
                 </p>
                 <div className="cta-buttons">
-                  <Link href="/auth/register" className="btn btn-primary btn-lg">Créer mon devis maintenant →</Link>
+                  <Link href="/auth/register" className="btn btn-primary btn-lg" data-plausible="CTA Click" data-event-location="bottom_cta" data-event-label="Créer mon devis maintenant">Créer mon devis maintenant →</Link>
                 </div>
                 <p className="cta-note">✓ Gratuit · ✓ Sans carte · ✓ Conforme DGI dès le premier document</p>
               </div>

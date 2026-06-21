@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { track, AUTH_EVENTS } from '@/lib/analytics';
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -27,8 +28,8 @@ function LoginForm() {
   } as React.CSSProperties;
 
   const toggleBtnClass = isDark
-    ? 'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[#4DCA8A] hover:bg-[var(--navy-4)]'
-    : 'bg-white border border-[rgba(0,0,0,0.08)] text-[#4DCA8A] hover:bg-gray-100';
+    ? 'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]'
+    : 'bg-white border border-[rgba(0,0,0,0.08)] text-[var(--green-3)] hover:bg-gray-100';
 
   // Validate redirect: must start with /dashboard for security
   const safeRedirect = redirectTo.startsWith('/dashboard') ? redirectTo : '';
@@ -46,6 +47,7 @@ function LoginForm() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Échec de connexion'); return; }
+      track(AUTH_EVENTS.LOGIN_SUCCESS, { method: data.method || 'password' });
       router.push(safeRedirect || '/dashboard');
     } catch {
       setError('Erreur réseau');

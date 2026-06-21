@@ -1,9 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { track, PAGE_EVENTS } from '@/lib/analytics';
 
 export function LandingAnimations({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    const maxDepth = { value: 0 };
+    const milestones = new Set<number>();
+    const scrollHandler = () => {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+      const pct = Math.round((window.scrollY / docHeight) * 100);
+      if (pct > maxDepth.value) maxDepth.value = pct;
+      [25, 50, 75, 100].forEach((m) => {
+        if (maxDepth.value >= m && !milestones.has(m)) {
+          milestones.add(m);
+          track('Scroll Depth', { percentage: m });
+        }
+      });
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+
+    let exitFired = false;
+    const exitHandler = (e: MouseEvent) => {
+      if (exitFired) return;
+      if (e.clientY <= 0) {
+        exitFired = true;
+        track(PAGE_EVENTS.EXIT_INTENT);
+      }
+    };
+    document.addEventListener('mouseleave', exitHandler);
+
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
@@ -23,7 +50,11 @@ export function LandingAnimations({ children }: { children: React.ReactNode }) {
       obs.observe(el);
     });
 
-    return () => obs.disconnect();
+    return () => {
+      obs.disconnect();
+      window.removeEventListener('scroll', scrollHandler);
+      document.removeEventListener('mouseleave', exitHandler);
+    };
   }, []);
 
   return <>{children}</>;
