@@ -58,8 +58,16 @@ function RegisterForm() {
   const totalSteps = mode === 'entreprise' ? 3 : 2;
   const errorId = 'register-error';
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && step < totalSteps) {
+      e.preventDefault();
+      nextStep();
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (step < totalSteps) return;
     setError('');
     if (!name.trim() || !email.trim() || !password) { setError('Veuillez remplir tous les champs'); return; }
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { setError('Email invalide'); return; }
@@ -157,7 +165,7 @@ function RegisterForm() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col gap-3">
           {/* Step 1: Compte */}
           {step === 1 && (
             <>
