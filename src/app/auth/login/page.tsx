@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
+import { useTheme } from '@/contexts/ThemeContext';
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -15,21 +16,8 @@ function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(searchParams.get('error') || '');
   const [loading, setLoading] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-
-  const lightVars: React.CSSProperties = isDark ? {} : {
-    '--navy': '#f3f4f6',
-    '--navy-2': '#ffffff',
-    '--navy-3': '#f9fafb',
-    '--navy-4': '#e5e7eb',
-    '--sand': '#1f2937',
-    '--sand-muted': '#6b7280',
-  } as React.CSSProperties;
-
-  const toggleBtnClass = isDark
-    ? 'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]'
-    : 'bg-white border border-[rgba(0,0,0,0.08)] text-[var(--green-3)] hover:bg-gray-100';
 
   const safeRedirect = redirectTo.startsWith('/dashboard') ? redirectTo : '';
 
@@ -66,7 +54,7 @@ function LoginForm() {
   ));
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--navy)]" style={lightVars}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--navy)]">
       <div className="w-full max-w-[380px] bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-xl p-7 sm:p-6">
         <div className="text-center mb-6">
           <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center mx-auto mb-3 text-lg font-extrabold text-[var(--sand)]">CD</div>
@@ -126,8 +114,8 @@ function LoginForm() {
           </div>
 
           <div className="flex gap-2.5 items-center">
-            <button type="button" onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className={`w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition ${toggleBtnClass}`}
+            <button type="button" onClick={toggleTheme}
+              className="w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]"
               aria-label={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
               {isDark ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

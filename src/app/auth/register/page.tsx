@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Hammer, Truck, Sparkles, Hotel, Wrench, Heart, BookOpen, Building, Bus, Palette, Wheat, Scale, Monitor, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const SECTORS = [
   { value: 'btp', label: 'BTP', Icon: Hammer },
@@ -50,6 +51,8 @@ function RegisterForm() {
   const [companyCapital, setCompanyCapital] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     track(AUTH_EVENTS.SIGNUP_STARTED, { mode, sector });
@@ -138,7 +141,25 @@ function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--navy)]">
       <div className="w-full max-w-[420px] bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-xl p-6 sm:p-5.5">
         <div className="text-center mb-5">
-          <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center mx-auto mb-3 text-lg font-extrabold text-[var(--sand)]">CD</div>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center text-lg font-extrabold text-[var(--sand)]">CD</div>
+            <button type="button" onClick={toggleTheme}
+              className="w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]"
+              aria-label={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
+              {isDark ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
+            </button>
+          </div>
           <h1 className="text-xl font-bold text-[var(--sand)] m-0">CloudDevis</h1>
           <p className="text-[13px] text-[var(--sand-muted)] mt-1">Créez votre compte</p>
         </div>
