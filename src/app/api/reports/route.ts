@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export async function GET(req: Request) {
+export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function getHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -139,6 +141,6 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     logger.error('GET /api/reports error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

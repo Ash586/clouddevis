@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { calculateDocument } from '@/lib/calculations';
@@ -8,7 +9,8 @@ import { DocumentState } from '@/types';
 
 const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -20,11 +22,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ document: doc });
   } catch (error) {
     logger.error('GET /api/documents/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = withApiErrorHandling(putHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function putHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -104,11 +107,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ id: updated.id, number: updated.number });
   } catch (error) {
     logger.error('PUT /api/documents/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(deleteHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -121,6 +125,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('DELETE /api/documents/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
 const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -34,11 +36,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (error) {
     logger.error('Admin subscription detail error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(patchHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -84,6 +87,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ success: true, subscription: updated });
   } catch (error) {
     logger.error('Admin subscription update error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

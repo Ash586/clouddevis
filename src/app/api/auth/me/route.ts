@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) {
@@ -26,6 +28,6 @@ export async function GET() {
     return NextResponse.json({ user: session });
   } catch (error) {
     logger.error('GET /api/auth/me', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

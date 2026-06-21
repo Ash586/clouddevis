@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
@@ -12,7 +13,8 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36);
 }
 
-export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function getHandler(req: Request, { params }: { params: Promise<{ code: string }> }) {
   try {
     const { code } = await params;
 

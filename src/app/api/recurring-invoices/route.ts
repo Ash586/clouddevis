@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -16,11 +18,12 @@ export async function GET() {
     return NextResponse.json({ invoices });
   } catch (error) {
     logger.error('Recurring GET error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -47,11 +50,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ invoice }, { status: 201 });
   } catch (error) {
     logger.error('Recurring POST error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PATCH(req: Request) {
+export const PATCH = withApiErrorHandling(patchHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function patchHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -81,6 +85,6 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ invoice: updated });
   } catch (error) {
     logger.error('Recurring PATCH error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

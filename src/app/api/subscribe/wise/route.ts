@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });

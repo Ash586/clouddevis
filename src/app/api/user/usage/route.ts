@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { getPlanByStatus } from '@/lib/pricing';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -48,6 +50,6 @@ export async function GET() {
     });
   } catch (error) {
     logger.error('GET /api/user/usage', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    throw error;
   }
 }

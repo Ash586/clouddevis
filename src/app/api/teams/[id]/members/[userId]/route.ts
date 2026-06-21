@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
 const VALID_ROLES = ['MEMBER', 'ADMIN', 'OWNER'];
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
+export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function patchHandler(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -32,11 +34,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ member: updated });
   } catch (error) {
     logger.error('Team member PATCH error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
+export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -57,6 +60,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('Team member DELETE error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

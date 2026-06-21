@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     const rateCheck = await checkRateLimit(`reset:${ip}`, 10, 60000);
@@ -50,6 +52,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, message: 'Mot de passe réinitialisé avec succès' });
   } catch (error) {
     logger.error('Reset password error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

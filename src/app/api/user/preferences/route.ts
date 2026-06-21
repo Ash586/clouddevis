@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
@@ -12,7 +13,8 @@ function isNewFormat(fields: unknown): fields is Record<string, Record<string, s
   return keys.some(k => VALID_DOC_TYPES.includes(k));
 }
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -39,11 +41,12 @@ export async function GET() {
     return NextResponse.json({ fields: fieldPreferences });
   } catch (error) {
     logger.error('GET /api/user/preferences', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PUT(request: Request) {
+export const PUT = withApiErrorHandling(putHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function putHandler(request: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -69,6 +72,6 @@ export async function PUT(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     logger.error('PUT /api/user/preferences', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

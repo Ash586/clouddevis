@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -72,6 +74,6 @@ export async function GET() {
     });
   } catch (error) {
     logger.error('Admin commissions overview error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

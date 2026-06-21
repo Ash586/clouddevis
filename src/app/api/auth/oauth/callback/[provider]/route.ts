@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { createSession } from '@/lib/auth';
 import { logger } from '@/lib/logger';
@@ -28,7 +29,8 @@ const USER_URLS: Record<ValidProvider, { url: string; emailUrl?: string; parser:
   },
 };
 
-export async function GET(_req: Request, { params }: { params: Promise<{ provider: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ provider: string }> }) {
   const { provider: rawProvider } = await params;
 
   if (!VALID_PROVIDERS.includes(rawProvider as ValidProvider)) {

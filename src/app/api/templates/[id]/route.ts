@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -26,11 +28,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (error) {
     logger.error('GET /api/templates/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PUT(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = withApiErrorHandling(putHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function putHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -79,11 +82,12 @@ export async function PUT(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ id: updated.id, name: updated.name });
   } catch (error) {
     logger.error('PUT /api/templates/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(deleteHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
+async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -96,6 +100,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('DELETE /api/templates/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
@@ -7,7 +8,8 @@ import { hasPermission } from '@/lib/admin/permissions';
 
 const VALID_REQUEST_STATUSES = ['PENDING', 'APPROVED', 'REJECTED'];
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -25,11 +27,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json(request);
   } catch (error) {
     logger.error('Fetch enterprise request detail', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -68,6 +71,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json(updated);
   } catch (error) {
     logger.error('Update enterprise request', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur' }, { status: 500 });
+    throw error;
   }
 }

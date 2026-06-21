@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createAdminSession } from '@/lib/adminAuth';
 import { checkRateLimit } from '@/lib/rateLimit';
@@ -14,7 +15,8 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36);
 }
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const { email, password, redirect } = await req.json();
     if (!email || !password) {
@@ -99,6 +101,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, redirect: safeRedirect, admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role } });
   } catch (error) {
     logger.error('Admin login error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

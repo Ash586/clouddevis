@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { verifyWebhookSignature, parseWebhookEvent } from '@/lib/lemon-squeezy';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const body = await req.text();
     const signature = req.headers.get('x-signature') || '';
@@ -77,6 +79,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true });
   } catch (error) {
     logger.error('LS webhook error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

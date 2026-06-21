@@ -7,6 +7,9 @@ import './landing.css';
 import { I18nClientProvider } from '@/contexts/I18nClientProvider';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { PageViewTracker } from '@/components/tracking/PageViewTracker';
+import { AppErrorBoundary } from '@/components/errors/AppErrorBoundary';
+import { SentryActionRecorder } from '@/components/errors/SentryActionRecorder';
+import { SentryUserContext } from '@/components/errors/SentryUserContext';
 import { cookies } from 'next/headers';
 import { PLAUSIBLE_DOMAIN } from '@/lib/analytics';
 
@@ -54,7 +57,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </noscript>
         <ThemeProvider initialTheme={theme ?? 'dark'}>
-          <I18nClientProvider initialLocale={locale}>{children}<PageViewTracker /></I18nClientProvider>
+          <I18nClientProvider initialLocale={locale}>
+            <AppErrorBoundary>
+              {children}
+              <SentryActionRecorder />
+              <SentryUserContext />
+            </AppErrorBoundary>
+            <PageViewTracker />
+          </I18nClientProvider>
         </ThemeProvider>
         <Script defer data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.tagged-events.js" strategy="afterInteractive" />
       </body>

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getAdminSession } from '@/lib/adminAuth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
@@ -8,7 +9,8 @@ import { hasPermission } from '@/lib/admin/permissions';
 const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
 const VALID_MODES = ['ARTISAN', 'ENTREPRISE'];
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -30,11 +32,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ user: { ...user, createdAt: user.createdAt.toISOString().split('T')[0] } });
   } catch (error) {
     logger.error('Admin user detail error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -84,11 +87,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ success: true, user: { id: updated.id, subscriptionStatus: updated.subscriptionStatus } });
   } catch (error) {
     logger.error('Admin user update error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -115,6 +119,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('Admin user delete error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

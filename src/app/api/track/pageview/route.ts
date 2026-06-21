@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'api', severity: 'medium', userImpact: 'degraded' });
+async function postHandler(req: Request) {
   try {
     const body = await req.json();
     const { path, referrer, userAgent, locale, sessionId, userId } = body;
@@ -57,6 +59,6 @@ export async function POST(req: Request) {
   } catch (error) {
     // Don't log tracking errors verbosely — they're non-critical
     console.error('Page view track error:', String(error));
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    throw error;
   }
 }

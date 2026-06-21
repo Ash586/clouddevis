@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import crypto from 'crypto';
 
 const PROVIDERS: Record<string, { authUrl: string; params: Record<string, string> }> = {
@@ -37,7 +38,8 @@ function parseCookies(cookieHeader: string): Record<string, string> {
   );
 }
 
-export async function GET(_req: Request, { params }: { params: Promise<{ provider: string }> }) {
+export const GET = withApiErrorHandling(getHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function getHandler(_req: Request, { params }: { params: Promise<{ provider: string }> }) {
   const { provider } = await params;
   const config = PROVIDERS[provider];
 

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'api', severity: 'medium', userImpact: 'degraded' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ partner: null });

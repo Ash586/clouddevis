@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, createSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const body = await req.json();
     const validation = validateAuthInput(body, 'register');
@@ -94,6 +96,6 @@ export async function POST(req: Request) {
     return response;
   } catch (error) {
     logger.error('Register error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

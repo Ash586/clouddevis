@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const body = await req.json();
     const validation = validateAuthInput(body, 'login');
@@ -51,6 +53,6 @@ export async function POST(req: Request) {
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' ') : '';
     logger.error('Login error', { message: msg, stack });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { CustomSectionDef } from '@/types';
 import type { Prisma } from '@prisma/client';
 
-export async function GET() {
+export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function getHandler() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -20,11 +22,12 @@ export async function GET() {
     return NextResponse.json({ sections });
   } catch (error) {
     logger.error('GET /api/user/custom-sections', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -55,11 +58,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ section }, { status: 201 });
   } catch (error) {
     logger.error('POST /api/user/custom-sections', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function PUT(req: Request) {
+export const PUT = withApiErrorHandling(putHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function putHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -86,11 +90,12 @@ export async function PUT(req: Request) {
     return NextResponse.json({ section });
   } catch (error) {
     logger.error('PUT /api/user/custom-sections', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }
 
-export async function DELETE(req: Request) {
+export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
+async function deleteHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -117,6 +122,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('DELETE /api/user/custom-sections', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
+    throw error;
   }
 }

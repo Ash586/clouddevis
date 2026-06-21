@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { withApiErrorHandling } from '@/lib/sentry/api';
 import { getSession } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { createCheckout, PLAN_VARIANTS } from '@/lib/lemon-squeezy';
 
-export async function POST(req: Request) {
+export const POST = withApiErrorHandling(postHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+async function postHandler(req: Request) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
@@ -50,6 +52,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: checkout.attributes.url });
   } catch (error) {
     logger.error('Subscribe error', { error: String(error) });
-    return NextResponse.json({ error: 'Erreur lors de la création du paiement' }, { status: 500 });
+    throw error;
   }
 }

@@ -1,14 +1,16 @@
 import * as Sentry from '@sentry/nextjs';
+import { replayIntegration } from '@sentry/replay';
+import sentryConfig from './sentry.config';
+
+const environment = sentryConfig.getEnvironment();
 
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN,
-  environment: process.env.SENTRY_ENVIRONMENT || 'development',
-  tracesSampleRate: process.env.SENTRY_ENVIRONMENT === 'production' ? 0.1 : 1.0,
-  replaysSessionSampleRate: process.env.SENTRY_ENVIRONMENT === 'production' ? 0.1 : 0,
-  replaysOnErrorSampleRate: 1.0,
+  ...sentryConfig.getCommonOptions(),
+  replaysSessionSampleRate: environment === 'production' ? 0.1 : 1,
+  replaysOnErrorSampleRate: 1,
   integrations: [
-    Sentry.replayIntegration({
-      maskAllText: true,
+    replayIntegration({
+      maskAllText: false,
       blockAllMedia: true,
     }),
   ],
