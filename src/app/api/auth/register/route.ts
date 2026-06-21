@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
 
-    const { name, email, password, mode, sector, country, language, companyInfo, ref: bodyRef } = body;
+    const { name, email, password, mode, sector, country, language, companyInfo, referralCode: bodyRef } = body;
 
     let referralCode = bodyRef;
     if (!referralCode) {
