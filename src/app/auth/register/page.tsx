@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Hammer, Truck, Sparkles, Hotel, Wrench, Heart, BookOpen, Building, Bus, Palette, Wheat, Scale, Monitor, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
@@ -57,17 +57,22 @@ function RegisterForm() {
 
   const totalSteps = mode === 'entreprise' ? 3 : 2;
   const errorId = 'register-error';
+  const stepRef = useRef(step);
+  stepRef.current = step;
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && step < totalSteps) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      nextStep();
+      if (stepRef.current < totalSteps) {
+        nextStep();
+      } else if (!loading) {
+        handleSubmit();
+      }
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (step < totalSteps) return;
+  async function handleSubmit() {
+    if (stepRef.current < totalSteps) return;
     setError('');
     if (!name.trim() || !email.trim() || !password) { setError('Veuillez remplir tous les champs'); return; }
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { setError('Email invalide'); return; }
@@ -165,7 +170,7 @@ function RegisterForm() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col gap-3">
+        <form onKeyDown={handleKeyDown} className="flex flex-col gap-3">
           {/* Step 1: Compte */}
           {step === 1 && (
             <>
@@ -286,7 +291,7 @@ function RegisterForm() {
                 Suivant <ChevronRight size={16} aria-hidden="true" />
               </button>
             ) : (
-              <button type="submit" disabled={loading}
+              <button type="button" disabled={loading} onClick={handleSubmit}
                 className="flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-bold border border-[rgba(245,237,214,0.08)] cursor-pointer bg-[var(--navy-3)] text-[var(--sand)] transition hover:bg-[var(--navy-4)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
