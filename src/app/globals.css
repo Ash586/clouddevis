@@ -120,6 +120,7 @@
   --cd-success: 16 185 129;
   --cd-warning: 245 158 11;
   --cd-danger: 239 68 68;
+  --cd-info: 74 158 255;
   --cd-radius: var(--radius-lg);
   --cd-radius-lg: var(--radius-xl);
 }
@@ -162,6 +163,7 @@
   --cd-success: 20 185 129;
   --cd-warning: 245 158 11;
   --cd-danger: 232 84 46;
+  --cd-info: 74 158 255;
   --cd-radius: var(--radius-lg);
   --cd-radius-lg: var(--radius-xl);
 }

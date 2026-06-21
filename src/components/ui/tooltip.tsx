@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useId, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TooltipProps {
@@ -11,15 +11,32 @@ interface TooltipProps {
 
 export function Tooltip({ children, content, side = 'top' }: TooltipProps) {
   const [show, setShow] = useState(false);
+  const tipId = useRef(`tooltip-${Math.random().toString(36).slice(2, 8)}`).current;
+  const childRef = useRef<HTMLDivElement>(null);
+
+  const showTooltip = () => setShow(true);
+  const hideTooltip = () => setShow(false);
 
   return (
-    <div className="relative inline-flex" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-      {children}
+    <div
+      className="relative inline-flex"
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onFocus={showTooltip}
+      onBlur={hideTooltip}
+    >
+      <div ref={childRef} aria-describedby={show ? tipId : undefined}>
+        {children}
+      </div>
       {show && (
-        <div className={cn(
-          'absolute z-50 px-2 py-1 text-[10px] font-medium text-[var(--sand)] bg-[var(--navy-4)] rounded-lg shadow-sm whitespace-nowrap pointer-events-none animate-fade-in',
-          side === 'top' ? 'bottom-full mb-1.5 left-1/2 -translate-x-1/2' : 'top-full mt-1.5 left-1/2 -translate-x-1/2',
-        )}>
+        <div
+          id={tipId}
+          role="tooltip"
+          className={cn(
+            'absolute z-50 px-2 py-1 text-[10px] font-medium text-[var(--sand)] bg-[var(--navy-4)] rounded-lg shadow-sm whitespace-nowrap pointer-events-none animate-fade-in',
+            side === 'top' ? 'bottom-full mb-1.5 left-1/2 -translate-x-1/2' : 'top-full mt-1.5 left-1/2 -translate-x-1/2',
+          )}
+        >
           {content}
         </div>
       )}

@@ -74,24 +74,27 @@ function LoginForm() {
         </div>
 
         {(error || oauthError) && (
-          <div className={`text-[13px] rounded-lg py-2.5 px-3.5 text-center font-semibold mb-4 ${oauthError ? 'bg-[rgba(251,191,36,0.10)] text-[#fbbf24]' : 'bg-[rgba(248,113,113,0.10)] text-[#f87171]'}`}>
+          <div role="alert" className={`text-[13px] rounded-lg py-2.5 px-3.5 text-center font-semibold mb-4 ${oauthError ? 'bg-[rgba(251,191,36,0.10)] text-[#fbbf24]' : 'bg-[rgba(248,113,113,0.10)] text-[#f87171]'}`}>
             {oauthError || error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           <div>
-            <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required
-              className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+            <label htmlFor="login-email" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Email</label>
+            <input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required autoComplete="email"
+              aria-invalid={error ? 'true' : undefined}
+              className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
+            <label htmlFor="login-password" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
             <div className="relative">
-              <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6}
-                className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus:ring-2 focus:ring-[var(--green-2)]" />
+              <input id="login-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="current-password"
+                aria-invalid={error ? 'true' : undefined}
+                className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               <button type="button" onClick={() => setShowPw(!showPw)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[var(--sand-muted)] hover:text-[var(--sand)] p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center transition">
+                aria-label={showPw ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[var(--sand-muted)] hover:text-[var(--sand)] p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center transition rounded-xl hover:bg-[var(--navy-4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-glow)]">
                 {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
@@ -111,7 +114,7 @@ function LoginForm() {
           <div className="flex gap-2.5 items-center">
             <button type="button" onClick={() => setTheme(isDark ? 'light' : 'dark')}
               className={`w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition ${toggleBtnClass}`}
-              title={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
+              aria-label={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
               {isDark ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
