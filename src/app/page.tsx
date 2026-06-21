@@ -4,12 +4,12 @@ import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
 import { ThemeHint } from '@/components/layout/ThemeHint';
 
 const FAQ_ITEMS = [
-  { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui. CloudDevis l\u2019applique automatiquement aux factures concernées à partir de 10 000 DA, selon les règles configurées dans l\u2019application. Les devis restent exclus du calcul." },
-  { q: 'Puis-je essayer CloudDevis gratuitement ?', a: "Oui. Vous pouvez créer un compte gratuit et générer vos premiers documents avec les limites incluses dans la formule gratuite." },
-  { q: 'Mes données sont-elles sécurisées ?', a: "Vos sessions utilisent des cookies sécurisés et les communications passent par HTTPS en production. Les données de compte et documents sont associées à votre espace utilisateur." },
-  { q: 'CloudDevis fonctionne-t-il sur mobile ?', a: "Oui, CloudDevis est entièrement responsive. Vous pouvez créer des devis depuis votre smartphone ou tablette, directement depuis un navigateur — sans installation requise." },
-  { q: 'Comment fonctionne la TVA sur les documents ?', a: "CloudDevis calcule la TVA selon le taux sélectionné et affiche les totaux en temps réel pour limiter les erreurs de saisie." },
-  { q: "Comment payer l\u2019abonnement Pro en Algérie ?", a: "Les moyens de paiement disponibles dépendent de la configuration active du compte et des options proposées au moment de la souscription." },
+   { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
+   { q: 'Puis-je essayer CloudDevis gratuitement ?', a: "Oui : avec le plan gratuit vous pouvez créer jusqu’à 5 documents par mois, suffit pour tester." },
+   { q: 'Mes données sont-elles sécurisées ?', a: "Vos données sont protégées par un chiffrement HTTPS et stockées dans votre compte privé – aucun accès tiers." },
+   { q: 'CloudDevis fonctionne-t-il sur mobile ?', a: "Oui : le site s’adapte à tous les écrans, vous pouvez créer ou consulter vos documents où que vous soyez, sans installer d’application." },
+   { q: 'Comment fonctionne la TVA sur les documents ?', a: "La TVA (9 % ou 19 %) est recalculée à chaque ligne ; vous voyez immédiatement le total HT et TTC, fini les erreurs de calcul." },
+   { q: 'Comment payer l’abonnement Pro en Algérie ?', a: "Vous pouvez payer par carte bancaire, virement bancaire ou via les portefeuilles locaux disponibles lors de la souscription ; les options exactes s’affichent dans la page de paiement." },
 ];
 
 export default function HomePage() {
@@ -32,10 +32,10 @@ export default function HomePage() {
                   <li><a href="#pricing">Tarifs</a></li>
                   <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <div className="nav-cta">
-                  <Link href="/auth/login" className="btn btn-ghost">Se connecter</Link>
-                  <Link href="/auth/register" className="btn btn-primary">Essai gratuit →</Link>
-                </div>
+                 <div className="nav-cta">
+                   <Link href="/auth/login" className="btn btn-ghost">Se connecter à mon tableau de bord</Link>
+                   <Link href="/auth/register" className="btn btn-primary">Commencer gratuitement</Link>
+                 </div>
               </div>
             </div>
           </nav>
@@ -52,18 +52,17 @@ export default function HomePage() {
                     </span>
                     <span className="badge badge-gold">Gratuit pour démarrer</span>
                   </div>
-                  <h1 className="hero-title">
-                    Vos devis &amp; factures<br />
-                    <em>conformes en 2 minutes</em>
-                  </h1>
-                  <p className="hero-sub">
-                    Une plateforme algérienne pensée pour NIF, RC, TVA 9%/19% et Timbre Fiscal sur les factures concernées. Moins d&apos;erreurs, moins de retards.
-                  </p>
-                  <div className="hero-ctas">
-                    <Link href="/auth/register" className="btn btn-primary btn-lg">
-                      Créer mon premier devis →
-                    </Link>
-                  </div>
+                   <h1 className="hero-title">
+                     Vos devis & factures conformes en 2 minutes – zéro erreur, zéro stress
+                   </h1>
+                   <p className="hero-sub">
+                     Arrêtez de perdre du temps et de l’argent à cause de devis non conformes : CloudDevis vérifie NIF, RC, TVA et Timbre Fiscal pour vous, dès la première saisie.
+                   </p>
+                   <div className="hero-ctas">
+                     <Link href="/auth/register" className="btn btn-primary btn-lg">
+                       Créer mon devis conforme maintenant
+                     </Link>
+                   </div>
                   {/* Trust items — horizontal scroll chips on mobile */}
                   <div className="hero-trust-mobile">
                     <div className="trust-item">
@@ -183,13 +182,13 @@ export default function HomePage() {
             <div className="container">
               <div className="compliance-grid">
                 <div className="compliance-fields">
-                  {[
-                    { icon: '🪪', name: 'NIF', desc: "Numéro d\u2019Identification Fiscale — validé" },
-                    { icon: '📋', name: 'RC', desc: 'Registre du Commerce — format vérifié' },
-                    { icon: '🔢', name: 'NIS / AI', desc: "Numéro d\u2019Identification Statistique" },
-                    { icon: '💹', name: 'TVA 9% / 19%', desc: "Calcul automatique selon l\u2019activité" },
-                    { icon: '🪙', name: 'Timbre Fiscal', desc: "Ajouté automatiquement au total — conforme à l\u2019article 220 du CII", span: true },
-                  ].map((f, i) => (
+                   {[
+                     { icon: '🪪', name: 'NIF', desc: "NIF – vérifié automatiquement pour éviter les amendes de 50 000 DA à 500 000 DA." },
+                     { icon: '📋', name: 'RC', desc: "RC – contrôle du format pour empêcher les rejets du registre." },
+                     { icon: '🔢', name: 'NIS / AI', desc: "Numéro d\u2019Identification Statistique" },
+                     { icon: '💹', name: 'TVA 9%/19%', desc: "TVA 9 %/19 % – calculée en temps réel, vous ne payez jamais trop ou trop peu." },
+                     { icon: '🪙', name: 'Timbre Fiscal', desc: "Timbre Fiscal ajouté automatiquement – évitez les redressements de 50 000 DA à 500 000 DA sur chaque facture ≥ 10 000 DA.", span: true },
+                   ].map((f, i) => (
                     <div key={i} className="field-tag animate-on-scroll" style={f.span ? { gridColumn: 'span 2' } : {}}>
                       <div className="field-icon">{f.icon}</div>
                       <div>
@@ -225,7 +224,7 @@ export default function HomePage() {
               <div className="bento-grid">
                 <div className="bento-card bento-span3 bento-big animate-on-scroll">
                   <div className="card-icon icon-green">📄</div>
-                  <div className="card-title">5 types de documents en un clic</div>
+                   <div className="card-title">Créez devis, factures, proforma, BC ou BR en un seul clic – plus besoin de changer d’outil</div>
                   <div className="card-desc">Devis, Proforma, Bon de Commande, Bon de Réception, Facture. Chaque type avec ses champs spécifiques pré-remplis selon la loi algérienne.</div>
                   <div className="doc-types-row">
                     {['📝 Devis', '📊 Proforma', '🛒 Bon de Commande', '📦 Bon de Réception', '🧾 Facture'].map(d => (
@@ -235,7 +234,7 @@ export default function HomePage() {
                 </div>
                 <div className="bento-card bento-span3 animate-on-scroll">
                   <div className="card-icon icon-gold">⚡</div>
-                  <div className="card-title">Généré en moins de 30 secondes</div>
+                   <div className="card-title">Obtenez votre PDF prêt à envoyer en moins de 30 secondes – facturez vos clients plus vite</div>
                   <div className="card-desc">Saisissez vos articles, prévisualisez en temps réel, téléchargez le PDF. Le tout sans compte requis pour démarrer.</div>
                   <div className="speed-bar">
                     {[{ label: 'Saisie', pct: 95 }, { label: 'Calcul TVA', pct: 100 }, { label: 'Export PDF', pct: 88 }].map(s => (
@@ -248,7 +247,7 @@ export default function HomePage() {
                 </div>
                 <div className="bento-card bento-span2 animate-on-scroll">
                   <div className="card-icon icon-teal">👁️</div>
-                  <div className="card-title">Prévisualisation en direct</div>
+                   <div className="card-title">Voyez exactement ce qui sera imprimé pendant que vous saisissez – fini les surprises à l’impression</div>
                   <div className="card-desc">Voyez votre document se construire en temps réel pendant la saisie. Ce que vous voyez est exactement ce qui est imprimé.</div>
                   <div className="mini-preview">
                     <span className="label">TVA calculée →</span>
@@ -257,7 +256,7 @@ export default function HomePage() {
                 </div>
                 <div className="bento-card bento-span2 animate-on-scroll">
                   <div className="card-icon icon-purple">🌍</div>
-                  <div className="card-title">Trilingue : FR · AR · EN</div>
+                   <div className="card-title">Éditez vos documents en français, arabe ou anglais – choisissez la langue de votre client sans copier‑coller</div>
                   <div className="card-desc">Générez vos documents en français, arabe avec support RTL complet, ou en anglais pour vos clients internationaux.</div>
                   <div className="doc-types-row">
                     <span className="doc-type-pill">🇫🇷 Français</span>
@@ -267,7 +266,7 @@ export default function HomePage() {
                 </div>
                 <div className="bento-card bento-span2 animate-on-scroll">
                   <div className="card-icon icon-blue">📍</div>
-                  <div className="card-title">4 pays pris en charge</div>
+                   <div className="card-title">Facturez conformément aux règles de l’Algérie, Tunisie, Maroc et France – idéal si vous travaillez à l’international</div>
                   <div className="card-desc">Algérie, Tunisie, Maroc, France. Chaque pays avec ses propres règles fiscales appliquées automatiquement.</div>
                   <div className="doc-types-row">
                     <span className="doc-type-pill">🇩🇿 Algérie</span>
@@ -447,14 +446,14 @@ export default function HomePage() {
                   <ul>
                     <li><a href="#features">Fonctionnalités</a></li>
                     <li><a href="#pricing">Tarifs</a></li>
-                    <li><Link href="/auth/register">Démo</Link></li>
+                     <li><Link href="/auth/register">Voir une démo en direct</Link></li>
                   </ul>
                 </div>
                 <div className="footer-col">
                   <h5>Aide</h5>
                   <ul>
                     <li><a href="#faq">FAQ</a></li>
-                    <li><Link href="/enterprise">Nous contacter</Link></li>
+                     <li><Link href="/enterprise">Nous contacter par email ou téléphone</Link></li>
                     <li><Link href="/partners">Programme Partenaire</Link></li>
                   </ul>
                 </div>

@@ -864,9 +864,9 @@ function EditorContent() {
               {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
               <span className="hidden sm:inline">{tc('save')}</span>
             </Button>
-            <Button size="sm" onClick={handleDownload} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
-              <Download size={12} />
-              <span className="hidden sm:inline">PDF</span>
+             <Button size="sm" onClick={handleDownload} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
+               <Download size={12} />
+               <span className="hidden sm:inline">{te('downloadPdf')}</span>
             </Button>
           </div>
         </div>
@@ -879,9 +879,9 @@ function EditorContent() {
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>{tc('save')}</span>
             </button>
-            <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97] disabled:opacity-50">
-              <Download size={14} />
-              <span>PDF</span>
+             <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97] disabled:opacity-50">
+               <Download size={14} />
+               <span>{te('downloadPdf')}</span>
             </button>
             <button onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97]">
               <MoreHorizontal size={18} />
