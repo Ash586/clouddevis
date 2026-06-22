@@ -313,7 +313,95 @@ export const CATEGORY_OPTIONS: { value: string; labelKey: string }[] = [
   { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
   { value: 'transport', labelKey: 'preview.categories.transport' },
   { value: 'divers', labelKey: 'preview.categories.divers' },
+  { value: 'services', labelKey: 'preview.categories.services' },
 ];
+
+export const DOC_TYPE_CATEGORIES: Record<DocumentType, { value: string; labelKey: string }[]> = {
+  devis: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'preparation', labelKey: 'preview.categories.preparation' },
+    { value: 'peinture', labelKey: 'preview.categories.peinture' },
+    { value: 'finition', labelKey: 'preview.categories.finition' },
+    { value: 'revetement', labelKey: 'preview.categories.revetement' },
+    { value: 'facade', labelKey: 'preview.categories.facade' },
+    { value: 'enduit', labelKey: 'preview.categories.enduit' },
+    { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'transport', labelKey: 'preview.categories.transport' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  facture: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'prestation', labelKey: 'preview.categories.services' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+    { value: 'transport', labelKey: 'preview.categories.transport' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  proforma: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'prestation', labelKey: 'preview.categories.services' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+    { value: 'transport', labelKey: 'preview.categories.transport' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  bc: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'equipement', labelKey: 'preview.categories.equipement' },
+    { value: 'outillage', labelKey: 'preview.categories.outillage' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  br: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'equipement', labelKey: 'preview.categories.equipement' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  intervention: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'diagnostic', labelKey: 'preview.categories.diagnostic' },
+    { value: 'reparation', labelKey: 'preview.categories.reparation' },
+    { value: 'pieces', labelKey: 'preview.categories.pieces' },
+    { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+    { value: 'transport', labelKey: 'preview.categories.transport' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+  attachement: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'preparation', labelKey: 'preview.categories.preparation' },
+    { value: 'peinture', labelKey: 'preview.categories.peinture' },
+    { value: 'finition', labelKey: 'preview.categories.finition' },
+    { value: 'revetement', labelKey: 'preview.categories.revetement' },
+    { value: 'facade', labelKey: 'preview.categories.facade' },
+    { value: 'enduit', labelKey: 'preview.categories.enduit' },
+    { value: 'main_oeuvre', labelKey: 'preview.categories.main_oeuvre' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'transport', labelKey: 'preview.categories.transport' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
+};
+
+export const DOC_TYPE_SECTION_ORDER: Record<DocumentType, string[]> = {
+  devis: ['design', 'general', 'devis', 'client', 'chantier', 'materiaux', 'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature'],
+  facture: ['design', 'general', 'client', 'prestations', 'remise', 'garanties', 'paiement', 'notes'],
+  proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
+  bc: ['design', 'general', 'client', 'prestations', 'notes'],
+  br: ['design', 'general', 'client', 'materiaux', 'notes'],
+  intervention: ['design', 'general', 'client', 'chantier', 'prestations', 'garanties', 'paiement', 'notes'],
+  attachement: ['design', 'general', 'client', 'chantier', 'materiaux', 'prestations', 'notes', 'signature'],
+};
+
+export const DOC_TYPE_SECTIONS: Record<DocumentType, string[]> = {
+  devis: ['design', 'general', 'devis', 'client', 'chantier', 'materiaux', 'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature'],
+  facture: ['design', 'general', 'client', 'prestations', 'remise', 'garanties', 'paiement', 'notes'],
+  proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
+  bc: ['design', 'general', 'client', 'prestations', 'notes'],
+  br: ['design', 'general', 'client', 'materiaux', 'notes'],
+  intervention: ['design', 'general', 'client', 'chantier', 'prestations', 'garanties', 'paiement', 'notes'],
+  attachement: ['design', 'general', 'client', 'chantier', 'materiaux', 'prestations', 'notes', 'signature'],
+};
 
 export const BLOCK_LABELS: Record<BlockId, string> = {
   header: 'Header',

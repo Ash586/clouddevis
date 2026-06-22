@@ -20,17 +20,18 @@ export function loadDraft(mode: UserMode, initialType?: DocumentType): DocumentS
         sectionOrder: parsed.sectionOrder ?? [...DEFAULT_SECTION_ORDER],
         hiddenBlocks: ['signature', ...(parsed.hiddenBlocks ?? []).filter((b: string) => b !== 'signature')],
       };
-      if (parsed.companyInfo && defaults.companyInfo) {
-        merged.companyInfo = { ...defaults.companyInfo, ...parsed.companyInfo };
-        if (parsed.companyInfo.taxIds) {
-          merged.companyInfo.taxIds = { ...defaults.companyInfo.taxIds, ...parsed.companyInfo.taxIds };
+        if (parsed.companyInfo && defaults.companyInfo) {
+          merged.companyInfo = { ...defaults.companyInfo, ...parsed.companyInfo };
+          if (parsed.companyInfo.taxIds) {
+            merged.companyInfo.taxIds = { ...defaults.companyInfo.taxIds, ...parsed.companyInfo.taxIds };
+          }
         }
-      }
-      if (parsed.stampDuty) merged.stampDuty = { ...defaults.stampDuty, ...parsed.stampDuty };
-      if (parsed.paymentDetails) merged.paymentDetails = { ...defaults.paymentDetails, ...parsed.paymentDetails };
-      if (parsed.discount) merged.discount = { ...defaults.discount, ...parsed.discount };
-      if (parsed.customFields) merged.customFields = { ...parsed.customFields };
-      return merged;
+        if (parsed.stampDuty) merged.stampDuty = { ...defaults.stampDuty, ...parsed.stampDuty };
+        if (parsed.paymentDetails) merged.paymentDetails = { ...defaults.paymentDetails, ...parsed.paymentDetails };
+        if (parsed.discount) merged.discount = { ...defaults.discount, ...parsed.discount };
+        if (parsed.customFields) merged.customFields = { ...parsed.customFields };
+        if (initialType) merged.documentType = initialType;
+        return merged;
     }
   } catch {}
   return createEmptyDoc(mode, initialType);

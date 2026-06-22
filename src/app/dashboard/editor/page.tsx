@@ -15,7 +15,7 @@ import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
-import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS } from '@/types';
+import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_CATEGORIES, DOC_TYPE_SECTIONS, DOC_TYPE_SECTION_ORDER } from '@/types';
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
@@ -97,23 +97,26 @@ function EditorContent() {
   const [showCatalog, setShowCatalog] = useState(false);
   const [catalogItems, setCatalogItems] = useState<LineItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
-  const ALL_SECTIONS: string[] = [...DEFAULT_SECTION_ORDER, ...customSections.map(s => s.id)];
-
   // Left rail navigation config
-  const sectionNavItems = useMemo(() => [
-    { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
-    { id: 'client' as SectionId, icon: User, label: te('sections.client').replace(/^\d+\.\s*/, '') },
-    { id: 'general' as SectionId, icon: FileText, label: te('sections.general').replace(/^\d+\.\s*/, '') },
-    ...(doc.documentType === 'devis' ? [{ id: 'devis' as SectionId, icon: FileText, label: 'Devis' }] : []),
-    { id: 'design' as SectionId, icon: Palette, label: te('sections.design') },
-    { id: 'paiement' as SectionId, icon: CreditCard, label: te('sections.paiement').replace(/^\d+\.\s*/, '') },
-    { id: 'chantier' as SectionId, icon: MapPin, label: te('sections.chantier').replace(/^\d+\.\s*/, '') },
-    { id: 'materiaux' as SectionId, icon: Package, label: te('sections.materiaux').replace(/^\d+\.\s*/, '') },
-    { id: 'remise' as SectionId, icon: Percent, label: te('sections.remise').replace(/^\d+\.\s*/, '') },
-    { id: 'garanties' as SectionId, icon: Shield, label: te('sections.garanties').replace(/^\d+\.\s*/, '') },
-    { id: 'notes' as SectionId, icon: StickyNote, label: te('sections.notes') },
-    ...customSections.map(cs => ({ id: cs.id as SectionId, icon: FileText, label: cs.label })),
-  ], [te, customSections, doc.documentType]);
+  const relevantSections = DOC_TYPE_SECTIONS[doc.documentType] ?? DEFAULT_SECTION_ORDER;
+  const ALL_SECTIONS: string[] = [...relevantSections, ...customSections.map(s => s.id).filter(id => !relevantSections.includes(id))];
+  const sectionNavItems = useMemo(() => {
+    const allItems = [
+      { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
+      { id: 'client' as SectionId, icon: User, label: te('sections.client').replace(/^\d+\.\s*/, '') },
+      { id: 'general' as SectionId, icon: FileText, label: te('sections.general').replace(/^\d+\.\s*/, '') },
+      ...(doc.documentType === 'devis' ? [{ id: 'devis' as SectionId, icon: FileText, label: 'Devis' }] : []),
+      { id: 'design' as SectionId, icon: Palette, label: te('sections.design') },
+      { id: 'paiement' as SectionId, icon: CreditCard, label: te('sections.paiement').replace(/^\d+\.\s*/, '') },
+      { id: 'chantier' as SectionId, icon: MapPin, label: te('sections.chantier').replace(/^\d+\.\s*/, '') },
+      { id: 'materiaux' as SectionId, icon: Package, label: te('sections.materiaux').replace(/^\d+\.\s*/, '') },
+      { id: 'remise' as SectionId, icon: Percent, label: te('sections.remise').replace(/^\d+\.\s*/, '') },
+      { id: 'garanties' as SectionId, icon: Shield, label: te('sections.garanties').replace(/^\d+\.\s*/, '') },
+      { id: 'notes' as SectionId, icon: StickyNote, label: te('sections.notes') },
+      ...customSections.map(cs => ({ id: cs.id as SectionId, icon: FileText, label: cs.label })),
+    ];
+    return allItems.filter(item => relevantSections.includes(item.id));
+  }, [te, customSections, doc.documentType, relevantSections]);
 
   // Map section → preview focus area
   const sectionFocusMap: Record<string, PreviewFocus> = {
@@ -618,8 +621,7 @@ function EditorContent() {
                 <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.category')}</label>
                 <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
-                  <option value="">{te('prestations.noCategory')}</option>
-                  {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
+                  {(DOC_TYPE_CATEGORIES[doc.documentType] ?? CATEGORY_OPTIONS).map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
             </div>
             <div className="flex gap-1.5">
               <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="flex-1 sm:flex-none bg-green-600 text-white text-[11px] font-bold px-4 py-2 min-h-[44px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"><Plus size={14} /><span>Ajouter</span></button>
@@ -938,17 +940,21 @@ function EditorContent() {
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
               {showSectionNav ? renderSection(activeSection) : (
                 <>
-                  {DEFAULT_SECTION_ORDER.filter(s => {
+                  {relevantSections.filter(s => {
+                    if (s === 'design' || s === 'signature') return true;
                     const sectionFields = SECTION_FIELDS[s];
-                    if (!sectionFields) return false;
+                    if (!sectionFields) return customSections.some(cs => cs.id === s);
                     return sectionFields.some(f => !hiddenFields.has(f));
                   }).map(s => (
                     <div key={s} className="scroll-mt-16">{renderSection(s)}</div>
                   ))}
                   {customSections.map(cs => {
-                    const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
-                    if (!hasVisible) return null;
-                    return <div key={cs.id} className="scroll-mt-16">{renderSection(cs.id)}</div>;
+                    if (relevantSections.includes(cs.id)) {
+                      const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
+                      if (!hasVisible) return null;
+                      return <div key={cs.id} className="scroll-mt-16">{renderSection(cs.id)}</div>;
+                    }
+                    return null;
                   })}
                 </>
               )}
@@ -1098,6 +1104,7 @@ function EditorContent() {
                       label: 'Document',
                       color: 'bg-slate-100 text-slate-700 border-slate-200',
                       fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef'],
+                      section: 'general',
                     },
                     {
                       id: 'company',
@@ -1105,6 +1112,7 @@ function EditorContent() {
                       label: 'Entreprise',
                       color: 'bg-blue-50 text-blue-700 border-blue-100',
                       fields: ['businessMode', 'logo', 'logoPosition'],
+                      section: 'mode',
                     },
                     {
                       id: 'clientSection',
@@ -1112,6 +1120,16 @@ function EditorContent() {
                       label: 'Client',
                       color: 'bg-emerald-50 text-emerald-700 border-emerald-100',
                       fields: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+                      section: 'client',
+                    },
+                    {
+                      id: 'devisInfo',
+                      icon: <FileText size={16} />,
+                      label: 'Informations Devis',
+                      color: 'bg-sky-50 text-sky-700 border-sky-100',
+                      fields: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
+                      section: 'devis',
+                      onlyFor: ['devis'] as DocumentType[],
                     },
                     {
                       id: 'chantier',
@@ -1119,6 +1137,7 @@ function EditorContent() {
                       label: 'Chantier',
                       color: 'bg-amber-50 text-amber-700 border-amber-100',
                       fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
+                      section: 'chantier',
                     },
                     {
                       id: 'materiaux',
@@ -1126,6 +1145,7 @@ function EditorContent() {
                       label: 'Matériaux',
                       color: 'bg-orange-50 text-orange-700 border-orange-100',
                       fields: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+                      section: 'materiaux',
                     },
                     {
                       id: 'prestations',
@@ -1133,6 +1153,7 @@ function EditorContent() {
                       label: 'Prestations',
                       color: 'bg-cyan-50 text-cyan-700 border-cyan-100',
                       fields: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
+                      section: 'prestations',
                     },
                     {
                       id: 'remise',
@@ -1140,6 +1161,7 @@ function EditorContent() {
                       label: 'Remise',
                       color: 'bg-rose-50 text-rose-700 border-rose-100',
                       fields: ['remiseType', 'remiseValue', 'remiseReason'],
+                      section: 'remise',
                     },
                     {
                       id: 'garanties',
@@ -1147,6 +1169,7 @@ function EditorContent() {
                       label: 'Garanties',
                       color: 'bg-teal-50 text-teal-700 border-teal-100',
                       fields: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
+                      section: 'garanties',
                     },
                     {
                       id: 'fiscalite',
@@ -1154,6 +1177,7 @@ function EditorContent() {
                       label: 'Fiscalité',
                       color: 'bg-red-50 text-red-700 border-red-100',
                       fields: ['vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+                      section: 'general',
                     },
                     {
                       id: 'paiement',
@@ -1161,6 +1185,7 @@ function EditorContent() {
                       label: 'Paiement',
                       color: 'bg-violet-50 text-violet-700 border-violet-100',
                       fields: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+                      section: 'paiement',
                     },
                     {
                       id: 'notes',
@@ -1168,6 +1193,7 @@ function EditorContent() {
                       label: 'Notes',
                       color: 'bg-gray-50 text-gray-700 border-gray-100',
                       fields: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+                      section: 'notes',
                     },
                     {
                       id: 'signature',
@@ -1175,8 +1201,12 @@ function EditorContent() {
                       label: te('sections.signature') || 'Signature',
                       color: 'bg-indigo-50 text-indigo-700 border-indigo-100',
                       fields: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
+                      section: 'signature',
                     },
-                  ] as const).map(group => {
+                  ] as const).filter(group => {
+                    const relevantSections = DOC_TYPE_SECTIONS[doc.documentType] ?? DEFAULT_SECTION_ORDER;
+                    return relevantSections.includes(group.section);
+                  }).map(group => {
                     const visibleCount = group.fields.filter(f => !hiddenFields.has(f)).length;
                     return (
                       <details key={group.id} className="group rounded-xl border border-slate-200 overflow-hidden">
