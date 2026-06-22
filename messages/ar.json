@@ -353,6 +353,11 @@
     "customSections": "أقسامي",
     "showSectionNav": "متنقل الأقسام",
     "lineTotal": "مجموع السطر",
+    "previewChecks": {
+      "client": "العميل",
+      "items": "المقالات",
+      "date": "التاريخ"
+    },
     "fields": {
       "logo": "الشعار",
       "logoPosition": "موضع الشعار",

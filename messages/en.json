@@ -353,6 +353,11 @@
     "customSections": "My sections",
     "showSectionNav": "Section navigator",
     "lineTotal": "Line total",
+    "previewChecks": {
+      "client": "Client",
+      "items": "Items",
+      "date": "Date"
+    },
     "fields": {
       "logo": "Logo",
       "logoPosition": "Logo position",

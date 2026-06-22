@@ -85,6 +85,7 @@ function EditorContent() {
   const [previewFocus, setPreviewFocus] = useState<PreviewFocus>(null);
   const [mobileTab, setMobileTab] = useState<'editor' | 'preview' | 'totals'>('editor');
   const [showGrid, setShowGrid] = useState(false);
+  const [showReadyChecks, setShowReadyChecks] = useState(false);
   const [showSectionNav, setShowSectionNav] = useState(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
@@ -144,10 +145,10 @@ function EditorContent() {
 
   const computedScale = previewZoom === 'fit' ? fitScale : previewZoom;
   const previewReadyChecks = useMemo(() => [
-    { label: 'Client', done: Boolean(doc.clientInfo.name?.trim()) },
-    { label: 'Articles', done: doc.items.length > 0 },
-    { label: 'Date', done: Boolean(doc.date) },
-  ], [doc.clientInfo.name, doc.items.length, doc.date]);
+    { label: tp('previewChecks.client') || 'Client', done: Boolean(doc.clientInfo.name?.trim()), section: 'client' as SectionId },
+    { label: tp('previewChecks.items') || 'Articles', done: doc.items.length > 0, section: 'prestations' as SectionId },
+    { label: tp('previewChecks.date') || 'Date', done: Boolean(doc.date), section: 'general' as SectionId },
+  ], [doc.clientInfo.name, doc.items.length, doc.date, tp]);
   const completedPreviewChecks = previewReadyChecks.filter(check => check.done).length;
 
   useEffect(() => {
@@ -1032,13 +1033,31 @@ function EditorContent() {
                 <div className="flex items-center gap-2">
                   <h2 className="truncate text-xs font-black uppercase tracking-wide text-[var(--sand)]">{te('previewTitle') || 'Aperçu'}</h2>
                   <span className="rounded-md bg-[var(--navy-4)] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--sand-muted)]">A4</span>
-                  <span className={cn(
-                    'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold',
-                    completedPreviewChecks === 3 ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300',
-                  )}>
-                    {completedPreviewChecks === 3 ? <Check size={10} /> : <AlertTriangle size={10} />}
-                    {completedPreviewChecks}/3 {te('ready') || 'prêt'}
-                  </span>
+                  <div className="relative">
+                    <button onClick={() => setShowReadyChecks(v => !v)} className={cn(
+                      'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold cursor-pointer transition hover:brightness-110',
+                      completedPreviewChecks === 3 ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300',
+                    )}>
+                      {completedPreviewChecks === 3 ? <Check size={10} /> : <AlertTriangle size={10} />}
+                      {completedPreviewChecks}/3 {te('ready') || 'prêt'}
+                    </button>
+                    {showReadyChecks && (
+                      <>
+                        <div className="fixed inset-0 z-[99]" onClick={() => setShowReadyChecks(false)} />
+                        <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-2 z-[100] min-w-[200px]">
+                          <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(245,237,214,0.06)]">{te('validationState') || 'État de validation'}</div>
+                          {previewReadyChecks.map((check, i) => (
+                            <button key={i} onClick={() => { setActiveSection(check.section); setMobileTab('editor'); setShowReadyChecks(false); }}
+                              className={cn('w-full flex items-center gap-2 px-2 py-2 rounded-lg text-[11px] font-medium transition text-left', check.done ? 'text-[var(--green-3)]' : 'text-amber-400 hover:bg-[var(--navy-4)]')}>
+                              {check.done ? <Check size={12} className="shrink-0" /> : <AlertTriangle size={12} className="shrink-0" />}
+                              <span className="flex-1">{check.label}</span>
+                              {!check.done && <ChevronRight size={11} className="shrink-0 opacity-50" />}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <p className="truncate text-[11px] text-[var(--sand-muted)]">
                   {doc.items.length} ligne{doc.items.length !== 1 ? 's' : ''} · {formatCurrency(results.netAPayer, tc('currency'))}
