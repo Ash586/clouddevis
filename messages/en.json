@@ -260,6 +260,7 @@
     "tableStatus": "Status",
     "trialDaysLeft": "{count} trial days remaining",
     "trialUpgradeHint": "Upgrade to a plan to unlock all features.",
+    "trialUrgent": "Your access expires soon! Upgrade to a paid plan.",
     "upgrade": "See plans",
     "created": "created",
     "untitledDoc": "Untitled document",

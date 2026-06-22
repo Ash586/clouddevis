@@ -147,24 +147,27 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       </div>
 
       {/* ── Trial Banner ── */}
-      {stats.trialDaysRemaining > 0 && (
-        <Card className="p-4 mb-6 border-[rgba(212,168,67,0.2)] bg-gradient-to-r from-[rgba(212,168,67,0.06)] to-transparent">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[rgba(212,168,67,0.1)] flex items-center justify-center shrink-0">
-              <Clock size={20} className="text-[var(--gold)]" />
+      {stats.trialDaysRemaining > 0 && (() => {
+        const urgent = stats.trialDaysRemaining <= 2;
+        return (
+          <Card className={`p-4 mb-6 border ${urgent ? 'border-red-400/30 bg-gradient-to-r from-[rgba(239,68,68,0.08)] to-transparent' : 'border-[rgba(212,168,67,0.2)] bg-gradient-to-r from-[rgba(212,168,67,0.06)] to-transparent'}`}>
+            <div className="flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${urgent ? 'bg-red-400/10 animate-pulse' : 'bg-[rgba(212,168,67,0.1)]'}`}>
+                <Clock size={20} className={urgent ? 'text-red-400' : 'text-[var(--gold)]'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-bold ${urgent ? 'text-red-400' : 'text-[var(--sand)]'}`}>
+                  {t('trialDaysLeft', { count: stats.trialDaysRemaining })}
+                </p>
+                <p className="text-xs text-[var(--sand-muted)]">{urgent ? (t('trialUrgent') || 'Votre accès expire bientôt ! Passez à un forfait payant.') : t('trialUpgradeHint')}</p>
+              </div>
+              <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')}>
+                {t('upgrade')} <ArrowRight size={14} className="ml-1" />
+              </Button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--sand)]">
-                {t('trialDaysLeft', { count: stats.trialDaysRemaining })}
-              </p>
-              <p className="text-xs text-[var(--sand-muted)]">{t('trialUpgradeHint')}</p>
-            </div>
-            <Button variant="gold" onClick={() => router.push('/dashboard/subscription')}>
-              {t('upgrade')} <ArrowRight size={14} className="ml-1" />
-            </Button>
-          </div>
-        </Card>
-      )}
+          </Card>
+        );
+      })()}
 
       {/* ── KPI Cards (F-pattern: revenue hero top-left) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
