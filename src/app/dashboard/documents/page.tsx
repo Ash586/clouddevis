@@ -29,13 +29,13 @@ interface TypeInfo {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  DEVIS: 'Devis',
-  FACTURE: 'Facture',
-  PROFORMA: 'Proforma',
-  BC: 'BC',
-  BR: 'BR',
-  INTERVENTION: 'Intervention',
-  ATTACHEMENT: 'Attachement',
+  devis: 'Devis',
+  facture: 'Facture',
+  proforma: 'Proforma',
+  bc: 'B. Commande',
+  br: 'B. Réception',
+  intervention: 'Intervention',
+  attachement: 'Attachement',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -291,7 +291,7 @@ export default function DocumentsPage() {
                         <td className="py-3 px-3 font-semibold text-slate-900">{doc.number}</td>
                         <td className="py-3 px-3">
                           <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-slate-100 text-slate-600')}>
-                            {TYPE_LABELS[doc.type] || doc.type}
+                            {TYPE_LABELS[doc.type.toLowerCase()] || doc.type}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-slate-600">{doc.client || '—'}</td>

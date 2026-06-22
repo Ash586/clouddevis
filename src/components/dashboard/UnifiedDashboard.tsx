@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -60,9 +60,14 @@ const STATUS_LABELS: Record<string, string> = {
   DRAFT: 'draft', ACCEPTED: 'accepted', PROGRESS: 'progress', DELIVERED: 'delivered',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  DEVIS: 'Devis', PROFORMA: 'Proforma', BC: 'B. Commande', BR: 'B. Réception',
-  FACTURE: 'Facture', INTERVENTION: 'Intervention', ATTACHEMENT: 'Attachement',
+const DOC_TYPE_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
+  devis: { label: 'Devis', bg: 'bg-blue-400/10', text: 'text-blue-400', border: 'border-blue-400/20' },
+  facture: { label: 'Facture', bg: 'bg-[rgba(0,149,77,0.1)]', text: 'text-[var(--green-3)]', border: 'border-[rgba(0,149,77,0.2)]' },
+  proforma: { label: 'Proforma', bg: 'bg-purple-400/10', text: 'text-purple-400', border: 'border-purple-400/20' },
+  bc: { label: 'B. Commande', bg: 'bg-amber-400/10', text: 'text-amber-400', border: 'border-amber-400/20' },
+  br: { label: 'B. Réception', bg: 'bg-teal-400/10', text: 'text-teal-400', border: 'border-teal-400/20' },
+  intervention: { label: 'Intervention', bg: 'bg-rose-400/10', text: 'text-rose-400', border: 'border-rose-400/20' },
+  attachement: { label: 'Attachement', bg: 'bg-orange-400/10', text: 'text-orange-400', border: 'border-orange-400/20' },
 };
 
 const QUICK_CREATE_TYPES = [
@@ -76,16 +81,6 @@ const QUICK_CREATE_TYPES = [
 ];
 
 const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'INTERVENTION', 'ATTACHEMENT'] as const;
-
-const DOC_TYPE_BADGE: Record<string, { bg: string; text: string; border: string }> = {
-  DEVIS: { bg: 'bg-blue-400/10', text: 'text-blue-400', border: 'border-blue-400/20' },
-  FACTURE: { bg: 'bg-[rgba(0,149,77,0.1)]', text: 'text-[var(--green-3)]', border: 'border-[rgba(0,149,77,0.2)]' },
-  PROFORMA: { bg: 'bg-purple-400/10', text: 'text-purple-400', border: 'border-purple-400/20' },
-  BC: { bg: 'bg-amber-400/10', text: 'text-amber-400', border: 'border-amber-400/20' },
-  BR: { bg: 'bg-teal-400/10', text: 'text-teal-400', border: 'border-teal-400/20' },
-  INTERVENTION: { bg: 'bg-rose-400/10', text: 'text-rose-400', border: 'border-rose-400/20' },
-  ATTACHEMENT: { bg: 'bg-orange-400/10', text: 'text-orange-400', border: 'border-orange-400/20' },
-};
 
 /* ─── Delete Modal ─── */
 function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () => void; onConfirm: () => void }) {
@@ -120,12 +115,12 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
   const isEnt = mode === 'ENTREPRISE';
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const getTimeGreeting = () => {
+  const greeting = (() => {
     const hour = new Date().getHours();
     if (hour < 12) return t('goodMorning');
     if (hour < 18) return t('goodAfternoon');
     return t('goodEvening');
-  };
+  })();
 
   const filterChipClass = (active: boolean) =>
     `px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border ${
@@ -143,7 +138,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       {/* ── Header ── */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-sora font-extrabold text-[var(--sand)]">{getTimeGreeting()}, {userName}</h1>
+          <h1 className="text-2xl font-sora font-extrabold text-[var(--sand)]">{greeting}, {userName}</h1>
           <span className="px-2.5 py-0.5 rounded-full bg-[var(--green-glow)] text-[var(--green-3)] text-[10px] font-bold uppercase tracking-wider border border-[rgba(0,149,77,0.2)]">
             {isEnt ? t('businessMode') : t('artisanMode')}
           </span>
@@ -250,7 +245,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
           <div className="flex items-center gap-2 flex-wrap mb-4">
             {TYPE_FILTERS.map((tf) => (
               <button key={tf} onClick={() => onTypeFilterChange(tf)} className={filterChipClass(typeFilter === tf)}>
-                {tf === 'ALL' ? t('allTypes') : TYPE_LABELS[tf] || tf}
+                {tf === 'ALL' ? t('allTypes') : DOC_TYPE_CONFIG[tf.toLowerCase()]?.label || tf}
               </button>
             ))}
           </div>
@@ -304,8 +299,8 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                     <tr key={doc.id} className="group hover:bg-[rgba(245,237,214,0.02)] transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
                       <td className="px-6 py-3 text-sm font-mono text-[var(--sand)]">{doc.number || '—'}</td>
                       <td className="px-6 py-3">
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${DOC_TYPE_BADGE[doc.type]?.bg || ''} ${DOC_TYPE_BADGE[doc.type]?.text || ''} ${DOC_TYPE_BADGE[doc.type]?.border || ''}`}>
-                          {TYPE_LABELS[doc.type] || doc.type}
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.bg || ''} ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.text || ''} ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.border || ''}`}>
+                          {DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.label || doc.type}
                         </span>
                       </td>
                       <td className="px-6 py-3 text-sm text-[var(--sand-2)]">{doc.client || '—'}</td>

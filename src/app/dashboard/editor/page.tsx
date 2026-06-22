@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { ClientCombobox } from '@/components/editor/ClientCombobox';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
+import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
@@ -90,15 +91,9 @@ function EditorContent() {
   const [showReadyChecks, setShowReadyChecks] = useState(false);
   const [showSectionNav, setShowSectionNav] = useState(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
-  const UNDO_LIMIT = 50;
-  const undoStack = useRef<DocumentState[]>([]);
-  const redoStack = useRef<DocumentState[]>([]);
-  const lastDocRef = useRef<DocumentState>(doc);
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { canUndo, canRedo, handleUndo, handleRedo } = useEditorUndo(doc, setDoc);
   const [showCatalog, setShowCatalog] = useState(false);
   const [catalogItems, setCatalogItems] = useState<LineItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
@@ -293,79 +288,34 @@ function EditorContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Undo tracking with debounce
-  useEffect(() => {
-    if (lastDocRef.current === doc) return;
-    const prevDoc = lastDocRef.current;
-    lastDocRef.current = doc;
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    debounceTimerRef.current = setTimeout(() => {
-      undoStack.current.push(prevDoc);
-      if (undoStack.current.length > UNDO_LIMIT) undoStack.current.shift();
-      redoStack.current = [];
-      setCanUndo(undoStack.current.length > 0);
-      setCanRedo(false);
-    }, 400);
-  }, [doc]);
-
-  const handleUndo = useCallback(() => {
-    const prev = undoStack.current.pop();
-    if (!prev) return;
-    redoStack.current.push(doc);
-    setDoc(prev);
-    setCanUndo(undoStack.current.length > 0);
-    setCanRedo(true);
-  }, [doc, setDoc]);
-
-  const handleRedo = useCallback(() => {
-    const next = redoStack.current.pop();
-    if (!next) return;
-    undoStack.current.push(doc);
-    setDoc(next);
-    setCanRedo(redoStack.current.length > 0);
-    setCanUndo(true);
-  }, [doc, setDoc]);
 
   // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download, Ctrl+Z = undo, Ctrl+Shift+Z = redo
-  const saveDocRef = useRef(saveDoc);
-  const handleDownloadRef = useRef(handleDownload);
-  const handleUndoRef = useRef(handleUndo);
-  const handleRedoRef = useRef(handleRedo);
-  // eslint-disable-next-line react-hooks/refs
-  saveDocRef.current = saveDoc;
-  // eslint-disable-next-line react-hooks/refs
-  handleDownloadRef.current = handleDownload;
-  // eslint-disable-next-line react-hooks/refs
-  handleUndoRef.current = handleUndo;
-  // eslint-disable-next-line react-hooks/refs
-  handleRedoRef.current = handleRedo;
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
-        saveDocRef.current();
+        saveDoc();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
-        handleDownloadRef.current();
+        handleDownload();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        handleUndoRef.current();
+        handleUndo();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
         e.preventDefault();
-        handleRedoRef.current();
+        handleRedo();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
         e.preventDefault();
-        handleRedoRef.current();
+        handleRedo();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [saveDoc, handleDownload, handleUndo, handleRedo]);
 
   // Autosave every 30 seconds — silent (the save button shows a saving spinner).
   // A success toast on every autosave caused notification fatigue.
