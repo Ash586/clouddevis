@@ -23,7 +23,6 @@ import {
   PenLine,
   Receipt,
   ClipboardList,
-  Package,
   Wrench,
   FilePen,
   X,
@@ -271,12 +270,15 @@ function SidebarInner() {
         </div>
       )}
 
-      <button onClick={() => setMobileOpen(!mobileOpen)}
-        className="hidden md:hidden fixed bottom-6 right-6 z-[140] w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95"
-        style={{ display: 'none' }}
-        aria-hidden="true">
-        <Menu size={24} />
-      </button>
+      {!mobileOpen && (
+        <button onClick={() => setMobileOpen(true)}
+          className="flex md:hidden fixed bottom-6 right-6 z-[140] w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95"
+          style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          aria-label="Menu">
+
+          <Menu size={24} />
+        </button>
+      )}
     </>
   );
 }

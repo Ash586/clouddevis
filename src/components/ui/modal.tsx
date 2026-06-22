@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<Element | null>(null);
-  const titleId = useRef(`modal-title-${Math.random().toString(36).slice(2, 8)}`);
+  const titleId = useId();
 
   const sizes = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' };
 
@@ -61,7 +61,7 @@ export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={titleId.current}
+        aria-labelledby={titleId}
         className={cn(
           'relative bg-[var(--navy-2)] rounded-3xl p-6 w-full text-center shadow-2xl border border-[var(--border-2)] animate-in zoom-in-95',
           sizes[size]
@@ -77,7 +77,7 @@ export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h3 id={titleId.current} className="text-lg font-black text-[var(--sand)] mb-4">{title}</h3>
+        <h3 id={titleId} className="text-lg font-black text-[var(--sand)] mb-4">{title}</h3>
         {children}
       </div>
     </div>

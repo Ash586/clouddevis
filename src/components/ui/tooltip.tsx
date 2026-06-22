@@ -11,7 +11,7 @@ interface TooltipProps {
 
 export function Tooltip({ children, content, side = 'top' }: TooltipProps) {
   const [show, setShow] = useState(false);
-  const tipId = useRef(`tooltip-${Math.random().toString(36).slice(2, 8)}`).current;
+  const tipId = useId();
   const childRef = useRef<HTMLDivElement>(null);
 
   const showTooltip = () => setShow(true);

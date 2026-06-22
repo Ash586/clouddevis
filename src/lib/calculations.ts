@@ -8,18 +8,25 @@ import {
   generateDocNumber as dgiGenerateDocNumber,
 } from './dgi';
 
+/** Round to 2 decimals (centimes) to avoid binary floating-point drift on money. */
+function round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
 export function calculateDocument(doc: DocumentState): CalculationResult {
-  const subTotalHT = doc.items.reduce((sum, it) => sum + it.quantity * it.unitPrice, 0);
+  const subTotalHT = round2(doc.items.reduce((sum, it) => sum + it.quantity * it.unitPrice, 0));
 
-  const discountAmount = doc.discount.value > 0
-    ? doc.discount.type === 'percentage'
-      ? subTotalHT * doc.discount.value / 100
-      : doc.discount.value
-    : 0;
+  const discountAmount = round2(
+    doc.discount.value > 0
+      ? doc.discount.type === 'percentage'
+        ? subTotalHT * doc.discount.value / 100
+        : doc.discount.value
+      : 0
+  );
 
-  const totalHTAfterDiscount = subTotalHT - discountAmount;
-  const tvaAmount = totalHTAfterDiscount * doc.tvaRate / 100;
-  const totalTTC = totalHTAfterDiscount + tvaAmount;
+  const totalHTAfterDiscount = round2(subTotalHT - discountAmount);
+  const tvaAmount = round2(totalHTAfterDiscount * doc.tvaRate / 100);
+  const totalTTC = round2(totalHTAfterDiscount + tvaAmount);
 
   // Timbre fiscal — fixed 1,000 DA per Art. 220 CII
   // Applies to all documents except devis and attachements, when total TTC >= 10,000 DA
@@ -27,7 +34,7 @@ export function calculateDocument(doc: DocumentState): CalculationResult {
   const timbreFiscal = calculateTimbreFiscal(timbreApplies);
 
   const acompte = doc.acompte ?? 0;
-  const netAPayer = totalTTC + timbreFiscal - acompte;
+  const netAPayer = round2(totalTTC + timbreFiscal - acompte);
 
   return {
     subTotalHT,

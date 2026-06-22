@@ -41,19 +41,19 @@ export function OnboardingTour() {
     if (!completed) setVisible(true);
   }, []);
 
-  const next = useCallback(() => {
-    if (step < TOUR_STEPS.length - 1) setStep(s => s + 1);
-    else finish();
-  }, [step]);
-
-  const prev = useCallback(() => {
-    if (step > 0) setStep(s => s - 1);
-  }, [step]);
-
   const finish = useCallback(() => {
     localStorage.setItem('onboardingCompleted', 'true');
     setVisible(false);
   }, []);
+
+  const next = useCallback(() => {
+    if (step < TOUR_STEPS.length - 1) setStep(s => s + 1);
+    else finish();
+  }, [step, finish]);
+
+  const prev = useCallback(() => {
+    if (step > 0) setStep(s => s - 1);
+  }, [step]);
 
   if (!mounted || !visible) return null;
 

@@ -147,6 +147,14 @@
   --teal-bg:   rgba(30,125,109,0.12);
   --stamp-red: #E8542E;
 
+  /* Border helpers — dark-tinted so they stay visible on the light surface
+     (the default sand-tinted borders are invisible on cream/white). */
+  --border:    rgba(26,26,26,0.10);
+  --border-2:  rgba(26,26,26,0.16);
+  --green-bg:  rgba(20,83,63,0.10);
+  --red-bg:    rgba(232,84,46,0.10);
+  --blue-bg:   rgba(74,158,255,0.10);
+
   --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
   --shadow-md:   0 4px 12px rgba(0,0,0,0.08);
   --shadow-lg:   0 8px 30px rgba(0,0,0,0.1);

@@ -11,7 +11,6 @@ import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   IconSearch,
-  IconFilter,
   IconFilePlus,
   IconFiles,
   IconX,
@@ -20,7 +19,19 @@ import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
-import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
+import { generatePDFBase64FromDoc, printDocument } from '@/mobile/lib/pdf';
+import { shareDocument } from '@/mobile/lib/whatsapp';
+import type { Document } from '@/mobile/types';
+
+/** Show a lightweight native toast when available, falling back to console. */
+async function notify(message: string) {
+  try {
+    const { Toast } = await import('@capacitor/toast');
+    await Toast.show({ text: message, duration: 'short' });
+  } catch {
+    if (typeof window !== 'undefined') console.info(message);
+  }
+}
 
 // ── Filter definitions ───────────────────────────────────────
 
@@ -135,7 +146,7 @@ export function DocumentsListScreen({
     (doc: Document) => {
       const newDoc = duplicateDocument(doc.id);
       if (newDoc) {
-        // TODO: show toast "Document dupliqué"
+        void notify('Document dupliqué');
       }
     },
     [duplicateDocument]
@@ -155,25 +166,38 @@ export function DocumentsListScreen({
   }, []);
 
   const handleActionSheet = useCallback(
-    (actionId: string, doc: Document) => {
+    async (actionId: string, doc: Document) => {
       switch (actionId) {
         case 'edit':
           onEditDocument?.(doc);
           break;
         case 'duplicate':
-          duplicateDocument(doc.id);
+          if (duplicateDocument(doc.id)) void notify('Document dupliqué');
           break;
         case 'delete':
           deleteDocument(doc.id);
           break;
         case 'share':
-          // TODO: integrate with share.ts
+          try {
+            const pdf = await generatePDFBase64FromDoc(doc);
+            await shareDocument({
+              pdfBase64: pdf,
+              docNumber: doc.number,
+              clientName: doc.client.name,
+              total: doc.totalTTC + doc.timbreAmount - (doc.acompte || 0),
+            });
+          } catch {
+            void notify('Partage impossible');
+          }
           break;
         case 'download':
-          // TODO: generate PDF and download
-          break;
         case 'print':
-          // TODO: open print dialog
+          try {
+            const pdf = await generatePDFBase64FromDoc(doc);
+            printDocument(pdf);
+          } catch {
+            void notify('Génération du PDF impossible');
+          }
           break;
       }
     },

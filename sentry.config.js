@@ -1,8 +1,15 @@
-const { execSync } = module.require('child_process');
 const VALID_ENVIRONMENTS = new Set(['production', 'staging', 'development']);
 
 function safeGitSha() {
+  // Never touch Node APIs in the browser bundle — `child_process` does not
+  // exist there and `module.require` is undefined, which would crash on import.
+  if (typeof window !== 'undefined' || typeof process === 'undefined' || !process.versions?.node) {
+    return '';
+  }
   try {
+    // Lazy require so this file stays import-safe in the client bundle.
+    const req = typeof module !== 'undefined' && module.require ? module.require : require;
+    const { execSync } = req('child_process');
     return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8' }).trim();
   } catch {
     return '';

@@ -24,6 +24,9 @@ export interface ApiErrorHandlingOptions {
   captureResponses?: boolean;
 }
 
+// Variadic `any[]` is required: a handler typed `(req: Request, ctx) => ...` must stay
+// assignable to this type, which `unknown[]` (contravariant) would forbid.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ApiRouteHandler = (...args: any[]) => Promise<Response> | Response;
 
 interface CaptureApiErrorInput {

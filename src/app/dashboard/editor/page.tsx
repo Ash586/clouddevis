@@ -24,7 +24,7 @@ import {
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
-  Grid3X3, GripVertical, Trash2, Plus, EyeOff, MoreHorizontal, Grip,
+  Grid3X3, Trash2, Plus, MoreHorizontal,
   ChevronDown, ZoomIn, ZoomOut, Ruler, Layers3, MonitorCheck,
   Building2, Receipt, BadgeCheck, CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench, Pen,
 } from 'lucide-react';
@@ -356,15 +356,16 @@ function EditorContent() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // Autosave every 30 seconds
+  // Autosave every 30 seconds — silent (the save button shows a saving spinner).
+  // A success toast on every autosave caused notification fatigue.
   useEffect(() => {
     const interval = setInterval(() => {
       if (doc.items.length > 0 || doc.clientInfo.name) {
-        saveDoc().then(() => showToast(tc('save') + ' ✓', 'success')).catch(() => {});
+        saveDoc().catch(() => {});
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [doc.items.length, doc.clientInfo.name, saveDoc, showToast, tc]);
+  }, [doc.items.length, doc.clientInfo.name, saveDoc]);
 
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
