@@ -24,7 +24,6 @@ export default function DashboardPage() {
   const [docs, setDocs] = useState<DocSummary[]>([]);
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
-  const [userPhone, setUserPhone] = useState<string | null>(null);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [stats, setStats] = useState({ totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {} as Record<string, number>, typeBreakdown: {} as Record<string, number>, recentDraft: null as { id: string; number: string; type: string; clientName: string; updatedAt: string } | null });
   const [loading, setLoading] = useState(true);
@@ -52,7 +51,6 @@ export default function DashboardPage() {
       setTotalPages(docData.pagination?.totalPages || 1);
       setUserName(dashData.user?.name || '');
       setUserMode(dashData.user?.mode || '');
-      setUserPhone(dashData.user?.phone || null);
       setCompanyInfo(dashData.user?.companyInfo || null);
       setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
     } catch {
@@ -94,7 +92,6 @@ export default function DashboardPage() {
           <TrialGate>
           <UnifiedDashboard
             userName={userName}
-            userPhone={userPhone}
             companyInfo={companyInfo}
             stats={stats}
             docs={docs}

@@ -38,7 +38,6 @@ interface DashboardStats {
 
 interface UnifiedDashboardProps {
   userName: string;
-  userPhone?: string | null;
   companyInfo?: CompanyInfo | null;
   stats: DashboardStats;
   docs: DocSummary[];
