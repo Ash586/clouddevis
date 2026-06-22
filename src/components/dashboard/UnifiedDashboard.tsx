@@ -295,8 +295,8 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                 <thead>
               <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">
                 <SortHeader column="number" label={t('tableNumber')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
-                <SortHeader column="type" label={t('tableType')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
                 <SortHeader column="client" label={t('tableClient')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
+                <SortHeader column="type" label={t('tableType')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
                 <SortHeader column="total" label={t('tableTotal')} current={sortBy} dir={sortOrder} onSort={onSortChange} align="right" />
                 <SortHeader column="status" label={t('tableStatus')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
                 <th className="px-6 py-3 w-20"></th>
@@ -306,14 +306,14 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                   {docs.map((doc) => (
                     <tr key={doc.id} className="group hover:bg-[rgba(245,237,214,0.02)] transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
                       <td className="px-6 py-3 text-sm font-mono text-[var(--sand)]">{doc.number || '—'}</td>
-                      <td className="px-6 py-3">
+                      <td className="px-6 py-3 text-sm text-[var(--sand-2)] max-w-xs truncate">{doc.client || '—'}</td>
+                      <td className="px-6 py-3 hidden sm:table-cell">
                         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.bg || ''} ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.text || ''} ${DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.border || ''}`}>
                           {DOC_TYPE_CONFIG[doc.type.toLowerCase()]?.label || doc.type}
                         </span>
                       </td>
-                      <td className="px-6 py-3 text-sm text-[var(--sand-2)]">{doc.client || '—'}</td>
                       <td className="px-6 py-3 text-sm font-bold text-[var(--sand)] text-right">{doc.total} {tc('currency')}</td>
-                      <td className="px-6 py-3">
+                      <td className="px-6 py-3 hidden sm:table-cell">
                         <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
                       </td>
                       <td className="px-6 py-3">

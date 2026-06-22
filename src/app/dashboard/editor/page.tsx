@@ -369,7 +369,7 @@ function EditorContent() {
       case 'design':
         return <CollapsibleSection title={te('sections.design')} sectionId="design" {...dragProps} {...s()}>
           {mode === 'entreprise' && !hiddenFields.has('logo') && <div className="space-y-2">
-            <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)]">
+            <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.08)]">
               <input type="file" accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -415,35 +415,35 @@ function EditorContent() {
           <div className="grid grid-cols-2 gap-2">
             {!hiddenFields.has('docNumber') && <input type="text" placeholder={te('general.docNumber')} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.documentNumber} onChange={(e) => updateDoc('documentNumber', e.target.value)} />}
             {!hiddenFields.has('orderRef') && <input type="text" placeholder={te('general.orderRef')} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.bcRef ?? ''} onChange={(e) => updateDoc('bcRef', e.target.value)} />}
-            {!hiddenFields.has('issueDate') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.issueDate')}</label>
+            {!hiddenFields.has('issueDate') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('general.issueDate')}</label>
               <input type="date" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.date} onChange={(e) => updateDoc('date', e.target.value)} /></div>}
-            {!hiddenFields.has('validUntil') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.validUntil')}</label>
+            {!hiddenFields.has('validUntil') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('general.validUntil')}</label>
               <input type="date" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validUntil ?? ''} onChange={(e) => updateDoc('validUntil', e.target.value)} /></div>}
             {!hiddenFields.has('objet') && <div className="col-span-2">
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('objet')}</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('objet')}</label>
               <input type="text" placeholder={te('objet') || 'Objet du devis'} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.objet ?? ''} onChange={(e) => updateDoc('objet', e.target.value)} />
             </div>}
             {!hiddenFields.has('docCity') && <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('docCity')}</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('docCity')}</label>
               <input type="text" placeholder={te('docCity') || 'Ville'} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.docCity ?? ''} onChange={(e) => updateDoc('docCity', e.target.value)} />
             </div>}
             {doc.documentType === 'bc' && <>
               <div className="col-span-2">
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Source de financement</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Source de financement</label>
                 <input type="text" placeholder="02 — 03 — 07" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).financementSource ?? '')} onChange={(e) => updateCustomField('bc', 'financementSource', e.target.value)} />
               </div>
               <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Code gestionnaire</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Code gestionnaire</label>
                 <input type="text" placeholder="0699" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).codeGestionnaire ?? '')} onChange={(e) => updateCustomField('bc', 'codeGestionnaire', e.target.value)} />
               </div>
               <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Nature de prestation</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Nature de prestation</label>
                 <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).naturePrestation ?? '')} onChange={(e) => updateCustomField('bc', 'naturePrestation', e.target.value)}>
                   <option value="">—</option><option value="travaux">Travaux</option><option value="fournitures">Fournitures</option><option value="services">Services</option>
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Type de dépense</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Type de dépense</label>
                 <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).typeDepense ?? '')} onChange={(e) => updateCustomField('bc', 'typeDepense', e.target.value)}>
                   <option value="">—</option><option value="fonctionnement">Dépenses de fonctionnement</option><option value="equipement">Dépenses d&apos;équipement</option><option value="autre">Autre</option>
                 </select>
@@ -468,58 +468,58 @@ function EditorContent() {
         return <CollapsibleSection title="Informations Devis" sectionId="devis" {...dragProps} {...s()} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Devise / Slogan</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Devise / Slogan</label>
               <input type="text" placeholder="Société de Services — Étude, Conseil & Réalisation" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyTagline ?? ''} onChange={(e) => updateDoc('companyTagline', e.target.value)} />
             </div>
             <div className="col-span-2">
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Capital Social</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Capital Social</label>
               <input type="text" placeholder="100 000,00 DA" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyCapital ?? ''} onChange={(e) => updateDoc('companyCapital', e.target.value)} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">R.C.</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">R.C.</label>
               <input type="text" placeholder="12/B/0807586-00/09-BLIDA" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.rcNumber ?? ''} onChange={(e) => updateDoc('rcNumber', e.target.value)} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">NIS</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">NIS</label>
               <input type="text" placeholder="001209250009852" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.nisNumber ?? ''} onChange={(e) => updateDoc('nisNumber', e.target.value)} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">N° AI</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">N° AI</label>
               <input type="text" placeholder="0925314021031" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.aiNumber ?? ''} onChange={(e) => updateDoc('aiNumber', e.target.value)} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Référence</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Référence</label>
               <input type="text" placeholder="76/2025" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.reference ?? ''} onChange={(e) => updateDoc('reference', e.target.value)} />
             </div>
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 mt-2 space-y-2">
+          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 mt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">Coordonnées Bancaires</h4>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">RIB</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">RIB</label>
               <input type="text" placeholder="021 00201 1130029324 83" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] font-mono outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.rib ?? ''} onChange={(e) => updateDoc('rib', e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Banque</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Banque</label>
                 <input type="text" placeholder="SOCIÉTÉ GÉNÉRALE" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.bankName ?? ''} onChange={(e) => updateDoc('bankName', e.target.value)} />
               </div>
               <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Agence</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Agence</label>
                 <input type="text" placeholder="ALGÉRIE — AGENCE BLIDA" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.bankAgency ?? ''} onChange={(e) => updateDoc('bankAgency', e.target.value)} />
               </div>
             </div>
             <div>
-              <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">CCP</label>
+              <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">CCP</label>
               <input type="text" placeholder="007 99999 0000391699 70" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] font-mono outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.ccpNumber ?? ''} onChange={(e) => updateDoc('ccpNumber', e.target.value)} />
             </div>
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 mt-2">
+          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 mt-2">
             <div className="grid grid-cols-2 gap-2 items-end">
               <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Validité (jours)</label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Validité (jours)</label>
                 <input type="number" min="1" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validityDays ?? 30} onChange={(e) => updateDoc('validityDays', parseInt(e.target.value) || 30)} />
               </div>
-              <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)] cursor-pointer">
+              <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.08)] cursor-pointer">
                 <input type="checkbox" className="w-3.5 h-3.5 rounded text-[var(--green-3)]" checked={doc.showWatermark ?? false} onChange={(e) => updateDoc('showWatermark', e.target.checked)} />
                 <span className="text-[10px] font-bold text-[var(--sand-muted)]">Filigrane DEVIS</span>
               </label>
@@ -539,7 +539,7 @@ function EditorContent() {
           {!hiddenFields.has('clientName') && <ClientCombobox value={doc.clientInfo.name} onSelect={(c) => updateClientInfo({ name: c.name, address: c.address ?? doc.clientInfo.address, phone: c.phone ?? doc.clientInfo.phone, email: c.email ?? doc.clientInfo.email, nif: c.nif ?? doc.clientInfo.nif, nis: c.nis ?? doc.clientInfo.nis, rc: c.rc ?? doc.clientInfo.rc, ai: c.ai ?? doc.clientInfo.ai })} placeholder={te('client.clientName')} />}
           {!hiddenFields.has('clientAddress') && <textarea placeholder={te('client.clientAddress')} className="w-full border p-2 rounded-lg text-[11px] h-12 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.address ?? ''} onChange={(e) => updateClientInfo({ address: e.target.value })} />}
           {!hiddenFields.has('clientPhone') && <input type="text" placeholder={te('client.clientPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.phone ?? ''} onChange={(e) => updateClientInfo({ phone: e.target.value })} />}
-          <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
             <div className="flex items-center gap-1.5">
               <Shield size={12} className="text-[var(--green-3)]" />
               <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.taxIds') || 'Identifiants fiscaux'}</h4>
@@ -547,22 +547,22 @@ function EditorContent() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {!hiddenFields.has('clientNif') && <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('client.clientNif')} <span className="text-red-400">*</span></label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('client.clientNif')} <span className="text-red-400">*</span></label>
                 <input type="text" placeholder="00000000000" maxLength={11} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) ? 'border-red-400/40 focus:ring-red-400 bg-[rgba(232,84,46,0.08)]' : 'focus:ring-[var(--green-2)]'}`} value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />
                 {doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
               </div>}
               {!hiddenFields.has('clientNis') && <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('client.clientNis') || 'NIS'} <span className="text-red-400">*</span></label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('client.clientNis') || 'NIS'} <span className="text-red-400">*</span></label>
                 <input type="text" placeholder="0000000000" maxLength={10} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.nis && !validateNIS(doc.clientInfo.nis) ? 'border-red-400/40 focus:ring-red-400 bg-[rgba(232,84,46,0.08)]' : 'focus:ring-[var(--green-2)]'}`} value={doc.clientInfo.nis ?? ''} onChange={(e) => updateClientInfo({ nis: e.target.value })} />
                 {doc.clientInfo.nis && !validateNIS(doc.clientInfo.nis) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
               </div>}
               {!hiddenFields.has('clientRc') && <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('client.clientRc') || 'RC'} <span className="text-red-400">*</span></label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('client.clientRc') || 'RC'} <span className="text-red-400">*</span></label>
                 <input type="text" placeholder="16/00-0000000" className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.rc && !validateRC(doc.clientInfo.rc) ? 'border-red-400/40 focus:ring-red-400 bg-[rgba(232,84,46,0.08)]' : 'focus:ring-[var(--green-2)]'}`} value={doc.clientInfo.rc ?? ''} onChange={(e) => updateClientInfo({ rc: e.target.value })} />
                 {doc.clientInfo.rc && !validateRC(doc.clientInfo.rc) && <span className="text-[8px] text-red-500">Format RC invalide</span>}
               </div>}
               {!hiddenFields.has('clientAi') && <div>
-                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('client.clientAi') || 'AI'} <span className="text-red-400">*</span></label>
+                <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('client.clientAi') || 'AI'} <span className="text-red-400">*</span></label>
                 <input type="text" placeholder="0000000000" maxLength={10} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.ai && !validateAI(doc.clientInfo.ai) ? 'border-red-400/40 focus:ring-red-400 bg-[rgba(232,84,46,0.08)]' : 'focus:ring-[var(--green-2)]'}`} value={doc.clientInfo.ai ?? ''} onChange={(e) => updateClientInfo({ ai: e.target.value })} />
                 {doc.clientInfo.ai && !validateAI(doc.clientInfo.ai) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
               </div>}
@@ -576,13 +576,13 @@ function EditorContent() {
           </div>
           {!hiddenFields.has('clientEmail') && <div className="flex items-center gap-2 pt-1">
             <input type="text" placeholder={te('client.companyEmail')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.email ?? ''} onChange={(e) => updateClientInfo({ email: e.target.value })} /></div>}
-          {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+          {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.yourInfo')}</h4>
             <input type="text" placeholder={te('client.yourName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.name} onChange={(e) => updateArtisanInfo({ name: e.target.value })} />
             <input type="text" placeholder={te('client.yourAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.address} onChange={(e) => updateArtisanInfo({ address: e.target.value })} />
             <input type="text" placeholder={te('client.yourPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.phone ?? ''} onChange={(e) => updateArtisanInfo({ phone: e.target.value })} />
           </div>}
-          {mode === 'entreprise' && doc.companyInfo && <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+          {mode === 'entreprise' && doc.companyInfo && <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.yourCompany')}</h4>
             <input type="text" placeholder={te('client.companyName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyInfo.name} onChange={(e) => updateCompanyInfo({ name: e.target.value })} />
             <input type="text" placeholder={te('client.companyAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyInfo.address} onChange={(e) => updateCompanyInfo({ address: e.target.value })} />
@@ -609,17 +609,17 @@ function EditorContent() {
       case 'chantier':
         return <CollapsibleSection title={te('sections.chantier')} sectionId="chantier" {...dragProps} {...s('chantier')} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-2">
-            {!hiddenFields.has('chantierAddress') && <div className="col-span-2"><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.address')}</label>
+            {!hiddenFields.has('chantierAddress') && <div className="col-span-2"><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('chantier.address')}</label>
               <input type="text" placeholder={te('chantier.addressPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.chantierAddress} onChange={(e) => setChantierField('chantierAddress', e.target.value)} /></div>}
-            {!hiddenFields.has('chantierType') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.type')}</label>
+            {!hiddenFields.has('chantierType') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('chantier.type')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.chantierType} onChange={(e) => setChantierField('chantierType', e.target.value)}>
                 <option value={te('chantier.options.apartment')}>{te('chantier.options.apartment')}</option><option value={te('chantier.options.house')}>{te('chantier.options.house')}</option><option value={te('chantier.options.commercial')}>{te('chantier.options.commercial')}</option><option value={te('chantier.options.office')}>{te('chantier.options.office')}</option><option value={te('chantier.options.facade')}>{te('chantier.options.facade')}</option><option value={te('chantier.options.other')}>{te('chantier.options.other')}</option></select></div>}
-            {!hiddenFields.has('chantierCondition') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.condition')}</label>
+            {!hiddenFields.has('chantierCondition') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('chantier.condition')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.chantierEtat} onChange={(e) => setChantierField('chantierEtat', e.target.value)}>
                 <option value={te('chantier.conditionNew')}>{te('chantier.conditionNew')}</option><option value={te('chantier.conditionRenovation')}>{te('chantier.conditionRenovation')}</option></select></div>}
-            {!hiddenFields.has('chantierSurface') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.surface')}</label>
+            {!hiddenFields.has('chantierSurface') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('chantier.surface')}</label>
               <input type="number" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.chantierSurface || ''} onChange={(e) => setChantierField('chantierSurface', parseFloat(e.target.value) || 0)} /></div>}
-            {!hiddenFields.has('chantierProtection') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.protection')}</label>
+            {!hiddenFields.has('chantierProtection') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('chantier.protection')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.chantierProtection} onChange={(e) => setChantierField('chantierProtection', e.target.value)}>
                 <option value={te('chantier.protectionProvider')}>{te('chantier.protectionProvider')}</option><option value={te('chantier.protectionClient')}>{te('chantier.protectionClient')}</option><option value={te('chantier.protectionNone')}>{te('chantier.protectionNone')}</option></select></div>}
           </div>
@@ -628,14 +628,14 @@ function EditorContent() {
       case 'materiaux':
         return <CollapsibleSection title={te('sections.materiaux')} sectionId="materiaux" {...dragProps} {...s('materiaux')} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-2">
-            {!hiddenFields.has('materiauxBrand') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.brand')}</label>
+            {!hiddenFields.has('materiauxBrand') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('materiaux.brand')}</label>
               <input type="text" placeholder={te('materiaux.brandPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxMarque} onChange={(e) => setMateriauxField('materiauxMarque', e.target.value)} /></div>}
-            {!hiddenFields.has('materiauxType') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.type')}</label>
+            {!hiddenFields.has('materiauxType') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('materiaux.type')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxType} onChange={(e) => setMateriauxField('materiauxType', e.target.value)}>
                 <option value={te('materiaux.options.acrylicMat')}>{te('materiaux.options.acrylicMat')}</option><option value={te('materiaux.options.acrylicSatin')}>{te('materiaux.options.acrylicSatin')}</option><option value={te('materiaux.options.glycéro')}>{te('materiaux.options.glycéro')}</option><option value={te('materiaux.options.floor')}>{te('materiaux.options.floor')}</option><option value={te('materiaux.options.decorative')}>{te('materiaux.options.decorative')}</option><option value={te('materiaux.options.other')}>{te('materiaux.options.other')}</option></select></div>}
-            {!hiddenFields.has('materiauxColor') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.color')}</label>
+            {!hiddenFields.has('materiauxColor') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('materiaux.color')}</label>
               <input type="text" placeholder={te('materiaux.colorPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxCouleur} onChange={(e) => setMateriauxField('materiauxCouleur', e.target.value)} /></div>}
-            {!hiddenFields.has('materiauxQty') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.quantity')}</label>
+            {!hiddenFields.has('materiauxQty') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('materiaux.quantity')}</label>
               <input type="number" placeholder={te('materiaux.quantityPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxQte || ''} onChange={(e) => setMateriauxField('materiauxQte', parseFloat(e.target.value) || 0)} /></div>}
           </div>
         </CollapsibleSection>;
@@ -646,14 +646,14 @@ function EditorContent() {
             <input type="text" placeholder={te('prestations.description')} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[11px] font-medium outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.designation} onChange={(e) => setNewItem(p => ({ ...p, designation: e.target.value }))} />
             <input type="text" placeholder={te('prestations.subDescription') || 'Description (optionnel)'} className="w-full bg-[var(--navy-2)] border p-1.5 sm:p-2 rounded-lg text-[10px] italic text-gray-500 outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.description ?? ''} onChange={(e) => setNewItem(p => ({ ...p, description: e.target.value }))} />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.qty')}</label>
+              <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.qty')}</label>
                 <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} /></div>
-              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unit')}</label>
+              <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.unit')}</label>
                 <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as UnitMeasure }))}>
                   {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}</select></div>
-              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.unitPrice')}</label>
+              <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.unitPrice')}</label>
                 <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
-              <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.category')}</label>
+              <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.category')}</label>
                 <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
                   {getCategoryOptions(doc.documentType).map(c => <option key={c.value} value={c.value}>{tp(c.labelKey.replace(/^preview\./, ''))}</option>)}</select></div>
             </div>
@@ -714,7 +714,7 @@ function EditorContent() {
             </div>
           ))}
           {!addingItem && <div className="flex gap-2">
-            <button onClick={startNewItem} className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-[rgba(245,237,214,0.15)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>
+            <button onClick={startNewItem} className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-[rgba(245,237,214,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>
             <button onClick={async () => {
               setCatalogLoading(true); setShowCatalog(true);
               try {
@@ -741,7 +741,7 @@ function EditorContent() {
             <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCatalog(false)}>
               <div className="bg-[var(--navy-2)] w-full sm:max-w-md sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
-                <div className="px-4 py-3 border-b border-[rgba(245,237,214,0.06)] flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-[rgba(245,237,214,0.08)] flex items-center justify-between">
                   <h3 className="text-[13px] font-semibold text-[var(--sand)]">{te('catalog') || 'Catalogue articles'}</h3>
                   <button onClick={() => setShowCatalog(false)} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1">✕</button>
                 </div>
@@ -755,7 +755,7 @@ function EditorContent() {
                       setNewItem({ id: '', designation: item.designation, quantity: 1, unit: item.unit, unitPrice: item.unitPrice, category: item.category ?? '' });
                       setAddingItem(true);
                       setShowCatalog(false);
-                    }} className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(245,237,214,0.15)] transition flex items-center justify-between gap-2">
+                    }} className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(245,237,214,0.12)] transition flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="text-[11px] font-medium text-[var(--sand-2)] truncate">{item.designation}</div>
                         {item.category && <div className="text-[8px] text-[var(--sand-muted)] uppercase mt-0.5">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</div>}
@@ -772,12 +772,12 @@ function EditorContent() {
       case 'remise':
         return <CollapsibleSection title={te('sections.remise')} sectionId="remise" {...dragProps} {...s('remise')} defaultOpen={false}>
           <div className="grid grid-cols-3 gap-2 items-end">
-            {!hiddenFields.has('remiseType') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('remise.type')}</label>
+            {!hiddenFields.has('remiseType') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('remise.type')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.type} onChange={(e) => updateDiscount({ type: e.target.value as 'percentage' | 'fixed' })}>
                 <option value="percentage">{te('remise.pct')}</option><option value="fixed">{te('remise.amount')}</option></select></div>}
-            {!hiddenFields.has('remiseValue') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{doc.discount.type === 'percentage' ? te('remise.valuePct') : te('remise.valueDA')}</label>
+            {!hiddenFields.has('remiseValue') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{doc.discount.type === 'percentage' ? te('remise.valuePct') : te('remise.valueDA')}</label>
               <input type="number" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.value} onChange={(e) => updateDiscount({ value: parseFloat(e.target.value) || 0 })} /></div>}
-            {!hiddenFields.has('remiseReason') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('remise.reason')}</label>
+            {!hiddenFields.has('remiseReason') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('remise.reason')}</label>
               <input type="text" placeholder={te('remise.reasonPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.reason} onChange={(e) => updateDiscount({ reason: e.target.value })} /></div>}
           </div>
           {doc.discount.value > 0 && <div className="text-[10px] text-[var(--green-3)] bg-[rgba(0,149,77,0.08)] p-2 rounded-lg font-medium">
@@ -787,13 +787,13 @@ function EditorContent() {
       case 'garanties':
         return <CollapsibleSection title={te('sections.garanties')} sectionId="garanties" {...dragProps} {...s('garanties')} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-2">
-            {!hiddenFields.has('garantieLabor') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('garanties.labor')}</label>
+            {!hiddenFields.has('garantieLabor') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('garanties.labor')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.garantieMO} onChange={(e) => setGarantieField('garantieMO', e.target.value)}>
                 <option value={te('garanties.year1')}>{te('garanties.year1')}</option><option value={te('garanties.year2')}>{te('garanties.year2')}</option><option value={te('garanties.year5')}>{te('garanties.year5')}</option><option value={te('garanties.year10')}>{te('garanties.year10')}</option><option value={te('garanties.none')}>{te('garanties.none')}</option></select></div>}
-            {!hiddenFields.has('garantieMaterials') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('garanties.materials')}</label>
+            {!hiddenFields.has('garantieMaterials') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('garanties.materials')}</label>
               <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.garantieMateriaux} onChange={(e) => setGarantieField('garantieMateriaux', e.target.value)}>
                 <option value={te('garanties.year1')}>{te('garanties.year1')}</option><option value={te('garanties.year2')}>{te('garanties.year2')}</option><option value={te('garanties.year5')}>{te('garanties.year5')}</option><option value={te('garanties.year10')}>{te('garanties.year10')}</option><option value={te('garanties.none')}>{te('garanties.none')}</option></select></div>}
-            {!hiddenFields.has('garantieNotes') && <div className="col-span-2"><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('garanties.notes')}</label>
+            {!hiddenFields.has('garantieNotes') && <div className="col-span-2"><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('garanties.notes')}</label>
               <textarea placeholder={te('garanties.notesPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] h-14 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.garantieNotes} onChange={(e) => setGarantieField('garantieNotes', e.target.value)} /></div>}
           </div>
         </CollapsibleSection>;
@@ -811,7 +811,7 @@ function EditorContent() {
             {!hiddenFields.has('paymentIban') && <div className="col-span-2"><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.iban')}</label>
               <input type="text" placeholder={te('paiement.ibanPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] font-mono outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.paymentDetails.iban} onChange={(e) => updatePaymentDetails({ iban: e.target.value })} /></div>}
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-1">
+          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-1">
             <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.totalHT')}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></div>
             {results.discountAmount > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.remise')}</span><span className="font-semibold text-red-500">-{formatCurrency(results.discountAmount, tc('currency'))}</span></div>}
             {results.tvaRate > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.vatLine', { rate: results.tvaRate })}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></div>}
@@ -844,13 +844,13 @@ function EditorContent() {
           switch (field.type) {
             case 'text':
             case 'number':
-              return <div key={field.id}><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{field.label}</label><input type={field.type} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(field.type === 'number' ? (parseFloat(e.target.value) || '') : e.target.value)} /></div>;
+              return <div key={field.id}><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{field.label}</label><input type={field.type} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(field.type === 'number' ? (parseFloat(e.target.value) || '') : e.target.value)} /></div>;
             case 'date':
-              return <div key={field.id}><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{field.label}</label><input type="date" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)} /></div>;
+              return <div key={field.id}><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{field.label}</label><input type="date" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)} /></div>;
             case 'textarea':
-              return <div key={field.id}><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{field.label}</label><textarea className="w-full border p-2 rounded-lg text-[11px] h-14 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)} /></div>;
+              return <div key={field.id}><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{field.label}</label><textarea className="w-full border p-2 rounded-lg text-[11px] h-14 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)} /></div>;
             case 'select':
-              return <div key={field.id}><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{field.label}</label><select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)}>{field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>;
+              return <div key={field.id}><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{field.label}</label><select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={val} onChange={(e) => onChange(e.target.value)}>{field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select></div>;
           }
         })}
       </CollapsibleSection>
@@ -930,9 +930,9 @@ function EditorContent() {
         </div>
 
         {/* ═══════════════ MOBILE BOTTOM BAR ═══════════════ */}
-        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
           {/* Action row */}
-          <div className="flex items-center gap-1.5 px-2 py-1.5">
+          <div className="flex items-center gap-1.5 px-2 py-1">
             <button onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>{tc('save')}</span>
@@ -1042,7 +1042,7 @@ function EditorContent() {
                 <div className="flex justify-between pt-2 border-t border-[rgba(245,237,214,0.1)]"><span className="font-bold text-[var(--sand)]">{te('paiement.netToPay')}</span><span className="font-black text-[var(--green-3)] text-[13px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
               </div>
               {/* Validation state */}
-              <div className="border-t border-[rgba(245,237,214,0.06)] pt-3 space-y-2">
+              <div className="border-t border-[rgba(245,237,214,0.08)] pt-3 space-y-2">
                 <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('validationState') || 'État de validation'}</h4>
                 <div className="space-y-1.5">
                   <div className={cn('flex items-center gap-2 text-[11px] p-2 rounded-lg', doc.clientInfo.name ? 'text-[var(--green-3)] bg-[var(--green-glow)]' : 'text-[var(--sand-muted)] bg-[var(--navy-3)]')}>
@@ -1084,7 +1084,7 @@ function EditorContent() {
                       <>
                         <div className="fixed inset-0 z-[99]" onClick={() => setShowReadyChecks(false)} />
                         <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-2 z-[100] min-w-[200px]">
-                          <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(245,237,214,0.06)]">{te('validationState') || 'État de validation'}</div>
+                          <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(245,237,214,0.08)]">{te('validationState') || 'État de validation'}</div>
                           {previewReadyChecks.map((check, i) => (
                             <button key={i} onClick={() => { setActiveSection(check.section); setMobileTab('editor'); setShowReadyChecks(false); }}
                               className={cn('w-full flex items-center gap-2 px-2 py-2 rounded-lg text-[11px] font-medium transition text-left', check.done ? 'text-[var(--green-3)]' : 'text-amber-400 hover:bg-[var(--navy-4)]')}>
