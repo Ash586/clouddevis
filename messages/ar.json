@@ -288,7 +288,8 @@
       "devis": "تقدير",
       "facture": "فاتورة",
       "proforma": "فاتورة Proforma",
-      "bonCommande": "أمر شراء"
+      "bonCommande": "أمر شراء",
+      "attachement": "كشف"
     }
   },
   "editor": {
@@ -621,7 +622,13 @@
       "materiaux": "مواد",
       "transport": "نقل",
       "divers": "متنوع",
-      "services": "خدمات"
+      "services": "خدمات",
+      "prestation": "خدمة",
+      "equipement": "معدات",
+      "outillage": "أدوات",
+      "diagnostic": "تشخيص",
+      "reparation": "إصلاح",
+      "pieces": "قطع غيار"
     },
     "units": {
       "u": "وحدة",

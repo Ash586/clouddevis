@@ -1,9 +1,14 @@
 const VALID_ENVIRONMENTS = new Set(['production', 'staging', 'development']);
 
 function safeGitSha() {
-  // Never touch Node APIs in the browser bundle — `child_process` does not
-  // exist there and `module.require` is undefined, which would crash on import.
-  if (typeof window !== 'undefined' || typeof process === 'undefined' || !process.versions?.node) {
+  // Only run in the Node.js server runtime. Bail in the browser (`child_process`
+  // doesn't exist and `module.require` is undefined → crash on import) and in the
+  // Edge runtime (touching `process.versions` trips an Edge static-analysis error).
+  if (
+    typeof window !== 'undefined' ||
+    typeof process === 'undefined' ||
+    process.env.NEXT_RUNTIME === 'edge'
+  ) {
     return '';
   }
   try {

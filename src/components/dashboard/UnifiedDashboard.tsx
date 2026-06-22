@@ -5,11 +5,12 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
-  FileText, CreditCard, Users, RefreshCw, FileStack,
+  FileText, Users, FileStack,
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
-  Search, Trash2, ChevronRight, Clock, TrendingUp,
-  Hammer, ClipboardList, Receipt, Eye, FileEdit, FilePen,
+  Search, Trash2, ChevronRight, Clock, Wallet,
+  ClipboardList, Receipt, Eye, FileEdit, FilePen,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -55,11 +56,11 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const QUICK_CREATE_TYPES = [
-  { type: 'devis', labelKey: 'devis', icon: FileText, color: 'blue', borderColor: 'border-blue-400/30', bgColor: 'bg-blue-400/5 hover:bg-blue-400/10', textColor: 'text-blue-400' },
-  { type: 'facture', labelKey: 'facture', icon: Receipt, color: 'green', borderColor: 'border-[rgba(0,149,77,0.3)]', bgColor: 'bg-[rgba(0,149,77,0.05)] hover:bg-[rgba(0,149,77,0.1)]', textColor: 'text-[var(--green-3)]' },
-  { type: 'proforma', labelKey: 'proforma', icon: ClipboardList, color: 'purple', borderColor: 'border-purple-400/30', bgColor: 'bg-purple-400/5 hover:bg-purple-400/10', textColor: 'text-purple-400' },
-  { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack, color: 'amber', borderColor: 'border-amber-400/30', bgColor: 'bg-amber-400/5 hover:bg-amber-400/10', textColor: 'text-amber-400' },
-  { type: 'attachement', labelKey: 'attachement', icon: FilePen, color: 'indigo', borderColor: 'border-indigo-400/30', bgColor: 'bg-indigo-400/5 hover:bg-indigo-400/10', textColor: 'text-indigo-400' },
+  { type: 'devis', labelKey: 'devis', icon: FileText, iconBg: 'bg-blue-400/10', textColor: 'text-blue-400' },
+  { type: 'facture', labelKey: 'facture', icon: Receipt, iconBg: 'bg-[rgba(0,149,77,0.12)]', textColor: 'text-[var(--green-3)]' },
+  { type: 'proforma', labelKey: 'proforma', icon: ClipboardList, iconBg: 'bg-purple-400/10', textColor: 'text-purple-400' },
+  { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack, iconBg: 'bg-amber-400/10', textColor: 'text-amber-400' },
+  { type: 'attachement', labelKey: 'attachement', icon: FilePen, iconBg: 'bg-indigo-400/10', textColor: 'text-indigo-400' },
 ];
 
 const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'INTERVENTION', 'ATTACHEMENT'] as const;
@@ -103,7 +104,6 @@ function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () 
 export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, onDelete, mode }: UnifiedDashboardProps) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
-  const te = useTranslations('editor');
   const router = useRouter();
   const isEnt = mode === 'ENTREPRISE';
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -136,18 +136,18 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
   const draftDoc = stats.recentDraft;
 
   return (
-    <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-6">
+    <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-6 py-6">
       <DeleteModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={() => deleteTarget && onDelete(deleteTarget)} />
 
       {/* ── Header ── */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-xl font-sora font-extrabold text-[var(--sand)]">{getTimeGreeting()}, {userName}</h1>
+          <h1 className="text-2xl font-sora font-extrabold text-[var(--sand)]">{getTimeGreeting()}, {userName}</h1>
           <span className="px-2.5 py-0.5 rounded-full bg-[var(--green-glow)] text-[var(--green-3)] text-[10px] font-bold uppercase tracking-wider border border-[rgba(0,149,77,0.2)]">
             {isEnt ? t('businessMode') : t('artisanMode')}
           </span>
         </div>
-        <p className="text-xs text-[var(--sand-muted)]">{t('subtitle')}</p>
+        <p className="text-sm text-[var(--sand-muted)]">{t('subtitle')}</p>
       </div>
 
       {/* ── Trial Banner ── */}
@@ -170,104 +170,61 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
         </Card>
       )}
 
-      {/* ── Quick Create Strip ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {QUICK_CREATE_TYPES.map((qd) => (
-          <button key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
-            className={`flex items-center gap-3 p-4 rounded-xl border transition-all active:scale-[0.98] ${qd.bgColor} ${qd.borderColor}`}>
-            <qd.icon size={20} className={qd.textColor} />
-            <div className="text-start">
-              <div className={`text-sm font-bold ${qd.textColor}`}>{t(`docTypes.${qd.labelKey}`)}</div>
-              <div className="text-[10px] text-[var(--sand-muted)]">{stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0} {t('created')}</div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* ── Actions Rapides ── */}
-      <div className="mb-6">
-        <h2 className="text-xs font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-3">{t('quickActions')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {/* Continue Draft */}
-          {draftDoc && (
-            <button onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
-              className="flex items-center gap-4 p-4 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.12)] hover:bg-[var(--navy-3)] transition-all text-start group">
-              <div className="w-10 h-10 rounded-xl bg-blue-400/10 flex items-center justify-center shrink-0 group-hover:bg-blue-400/20 transition">
-                <FileEdit size={18} className="text-blue-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[var(--sand)] truncate">{draftDoc.number || t('untitledDoc')}</p>
-                <p className="text-[10px] text-[var(--sand-muted)]">{t('continueDraft')}</p>
-              </div>
-              <ChevronRight size={16} className="text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition shrink-0" />
-            </button>
-          )}
-
-          {/* New Devis */}
-          <button onClick={() => router.push('/dashboard/editor?type=devis')}
-            className="flex items-center gap-4 p-4 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.12)] hover:bg-[var(--navy-3)] transition-all text-start group">
-            <div className="w-10 h-10 rounded-xl bg-[rgba(0,149,77,0.1)] flex items-center justify-center shrink-0 group-hover:bg-[rgba(0,149,77,0.2)] transition">
-              <PenLine size={18} className="text-[var(--green-3)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--sand)]">{t('newDevis')}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{t('newDevisDesc')}</p>
-            </div>
-            <ChevronRight size={16} className="text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition shrink-0" />
-          </button>
-
-          {/* Add Client */}
-          <button onClick={() => router.push('/dashboard/clients')}
-            className="flex items-center gap-4 p-4 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.12)] hover:bg-[var(--navy-3)] transition-all text-start group">
-            <div className="w-10 h-10 rounded-xl bg-purple-400/10 flex items-center justify-center shrink-0 group-hover:bg-purple-400/20 transition">
-              <Users size={18} className="text-purple-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--sand)]">{t('addClient')}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{stats.totalClients} {t('registered')}</p>
-            </div>
-            <ChevronRight size={16} className="text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition shrink-0" />
-          </button>
-
-          {/* Reports */}
-          <button onClick={() => router.push('/dashboard/reports')}
-            className="flex items-center gap-4 p-4 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.12)] hover:bg-[var(--navy-3)] transition-all text-start group">
-            <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition">
-              <BarChart3 size={18} className="text-amber-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--sand)]">{t('viewReports')}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{t('viewReportsDesc')}</p>
-            </div>
-            <ChevronRight size={16} className="text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition shrink-0" />
-          </button>
-
-          {/* Subscription */}
-          <button onClick={() => router.push('/dashboard/subscription')}
-            className="flex items-center gap-4 p-4 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.12)] hover:bg-[var(--navy-3)] transition-all text-start group">
-            <div className="w-10 h-10 rounded-xl bg-[rgba(212,168,67,0.1)] flex items-center justify-center shrink-0 group-hover:bg-[rgba(212,168,67,0.2)] transition">
-              <CreditCardIcon size={18} className="text-[var(--gold)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[var(--sand)]">{t('manageSubscription')}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{stats.trialDaysRemaining > 0 ? t('trialActive') : t('viewPlans')}</p>
-            </div>
-            <ChevronRight size={16} className="text-[var(--sand-muted)] group-hover:text-[var(--sand)] transition shrink-0" />
-          </button>
-        </div>
-      </div>
-
-      {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <KpiCard label={t('statDocuments')} value={stats.totalDocs} sub={`${t('statThisMonth')}: ${stats.monthDocs}`} icon={<FileText size={18} />} />
-        <KpiCard label={t('statTotal')} value={`${stats.totalTTC}`} suffix={tc('currency')} sub={t('totalTTC')} icon={<TrendingUp size={18} />} color="green" />
+      {/* ── KPI Cards (F-pattern: revenue hero top-left) ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <KpiCard hero label={t('statTotal')} value={`${stats.totalTTC}`} suffix={tc('currency')} sub={t('totalTTC')} icon={<Wallet size={19} />} color="green" />
+        <KpiCard label={t('statDocuments')} value={stats.totalDocs} sub={`+${stats.monthDocs} ${t('statThisMonth')}`} icon={<FileText size={18} />} />
         <KpiCard label={t('statClients')} value={stats.totalClients} sub={t('statRegistered')} icon={<Users size={18} />} color="blue" />
         <KpiCard label={t('statDrafts')} value={stats.draftCount} sub={t('statDraftsSub')} icon={<PenLine size={18} />} color="amber" />
       </div>
 
+      {/* ── Continue Draft (contextual) ── */}
+      {draftDoc && (
+        <button onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
+          className="w-full flex items-center gap-3 sm:gap-4 p-3.5 mb-6 rounded-2xl bg-gradient-to-r from-[rgba(0,149,77,0.08)] to-transparent border border-[rgba(0,149,77,0.18)] hover:border-[rgba(0,149,77,0.3)] transition-all text-start group">
+          <div className="w-10 h-10 rounded-xl bg-[var(--green-glow)] flex items-center justify-center shrink-0">
+            <FileEdit size={18} className="text-[var(--green-3)]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold text-[var(--green-3)] uppercase tracking-wider">{t('continueDraft')}</p>
+            <p className="text-sm font-bold text-[var(--sand)] truncate">{draftDoc.number || t('untitledDoc')}{draftDoc.clientName ? ` · ${draftDoc.clientName}` : ''}</p>
+          </div>
+          <ChevronRight size={18} className="text-[var(--green-3)] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      )}
+
+      {/* ── Quick Create ── */}
+      <div className="mb-6">
+        <h2 className="text-xs font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-3">{t('quickActions')}</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {QUICK_CREATE_TYPES.map((qd) => {
+            const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
+            return (
+              <button key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
+                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] hover:bg-[var(--navy-3)] transition-all active:scale-[0.98] text-start">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${qd.iconBg} ${qd.textColor}`}>
+                  <qd.icon size={19} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-[var(--sand)] truncate">{t(`docTypes.${qd.labelKey}`)}</div>
+                  <div className="text-[11px] text-[var(--sand-muted)]">{count} {t('created')}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Secondary quick links ── */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <SecondaryLink icon={<Users size={16} />} label={t('addClient')} sub={`${stats.totalClients} ${t('statRegistered')}`} onClick={() => router.push('/dashboard/clients')} />
+        <SecondaryLink icon={<BarChart3 size={16} />} label={t('viewReports')} sub={t('viewReportsDesc')} onClick={() => router.push('/dashboard/reports')} />
+        <SecondaryLink icon={<CreditCardIcon size={16} />} label={t('manageSubscription')} sub={stats.trialDaysRemaining > 0 ? t('trialActive') : t('viewPlans')} onClick={() => router.push('/dashboard/subscription')} />
+      </div>
+
       {/* ── Recent Documents ── */}
       <Card className="overflow-hidden border-[rgba(245,237,214,0.06)]">
-        <div className="px-6 pt-5 pb-4">
+        <div className="px-5 sm:px-6 pt-5 pb-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
             <h2 className="text-sm font-sora font-bold text-[var(--sand)]">{t('recentDocs')}</h2>
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -364,7 +321,7 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
 }
 
 /* ─── KPI Card ─── */
-function KpiCard({ label, value, sub, icon, suffix, color = 'default' }: { label: string; value: string | number; sub?: string; icon: React.ReactNode; suffix?: string; color?: 'default' | 'green' | 'blue' | 'amber' }) {
+function KpiCard({ label, value, sub, icon, suffix, color = 'default', hero = false }: { label: string; value: string | number; sub?: string; icon: React.ReactNode; suffix?: string; color?: 'default' | 'green' | 'blue' | 'amber'; hero?: boolean }) {
   const colorMap = {
     default: { iconBg: 'bg-[var(--navy-3)]', iconText: 'text-[var(--sand-muted)]' },
     green: { iconBg: 'bg-[var(--green-glow)]', iconText: 'text-[var(--green-3)]' },
@@ -374,14 +331,33 @@ function KpiCard({ label, value, sub, icon, suffix, color = 'default' }: { label
   const c = colorMap[color];
 
   return (
-    <Card className="p-4">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${c.iconBg} ${c.iconText} mb-3`}>
+    <Card className={cn('p-4 sm:p-5', hero && 'bg-gradient-to-br from-[rgba(0,149,77,0.08)] to-transparent border-[rgba(0,149,77,0.18)]')}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.iconBg} ${c.iconText} mb-3`}>
         {icon}
       </div>
-      <p className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-lg font-sora font-extrabold text-[var(--sand)]">{value}{suffix ? ` ${suffix}` : ''}</p>
-      {sub && <p className="text-[10px] text-[var(--sand-muted)] mt-0.5">{sub}</p>}
+      <p className="text-[11px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-1">{label}</p>
+      <p className={cn('font-sora font-extrabold text-[var(--sand)] leading-tight', hero ? 'text-2xl' : 'text-xl')}>
+        {value}{suffix ? <span className="text-sm font-bold text-[var(--sand-muted)] ml-1">{suffix}</span> : ''}
+      </p>
+      {sub && <p className="text-[11px] text-[var(--sand-muted)] mt-1">{sub}</p>}
     </Card>
+  );
+}
+
+/* ─── Secondary quick link ─── */
+function SecondaryLink({ icon, label, sub, onClick }: { icon: React.ReactNode; label: string; sub?: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick}
+      className="group flex items-center gap-2.5 p-3 rounded-xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] hover:bg-[var(--navy-3)] transition-all text-start min-w-0">
+      <div className="w-8 h-8 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] group-hover:text-[var(--sand)] flex items-center justify-center shrink-0 transition-colors">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-xs font-bold text-[var(--sand)] truncate">{label}</div>
+        {sub && <div className="text-[10px] text-[var(--sand-muted)] truncate">{sub}</div>}
+      </div>
+      <ChevronRight size={14} className="text-[var(--sand-muted)] shrink-0 hidden sm:block group-hover:translate-x-0.5 transition-transform" />
+    </button>
   );
 }
 

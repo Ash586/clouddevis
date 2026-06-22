@@ -288,7 +288,8 @@
       "devis": "Devis",
       "facture": "Facture",
       "proforma": "Facture Proforma",
-      "bonCommande": "Bon de Commande"
+      "bonCommande": "Bon de Commande",
+      "attachement": "Attachement"
     }
   },
   "editor": {
@@ -621,7 +622,13 @@
       "materiaux": "Matériaux",
       "transport": "Transport",
       "divers": "Divers",
-      "services": "Services"
+      "services": "Services",
+      "prestation": "Prestation",
+      "equipement": "Équipement",
+      "outillage": "Outillage",
+      "diagnostic": "Diagnostic",
+      "reparation": "Réparation",
+      "pieces": "Pièces"
     },
     "units": {
       "u": "Unité",
