@@ -15,7 +15,7 @@ import { formatCurrency } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
-import { UNIT_OPTIONS, CATEGORY_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_CATEGORIES, DOC_TYPE_SECTIONS, DOC_TYPE_SECTION_ORDER } from '@/types';
+import { UNIT_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions, categoryLabelKey } from '@/types';
 import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,9 @@ function EditorContent() {
   const sp = useSearchParams();
   const modeParam = sp.get('mode') as UserMode | null;
   const docIdParam = sp.get('id');
-  const typeParam = sp.get('type') as DocumentType | null;
+  const rawTypeParam = sp.get('type');
+  const URL_TYPE_MAP: Record<string, DocumentType> = { bon_commande: 'bc', bon_reception: 'br' };
+  const typeParam = rawTypeParam ? (URL_TYPE_MAP[rawTypeParam] ?? rawTypeParam as DocumentType) : null;
   const { showToast } = useToast();
   const {
     doc, setDoc, mode, setMode,
@@ -231,7 +233,9 @@ function EditorContent() {
     const hf = new Set(hiddenFields);
     const sf = (fieldId: string) => !hf.has(fieldId);
     const bv = (...fieldIds: string[]) => fieldIds.some(f => sf(f));
-    const catLabels: Record<string, string> = { preparation: tp('categories.preparation'), peinture: tp('categories.peinture'), finition: tp('categories.finition'), revetement: tp('categories.revetement'), facade: tp('categories.facade'), enduit: tp('categories.enduit'), main_oeuvre: tp('categories.main_oeuvre'), materiaux: tp('categories.materiaux'), transport: tp('categories.transport'), divers: tp('categories.divers') };
+    const catLabels: Record<string, string> = Object.fromEntries(
+      ALL_CATEGORY_OPTIONS.filter(c => c.value).map(c => [c.value, tp(c.labelKey.replace(/^preview\./, ''))])
+    );
     const paymentLabels: Record<string, string> = { cheque: te('paiement.check'), virement: te('paiement.transfer'), especes: te('paiement.cash'), cb: te('paiement.card') };
 
     const grouped: Record<string, typeof doc.items> = {};
@@ -368,6 +372,14 @@ function EditorContent() {
     }, 30000);
     return () => clearInterval(interval);
   }, [doc.items.length, doc.clientInfo.name, saveDoc]);
+
+  // Reset the pending new-item category when the document type changes if it's
+  // no longer one of that type's categories.
+  useEffect(() => {
+    const valid = getCategoryOptions(doc.documentType).some(c => c.value === (newItem.category ?? ''));
+    if (!valid) setNewItem(p => ({ ...p, category: '' }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc.documentType]);
 
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
@@ -621,7 +633,7 @@ function EditorContent() {
                 <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} /></div>
               <div><label className="block text-[9px] font-bold text-[var(--sand-muted)]">{te('prestations.category')}</label>
                 <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={newItem.category ?? ''} onChange={(e) => setNewItem(p => ({ ...p, category: e.target.value }))}>
-                  {(DOC_TYPE_CATEGORIES[doc.documentType] ?? CATEGORY_OPTIONS).map(c => <option key={c.value} value={c.value}>{te(c.labelKey)}</option>)}</select></div>
+                  {getCategoryOptions(doc.documentType).map(c => <option key={c.value} value={c.value}>{tp(c.labelKey.replace(/^preview\./, ''))}</option>)}</select></div>
             </div>
             <div className="flex gap-1.5">
               <button onClick={() => { const v = validateLineItem(newItem); if (!v.valid) { setItemErrors(Object.values(v.errors)[0] ?? null); return; } setItemErrors(null); handleAddItem(); }} disabled={!newItem.designation || newItem.unitPrice <= 0} className="flex-1 sm:flex-none bg-green-600 text-white text-[11px] font-bold px-4 py-2 min-h-[44px] rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"><Plus size={14} /><span>Ajouter</span></button>
@@ -649,7 +661,7 @@ function EditorContent() {
                   <span className="text-[var(--sand-muted)] cursor-grab active:cursor-grabbing text-[14px] select-none px-0.5" title={te('dragToReorder') || 'Drag to reorder'}>⠿</span>
                   <div className="flex-1 min-w-0">
                     <span className="text-[11px] font-medium text-[var(--sand-2)] truncate block">{item.designation}</span>
-                    {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? 'preview.categories.none')}</span>}
+                    {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</span>}
                   </div>
                 </div>
                 <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 hover:text-red-700 shrink-0 ml-1 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-red-500/10 transition"><Trash2 size={15} /></button>
@@ -708,7 +720,7 @@ function EditorContent() {
                     }} className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(245,237,214,0.15)] transition flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="text-[11px] font-medium text-[var(--sand-2)] truncate">{item.designation}</div>
-                        {item.category && <div className="text-[8px] text-[var(--sand-muted)] uppercase mt-0.5">{te(CATEGORY_OPTIONS.find(c => c.value === item.category)?.labelKey ?? '')}</div>}
+                        {item.category && <div className="text-[8px] text-[var(--sand-muted)] uppercase mt-0.5">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</div>}
                       </div>
                       <div className="text-[11px] font-bold text-[var(--green-3)] whitespace-nowrap">{item.unitPrice.toLocaleString('fr-DZ')} {tc('currency')}</div>
                     </button>
