@@ -1176,6 +1176,7 @@
     "companyAddress": "العنوان",
     "companyCapital": "رأس المال (د.ج)",
     "taxIds": "الأرقام الجبائية",
+    "taxIdsWarning": "NIF و NIS و RC و AI مطلوبة للامتثال لمعايير DGI",
     "docPrefs": "تفضيلات المستندات",
     "defaultDocType": "النوع الافتراضي",
     "defaultTva": "نسبة الضريبة الافتراضية",

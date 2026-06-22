@@ -41,7 +41,7 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
   const docType: DocumentType = initialType ?? 'devis';
   const base: DocumentState = {
     mode,
-    clientInfo: { name: '', address: '', phone: '', email: '' },
+    clientInfo: { name: '', address: '', phone: '', email: '', ai: '' },
     artisanInfo: mode === 'artisan' ? { name: '', address: '', phone: '' } : undefined,
     companyInfo: mode === 'entreprise'
       ? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }

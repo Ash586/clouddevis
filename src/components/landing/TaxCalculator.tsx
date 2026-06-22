@@ -18,7 +18,7 @@ export function TaxCalculator({ defaultAmount = 100000, defaultTva = 19 }: Props
   const results = useMemo(() => {
     const mockDoc = {
       mode: 'entreprise' as const,
-      clientInfo: { name: '', address: '', phone: '', email: '' },
+      clientInfo: { name: '', address: '', phone: '', email: '', ai: '' },
       items: [{ id: 'calc', designation: 'Service', quantity: 1, unit: 'u' as const, unitPrice: amount }],
       tvaRate,
       paymentMode: 'virement' as const,

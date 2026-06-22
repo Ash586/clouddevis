@@ -48,6 +48,7 @@ export interface ClientInfo {
   nif?: string;
   nis?: string;
   rc?: string;
+  ai?: string;
 }
 
 export interface LineItem {
@@ -382,6 +383,25 @@ export const DOC_TYPE_CATEGORIES: Record<DocumentType, { value: string; labelKey
     { value: 'divers', labelKey: 'preview.categories.divers' },
   ],
 };
+
+/** Every known category (global list + every per-type list), de-duplicated by value. */
+export const ALL_CATEGORY_OPTIONS: { value: string; labelKey: string }[] = (() => {
+  const seen = new Map<string, { value: string; labelKey: string }>();
+  for (const opt of [...CATEGORY_OPTIONS, ...Object.values(DOC_TYPE_CATEGORIES).flat()]) {
+    if (!seen.has(opt.value)) seen.set(opt.value, opt);
+  }
+  return [...seen.values()];
+})();
+
+/** Category options to show in the editor for a given document type. */
+export function getCategoryOptions(type: DocumentType): { value: string; labelKey: string }[] {
+  return DOC_TYPE_CATEGORIES[type] ?? CATEGORY_OPTIONS;
+}
+
+/** Resolve a category value to its i18n labelKey (handles type-only categories). */
+export function categoryLabelKey(value: string): string | undefined {
+  return ALL_CATEGORY_OPTIONS.find((c) => c.value === value)?.labelKey;
+}
 
 export const DOC_TYPE_SECTION_ORDER: Record<DocumentType, string[]> = {
   devis: ['design', 'general', 'devis', 'client', 'chantier', 'materiaux', 'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature'],

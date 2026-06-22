@@ -146,6 +146,7 @@ model Client {
   nif       String?  // Algérie
   nis       String?
   rc        String?
+  ai        String?  // Artisan Identification
   ice       String?  // Maroc
   matriculeFiscal String? // Tunisie
   siret     String?  // France

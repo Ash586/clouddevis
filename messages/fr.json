@@ -1176,6 +1176,7 @@
     "companyAddress": "Adresse",
     "companyCapital": "Capital (DA)",
     "taxIds": "Identifiants fiscaux",
+    "taxIdsWarning": "NIF, NIS, RC et AI sont obligatoires pour la conformité DGI",
     "docPrefs": "Préférences de documents",
     "defaultDocType": "Type par défaut",
     "defaultTva": "TVA par défaut",

@@ -38,7 +38,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
       client: {
         id: client.id, name: client.name, address: client.address,
         phone: client.phone, email: client.email,
-        nif: client.nif, nis: client.nis, rc: client.rc,
+        nif: client.nif, nis: client.nis, rc: client.rc, ai: client.ai,
         ice: client.ice, matriculeFiscal: client.matriculeFiscal, siret: client.siret,
         createdAt: client.createdAt.toISOString().split('T')[0],
       },
@@ -70,7 +70,7 @@ async function putHandler(_req: Request, { params }: { params: Promise<{ id: str
     if (!client) return NextResponse.json({ error: 'Client non trouvé' }, { status: 404 });
 
     const body = await _req.json();
-    const { name, address, phone, email, nif, nis, rc, ice, matriculeFiscal, siret } = body;
+    const { name, address, phone, email, nif, nis, rc, ai, ice, matriculeFiscal, siret } = body;
 
     if (name !== undefined && (!name || typeof name !== 'string' || !name.trim())) {
       return NextResponse.json({ error: 'Le nom ne peut pas être vide' }, { status: 400 });
@@ -97,6 +97,7 @@ async function putHandler(_req: Request, { params }: { params: Promise<{ id: str
         ...(nif !== undefined && { nif: nif?.trim() || null }),
         ...(nis !== undefined && { nis: nis?.trim() || null }),
         ...(rc !== undefined && { rc: rc?.trim() || null }),
+        ...(ai !== undefined && { ai: ai?.trim() || null }),
         ...(ice !== undefined && { ice: ice?.trim() || null }),
         ...(matriculeFiscal !== undefined && { matriculeFiscal: matriculeFiscal?.trim() || null }),
         ...(siret !== undefined && { siret: siret?.trim() || null }),

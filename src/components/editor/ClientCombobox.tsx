@@ -13,6 +13,7 @@ interface ClientData {
   nif?: string;
   nis?: string;
   rc?: string;
+  ai?: string;
 }
 
 interface Props {

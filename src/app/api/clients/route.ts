@@ -54,6 +54,7 @@ async function getHandler(req: Request) {
         nif: c.nif,
         nis: c.nis,
         rc: c.rc,
+        ai: c.ai,
         docCount: c._count.documents,
         lastDoc: c.documents[0] ? {
           number: c.documents[0].number,
@@ -77,7 +78,7 @@ async function postHandler(req: Request) {
     if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
 
     const body = await req.json();
-    const { name, address, phone, email, nif, nis, rc, ice, matriculeFiscal, siret } = body;
+    const { name, address, phone, email, nif, nis, rc, ai, ice, matriculeFiscal, siret } = body;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ error: 'Le nom du client est requis' }, { status: 400 });
@@ -102,6 +103,7 @@ async function postHandler(req: Request) {
           nif: nif?.trim() || null,
           nis: nis?.trim() || null,
           rc: rc?.trim() || null,
+          ai: ai?.trim() || null,
           ice: ice?.trim() || null,
           matriculeFiscal: matriculeFiscal?.trim() || null,
           siret: siret?.trim() || null,
@@ -120,6 +122,7 @@ async function postHandler(req: Request) {
         nif: nif?.trim() || null,
         nis: nis?.trim() || null,
         rc: rc?.trim() || null,
+        ai: ai?.trim() || null,
         ice: ice?.trim() || null,
         matriculeFiscal: matriculeFiscal?.trim() || null,
         siret: siret?.trim() || null,
