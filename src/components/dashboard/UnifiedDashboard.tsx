@@ -170,11 +170,19 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       })()}
 
       {/* ── KPI Cards (F-pattern: revenue hero top-left) ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <KpiCard hero label={t('statTotal')} value={`${stats.totalTTC}`} suffix={tc('currency')} sub={t('totalTTC')} icon={<Wallet size={19} />} color="green" />
-        <KpiCard label={t('statDocuments')} value={stats.totalDocs} sub={`+${stats.monthDocs} ${t('statThisMonth')}`} icon={<FileText size={18} />} />
-        <KpiCard label={t('statClients')} value={stats.totalClients} sub={t('statRegistered')} icon={<Users size={18} />} color="blue" />
-        <KpiCard label={t('statDrafts')} value={stats.draftCount} sub={t('statDraftsSub')} icon={<PenLine size={18} />} color="amber" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="sm:col-span-1">
+          <KpiCard hero label={t('statTotal')} value={`${stats.totalTTC}`} suffix={tc('currency')} sub={t('totalTTC')} icon={<Wallet size={19} />} color="green" />
+        </div>
+        <div>
+          <KpiCard label={t('statDocuments')} value={stats.totalDocs} sub={`+${stats.monthDocs} ${t('statThisMonth')}`} icon={<FileText size={18} />} />
+        </div>
+        <div>
+          <KpiCard label={t('statClients')} value={stats.totalClients} sub={t('statRegistered')} icon={<Users size={18} />} color="blue" />
+        </div>
+        <div>
+          <KpiCard label={t('statDrafts')} value={stats.draftCount} sub={t('statDraftsSub')} icon={<PenLine size={18} />} color="amber" />
+        </div>
       </div>
 
       {/* ── Continue Draft (contextual) ── */}
@@ -259,7 +267,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
           </div>
         ) : docs.length === 0 ? (
           <div className="text-center py-16 px-6">
-            <div className="w-16 h-16 bg-[var(--navy-3)] text-[var(--sand-muted)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[var(--navy-3)] text-[var(--sand)] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FileStack size={32} />
             </div>
             <p className="text-sm font-bold text-[var(--sand)] mb-1">{stats.totalDocs === 0 ? t('emptyTitle') : t('noResults')}</p>
@@ -333,12 +341,12 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                 <div className="flex items-center gap-2">
                   <button onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1}
                     className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
-                      page <= 1 ? 'opacity-30 cursor-not-allowed border-transparent' : 'border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
+                      page <= 1 ? 'opacity-50 cursor-not-allowed border-[rgba(245,237,214,0.04)] text-[var(--sand-muted)]/50 grayscale' : 'border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
                     <ChevronLeft size={14} /> {tc('back')}
                   </button>
                   <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages}
                     className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
-                      page >= totalPages ? 'opacity-30 cursor-not-allowed border-transparent' : 'border-[rgba(0,149,77,0.2)] bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.15)]')}>
+                      page >= totalPages ? 'opacity-50 cursor-not-allowed border-[rgba(0,149,77,0.1)] bg-[rgba(0,149,77,0.05)] text-[var(--green-3)]/50 grayscale' : 'border-[rgba(0,149,77,0.2)] bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.15)]')}>
                     {t('next')} <ChevronRight size={14} />
                   </button>
                 </div>
