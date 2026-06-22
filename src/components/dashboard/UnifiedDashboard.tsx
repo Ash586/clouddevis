@@ -184,17 +184,23 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
 
       {/* ── Continue Draft (contextual) ── */}
       {draftDoc && (
-        <button onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
-          className="w-full flex items-center gap-3 sm:gap-4 p-3.5 mb-6 rounded-2xl bg-gradient-to-r from-[rgba(0,149,77,0.08)] to-transparent border border-[rgba(0,149,77,0.18)] hover:border-[rgba(0,149,77,0.3)] transition-all text-start group">
-          <div className="w-10 h-10 rounded-xl bg-[var(--green-glow)] flex items-center justify-center shrink-0">
-            <FileEdit size={18} className="text-[var(--green-3)]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold text-[var(--green-3)] uppercase tracking-wider">{t('continueDraft')}</p>
-            <p className="text-sm font-bold text-[var(--sand)] truncate">{draftDoc.number || t('untitledDoc')}{draftDoc.clientName ? ` · ${draftDoc.clientName}` : ''}</p>
-          </div>
-          <ChevronRight size={18} className="text-[var(--green-3)] shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        <div className="flex items-start gap-3 sm:gap-4 p-3.5 mb-6 rounded-2xl bg-gradient-to-r from-[rgba(0,149,77,0.08)] to-transparent border border-[rgba(0,149,77,0.18)]">
+          <button onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
+            className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-start group">
+            <div className="w-10 h-10 rounded-xl bg-[var(--green-glow)] flex items-center justify-center shrink-0">
+              <FileEdit size={18} className="text-[var(--green-3)]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold text-[var(--green-3)] uppercase tracking-wider">{t('continueDraft')}</p>
+              <p className="text-sm font-bold text-[var(--sand)] truncate">{draftDoc.number || t('untitledDoc')}{draftDoc.clientName ? ` · ${draftDoc.clientName}` : ''}</p>
+            </div>
+            <ChevronRight size={18} className="text-[var(--green-3)] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); router.push('/dashboard/documents?status=DRAFT'); }}
+            className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] text-[10px] font-bold hover:bg-[var(--navy-4)] hover:text-[var(--sand)] transition-all">
+            {tc('viewAll')}
+          </button>
+        </div>
       )}
 
       {/* ── Quick Create ── */}
