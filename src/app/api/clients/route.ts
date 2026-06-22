@@ -59,9 +59,9 @@ async function getHandler(req: Request) {
         lastDoc: c.documents[0] ? {
           number: c.documents[0].number,
           total: c.documents[0].totalTTC,
-          date: c.documents[0].createdAt.toISOString().split('T')[0],
+          date: c.documents[0].createdAt.toLocaleDateString('fr-DZ'),
         } : null,
-        createdAt: c.createdAt.toISOString().split('T')[0],
+        createdAt: c.createdAt.toLocaleDateString('fr-DZ'),
       })),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });

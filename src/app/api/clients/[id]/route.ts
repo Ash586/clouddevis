@@ -40,7 +40,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
         phone: client.phone, email: client.email,
         nif: client.nif, nis: client.nis, rc: client.rc, ai: client.ai,
         ice: client.ice, matriculeFiscal: client.matriculeFiscal, siret: client.siret,
-        createdAt: client.createdAt.toISOString().split('T')[0],
+        createdAt: client.createdAt.toLocaleDateString('fr-DZ'),
       },
       stats: {
         totalDocs: stats._count,
@@ -50,7 +50,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
       documents: client.documents.map(d => ({
         id: d.id, number: d.number, type: d.type, status: d.status,
         total: d.totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
-        date: d.date.toISOString().split('T')[0],
+        date: d.date.toLocaleDateString('fr-DZ'),
       })),
     });
   } catch (error) {
