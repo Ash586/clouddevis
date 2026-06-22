@@ -8,6 +8,7 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
 import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
+import { ClientCombobox } from '@/components/editor/ClientCombobox';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
@@ -546,7 +547,7 @@ function EditorContent() {
 
       case 'client':
         return <CollapsibleSection title={te('sections.client')} sectionId="client" {...dragProps} {...s('client')}>
-          {!hiddenFields.has('clientName') && <input type="text" placeholder={te('client.clientName')} className="w-full border p-2 rounded-lg text-[11px] font-bold outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.name} onChange={(e) => updateClientInfo({ name: e.target.value })} />}
+          {!hiddenFields.has('clientName') && <ClientCombobox value={doc.clientInfo.name} onSelect={(c) => updateClientInfo({ name: c.name, address: c.address ?? doc.clientInfo.address, phone: c.phone ?? doc.clientInfo.phone, email: c.email ?? doc.clientInfo.email, nif: c.nif ?? doc.clientInfo.nif, nis: c.nis ?? doc.clientInfo.nis, rc: c.rc ?? doc.clientInfo.rc })} placeholder={te('client.clientName')} />}
           {!hiddenFields.has('clientAddress') && <textarea placeholder={te('client.clientAddress')} className="w-full border p-2 rounded-lg text-[11px] h-12 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.address ?? ''} onChange={(e) => updateClientInfo({ address: e.target.value })} />}
           {!hiddenFields.has('clientNif') && mode === 'entreprise' && <div>
             <input type="text" placeholder={te('client.clientNif')} className={`w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 ${doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) ? 'border-red-300 focus:ring-red-500 bg-red-50' : 'focus:ring-[var(--green-2)]'}`} value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />
