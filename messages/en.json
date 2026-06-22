@@ -290,7 +290,9 @@
       "proforma": "Proforma Invoice",
       "bonCommande": "Purchase Order",
       "attachement": "Attachment"
-    }
+    },
+    "next": "Next",
+    "back": "Back"
   },
   "editor": {
     "loading": "Loading…",

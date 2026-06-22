@@ -290,7 +290,9 @@
       "proforma": "فاتورة Proforma",
       "bonCommande": "أمر شراء",
       "attachement": "كشف"
-    }
+    },
+    "next": "التالي",
+    "back": "رجوع"
   },
   "editor": {
     "loading": "جارٍ التحميل…",

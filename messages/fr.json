@@ -290,7 +290,9 @@
       "proforma": "Facture Proforma",
       "bonCommande": "Bon de Commande",
       "attachement": "Attachement"
-    }
+    },
+    "next": "Suivant",
+    "back": "Retour"
   },
   "editor": {
     "loading": "Chargement…",

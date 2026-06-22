@@ -11,6 +11,7 @@ import {
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
   Search, Trash2, ChevronRight, Clock, Wallet,
   ClipboardList, Receipt, Eye, FileEdit, FilePen,
+  ChevronLeft,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -44,6 +45,13 @@ interface UnifiedDashboardProps {
   loading: boolean;
   onDelete: (id: string) => void;
   mode: 'ARTISAN' | 'ENTREPRISE';
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
+  typeFilter: string;
+  onTypeFilterChange: (t: string) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -101,14 +109,12 @@ function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () 
 }
 
 /* ─── Main Dashboard ─── */
-export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, onDelete, mode }: UnifiedDashboardProps) {
+export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mode, page, totalPages, onPageChange, searchQuery, onSearchChange, typeFilter, onTypeFilterChange }: UnifiedDashboardProps) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
   const router = useRouter();
   const isEnt = mode === 'ENTREPRISE';
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('ALL');
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -116,15 +122,6 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
     if (hour < 18) return t('goodAfternoon');
     return t('goodEvening');
   };
-
-  const filteredDocs = docs.filter(doc => {
-    const matchesSearch = !searchQuery.trim() || (() => {
-      const q = searchQuery.toLowerCase();
-      return doc.number.toLowerCase().includes(q) || doc.client.toLowerCase().includes(q) || (TYPE_LABELS[doc.type] || doc.type).toLowerCase().includes(q);
-    })();
-    const matchesType = typeFilter === 'ALL' || doc.type === typeFilter;
-    return matchesSearch && matchesType;
-  });
 
   const filterChipClass = (active: boolean) =>
     `px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border ${
@@ -230,7 +227,7 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-56">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]" />
-                <input type="text" placeholder={tc('search')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                <input type="text" placeholder={tc('search')} value={searchQuery} onChange={(e) => onSearchChange(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-lg text-xs text-[var(--sand)] focus:outline-none focus:ring-1 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all" />
               </div>
             </div>
@@ -239,7 +236,7 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
           {/* Filter Chips */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
             {TYPE_FILTERS.map((tf) => (
-              <button key={tf} onClick={() => setTypeFilter(tf)} className={filterChipClass(typeFilter === tf)}>
+              <button key={tf} onClick={() => onTypeFilterChange(tf)} className={filterChipClass(typeFilter === tf)}>
                 {tf === 'ALL' ? t('allTypes') : TYPE_LABELS[tf] || tf}
               </button>
             ))}
@@ -252,14 +249,14 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
               <div key={i} className="h-14 bg-[var(--navy-3)] rounded-xl animate-pulse" />
             ))}
           </div>
-        ) : filteredDocs.length === 0 ? (
+        ) : docs.length === 0 ? (
           <div className="text-center py-16 px-6">
             <div className="w-16 h-16 bg-[var(--navy-3)] text-[var(--sand-muted)] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FileStack size={32} />
             </div>
-            <p className="text-sm font-bold text-[var(--sand)] mb-1">{docs.length === 0 ? t('emptyTitle') : t('noResults')}</p>
-            <p className="text-xs text-[var(--sand-muted)] mb-6">{docs.length === 0 ? t('emptyDesc') : t('noResultsDesc')}</p>
-            {docs.length === 0 && (
+            <p className="text-sm font-bold text-[var(--sand)] mb-1">{stats.totalDocs === 0 ? t('emptyTitle') : t('noResults')}</p>
+            <p className="text-xs text-[var(--sand-muted)] mb-6">{stats.totalDocs === 0 ? t('emptyDesc') : t('noResultsDesc')}</p>
+            {stats.totalDocs === 0 && (
               <div className="flex items-center justify-center gap-3">
                 <Button variant="primary" onClick={() => router.push('/dashboard/editor?type=devis')}>
                   <Plus size={16} className="mr-1" /> {t('createFirstDevis')}
@@ -271,49 +268,70 @@ export function UnifiedDashboard({ userName, companyInfo, stats, docs, loading, 
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">
-                  <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableNumber')}</th>
-                  <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableType')}</th>
-                  <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableClient')}</th>
-                  <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider text-right">{t('tableTotal')}</th>
-                  <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableStatus')}</th>
-                  <th className="px-6 py-3 w-20"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(245,237,214,0.04)]">
-                {filteredDocs.map((doc) => (
-                  <tr key={doc.id} className="group hover:bg-[rgba(245,237,214,0.02)] transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
-                    <td className="px-6 py-3 text-sm font-mono text-[var(--sand)]">{doc.number || '—'}</td>
-                    <td className="px-6 py-3">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${DOC_TYPE_BADGE[doc.type]?.bg || ''} ${DOC_TYPE_BADGE[doc.type]?.text || ''} ${DOC_TYPE_BADGE[doc.type]?.border || ''}`}>
-                        {TYPE_LABELS[doc.type] || doc.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-sm text-[var(--sand-2)]">{doc.client || '—'}</td>
-                    <td className="px-6 py-3 text-sm font-bold text-[var(--sand)] text-right">{doc.total} {tc('currency')}</td>
-                    <td className="px-6 py-3">
-                      <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/editor?id=${doc.id}`); }}
-                          className="p-1.5 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.1)] rounded-lg transition-all" title={t('view')}>
-                          <Eye size={14} />
-                        </button>
-                        <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
-                          className="p-1.5 text-red-400/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title={tc('delete')}>
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">
+                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableNumber')}</th>
+                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableType')}</th>
+                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableClient')}</th>
+                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider text-right">{t('tableTotal')}</th>
+                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableStatus')}</th>
+                    <th className="px-6 py-3 w-20"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[rgba(245,237,214,0.04)]">
+                  {docs.map((doc) => (
+                    <tr key={doc.id} className="group hover:bg-[rgba(245,237,214,0.02)] transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}>
+                      <td className="px-6 py-3 text-sm font-mono text-[var(--sand)]">{doc.number || '—'}</td>
+                      <td className="px-6 py-3">
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${DOC_TYPE_BADGE[doc.type]?.bg || ''} ${DOC_TYPE_BADGE[doc.type]?.text || ''} ${DOC_TYPE_BADGE[doc.type]?.border || ''}`}>
+                          {TYPE_LABELS[doc.type] || doc.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-sm text-[var(--sand-2)]">{doc.client || '—'}</td>
+                      <td className="px-6 py-3 text-sm font-bold text-[var(--sand)] text-right">{doc.total} {tc('currency')}</td>
+                      <td className="px-6 py-3">
+                        <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/editor?id=${doc.id}`); }}
+                            className="p-1.5 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.1)] rounded-lg transition-all" title={t('view')}>
+                            <Eye size={14} />
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
+                            className="p-1.5 text-red-400/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title={tc('delete')}>
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ── Pagination ── */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-[rgba(245,237,214,0.06)]">
+                <span className="text-[11px] text-[var(--sand-muted)]">{page} / {totalPages}</span>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1}
+                    className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
+                      page <= 1 ? 'opacity-30 cursor-not-allowed border-transparent' : 'border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
+                    <ChevronLeft size={14} /> {tc('back')}
+                  </button>
+                  <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages}
+                    className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
+                      page >= totalPages ? 'opacity-30 cursor-not-allowed border-transparent' : 'border-[rgba(0,149,77,0.2)] bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.15)]')}>
+                    {t('next')} <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </Card>
     </main>

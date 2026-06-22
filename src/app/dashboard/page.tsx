@@ -28,29 +28,55 @@ export default function DashboardPage() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [stats, setStats] = useState({ totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {} as Record<string, number>, typeBreakdown: {} as Record<string, number>, recentDraft: null as { id: string; number: string; type: string; clientName: string; updatedAt: string } | null });
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('ALL');
 
-  const fetchData = useCallback(() => {
-    Promise.all([
-      fetch('/api/documents').then(r => r.ok ? r.json() : { documents: [] }),
-      fetch('/api/dashboard').then(r => r.ok ? r.json() : { user: {}, stats: {} }),
-    ])
-      .then(([docData, dashData]) => {
-        setDocs(docData.documents);
-        setUserName(dashData.user?.name || '');
-        setUserMode(dashData.user?.mode || '');
-        setUserPhone(dashData.user?.phone || null);
-        setCompanyInfo(dashData.user?.companyInfo || null);
-        setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
-      })
-      .catch(() => { setDocs([]); })
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const docParams = new URLSearchParams({ page: String(page), limit: '20' });
+      if (searchQuery.trim()) docParams.set('search', searchQuery.trim());
+      if (typeFilter !== 'ALL') docParams.set('type', typeFilter);
+
+      const [docRes, dashRes] = await Promise.all([
+        fetch(`/api/documents?${docParams}`),
+        fetch('/api/dashboard'),
+      ]);
+
+      const docData = docRes.ok ? await docRes.json() : { documents: [], pagination: { totalPages: 1 } };
+      const dashData = dashRes.ok ? await dashRes.json() : { user: {}, stats: {} };
+
+      setDocs(docData.documents || []);
+      setTotalPages(docData.pagination?.totalPages || 1);
+      setUserName(dashData.user?.name || '');
+      setUserMode(dashData.user?.mode || '');
+      setUserPhone(dashData.user?.phone || null);
+      setCompanyInfo(dashData.user?.companyInfo || null);
+      setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
+    } catch {
+      setDocs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, searchQuery, typeFilter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleDelete = useCallback(async (id: string) => {
     const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
-    if (res.ok) setDocs(prev => prev.filter(d => d.id !== id));
+    if (res.ok) fetchData();
+  }, [fetchData]);
+
+  const handleSearchChange = useCallback((q: string) => {
+    setSearchQuery(q);
+    setPage(1);
+  }, []);
+
+  const handleTypeFilterChange = useCallback((t: string) => {
+    setTypeFilter(t);
+    setPage(1);
   }, []);
 
   useEffect(() => {
@@ -75,6 +101,13 @@ export default function DashboardPage() {
             loading={loading}
             onDelete={handleDelete}
             mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            typeFilter={typeFilter}
+            onTypeFilterChange={handleTypeFilterChange}
           />
         </TrialGate>
 
