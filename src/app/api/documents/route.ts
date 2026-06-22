@@ -26,6 +26,22 @@ async function getHandler(req: Request) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20')));
     const skip = (page - 1) * limit;
 
+    const sortBy = searchParams.get('sortBy') || 'date';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const dir: 'asc' | 'desc' = sortOrder === 'asc' ? 'asc' : 'desc';
+    const defaultOrder = { createdAt: 'desc' as const };
+    const orderBy = (() => {
+      switch (sortBy) {
+        case 'date': return { date: dir };
+        case 'total': return { totalTTC: dir };
+        case 'client': return { client: { name: dir } };
+        case 'number': return { number: dir };
+        case 'type': return { type: dir };
+        case 'status': return { status: dir };
+        default: return defaultOrder;
+      }
+    })();
+
     const where: Record<string, unknown> = { userId: session.userId };
     if (search) {
       where.OR = [
@@ -54,7 +70,7 @@ async function getHandler(req: Request) {
     const [docs, total, statusGroup, typeGroup] = await Promise.all([
       prisma.document.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip,
         take: limit,
         include: { client: { select: { name: true } } },

@@ -11,7 +11,7 @@ import {
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
   Search, Trash2, ChevronRight, Clock, Wallet,
   ClipboardList, Receipt, Eye, FileEdit, FilePen,
-  ChevronLeft, ScrollText, Wrench, X,
+  ChevronLeft, ScrollText, Wrench, X, ArrowUpDown,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -51,6 +51,9 @@ interface UnifiedDashboardProps {
   onSearchChange: (q: string) => void;
   typeFilter: string;
   onTypeFilterChange: (t: string) => void;
+  sortBy: string;
+  sortOrder: string;
+  onSortChange: (column: string) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -110,7 +113,7 @@ function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () 
 }
 
 /* ─── Main Dashboard ─── */
-export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mode, page, totalPages, onPageChange, searchQuery, onSearchChange, typeFilter, onTypeFilterChange }: UnifiedDashboardProps) {
+export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mode, page, totalPages, onPageChange, searchQuery, onSearchChange, typeFilter, onTypeFilterChange, sortBy, sortOrder, onSortChange }: UnifiedDashboardProps) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
   const router = useRouter();
@@ -281,14 +284,14 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">
-                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableNumber')}</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableType')}</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableClient')}</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider text-right">{t('tableTotal')}</th>
-                    <th className="px-6 py-3 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{t('tableStatus')}</th>
-                    <th className="px-6 py-3 w-20"></th>
-                  </tr>
+              <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">
+                <SortHeader column="number" label={t('tableNumber')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
+                <SortHeader column="type" label={t('tableType')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
+                <SortHeader column="client" label={t('tableClient')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
+                <SortHeader column="total" label={t('tableTotal')} current={sortBy} dir={sortOrder} onSort={onSortChange} align="right" />
+                <SortHeader column="status" label={t('tableStatus')} current={sortBy} dir={sortOrder} onSort={onSortChange} />
+                <th className="px-6 py-3 w-20"></th>
+              </tr>
                 </thead>
                 <tbody className="divide-y divide-[rgba(245,237,214,0.04)]">
                   {docs.map((doc) => (
@@ -400,5 +403,21 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${styles[status] || styles.DRAFT}`}>
       {label}
     </span>
+  );
+}
+
+/* ─── Sortable Header ─── */
+function SortHeader({ column, label, current, dir, onSort, align }: { column: string; label: string; current: string; dir: string; onSort: (c: string) => void; align?: 'left' | 'right' }) {
+  const active = current === column;
+  return (
+    <th className={`px-6 py-3 ${align === 'right' ? 'text-right' : 'text-left'}`}>
+      <button onClick={() => onSort(column)}
+        className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+          active ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]'
+        }`}>
+        {label}
+        <ArrowUpDown size={11} className={active ? 'opacity-100' : 'opacity-30'} />
+      </button>
+    </th>
   );
 }

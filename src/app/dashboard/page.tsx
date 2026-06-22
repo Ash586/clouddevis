@@ -31,11 +31,13 @@ export default function DashboardPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const docParams = new URLSearchParams({ page: String(page), limit: '20' });
+      const docParams = new URLSearchParams({ page: String(page), limit: '20', sortBy, sortOrder });
       if (searchQuery.trim()) docParams.set('search', searchQuery.trim());
       if (typeFilter !== 'ALL') docParams.set('type', typeFilter);
 
@@ -58,7 +60,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery, typeFilter]);
+  }, [page, searchQuery, typeFilter, sortBy, sortOrder]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -74,6 +76,18 @@ export default function DashboardPage() {
 
   const handleTypeFilterChange = useCallback((t: string) => {
     setTypeFilter(t);
+    setPage(1);
+  }, []);
+
+  const handleSortChange = useCallback((column: string) => {
+    setSortBy(prev => {
+      if (prev === column) {
+        setSortOrder(o => o === 'asc' ? 'desc' : 'asc');
+        return prev;
+      }
+      setSortOrder('desc');
+      return column;
+    });
     setPage(1);
   }, []);
 
@@ -105,6 +119,9 @@ export default function DashboardPage() {
             onSearchChange={handleSearchChange}
             typeFilter={typeFilter}
             onTypeFilterChange={handleTypeFilterChange}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={handleSortChange}
           />
         </TrialGate>
 
