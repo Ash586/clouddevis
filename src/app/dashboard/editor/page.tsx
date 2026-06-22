@@ -25,7 +25,7 @@ import {
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
   Grid3X3, Trash2, Plus, MoreHorizontal,
-  ChevronDown, ZoomIn, ZoomOut, Ruler, Layers3, MonitorCheck,
+  ChevronDown, MonitorCheck,
   Building2, Receipt, BadgeCheck, CircleDollarSign, ScrollText, Briefcase, ClipboardList, FileStack, Wrench, Pen,
 } from 'lucide-react';
 
@@ -138,7 +138,6 @@ function EditorContent() {
   }, [previewZoom]);
 
   const computedScale = previewZoom === 'fit' ? fitScale : previewZoom;
-  const previewScaleLabel = previewZoom === 'fit' ? 'Fit' : `${Math.round(previewZoom * 100)}%`;
   const previewReadyChecks = useMemo(() => [
     { label: 'Client', done: Boolean(doc.clientInfo.name?.trim()) },
     { label: 'Articles', done: doc.items.length > 0 },
@@ -627,9 +626,9 @@ function EditorContent() {
               <button onClick={() => { setAddingItem(false); setItemErrors(null); }} className="bg-red-500 text-white text-[11px] font-bold px-4 py-2 min-h-[44px] rounded-lg hover:bg-red-600 flex items-center justify-center"><Trash2 size={14} /></button>
             </div>
             {newItem.designation && newItem.unitPrice > 0 && (
-              <div className="flex items-center justify-between px-2 py-1 bg-[var(--green-glow)] rounded-lg border border-blue-100">
+              <div className="flex items-center justify-between px-2.5 py-1.5 bg-[var(--green-glow)] rounded-lg ring-1 ring-[rgba(0,149,77,0.2)]">
                 <span className="text-[10px] text-[var(--green-3)] font-medium">{te('prestations.lineTotal') || 'Total ligne'}</span>
-                <span className="text-[12px] font-bold text-[var(--green-3)]">{(newItem.quantity * newItem.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}</span>
+                <span className="text-[13px] font-bold text-[var(--green-3)]">{(newItem.quantity * newItem.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}</span>
               </div>
             )}
             {itemErrors && <div className="text-[10px] text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200">{itemErrors}</div>}
@@ -683,7 +682,7 @@ function EditorContent() {
                 setCatalogItems(all);
               } catch { setCatalogItems([]); }
               setCatalogLoading(false);
-            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-blue-300 rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px] flex items-center justify-center" title={te('catalog') || 'Catalogue'}><Package size={16} /></button>
+            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-[rgba(0,149,77,0.25)] rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px] flex items-center justify-center" title={te('catalog') || 'Catalogue'}><Package size={16} /></button>
           </div>}
           {/* Catalog Modal */}
           {showCatalog && (
@@ -820,23 +819,24 @@ function EditorContent() {
         )}
 
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
-        <div className="no-print h-11 flex items-center px-3 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.08)] z-50 shrink-0 gap-2">
-          {/* Left: Nav back + Doc type segmented */}
-          <button onClick={() => router.push('/dashboard')} className="shrink-0 p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
-            <ChevronRight size={16} className="rotate-180" />
+        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.08)] z-50 shrink-0 gap-3">
+          {/* Left: Nav back + Doc type selector */}
+          <button onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
+            <ChevronRight size={18} className="rotate-180" />
           </button>
           <div className="relative shrink-0">
             <button onClick={() => setShowTypeMenu(v => !v)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--navy-4)] rounded-lg text-[10px] font-black uppercase tracking-wider transition min-w-[80px] text-center text-blue-400 hover:bg-[var(--navy-3)]">
-                    {te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}
-              <ChevronDown size={12} />
+              className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[rgba(0,149,77,0.2)]">
+              {doc.documentType === 'devis' ? <FileText size={15} /> : doc.documentType === 'facture' ? <Receipt size={15} /> : doc.documentType === 'proforma' ? <ClipboardList size={15} /> : doc.documentType === 'bc' ? <FileStack size={15} /> : doc.documentType === 'br' ? <Package size={15} /> : doc.documentType === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
+              <span>{te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}</span>
+              <ChevronDown size={13} className={cn('transition-transform', showTypeMenu && 'rotate-180')} />
             </button>
             {showTypeMenu && (
-              <div className="absolute top-full left-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[170px]">
+              <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[190px]">
                 {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
                   <button key={t} onClick={() => { updateDoc('documentType', t); setShowTypeMenu(false); }}
-                    className={cn('w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition min-h-[36px]', doc.documentType === t ? 'bg-blue-600/20 text-blue-400' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
-                    {t === 'devis' ? <FileText size={14} /> : t === 'facture' ? <Receipt size={14} /> : t === 'proforma' ? <ClipboardList size={14} /> : t === 'bc' ? <FileStack size={14} /> : t === 'br' ? <Package size={14} /> : t === 'intervention' ? <Wrench size={14} /> : <FileText size={14} />}
+                    className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition min-h-[38px]', doc.documentType === t ? 'bg-[var(--green-glow)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                    {t === 'devis' ? <FileText size={15} /> : t === 'facture' ? <Receipt size={15} /> : t === 'proforma' ? <ClipboardList size={15} /> : t === 'bc' ? <FileStack size={15} /> : t === 'br' ? <Package size={15} /> : t === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
                     {tp(DOC_TYPE_PREVIEW_LABELS[t] ?? 'docTypeQuote')}
                   </button>
                 ))}
@@ -844,31 +844,34 @@ function EditorContent() {
             )}
           </div>
 
-          {/* Center: Save status */}
-          <div className="hidden md:flex items-center gap-1.5 text-[10px] ml-2">
+          {/* Center: Document number + save status */}
+          <div className="hidden md:flex items-center gap-2.5 min-w-0">
+            {doc.documentNumber && (
+              <span className="font-mono text-xs text-[var(--sand-muted)] truncate">{doc.documentNumber}</span>
+            )}
             {saving ? (
-              <span className="flex items-center gap-1 text-blue-400"><Loader2 size={11} className="animate-spin" />{te('saving')}</span>
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--green-3)]"><Loader2 size={12} className="animate-spin" />{te('saving')}</span>
             ) : (
-              <span className="flex items-center gap-1 text-[var(--sand-muted)]"><Check size={11} className="text-green-400" />Enregistré</span>
+              <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-green-400" />Enregistré</span>
             )}
           </div>
 
           {/* Right: Undo/Redo + Save + PDF */}
-          <div className="flex items-center gap-0.5 ml-auto">
+          <div className="flex items-center gap-1 ml-auto">
             {!docIdParam && (
-              <button onClick={() => setShowCustomizer(true)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
-                <Settings size={15} />
+              <button onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
+                <Settings size={16} />
               </button>
             )}
-            <button onClick={handleUndo} disabled={!canUndo} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={15} /></button>
-            <button onClick={handleRedo} disabled={!canRedo} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={15} /></button>
-            <div className="w-px h-5 bg-[rgba(245,237,214,0.08)] mx-1" />
-            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
-              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+            <button onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
+            <button onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
+            <div className="w-px h-6 bg-[rgba(245,237,214,0.1)] mx-1.5" />
+            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span className="hidden sm:inline">{tc('save')}</span>
             </Button>
-             <Button size="sm" onClick={handleDownload} disabled={saving} className="h-7 text-[10px] gap-1 px-2.5">
-               <Download size={12} />
+             <Button size="sm" onClick={handleDownload} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+               <Download size={14} />
                <span className="hidden sm:inline">{te('downloadPdf')}</span>
             </Button>
           </div>
@@ -898,7 +901,7 @@ function EditorContent() {
               { key: 'totals' as const, label: te('editorTabTotals') || 'Totaux', icon: Grid3X3 },
             ]).map(tab => (
               <button key={tab.key} onClick={() => setMobileTab(tab.key)}
-                className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] text-[11px] font-bold rounded-xl transition', mobileTab === tab.key ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] active:bg-[var(--navy-4)]')}>
+                className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] text-[11px] font-bold rounded-xl transition', mobileTab === tab.key ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] active:bg-[var(--navy-4)]')}>
                 <tab.icon size={13} />{tab.label}
               </button>
             ))}
@@ -910,14 +913,14 @@ function EditorContent() {
 
           {/* ──── LEFT RAIL (desktop, hidden by default) ──── */}
           {showSectionNav && (
-            <nav className="hidden lg:flex flex-col items-center gap-0.5 py-2 px-1 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[60px] shrink-0 overflow-y-auto">
+            <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[72px] shrink-0 overflow-y-auto">
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
                 <button key={item.id} onClick={() => { setActiveSection(item.id); setMobileTab('editor'); }}
-                  className={cn('w-full flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl transition-all', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] shadow-[0_0_12px_rgba(0,149,77,0.15)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
-                  <item.icon size={17} strokeWidth={active ? 2.2 : 1.8} />
-                  <span className="text-[7px] font-bold leading-tight text-center uppercase tracking-wide truncate w-full">{item.label}</span>
+                  className={cn('w-full flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] shadow-[0_0_12px_rgba(0,149,77,0.15)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                  <item.icon size={18} strokeWidth={active ? 2.2 : 1.8} />
+                  <span className="text-[9px] font-bold leading-tight text-center tracking-tight truncate w-full">{item.label}</span>
                 </button>
               );
             })}
@@ -951,19 +954,21 @@ function EditorContent() {
               )}
             </div>
             {/* ──── BOTTOM TOTALS BAR ──── */}
-            <div className="shrink-0 border-t border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2 flex items-center gap-3 overflow-x-auto">
-              <div className="flex items-center gap-3 sm:gap-4 text-[10px] min-w-0 flex-1">
+            <div className="shrink-0 border-t border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
+              <div className="flex items-center gap-3 sm:gap-4 text-[11px] min-w-0 flex-1">
                 <span className="shrink-0"><span className="text-[var(--sand-muted)]">HT </span><span className="font-bold text-[var(--sand)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></span>
                 {results.tvaRate > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}% </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></span>}
                 {results.timbreFiscal > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">Timbre </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></span>}
-                <div className="w-px h-4 bg-[rgba(245,237,214,0.1)] shrink-0" />
-                <span className="shrink-0"><span className="text-[var(--sand)] font-bold">Net </span><span className="font-black text-[var(--green-3)] text-[11px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></span>
               </div>
               {itemErrors && (
-                <button onClick={() => setActiveSection('prestations')} className="flex items-center gap-1 text-[9px] font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded-lg transition shrink-0">
-                  <AlertTriangle size={10} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
+                <button onClick={() => setActiveSection('prestations')} className="flex items-center gap-1 text-[10px] font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded-lg transition shrink-0">
+                  <AlertTriangle size={11} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
                 </button>
               )}
+              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[rgba(0,149,77,0.2)]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--green-3)]/80">{te('paiement.netToPay') || 'Net'}</span>
+                <span className="font-black text-[var(--green-3)] text-sm whitespace-nowrap">{formatCurrency(results.netAPayer, tc('currency'))}</span>
+              </div>
             </div>
           </div>
 
@@ -1001,58 +1006,34 @@ function EditorContent() {
 
           {/* ──── PREVIEW PANEL ──── */}
           <div className={cn('lg:flex flex-1 min-w-0 flex-col bg-[#121826]', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
-            <div className="no-print shrink-0 border-b border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]/95 px-3 py-2">
-              <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
-                <div className="flex min-w-0 items-center gap-2">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--green-glow)] text-[var(--green-3)]">
-                    <MonitorCheck size={16} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h2 className="truncate text-[12px] font-black uppercase tracking-wide text-[var(--sand)]">Preview Studio</h2>
-                      <span className="rounded-md border border-[rgba(245,237,214,0.1)] bg-[var(--navy-4)] px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-[var(--sand-muted)]">A4</span>
-                    </div>
-                    <p className="truncate text-[10px] text-[var(--sand-muted)]">
-                      {doc.documentNumber || 'Document sans numero'} · {doc.items.length} ligne{doc.items.length !== 1 ? 's' : ''} · {formatCurrency(results.netAPayer, tc('currency'))}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {previewReadyChecks.map(check => (
-                    <span key={check.label} className={cn(
-                      'inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[9px] font-bold',
-                      check.done
-                        ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300'
-                        : 'border-amber-400/20 bg-amber-400/10 text-amber-300',
-                    )}>
-                      {check.done ? <Check size={10} /> : <AlertTriangle size={10} />}
-                      {check.label}
-                    </span>
-                  ))}
-                  <span className="inline-flex items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.1)] bg-[var(--navy-4)] px-2 py-1 text-[9px] font-bold text-[var(--sand-muted)]">
-                    <Layers3 size={10} />
-                    {completedPreviewChecks}/3
+            <div className="no-print shrink-0 flex items-center gap-3 border-b border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]/95 px-4 py-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--green-glow)] text-[var(--green-3)]">
+                <MonitorCheck size={17} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="truncate text-xs font-black uppercase tracking-wide text-[var(--sand)]">{te('previewTitle') || 'Aperçu'}</h2>
+                  <span className="rounded-md bg-[var(--navy-4)] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--sand-muted)]">A4</span>
+                  <span className={cn(
+                    'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold',
+                    completedPreviewChecks === 3 ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300',
+                  )}>
+                    {completedPreviewChecks === 3 ? <Check size={10} /> : <AlertTriangle size={10} />}
+                    {completedPreviewChecks}/3 {te('ready') || 'prêt'}
                   </span>
                 </div>
+                <p className="truncate text-[11px] text-[var(--sand-muted)]">
+                  {doc.items.length} ligne{doc.items.length !== 1 ? 's' : ''} · {formatCurrency(results.netAPayer, tc('currency'))}
+                </p>
               </div>
 
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.08)] bg-[var(--navy-4)] p-0.5">
-                  <button onClick={() => setPreviewZoom('fit')} className={cn('flex min-h-8 items-center gap-1 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 'fit' ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Ajuster"><Maximize size={11} />Fit</button>
-                  <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-8 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 0.75 ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
-                  <button onClick={() => setPreviewZoom(1)} className={cn('min-h-8 rounded-md px-2 text-[9px] font-bold transition', previewZoom === 1 ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
+              <div className="flex shrink-0 items-center gap-2">
+                <div className="flex items-center gap-0.5 rounded-xl bg-[var(--navy-4)] p-1">
+                  <button onClick={() => setPreviewZoom('fit')} className={cn('flex min-h-7 items-center gap-1 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 'fit' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Ajuster"><Maximize size={12} />Fit</button>
+                  <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
+                  <button onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
                 </div>
-
-                <div className="flex items-center gap-1.5">
-                  <span className="hidden items-center gap-1 rounded-lg border border-[rgba(245,237,214,0.08)] bg-[var(--navy-4)] px-2 py-1.5 text-[9px] font-black text-[var(--sand-muted)] sm:inline-flex">
-                    <Ruler size={11} />
-                    {previewScaleLabel}
-                  </span>
-                  <button onClick={() => setPreviewZoom(0.75)} className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-[var(--sand-muted)] transition hover:bg-[var(--navy-4)] hover:text-[var(--sand)]" title="Reduire"><ZoomOut size={14} /></button>
-                  <button onClick={() => setPreviewZoom(1)} className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-[var(--sand-muted)] transition hover:bg-[var(--navy-4)] hover:text-[var(--sand)]" title="Agrandir"><ZoomIn size={14} /></button>
-                  <button onClick={() => setShowGrid(g => !g)} className={cn('flex min-h-8 min-w-8 items-center justify-center rounded-lg transition', showGrid ? 'bg-blue-500/15 text-blue-300 ring-1 ring-blue-400/20' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={14} /></button>
-                </div>
+                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[rgba(0,149,77,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
               </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}
