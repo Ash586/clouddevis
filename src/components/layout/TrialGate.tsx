@@ -55,7 +55,7 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
       {isTrial ? (
         <div>
           <div className="bg-amber-400/10 border-b border-amber-400/20 px-4 py-2">
-            <div className="max-w-4xl mx-auto flex items-center gap-3 flex-wrap">
+            <div className="max-w-4xl mx-auto flex items-center justify-center gap-3 flex-wrap">
               <span className="text-xs font-medium text-amber-400">
                 {trialEndDateStr
                   ? `Essai gratuit — ${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''} (se termine le ${trialEndDateStr})`
