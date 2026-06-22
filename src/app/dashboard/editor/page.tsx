@@ -11,7 +11,7 @@ import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
@@ -848,7 +848,7 @@ function EditorContent() {
             {showTypeMenu && (
               <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[190px]">
                 {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
-                  <button key={t} onClick={() => { updateDoc('documentType', t); setShowTypeMenu(false); }}
+                  <button key={t} onClick={() => { setDoc(prev => ({ ...prev, documentType: t, documentNumber: generateDocumentNumber(t, prev.mode) })); setShowTypeMenu(false); }}
                     className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition min-h-[38px]', doc.documentType === t ? 'bg-[var(--green-glow)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
                     {t === 'devis' ? <FileText size={15} /> : t === 'facture' ? <Receipt size={15} /> : t === 'proforma' ? <ClipboardList size={15} /> : t === 'bc' ? <FileStack size={15} /> : t === 'br' ? <Package size={15} /> : t === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
                     {tp(DOC_TYPE_PREVIEW_LABELS[t] ?? 'docTypeQuote')}
