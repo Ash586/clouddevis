@@ -280,6 +280,7 @@
     "emptyDesc": "Commencez par créer votre premier document.",
     "noResults": "Aucun résultat",
     "noResultsDesc": "Aucun document ne correspond à votre recherche.",
+    "clearFilters": "Réinitialiser les filtres",
     "createFirstDevis": "Nouveau devis",
     "createFirstFacture": "Nouvelle facture",
     "view": "Voir",

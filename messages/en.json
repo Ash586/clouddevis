@@ -280,6 +280,7 @@
     "emptyDesc": "Start by creating your first document.",
     "noResults": "No results",
     "noResultsDesc": "No documents match your search.",
+    "clearFilters": "Clear filters",
     "createFirstDevis": "New quote",
     "createFirstFacture": "New invoice",
     "view": "View",

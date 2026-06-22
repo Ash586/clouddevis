@@ -11,7 +11,7 @@ import {
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
   Search, Trash2, ChevronRight, Clock, Wallet,
   ClipboardList, Receipt, Eye, FileEdit, FilePen,
-  ChevronLeft, ScrollText, Wrench,
+  ChevronLeft, ScrollText, Wrench, X,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -260,7 +260,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             </div>
             <p className="text-sm font-bold text-[var(--sand)] mb-1">{stats.totalDocs === 0 ? t('emptyTitle') : t('noResults')}</p>
             <p className="text-xs text-[var(--sand-muted)] mb-6">{stats.totalDocs === 0 ? t('emptyDesc') : t('noResultsDesc')}</p>
-            {stats.totalDocs === 0 && (
+            {stats.totalDocs === 0 ? (
               <div className="flex items-center justify-center gap-3">
                 <Button variant="primary" onClick={() => router.push('/dashboard/editor?type=devis')}>
                   <Plus size={16} className="mr-1" /> {t('createFirstDevis')}
@@ -269,6 +269,11 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                   <Plus size={16} className="mr-1" /> {t('createFirstFacture')}
                 </Button>
               </div>
+            ) : (
+              <button onClick={() => { onSearchChange(''); onTypeFilterChange('ALL'); }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] text-[11px] font-bold hover:bg-[var(--navy-4)] hover:text-[var(--sand)] transition-all">
+                <X size={13} /> {t('clearFilters') || 'Réinitialiser les filtres'}
+              </button>
             )}
           </div>
         ) : (
