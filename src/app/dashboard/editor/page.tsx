@@ -14,6 +14,7 @@ import { useEditor } from '@/hooks/useEditor';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
+import { generateBonCommandeHTML } from '@/lib/generateBonCommandeHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions, categoryLabelKey } from '@/types';
@@ -253,6 +254,8 @@ function EditorContent() {
       ? generateAttachementHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : doc.documentType === 'devis'
       ? generateDevisHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+      : doc.documentType === 'bc'
+      ? generateBonCommandeHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : generateDocumentHTML({
         isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels,
         grouped, uncategorized, catOrder, doc, results,
@@ -460,6 +463,28 @@ function EditorContent() {
               <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('docCity')}</label>
               <input type="text" placeholder={te('docCity') || 'Ville'} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.docCity ?? ''} onChange={(e) => updateDoc('docCity', e.target.value)} />
             </div>}
+            {doc.documentType === 'bc' && <>
+              <div className="col-span-2">
+                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Source de financement</label>
+                <input type="text" placeholder="02 — 03 — 07" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).financementSource ?? '')} onChange={(e) => updateCustomField('bc', 'financementSource', e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Code gestionnaire</label>
+                <input type="text" placeholder="0699" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).codeGestionnaire ?? '')} onChange={(e) => updateCustomField('bc', 'codeGestionnaire', e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Nature de prestation</label>
+                <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).naturePrestation ?? '')} onChange={(e) => updateCustomField('bc', 'naturePrestation', e.target.value)}>
+                  <option value="">—</option><option value="travaux">Travaux</option><option value="fournitures">Fournitures</option><option value="services">Services</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Type de dépense</label>
+                <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={String((doc.customFields.bc ?? {}).typeDepense ?? '')} onChange={(e) => updateCustomField('bc', 'typeDepense', e.target.value)}>
+                  <option value="">—</option><option value="fonctionnement">Dépenses de fonctionnement</option><option value="equipement">Dépenses d&apos;équipement</option><option value="autre">Autre</option>
+                </select>
+              </div>
+            </>}
           </div>
           {!hiddenFields.has('vatRate') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.vatRate')}</label>
             <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.tvaRate} onChange={(e) => updateDoc('tvaRate', Number(e.target.value))}>

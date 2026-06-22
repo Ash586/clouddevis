@@ -144,7 +144,7 @@ export function PreviewAttachement({ doc, sf, bv, vb, t, tu, design, highlight }
                   </tr>
                 );
               })}
-              {catOrder.map(cat => {
+              {[...catOrder, ...Object.keys(grouped).filter(c => !catOrder.includes(c))].map(cat => {
                 const items = grouped[cat];
                 if (!items) return null;
                 const catLabel = CATEGORY_LABELS[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);

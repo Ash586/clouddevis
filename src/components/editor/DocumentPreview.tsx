@@ -2,12 +2,14 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import type { DocumentState, CalculationResult, CustomSectionDef, BlockId } from '@/types';
+import { ALL_CATEGORY_OPTIONS } from '@/types';
 import { formatCurrency } from '@/lib/calculations';
 import { PreviewHeader } from './preview/PreviewHeader';
 import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
 import { PreviewAttachement } from './preview/PreviewAttachement';
 import { PreviewDevis } from './preview/PreviewDevis';
+import { PreviewBonCommande } from './preview/PreviewBonCommande';
 import { getDesign } from '@/lib/documentDesign';
 
 export type PreviewFocus = 'header' | 'client' | 'items' | 'totals' | 'payment' | null;
@@ -27,12 +29,11 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
   const tcommon = useTranslations('common');
   const tu = useTranslations('preview.units');
   const UNIT_LABELS: Record<string, string> = { u:tu('u'), h:tu('h'), j:tu('j'), m2:tu('m2'), m3:tu('m3'), ml:tu('ml'), kg:tu('kg'), forfait:tu('forfait') };
-  const CATEGORY_LABELS: Record<string, string> = {
-    preparation: tcat('preparation'), peinture: tcat('peinture'), finition: tcat('finition'),
-    revetement: tcat('revetement'), facade: tcat('facade'), enduit: tcat('enduit'),
-    main_oeuvre: tcat('main_oeuvre'), materiaux: tcat('materiaux'), transport: tcat('transport'),
-    divers: tcat('divers'), services: tcat('services'),
-  };
+  const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
+    ALL_CATEGORY_OPTIONS
+      .filter(c => c.value)
+      .map(c => [c.value, tcat(c.labelKey.replace(/^preview\.categories\./, ''))])
+  );
   const design = getDesign(doc.documentType);
   const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
   const hf = new Set(hiddenFields ?? []);
@@ -58,6 +59,10 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
 
   if (doc.documentType === 'devis') {
     return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} results={results} design={design} highlight={previewFocus} />;
+  }
+
+  if (doc.documentType === 'bc') {
+    return <PreviewBonCommande doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
   }
 
   return (
