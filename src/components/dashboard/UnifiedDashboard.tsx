@@ -11,7 +11,7 @@ import {
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
   Search, Trash2, ChevronRight, Clock, Wallet,
   ClipboardList, Receipt, Eye, FileEdit, FilePen,
-  ChevronLeft,
+  ChevronLeft, ScrollText, Wrench,
 } from 'lucide-react';
 
 interface CompanyInfo {
@@ -67,6 +67,8 @@ const QUICK_CREATE_TYPES = [
   { type: 'facture', labelKey: 'facture', icon: Receipt, iconBg: 'bg-[rgba(0,149,77,0.12)]', textColor: 'text-[var(--green-3)]' },
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList, iconBg: 'bg-purple-400/10', textColor: 'text-purple-400' },
   { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack, iconBg: 'bg-amber-400/10', textColor: 'text-amber-400' },
+  { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText, iconBg: 'bg-teal-400/10', textColor: 'text-teal-400' },
+  { type: 'intervention', labelKey: 'intervention', icon: Wrench, iconBg: 'bg-rose-400/10', textColor: 'text-rose-400' },
   { type: 'attachement', labelKey: 'attachement', icon: FilePen, iconBg: 'bg-indigo-400/10', textColor: 'text-indigo-400' },
 ];
 
@@ -197,7 +199,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
         <h2 className="text-xs font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-3">{t('quickActions')}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {QUICK_CREATE_TYPES.map((qd) => {
-            const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
+            const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', bon_reception:'BR', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
             return (
               <button key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
                 className="group flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] hover:border-[rgba(245,237,214,0.14)] hover:bg-[var(--navy-3)] transition-all active:scale-[0.98] text-start">

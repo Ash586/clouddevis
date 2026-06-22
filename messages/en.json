@@ -290,6 +290,8 @@
       "facture": "Invoice",
       "proforma": "Proforma Invoice",
       "bonCommande": "Purchase Order",
+      "bonReception": "Delivery Receipt",
+      "intervention": "Intervention",
       "attachement": "Attachment"
     },
     "next": "Next",

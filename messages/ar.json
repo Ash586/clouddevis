@@ -236,7 +236,7 @@
   "dashboard": {
     "welcome": "مرحباً 👋",
     "goodMorning": "صباح الخير",
-    "goodAfternoon": "مساء الخير",
+    "goodAfternoon": "مساء النور",
     "goodEvening": "مساء الخير",
     "subtitle": "هذا ملخص نشاطك.",
     "newQuote": "تقدير جديد",
@@ -290,6 +290,8 @@
       "facture": "فاتورة",
       "proforma": "فاتورة Proforma",
       "bonCommande": "أمر شراء",
+      "bonReception": "وصل استلام",
+      "intervention": "تدخل",
       "attachement": "كشف"
     },
     "next": "التالي",
