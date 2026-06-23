@@ -10,6 +10,7 @@ import { PreviewFooter } from './preview/PreviewFooter';
 import { PreviewAttachement } from './preview/PreviewAttachement';
 import { PreviewDevis } from './preview/PreviewDevis';
 import { PreviewBonCommande } from './preview/PreviewBonCommande';
+import { PreviewIntervention } from './preview/PreviewIntervention';
 import { getDesign } from '@/lib/documentDesign';
 
 export type PreviewFocus = 'header' | 'client' | 'items' | 'totals' | 'payment' | null;
@@ -63,6 +64,10 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
 
   if (doc.documentType === 'bc') {
     return <PreviewBonCommande doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
+  }
+
+  if (doc.documentType === 'intervention') {
+    return <PreviewIntervention doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
   }
 
   return (

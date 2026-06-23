@@ -117,6 +117,12 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   paiement: 'Payment',
   notes: 'Notes',
   signature: 'Signature',
+  equipement: 'Équipement',
+  visite: 'Visite',
+  verifications: 'Vérifications',
+  travaux: 'Travaux',
+  pieces: 'Pièces',
+  etat: 'État Appareil',
 };
 
 export interface CalculationResult {
@@ -214,6 +220,12 @@ export const SECTION_FIELDS: Record<SectionId, string[]> = {
   paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
   notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   signature: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
+  equipement: ['equipementDesignation', 'equipementType', 'equipementSerie'],
+  visite: ['typeVisite', 'duree', 'intervenants'],
+  verifications: [],
+  travaux: [],
+  pieces: [],
+  etat: ['etatAppareil', 'defauts'],
 };
 
 /**
@@ -274,10 +286,13 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     design: ['logo', 'logoPosition'],
     general: ['docNumber', 'issueDate'],
     client: ['clientName', 'clientAddress', 'clientPhone'],
-    chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierResponsable'],
-    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
-    garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
-    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+    equipement: ['equipementDesignation', 'equipementType', 'equipementSerie'],
+    visite: ['typeVisite', 'duree', 'intervenants'],
+    verifications: [],
+    travaux: [],
+    pieces: [],
+    etat: ['etatAppareil', 'defauts'],
+    notes: ['notes'],
   },
   attachement: {
     design: ['logo', 'logoPosition'],
@@ -419,7 +434,7 @@ export const DOC_TYPE_SECTIONS: Record<DocumentType, string[]> = {
   proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
   bc: ['design', 'general', 'client', 'prestations', 'notes'],
   br: ['design', 'general', 'client', 'materiaux', 'notes'],
-  intervention: ['design', 'general', 'client', 'chantier', 'prestations', 'garanties', 'paiement', 'notes'],
+  intervention: ['design', 'general', 'client', 'equipement', 'visite', 'verifications', 'travaux', 'pieces', 'etat', 'notes', 'signature'],
   attachement: ['design', 'general', 'client', 'chantier', 'materiaux', 'prestations', 'notes', 'signature'],
 };
 
