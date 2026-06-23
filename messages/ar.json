@@ -326,7 +326,13 @@
       "garanties": "الضمانات",
       "paiement": "الدفع والتسوية",
       "notes": "ملاحظات",
-      "signature": "التوقيع"
+      "signature": "التوقيع",
+      "equipement": "المعدات",
+      "visite": "الزيارة",
+      "verifications": "الفحوصات",
+      "travaux": "الأعمال",
+      "pieces": "الأجزاء",
+      "etat": "حالة الجهاز"
     },
     "customize": "إظهار / إخفاء",
     "customizeTitle": "ما تريد رؤيته",
@@ -633,6 +639,14 @@
     "signatureLabel": "الخاتم والتوقيع",
     "signatureStamp": "التوقيع",
     "footer": "تم الإنشاء عبر CloudDevis.io",
+    "interventionSections": {
+      "equipement": "المعدات",
+      "visite": "الزيارة",
+      "verifications": "الفحوصات التي تم إجراؤها",
+      "travaux": "الأعمال المنجزة",
+      "pieces": "الأجزاء المستخدمة / المطلوبة",
+      "etat": "حالة الجهاز"
+    },
     "categories": {
       "none": "— بدون فئة —",
       "preparation": "تحضير",

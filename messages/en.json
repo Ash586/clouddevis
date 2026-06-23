@@ -326,7 +326,13 @@
       "garanties": "Guarantees",
       "paiement": "Payment & Settlement",
       "notes": "Notes",
-      "signature": "Signature"
+      "signature": "Signature",
+      "equipement": "Equipment",
+      "visite": "Visit",
+      "verifications": "Verifications",
+      "travaux": "Work",
+      "pieces": "Parts",
+      "etat": "Device State"
     },
     "customize": "Show / Hide",
     "customizeTitle": "What you want to see",
@@ -633,6 +639,14 @@
     "signatureLabel": "Stamp and signature",
     "signatureStamp": "Signature",
     "footer": "Generated via CloudDevis.io",
+    "interventionSections": {
+      "equipement": "Equipment",
+      "visite": "Visit",
+      "verifications": "Verifications Performed",
+      "travaux": "Work Completed",
+      "pieces": "Parts Used / Ordered",
+      "etat": "Device State"
+    },
     "categories": {
       "none": "— No category —",
       "preparation": "Preparation",

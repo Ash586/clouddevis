@@ -326,7 +326,13 @@
       "garanties": "Garanties",
       "paiement": "Règlement & Paiement",
       "notes": "Notes",
-      "signature": "Signature"
+      "signature": "Signature",
+      "equipement": "Équipement",
+      "visite": "Visite",
+      "verifications": "Vérifications",
+      "travaux": "Travaux",
+      "pieces": "Pièces",
+      "etat": "État Appareil"
     },
     "customize": "Afficher / Masquer",
     "customizeTitle": "Ce que vous voulez voir",
@@ -633,6 +639,14 @@
     "signatureLabel": "Cachet et signature",
     "signatureStamp": "Signature",
     "footer": "Généré via CloudDevis.io",
+    "interventionSections": {
+      "equipement": "Équipement",
+      "visite": "Visite",
+      "verifications": "Vérifications effectuées",
+      "travaux": "Travaux effectués",
+      "pieces": "Pièces utilisées / Commandées",
+      "etat": "État Appareil"
+    },
     "categories": {
       "none": "— Sans catégorie —",
       "preparation": "Préparation",

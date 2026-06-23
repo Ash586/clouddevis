@@ -46,7 +46,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
 
       {/* Equipment Section */}
       <div className="mb-6 p-3 bg-slate-50 rounded-lg border border-slate-200">
-        <h3 className="text-xs font-bold uppercase text-slate-700 mb-2">Équipement</h3>
+        <h3 className="text-xs font-bold uppercase text-slate-700 mb-2">{t('interventionSections.equipement')}</h3>
         <div className="grid grid-cols-3 gap-3 text-xs">
           <div>
             <span className="font-bold text-slate-600">Désignation:</span>
@@ -90,7 +90,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
       {/* Verifications Checklist */}
       {(intervention.verifications as string[])?.length > 0 && (
         <div className="mb-6 p-3 bg-slate-50 rounded-lg border border-slate-200">
-          <h3 className="text-xs font-bold uppercase text-slate-700 mb-2">Vérifications effectuées</h3>
+          <h3 className="text-xs font-bold uppercase text-slate-700 mb-2">{t('interventionSections.verifications')}</h3>
           <div className="space-y-1">
             {(intervention.verifications as string[]).map((item, i) => (
               <p key={i} className="text-xs flex items-center gap-2">
@@ -104,7 +104,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
       {/* Work Done */}
       {(intervention.travaux as string[])?.length > 0 && (
         <div className="mb-6 p-3 bg-amber-50 rounded-lg border border-amber-200">
-          <h3 className="text-xs font-bold uppercase text-amber-700 mb-2">Travaux effectués</h3>
+          <h3 className="text-xs font-bold uppercase text-amber-700 mb-2">{t('interventionSections.travaux')}</h3>
           <div className="space-y-1">
             {(intervention.travaux as string[]).map((item, i) => (
               <p key={i} className="text-xs">{i + 1}. {item}</p>
@@ -116,7 +116,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
       {/* Parts Used */}
       {(intervention.pieces as string[])?.length > 0 && (
         <div className="mb-6 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
-          <h3 className="text-xs font-bold uppercase text-indigo-700 mb-2">Pièces utilisées/commandées</h3>
+          <h3 className="text-xs font-bold uppercase text-indigo-700 mb-2">{t('interventionSections.pieces')}</h3>
           <div className="space-y-1">
             {(intervention.pieces as string[]).map((item, i) => (
               <p key={i} className="text-xs">• {item}</p>
