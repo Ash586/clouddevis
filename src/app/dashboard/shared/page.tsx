@@ -52,12 +52,12 @@ export default function SharedDocumentsPage() {
         <div className="flex-1 min-w-0">
           <TrialGate>
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 mb-6">{t('title')}</h1>
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)] mb-6">{t('title')}</h1>
 
               <div className="flex gap-2 mb-4">
                 {['all', 'view', 'edit'].map(f => (
                   <button key={f} onClick={() => setFilter(f)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${filter === f ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${filter === f ? 'bg-[var(--green-2)] text-white' : 'bg-[var(--navy-3)] text-[var(--sand-2)] hover:bg-[var(--navy-4)]'}`}>
                     {t(`filter.${f}`)}
                   </button>
                 ))}
@@ -68,8 +68,8 @@ export default function SharedDocumentsPage() {
                   <div className="py-12 text-center"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>
                 ) : filtered.length === 0 ? (
                   <div className="text-center py-12">
-                    <svg className="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                    <p className="text-sm text-slate-400">{t('empty')}</p>
+                    <svg className="w-10 h-10 text-[var(--sand-muted)] mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                    <p className="text-sm text-[var(--sand-muted)]">{t('empty')}</p>
                   </div>
                 ) : (
                   <MobileTable columns={columns} data={filtered} keyField="id"

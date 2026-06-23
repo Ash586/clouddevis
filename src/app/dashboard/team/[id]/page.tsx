@@ -68,27 +68,27 @@ export default function TeamDetailPage() {
         <div className="flex-1 min-w-0">
           <TrialGate>
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
-              <button onClick={() => router.push('/dashboard/team')} className="text-xs text-blue-600 font-semibold hover:text-blue-700 mb-4 flex items-center gap-1">
+              <button onClick={() => router.push('/dashboard/team')} className="text-xs text-blue-400 font-semibold hover:text-blue-300 mb-4 flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 {t('backToTeams')}
               </button>
 
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900">{team.name}</h1>
-                  <p className="text-xs text-slate-400 mt-1">{t('teamInfo', { members: team.members.length, docs: team._count.documents })}</p>
+                  <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{team.name}</h1>
+                  <p className="text-xs text-[var(--sand-muted)] mt-1">{t('teamInfo', { members: team.members.length, docs: team._count.documents })}</p>
                 </div>
               </div>
 
               {/* Invite */}
               <Card className="p-4 mb-6">
-                <h3 className="text-sm font-bold text-slate-900 mb-3">{t('inviteMember')}</h3>
+                <h3 className="text-sm font-bold text-[var(--sand)] mb-3">{t('inviteMember')}</h3>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
                     placeholder={t('inviteEmailPlaceholder')}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                   <select value={inviteRole} onChange={e => setInviteRole(e.target.value)}
-                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+                    className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
                     <option value="MEMBER">{t('roleMember')}</option>
                     <option value="ADMIN">{t('roleAdmin')}</option>
                   </select>
@@ -98,22 +98,22 @@ export default function TeamDetailPage() {
 
               {/* Members */}
               <Card className="p-4 mb-6">
-                <h3 className="text-sm font-bold text-slate-900 mb-4">{t('members')} ({team.members.length})</h3>
+                <h3 className="text-sm font-bold text-[var(--sand)] mb-4">{t('members')} ({team.members.length})</h3>
                 <MobileTable columns={memberColumns} data={team.members} keyField="id" />
               </Card>
 
               {/* Invites */}
               {team.invites.length > 0 && (
                 <Card className="p-4">
-                  <h3 className="text-sm font-bold text-slate-900 mb-4">{t('pendingInvites')}</h3>
+                  <h3 className="text-sm font-bold text-[var(--sand)] mb-4">{t('pendingInvites')}</h3>
                   <div className="space-y-2">
                     {team.invites.map(inv => (
-                      <div key={inv.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                      <div key={inv.id} className="flex items-center justify-between p-3 bg-[var(--navy-3)] rounded-xl">
                         <div>
-                          <p className="text-sm font-semibold text-slate-700">{inv.email}</p>
-                          <p className="text-xs text-slate-400">{inv.role} • {new Date(inv.createdAt).toLocaleDateString()}</p>
+                          <p className="text-sm font-semibold text-[var(--sand-2)]">{inv.email}</p>
+                          <p className="text-xs text-[var(--sand-muted)]">{inv.role} • {new Date(inv.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">{t('pending')}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400">{t('pending')}</span>
                       </div>
                     ))}
                   </div>

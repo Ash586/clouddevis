@@ -45,10 +45,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600',
-  ACCEPTED: 'bg-green-50 text-green-600',
-  PROGRESS: 'bg-amber-50 text-amber-600',
-  DELIVERED: 'bg-blue-50 text-blue-600',
+  DRAFT: 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
+  ACCEPTED: 'bg-blue-400/10 text-blue-400',
+  PROGRESS: 'bg-amber-400/10 text-amber-400',
+  DELIVERED: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
 };
 
 export default function ClientDetailPage() {
@@ -98,10 +98,10 @@ export default function ClientDetailPage() {
             <TrialGate>
               <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
                 <div className="animate-pulse space-y-4">
-                  <div className="h-8 w-48 bg-slate-200 rounded" />
-                  <div className="h-32 bg-slate-100 rounded-xl" />
+                  <div className="h-8 w-48 bg-[var(--navy-4)] rounded" />
+                  <div className="h-32 bg-[var(--navy-3)] rounded-xl" />
                   <div className="grid grid-cols-3 gap-4">
-                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-slate-100 rounded-xl" />)}
+                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-[var(--navy-3)] rounded-xl" />)}
                   </div>
                 </div>
               </div>
@@ -132,21 +132,21 @@ export default function ClientDetailPage() {
               <Card>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-xl font-black text-slate-900">{client.name}</h1>
-                    <div className="mt-1 space-y-0.5 text-sm text-slate-500">
+                    <h1 className="text-xl font-black text-[var(--sand)]">{client.name}</h1>
+                    <div className="mt-1 space-y-0.5 text-sm text-[var(--sand-muted)]">
                       {client.address && <p>{client.address}</p>}
                       {client.phone && <p>{client.phone}</p>}
                       {client.email && <p>{client.email}</p>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    {client.nif && <span className="px-2 py-1 bg-slate-100 rounded-lg font-medium">NIF: {client.nif}</span>}
-                    {client.nis && <span className="px-2 py-1 bg-slate-100 rounded-lg font-medium">NIS: {client.nis}</span>}
-                    {client.rc && <span className="px-2 py-1 bg-slate-100 rounded-lg font-medium">RC: {client.rc}</span>}
+                  <div className="flex items-center gap-2 text-xs text-[var(--sand-muted)]">
+                    {client.nif && <span className="px-2 py-1 bg-[var(--navy-3)] rounded-lg font-medium">NIF: {client.nif}</span>}
+                    {client.nis && <span className="px-2 py-1 bg-[var(--navy-3)] rounded-lg font-medium">NIS: {client.nis}</span>}
+                    {client.rc && <span className="px-2 py-1 bg-[var(--navy-3)] rounded-lg font-medium">RC: {client.rc}</span>}
                   </div>
                 </div>
                 {(client.ice || client.matriculeFiscal || client.siret) && (
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--sand-muted)]">
                     {client.ice && <span>ICE: {client.ice}</span>}
                     {client.matriculeFiscal && <span>MF: {client.matriculeFiscal}</span>}
                     {client.siret && <span>SIRET: {client.siret}</span>}
@@ -156,50 +156,50 @@ export default function ClientDetailPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card className="text-center">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{t('totalDocs')}</p>
-                  <p className="text-2xl font-black text-blue-600 mt-1">{stats.totalDocs}</p>
+                  <p className="text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">{t('totalDocs')}</p>
+                  <p className="text-2xl font-black text-blue-400 mt-1">{stats.totalDocs}</p>
                 </Card>
                 <Card className="text-center">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{t('totalTTC')}</p>
-                  <p className="text-2xl font-black text-slate-900 mt-1">{formatCurrency(stats.totalTTC)}</p>
+                  <p className="text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">{t('totalTTC')}</p>
+                  <p className="text-2xl font-black text-[var(--sand)] mt-1">{formatCurrency(stats.totalTTC)}</p>
                 </Card>
                 <Card className="text-center">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{t('totalTVA')}</p>
-                  <p className="text-2xl font-black text-amber-600 mt-1">{formatCurrency(stats.totalTVA)}</p>
+                  <p className="text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">{t('totalTVA')}</p>
+                  <p className="text-2xl font-black text-amber-400 mt-1">{formatCurrency(stats.totalTVA)}</p>
                 </Card>
               </div>
 
               <div>
-                <h2 className="text-lg font-black text-slate-900 mb-4">{t('documents')}</h2>
+                <h2 className="text-lg font-black text-[var(--sand)] mb-4">{t('documents')}</h2>
                 {documents.length === 0 ? (
                   <Card className="text-center py-8">
                     <div className="text-3xl mb-2">📄</div>
-                    <p className="text-sm text-slate-500">{t('noDocuments')}</p>
+                    <p className="text-sm text-[var(--sand-muted)]">{t('noDocuments')}</p>
                   </Card>
                 ) : (
                   <Card className="overflow-x-auto p-0">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-slate-100">
-                          <th className="text-start px-4 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">{t('number')}</th>
-                          <th className="text-start px-4 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">{t('type')}</th>
-                          <th className="text-start px-4 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">{tc('status')}</th>
-                          <th className="text-end px-4 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">{t('total')}</th>
-                          <th className="text-start px-4 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">{t('date')}</th>
+                        <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                          <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('number')}</th>
+                          <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('type')}</th>
+                          <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{tc('status')}</th>
+                          <th className="text-end px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('total')}</th>
+                          <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('date')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {documents.map(doc => (
-                          <tr key={doc.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition">
-                            <td className="px-4 py-3 font-medium text-slate-900">{doc.number}</td>
-                            <td className="px-4 py-3 text-slate-600">{TYPE_LABELS[doc.type] ?? doc.type}</td>
+                          <tr key={doc.id} className="border-b border-[rgba(245,237,214,0.04)] hover:bg-[rgba(245,237,214,0.02)] transition">
+                            <td className="px-4 py-3 font-medium text-[var(--sand)]">{doc.number}</td>
+                            <td className="px-4 py-3 text-[var(--sand-2)]">{TYPE_LABELS[doc.type] ?? doc.type}</td>
                             <td className="px-4 py-3">
-                              <span className={cn('inline-flex px-2 py-0.5 rounded-full text-xs font-semibold', STATUS_COLORS[doc.status] ?? 'bg-slate-100 text-slate-600')}>
+                              <span className={cn('inline-flex px-2 py-0.5 rounded-full text-xs font-semibold', STATUS_COLORS[doc.status] ?? 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
                                 {doc.status}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-end font-medium text-slate-900">{doc.total}</td>
-                            <td className="px-4 py-3 text-slate-500 text-xs">{doc.date}</td>
+                            <td className="px-4 py-3 text-end font-medium text-[var(--sand)]">{doc.total}</td>
+                            <td className="px-4 py-3 text-[var(--sand-muted)] text-xs">{doc.date}</td>
                           </tr>
                         ))}
                       </tbody>

@@ -77,8 +77,8 @@ export default function RecurringInvoicesPage() {
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900">{t('title')}</h1>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">{t('subtitle')}</p>
+                  <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
+                  <p className="text-xs sm:text-sm text-[var(--sand-muted)] mt-1">{t('subtitle')}</p>
                 </div>
                 <Button size="sm" onClick={() => setShowCreate(true)}>
                   <Plus className="w-3.5 h-3.5 mr-1" /> {t('createNew')}
@@ -87,28 +87,28 @@ export default function RecurringInvoicesPage() {
 
               {showCreate && (
                 <Card className="p-4 mb-6">
-                  <h3 className="text-sm font-bold text-slate-900 mb-3">{t('createSchedule')}</h3>
+                  <h3 className="text-sm font-bold text-[var(--sand)] mb-3">{t('createSchedule')}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <input type="text" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                       placeholder={t('form.namePlaceholder')}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                     <select value={form.documentType} onChange={e => setForm(p => ({ ...p, documentType: e.target.value }))}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
                       <option value="FACTURE">Facture</option>
                       <option value="DEVIS">Devis</option>
                       <option value="PROFORMA">Proforma</option>
                     </select>
                     <select value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
                       <option value="WEEKLY">{t('eachWeek')}</option>
                       <option value="MONTHLY">{t('eachMonth')}</option>
                       <option value="QUARTERLY">{t('eachQuarter')}</option>
                       <option value="YEARLY">{t('eachYear')}</option>
                     </select>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 mb-1">{t('form.nextDate')}</label>
+                      <label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-1">{t('form.nextDate')}</label>
                       <input type="date" value={form.nextDate} onChange={e => setForm(p => ({ ...p, nextDate: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30" />
+                        className="w-full px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -125,30 +125,30 @@ export default function RecurringInvoicesPage() {
                   <div className="py-12 text-center"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>
                 ) : invoices.length === 0 ? (
                   <div className="text-center py-12">
-                    <RefreshCw className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                    <p className="text-sm text-slate-400">{t('empty')}</p>
+                    <RefreshCw className="w-10 h-10 text-[var(--sand-muted)] mx-auto mb-2" />
+                    <p className="text-sm text-[var(--sand-muted)]">{t('empty')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {invoices.map(inv => (
-                      <div key={inv.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                      <div key={inv.id} className="flex items-center justify-between p-3 bg-[var(--navy-3)] rounded-xl">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-bold text-slate-800">{inv.name}</p>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${inv.active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                            <p className="text-sm font-bold text-[var(--sand)]">{inv.name}</p>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${inv.active ? 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]' : 'bg-[var(--navy-3)] text-[var(--sand-muted)]'}`}>
                               {inv.active ? t('active') : t('paused')}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-[var(--sand-muted)] mt-0.5">
                             {t(FREQ_LABELS[inv.frequency] || inv.frequency)} • {t('nextGen')} {new Date(inv.nextDate).toLocaleDateString()}
                             {inv.lastGenerated && <> • {t('lastGen')} {new Date(inv.lastGenerated).toLocaleDateString()}</>}
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => handleToggle(inv)} className="p-2 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition" title={inv.active ? t('pause') : t('resume')}>
+                          <button onClick={() => handleToggle(inv)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 rounded-lg hover:bg-blue-400/10 transition" title={inv.active ? t('pause') : t('resume')}>
                             {inv.active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                           </button>
-                          <button onClick={() => handleDelete(inv.id)} className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition" title={tc('delete')}>
+                          <button onClick={() => handleDelete(inv.id)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 rounded-lg hover:bg-red-400/10 transition" title={tc('delete')}>
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

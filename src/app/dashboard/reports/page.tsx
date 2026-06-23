@@ -50,13 +50,13 @@ interface ReportsData {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  DEVIS: 'bg-blue-100 text-blue-700',
-  FACTURE: 'bg-emerald-100 text-emerald-700',
-  PROFORMA: 'bg-purple-100 text-purple-700',
-  BC: 'bg-amber-100 text-amber-700',
-  BR: 'bg-teal-100 text-teal-700',
-  INTERVENTION: 'bg-rose-100 text-rose-700',
-  ATTACHEMENT: 'bg-indigo-100 text-indigo-700',
+  DEVIS: 'bg-blue-400/10 text-blue-400',
+  FACTURE: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  PROFORMA: 'bg-purple-400/10 text-purple-400',
+  BC: 'bg-amber-400/10 text-amber-400',
+  BR: 'bg-teal-400/10 text-teal-400',
+  INTERVENTION: 'bg-rose-400/10 text-rose-400',
+  ATTACHEMENT: 'bg-indigo-400/10 text-indigo-400',
 };
 
 const PERIODS: { value: Period; labelKey: string }[] = [
@@ -148,7 +148,7 @@ export default function ReportsPage() {
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
 
               <div className="flex items-center justify-between">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900">{t('title')}</h1>
+                <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
                 <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!data}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                   {t('exportCSV')}
@@ -165,8 +165,8 @@ export default function ReportsPage() {
                       className={cn(
                         'px-4 py-2 rounded-xl text-sm font-semibold transition-all',
                         period === p.value
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          ? 'bg-[var(--green-2)] text-white shadow-sm'
+                          : 'bg-[var(--navy-3)] text-[var(--sand-2)] hover:bg-[var(--navy-4)]'
                       )}
                     >
                       {t(p.labelKey)}
@@ -176,21 +176,21 @@ export default function ReportsPage() {
                 {period === 'custom' && (
                   <div className="grid grid-cols-2 gap-3 mt-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{t('from')}</label>
+                      <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('from')}</label>
                       <input
                         type="date"
                         value={customFrom}
                         onChange={e => setCustomFrom(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                        className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{t('to')}</label>
+                      <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('to')}</label>
                       <input
                         type="date"
                         value={customTo}
                         onChange={e => setCustomTo(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                        className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                       />
                     </div>
                   </div>
@@ -198,35 +198,35 @@ export default function ReportsPage() {
               </Card>
 
               {loading ? (
-                <div className="text-center py-12 text-slate-400">{tc('loading')}</div>
+                <div className="text-center py-12 text-[var(--sand-muted)]">{tc('loading')}</div>
               ) : !data ? (
-                <div className="text-center py-12 text-slate-400">{t('noData')}</div>
+                <div className="text-center py-12 text-[var(--sand-muted)]">{t('noData')}</div>
               ) : (
                 <>
                   {/* Summary Cards */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <Card className="text-center">
-                      <p className="text-2xl font-black text-slate-900">{data.summary.totalRevenue} <span className="text-sm font-normal text-slate-400">{tc('currency')}</span></p>
-                      <p className="text-xs text-slate-500 font-semibold">{t('totalRevenue')}</p>
+                      <p className="text-2xl font-black text-[var(--sand)]">{data.summary.totalRevenue} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
+                      <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalRevenue')}</p>
                     </Card>
                     <Card className="text-center">
-                      <p className="text-2xl font-black text-slate-900">{data.summary.totalTVA} <span className="text-sm font-normal text-slate-400">{tc('currency')}</span></p>
-                      <p className="text-xs text-slate-500 font-semibold">{t('totalTVA')}</p>
+                      <p className="text-2xl font-black text-[var(--sand)]">{data.summary.totalTVA} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
+                      <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalTVA')}</p>
                     </Card>
                     <Card className="text-center">
-                      <p className="text-2xl font-black text-slate-900">{data.summary.totalCount}</p>
-                      <p className="text-xs text-slate-500 font-semibold">{t('docCount')}</p>
+                      <p className="text-2xl font-black text-[var(--sand)]">{data.summary.totalCount}</p>
+                      <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('docCount')}</p>
                     </Card>
                     <Card className="text-center">
-                      <p className="text-2xl font-black text-slate-900">{data.summary.avgInvoice} <span className="text-sm font-normal text-slate-400">{tc('currency')}</span></p>
-                      <p className="text-xs text-slate-500 font-semibold">{t('avgInvoice')}</p>
+                      <p className="text-2xl font-black text-[var(--sand)]">{data.summary.avgInvoice} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
+                      <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('avgInvoice')}</p>
                     </Card>
                   </div>
 
                   {/* Monthly Revenue Chart */}
                   {data.monthly.length > 0 && (
                     <Card>
-                      <h2 className="text-sm font-bold text-slate-700 mb-4">{t('monthlyRevenue')}</h2>
+                      <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('monthlyRevenue')}</h2>
                       <div className="flex items-end gap-2 h-48 overflow-x-auto pb-6">
                         {data.monthly.map(m => {
                           const val = parseRevenue(m.revenue);
@@ -234,9 +234,9 @@ export default function ReportsPage() {
                           const monthLabel = m.month.length === 7 ? `${MONTH_NAMES[parseInt(m.month.split('-')[1]) - 1]} ${m.month.split('-')[0].slice(-2)}` : m.month;
                           return (
                             <div key={m.month} className="flex flex-col items-center min-w-[60px] flex-1">
-                              <span className="text-[9px] font-semibold text-slate-400 mb-1 whitespace-nowrap">{val.toLocaleString()}</span>
-                              <div className="w-full max-w-[40px] bg-blue-600 rounded-t-lg transition-all" style={{ height: `${Math.max(4, pct)}%` }} />
-                              <span className="text-[10px] font-semibold text-slate-500 mt-2 whitespace-nowrap">{monthLabel}</span>
+                              <span className="text-[9px] font-semibold text-[var(--sand-muted)] mb-1 whitespace-nowrap">{val.toLocaleString()}</span>
+                              <div className="w-full max-w-[40px] bg-[var(--green-2)] rounded-t-lg transition-all" style={{ height: `${Math.max(4, pct)}%` }} />
+                              <span className="text-[10px] font-semibold text-[var(--sand-muted)] mt-2 whitespace-nowrap">{monthLabel}</span>
                             </div>
                           );
                         })}
@@ -247,29 +247,29 @@ export default function ReportsPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* By Type Table */}
                     <Card>
-                      <h2 className="text-sm font-bold text-slate-700 mb-4">{t('byType')}</h2>
+                      <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('byType')}</h2>
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-slate-100">
-                            <th className="text-start py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('type')}</th>
-                            <th className="text-end py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{t('count')}</th>
-                            <th className="text-end py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('total')}</th>
+                          <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                            <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('type')}</th>
+                            <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('count')}</th>
+                            <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('total')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.byType.map(r => (
-                            <tr key={r.type} className="border-b border-slate-50">
+                            <tr key={r.type} className="border-b border-[rgba(245,237,214,0.04)]">
                               <td className="py-2 px-3">
-                                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.type] || 'bg-slate-100 text-slate-600')}>
+                                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.type] || 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
                                   {r.type}
                                 </span>
                               </td>
-                              <td className="py-2 px-3 text-end text-slate-600">{r.count}</td>
-                              <td className="py-2 px-3 text-end font-bold text-slate-900">{r.total} <span className="text-xs font-normal text-slate-400">{tc('currency')}</span></td>
+                              <td className="py-2 px-3 text-end text-[var(--sand-2)]">{r.count}</td>
+                              <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{r.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
                             </tr>
                           ))}
                           {data.byType.length === 0 && (
-                            <tr><td colSpan={3} className="py-4 text-center text-slate-400">{t('noData')}</td></tr>
+                            <tr><td colSpan={3} className="py-4 text-center text-[var(--sand-muted)]">{t('noData')}</td></tr>
                           )}
                         </tbody>
                       </table>
@@ -277,27 +277,27 @@ export default function ReportsPage() {
 
                     {/* By Status Table */}
                     <Card>
-                      <h2 className="text-sm font-bold text-slate-700 mb-4">{t('byStatus')}</h2>
+                      <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('byStatus')}</h2>
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-slate-100">
-                            <th className="text-start py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('status')}</th>
-                            <th className="text-end py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{t('count')}</th>
+                          <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                            <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('status')}</th>
+                            <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('count')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.byStatus.map(r => (
-                            <tr key={r.status} className="border-b border-slate-50">
+                            <tr key={r.status} className="border-b border-[rgba(245,237,214,0.04)]">
                               <td className="py-2 px-3">
-                                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.status] || 'bg-slate-100 text-slate-600')}>
+                                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.status] || 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
                                   {tc(r.status?.toLowerCase()) || r.status}
                                 </span>
                               </td>
-                              <td className="py-2 px-3 text-end font-bold text-slate-900">{r.count}</td>
+                              <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{r.count}</td>
                             </tr>
                           ))}
                           {data.byStatus.length === 0 && (
-                            <tr><td colSpan={2} className="py-4 text-center text-slate-400">{t('noData')}</td></tr>
+                            <tr><td colSpan={2} className="py-4 text-center text-[var(--sand-muted)]">{t('noData')}</td></tr>
                           )}
                         </tbody>
                       </table>
@@ -307,22 +307,22 @@ export default function ReportsPage() {
                   {/* Top Clients Table */}
                   {data.topClients.length > 0 && (
                     <Card>
-                      <h2 className="text-sm font-bold text-slate-700 mb-4">{t('topClients')}</h2>
+                      <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('topClients')}</h2>
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b border-slate-100">
-                              <th className="text-start py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('name')}</th>
-                              <th className="text-end py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{t('docCount')}</th>
-                              <th className="text-end py-2 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('total')}</th>
+                            <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                              <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('name')}</th>
+                              <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('docCount')}</th>
+                              <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('total')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {data.topClients.map((r, i) => (
-                              <tr key={i} className="border-b border-slate-50">
-                                <td className="py-2 px-3 font-semibold text-slate-900">{r.name}</td>
-                                <td className="py-2 px-3 text-end text-slate-600">{r.count}</td>
-                                <td className="py-2 px-3 text-end font-bold text-slate-900">{r.total.toLocaleString()} <span className="text-xs font-normal text-slate-400">{tc('currency')}</span></td>
+                              <tr key={i} className="border-b border-[rgba(245,237,214,0.04)]">
+                                <td className="py-2 px-3 font-semibold text-[var(--sand)]">{r.name}</td>
+                                <td className="py-2 px-3 text-end text-[var(--sand-2)]">{r.count}</td>
+                                <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{r.total.toLocaleString()} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
                               </tr>
                             ))}
                           </tbody>
