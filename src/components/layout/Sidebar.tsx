@@ -29,22 +29,13 @@ import {
 } from 'lucide-react';
 
 const QUICK_DOCS = [
-  { type: 'devis', icon: FileText, color: 'blue' },
-  { type: 'facture', icon: Receipt, color: 'green' },
-  { type: 'proforma', icon: ClipboardList, color: 'purple' },
-  { type: 'bon_commande', icon: FileStack, color: 'amber' },
-  { type: 'intervention', icon: Wrench, color: 'teal' },
-  { type: 'attachement', icon: FilePen, color: 'indigo' },
+  { type: 'devis', icon: FileText },
+  { type: 'facture', icon: Receipt },
+  { type: 'proforma', icon: ClipboardList },
+  { type: 'bon_commande', icon: FileStack },
+  { type: 'intervention', icon: Wrench },
+  { type: 'attachement', icon: FilePen },
 ] as const;
-
-const QUICK_DOC_COLORS: Record<string, string> = {
-  blue: 'bg-blue-400/10 text-blue-400 hover:bg-blue-400/20',
-  green: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.2)]',
-  purple: 'bg-purple-400/10 text-purple-400 hover:bg-purple-400/20',
-  amber: 'bg-amber-400/10 text-amber-400 hover:bg-amber-400/20',
-  teal: 'bg-teal-400/10 text-teal-400 hover:bg-teal-400/20',
-  indigo: 'bg-indigo-400/10 text-indigo-400 hover:bg-indigo-400/20',
-};
 
 const DOCUMENT_TYPES = [
   { id: 'devis', key: 'devis' },
@@ -167,9 +158,10 @@ function SidebarInner() {
               </div>
               {QUICK_DOCS.map((qd) => (
                 <button key={qd.type} onClick={() => { navigateTo(qd.type); setQuickCreateOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition min-h-[44px] ${QUICK_DOC_COLORS[qd.color]}`}>
-                  <qd.icon size={16} />
-                  <span>{s(`docTypes.${qd.type}`)}</span>
+                  className="group relative w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-all duration-200 min-h-[44px] text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.08)] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[var(--green-glow)]/0 to-[var(--green-glow)]/0 group-hover:from-[var(--green-glow)]/60 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                  <qd.icon size={16} className="relative text-[var(--sand-muted)] group-hover:text-[var(--green-3)] group-hover:scale-110 transition-all duration-200" />
+                  <span className="relative">{s(`docTypes.${qd.type}`)}</span>
                 </button>
               ))}
               <div className="h-px bg-[rgba(15,39,71,0.08)] mx-3" />
