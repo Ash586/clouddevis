@@ -25,16 +25,18 @@ import {
   ClipboardList,
   Wrench,
   FilePen,
+  ScrollText,
   X,
 } from 'lucide-react';
 
 const QUICK_DOCS = [
-  { type: 'devis', icon: FileText },
-  { type: 'facture', icon: Receipt },
-  { type: 'proforma', icon: ClipboardList },
-  { type: 'bon_commande', icon: FileStack },
-  { type: 'intervention', icon: Wrench },
-  { type: 'attachement', icon: FilePen },
+  { type: 'devis', labelKey: 'devis', icon: FileText },
+  { type: 'facture', labelKey: 'facture', icon: Receipt },
+  { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
+  { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack },
+  { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText },
+  { type: 'intervention', labelKey: 'intervention', icon: Wrench },
+  { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ] as const;
 
 const DOCUMENT_TYPES = [
@@ -161,7 +163,7 @@ function SidebarInner() {
                   className="group relative w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-all duration-200 min-h-[44px] text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.08)] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-[var(--green-glow)]/0 to-[var(--green-glow)]/0 group-hover:from-[var(--green-glow)]/60 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
                   <qd.icon size={16} className="relative text-[var(--sand-muted)] group-hover:text-[var(--green-3)] group-hover:scale-110 transition-all duration-200" />
-                  <span className="relative">{s(`docTypes.${qd.type}`)}</span>
+                  <span className="relative">{s(`docTypes.${qd.labelKey}`)}</span>
                 </button>
               ))}
               <div className="h-px bg-[rgba(15,39,71,0.08)] mx-3" />
