@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Copy, CheckCheck, MousePointerClick, Users, TrendingUp, DollarSign, ExternalLink, ArrowUpRight, ShieldCheck, Clock } from 'lucide-react';
+import { Copy, CheckCheck, MousePointerClick, Users, TrendingUp, ExternalLink, ArrowUpRight, ShieldCheck, Clock } from 'lucide-react';
 
 interface PartnerData {
   partner: { id: string; code: string; tier: string; status: string; parent: { id: string; code: string; user: { name: string } } | null };

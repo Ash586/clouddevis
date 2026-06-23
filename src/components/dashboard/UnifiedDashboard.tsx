@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -472,7 +472,7 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
 }
 
 /* ─── Sortable Header ─── */
-function SortHeader({ column, label, current, dir, onSort, align }: { column: string; label: string; current: string; dir: string; onSort: (c: string) => void; align?: 'left' | 'right' }) {
+function SortHeader({ column, label, current, onSort, align }: { column: string; label: string; current: string; dir: string; onSort: (c: string) => void; align?: 'left' | 'right' }) {
   const active = current === column;
   return (
     <th className={`px-6 py-3 ${align === 'right' ? 'text-right' : 'text-left'}`}>

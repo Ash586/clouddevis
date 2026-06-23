@@ -1,6 +1,6 @@
 ﻿'use client';
 import React from 'react';
-import type { DocumentState, BlockId } from '@/types';
+import type { DocumentState } from '@/types';
 import type { DocTypeDesign } from '@/lib/documentDesign';
 
 const A = {

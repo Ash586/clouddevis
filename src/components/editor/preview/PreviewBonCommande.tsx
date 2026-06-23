@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import type { DocumentState, CalculationResult, BlockId } from '@/types';
+import type { DocumentState, CalculationResult } from '@/types';
 import type { DocTypeDesign } from '@/lib/documentDesign';
 import { numberToFrenchWords } from '@/lib/calculations';
 

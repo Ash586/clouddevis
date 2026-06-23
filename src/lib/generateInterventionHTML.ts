@@ -23,9 +23,9 @@ export function generateInterventionHTML({
   const intervention = (doc.customFields.intervention ?? {}) as Record<string, unknown>;
   const dateStr = new Date(doc.date).toLocaleDateString('fr-DZ');
 
-  const verifications = Array.isArray(intervention.verifications) ? intervention.verifications : [];
-  const travaux = Array.isArray(intervention.travaux) ? intervention.travaux : [];
-  const pieces = Array.isArray(intervention.pieces) ? intervention.pieces : [];
+  const verifications = (Array.isArray(intervention.verifications) ? intervention.verifications : []) as unknown[];
+  const travaux = (Array.isArray(intervention.travaux) ? intervention.travaux : []) as unknown[];
+  const pieces = (Array.isArray(intervention.pieces) ? intervention.pieces : []) as unknown[];
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -152,7 +152,7 @@ export function generateInterventionHTML({
     ${verifications.length > 0 ? `
     <div class="section">
       <div class="section-title">Vérifications effectuées</div>
-      ${verifications.map((item: any) => `<div class="check-item">${e(String(item))}</div>`).join('')}
+      ${verifications.map((item) => `<div class="check-item">${e(String(item))}</div>`).join('')}
     </div>
     ` : ''}
 
@@ -160,7 +160,7 @@ export function generateInterventionHTML({
     ${travaux.length > 0 ? `
     <div class="section">
       <div class="section-title">Travaux effectués</div>
-      ${travaux.map((item: any, i: number) => `<div class="list-item">${i + 1}. ${e(String(item))}</div>`).join('')}
+      ${travaux.map((item, i) => `<div class="list-item">${i + 1}. ${e(String(item))}</div>`).join('')}
     </div>
     ` : ''}
 
@@ -168,7 +168,7 @@ export function generateInterventionHTML({
     ${pieces.length > 0 ? `
     <div class="section">
       <div class="section-title">Pièces utilisées / Commandées</div>
-      ${pieces.map((item: any) => `<div class="list-item">${e(String(item))}</div>`).join('')}
+      ${pieces.map((item) => `<div class="list-item">${e(String(item))}</div>`).join('')}
     </div>
     ` : ''}
 

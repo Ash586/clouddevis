@@ -22,7 +22,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
     <div id="print-area" className="w-[21cm] min-h-[29.7cm] bg-white p-8 flex flex-col shadow-md print:shadow-none relative" style={{ borderTop: `12px solid ${design.borderColor}` }}>
       {/* Header */}
       <div className="mb-6 pb-4 border-b-2" style={{ borderColor: design.primaryHex }}>
-        <h1 className="text-2xl font-bold" style={{ color: design.primaryHex }}>Rapport d'Intervention</h1>
+        <h1 className="text-2xl font-bold" style={{ color: design.primaryHex }}>Rapport d&apos;Intervention</h1>
         <div className="grid grid-cols-3 gap-4 text-xs mt-2">
           <div><span className="font-bold">N°:</span> {doc.documentNumber}</div>
           <div><span className="font-bold">Date:</span> {new Date(doc.date).toLocaleDateString('fr-DZ')}</div>
@@ -39,7 +39,7 @@ export function PreviewIntervention({ doc, sf, t, tc, design, highlight }: Previ
           <p className="text-xs text-slate-600">{doc.clientInfo.phone}</p>
         </div>
         <div>
-          <h3 className="text-xs font-bold uppercase text-slate-500 mb-1">Lieu d'intervention</h3>
+          <h3 className="text-xs font-bold uppercase text-slate-500 mb-1">Lieu d&apos;intervention</h3>
           <p className="text-sm">{doc.chantierAddress || '—'}</p>
         </div>
       </div>

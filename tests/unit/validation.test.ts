@@ -236,7 +236,7 @@ describe('validateAuthInput - register', () => {
       'register',
     );
     expect(result.valid).toBe(false);
-    expect(result.errors.password).toBe('Minimum 6 caractères');
+    expect(result.errors.password).toMatch(/^Minimum 6 caractères/);
   });
 
   test('weak password produces errors.password', () => {

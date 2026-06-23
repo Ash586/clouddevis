@@ -20,7 +20,7 @@ import { generateInterventionHTML } from '@/lib/generateInterventionHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions, categoryLabelKey } from '@/types';
-import type { UserMode, BlockId, SectionId, DocumentState, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
+import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef, UnitMeasure, PaymentMode, DocumentType } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
 import { track } from '@/lib/analytics';
@@ -223,6 +223,8 @@ function EditorContent() {
 
   const router = useRouter();
 
+  const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
+
   const handleDownload = async () => {
     await saveDoc();
     track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
@@ -352,8 +354,6 @@ function EditorContent() {
     if (!valid) setNewItem(p => ({ ...p, category: '' }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc.documentType]);
-
-  const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
   // Update preview focus when active section changes
   useEffect(() => {
