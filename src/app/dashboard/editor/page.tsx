@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
 import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
 import { generateBonCommandeHTML } from '@/lib/generateBonCommandeHTML';
+import { generateInterventionHTML } from '@/lib/generateInterventionHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { validateNIF, validateRC, validateNIS, validateAI, validateLineItem } from '@/lib/validation';
 import { UNIT_OPTIONS, DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions, categoryLabelKey } from '@/types';
@@ -251,6 +252,8 @@ function EditorContent() {
       ? generateDevisHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : doc.documentType === 'bc'
       ? generateBonCommandeHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+      : doc.documentType === 'intervention'
+      ? generateInterventionHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : generateDocumentHTML({
         isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels,
         grouped, uncategorized, catOrder, doc, results,
