@@ -992,24 +992,26 @@ function EditorContent() {
             )}
           </div>
 
-          {/* Right: Undo/Redo + Save + PDF */}
+          {/* Right: Undo/Redo (always) + lg-only Settings/Save/PDF (mobile bottom bar covers these below lg) */}
           <div className="flex items-center gap-1 ml-auto">
-            {!docIdParam && (
-              <button onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
-                <Settings size={16} />
-              </button>
-            )}
             <button onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
             <button onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
-            <div className="w-px h-6 bg-[rgba(15,39,71,0.1)] mx-1.5" />
-            <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-              <span className="hidden sm:inline">{tc('save')}</span>
-            </Button>
-             <Button size="sm" onClick={handleDownload} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
-               <Download size={14} />
-               <span className="hidden sm:inline">{te('downloadPdf')}</span>
-            </Button>
+            <div className="hidden lg:flex items-center gap-1">
+              {!docIdParam && (
+                <button onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
+                  <Settings size={16} />
+                </button>
+              )}
+              <div className="w-px h-6 bg-[rgba(15,39,71,0.1)] mx-1.5" />
+              <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                <span>{tc('save')}</span>
+              </Button>
+              <Button size="sm" onClick={handleDownload} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+                <Download size={14} />
+                <span>{te('downloadPdf')}</span>
+              </Button>
+            </div>
           </div>
         </div>
 
