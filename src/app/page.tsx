@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { LandingAnimations, LandingFAQ, LangSwitcher } from '@/components/landing/LandingPageClient';
 import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
-import { ThemeHint } from '@/components/layout/ThemeHint';
 
 const FAQ_ITEMS = [
    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
@@ -16,8 +15,6 @@ export default function HomePage() {
   return (
     <div className="landing-page">
       <div className="landing-body">
-        <ThemeHint />
-
         <LandingAnimations>
           {/* ════════════ NAV ════════════ */}
           <nav>

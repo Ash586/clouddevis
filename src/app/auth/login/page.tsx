@@ -4,7 +4,6 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
-import { useTheme } from '@/contexts/ThemeContext';
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -16,8 +15,6 @@ function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(searchParams.get('error') || '');
   const [loading, setLoading] = useState(false);
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
 
   const safeRedirect = redirectTo.startsWith('/dashboard') ? redirectTo : '';
 
@@ -113,33 +110,15 @@ function LoginForm() {
             </a>
           </div>
 
-          <div className="flex gap-2.5 items-center">
-            <button type="button" onClick={toggleTheme}
-              className="w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]"
-              aria-label={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
-              {isDark ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                  <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-              )}
-            </button>
-            <button type="submit" disabled={loading}
-              className="flex-1 rounded-lg text-sm font-bold border border-[rgba(15,39,71,0.08)] cursor-pointer bg-[var(--navy-3)] text-[var(--sand)] min-h-[44px] transition hover:bg-[var(--navy-4)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 size={16} className="animate-spin" />
-                  Connexion...
-                </span>
-              ) : 'Se connecter'}
-            </button>
-          </div>
+          <button type="submit" disabled={loading}
+            className="w-full rounded-lg text-sm font-bold cursor-pointer bg-[var(--green-2)] text-white min-h-[48px] transition hover:bg-[var(--green-3)] shadow-lg shadow-[rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 size={16} className="animate-spin" />
+                Connexion...
+              </span>
+            ) : 'Se connecter'}
+          </button>
         </form>
 
         <div className="my-5 text-center relative">
