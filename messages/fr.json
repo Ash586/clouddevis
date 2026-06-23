@@ -1014,6 +1014,23 @@
       "all": "Tous",
       "allStatus": "Tous les statuts"
     },
+    "settings": {
+      "general": "Général",
+      "siteName": "Nom du site",
+      "adminEmail": "Email administrateur",
+      "sessionTimeout": "Expiration de session",
+      "defaultSubscription": "Abonnement par défaut",
+      "limits": "Limites",
+      "trialDays": "Jours d'essai",
+      "maxDocsPerUser": "Documents max par utilisateur",
+      "maxClientsPerUser": "Clients max par utilisateur",
+      "featuresStatus": "Statut des fonctionnalités",
+      "maintenanceMode": "Mode maintenance",
+      "registrationOpen": "Inscriptions ouvertes",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    },
     "system": {
       "status": "Statut",
       "uptime": "Uptime",

@@ -1014,6 +1014,23 @@
       "all": "All",
       "allStatus": "All statuses"
     },
+    "settings": {
+      "general": "General",
+      "siteName": "Site name",
+      "adminEmail": "Admin email",
+      "sessionTimeout": "Session timeout",
+      "defaultSubscription": "Default subscription",
+      "limits": "Limits",
+      "trialDays": "Trial days",
+      "maxDocsPerUser": "Max docs per user",
+      "maxClientsPerUser": "Max clients per user",
+      "featuresStatus": "Features status",
+      "maintenanceMode": "Maintenance mode",
+      "registrationOpen": "Registration open",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
     "system": {
       "status": "Status",
       "uptime": "Uptime",

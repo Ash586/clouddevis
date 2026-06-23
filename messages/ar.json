@@ -1014,6 +1014,23 @@
       "all": "الكل",
       "allStatus": "جميع الحالات"
     },
+    "settings": {
+      "general": "عام",
+      "siteName": "اسم الموقع",
+      "adminEmail": "البريد الإلكتروني للمشرف",
+      "sessionTimeout": "مهلة الجلسة",
+      "defaultSubscription": "الاشتراك الافتراضي",
+      "limits": "الحدود",
+      "trialDays": "أيام التجربة",
+      "maxDocsPerUser": "الحد الأقصى للوثائق لكل مستخدم",
+      "maxClientsPerUser": "الحد الأقصى للعملاء لكل مستخدم",
+      "featuresStatus": "حالة الميزات",
+      "maintenanceMode": "وضع الصيانة",
+      "registrationOpen": "التسجيل مفتوح",
+      "save": "حفظ",
+      "saving": "جاري الحفظ…",
+      "saved": "تم الحفظ"
+    },
     "system": {
       "status": "الحالة",
       "uptime": "وقت التشغيل",
