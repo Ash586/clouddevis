@@ -39,20 +39,20 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  DEVIS: 'bg-blue-100 text-blue-700',
-  FACTURE: 'bg-emerald-100 text-emerald-700',
-  PROFORMA: 'bg-purple-100 text-purple-700',
-  BC: 'bg-amber-100 text-amber-700',
-  BR: 'bg-teal-100 text-teal-700',
-  INTERVENTION: 'bg-rose-100 text-rose-700',
-  ATTACHEMENT: 'bg-indigo-100 text-indigo-700',
+  DEVIS: 'bg-blue-400/10 text-blue-400',
+  FACTURE: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  PROFORMA: 'bg-purple-400/10 text-purple-400',
+  BC: 'bg-amber-400/10 text-amber-400',
+  BR: 'bg-teal-400/10 text-teal-400',
+  INTERVENTION: 'bg-rose-400/10 text-rose-400',
+  ATTACHEMENT: 'bg-indigo-400/10 text-indigo-400',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600',
-  ACCEPTED: 'bg-blue-100 text-blue-700',
-  PROGRESS: 'bg-amber-100 text-amber-700',
-  DELIVERED: 'bg-emerald-100 text-emerald-700',
+  DRAFT: 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
+  ACCEPTED: 'bg-blue-400/10 text-blue-400',
+  PROGRESS: 'bg-amber-400/10 text-amber-400',
+  DELIVERED: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
 };
 
 const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
@@ -158,28 +158,28 @@ export default function DocumentsPage() {
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
 
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900">{t('title')}</h1>
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
 
               {/* Filters */}
               <Card className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div className="lg:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{tc('search')}</label>
+                    <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{tc('search')}</label>
                     <input
                       type="text"
                       value={search}
                       onChange={e => setSearch(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
                       placeholder={t('searchPlaceholder')}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{tc('type')}</label>
+                    <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{tc('type')}</label>
                     <select
                       value={typeFilter}
                       onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     >
                       <option value="">{t('allTypes')}</option>
                       <option value="DEVIS">Devis</option>
@@ -192,11 +192,11 @@ export default function DocumentsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{tc('status')}</label>
+                    <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{tc('status')}</label>
                     <select
                       value={statusFilter}
                       onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     >
                       <option value="">{t('allStatuses')}</option>
                       <option value="DRAFT">{tc('draft')}</option>
@@ -208,21 +208,21 @@ export default function DocumentsPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{t('dateFrom')}</label>
+                    <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('dateFrom')}</label>
                     <input
                       type="date"
                       value={dateFrom}
                       onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{t('dateTo')}</label>
+                    <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('dateTo')}</label>
                     <input
                       type="date"
                       value={dateTo}
                       onChange={e => { setDateTo(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                 </div>
@@ -233,26 +233,26 @@ export default function DocumentsPage() {
                 {loading ? (
                   Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="text-center animate-pulse">
-                      <div className="h-7 w-16 bg-slate-200 rounded mx-auto mb-1" />
-                      <div className="h-3 w-20 bg-slate-100 rounded mx-auto" />
+                      <div className="h-7 w-16 bg-[var(--navy-3)] rounded mx-auto mb-1" />
+                      <div className="h-3 w-20 bg-[var(--navy-4)] rounded mx-auto" />
                     </Card>
                   ))
                 ) : (<>
                 <Card className="text-center">
-                  <p className="text-2xl font-black text-slate-900">{totalDocs}</p>
-                  <p className="text-xs text-slate-500 font-semibold">{t('totalDocs')}</p>
+                  <p className="text-2xl font-black text-[var(--sand)]">{totalDocs}</p>
+                  <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalDocs')}</p>
                 </Card>
                 <Card className="text-center">
-                  <p className="text-2xl font-black text-slate-900">{totalRevenue.toLocaleString()} <span className="text-sm font-normal text-slate-400">{tc('currency')}</span></p>
-                  <p className="text-xs text-slate-500 font-semibold">{t('totalRevenue')}</p>
+                  <p className="text-2xl font-black text-[var(--sand)]">{totalRevenue.toLocaleString()} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
+                  <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalRevenue')}</p>
                 </Card>
                 <Card className="text-center">
-                  <p className="text-2xl font-black text-slate-900">{statusBreakdown['DRAFT'] || 0}</p>
-                  <p className="text-xs text-slate-500 font-semibold">{tc('draft')}</p>
+                  <p className="text-2xl font-black text-[var(--sand)]">{statusBreakdown['DRAFT'] || 0}</p>
+                  <p className="text-xs text-[var(--sand-muted)] font-semibold">{tc('draft')}</p>
                 </Card>
                 <Card className="text-center">
-                  <p className="text-2xl font-black text-slate-900">{statusBreakdown['DELIVERED'] || 0}</p>
-                  <p className="text-xs text-slate-500 font-semibold">{tc('delivered')}</p>
+                  <p className="text-2xl font-black text-[var(--sand)]">{statusBreakdown['DELIVERED'] || 0}</p>
+                  <p className="text-xs text-[var(--sand-muted)] font-semibold">{tc('delivered')}</p>
                 </Card>
                 </>)}
               </div>
@@ -261,60 +261,60 @@ export default function DocumentsPage() {
               <Card className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="text-start py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('number')}</th>
-                      <th className="text-start py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('type')}</th>
-                      <th className="text-start py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('client')}</th>
-                      <th className="text-end py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('total')}</th>
-                      <th className="text-start py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('date')}</th>
-                      <th className="text-start py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{tc('status')}</th>
-                      <th className="text-end py-3 px-3 text-xs font-semibold text-slate-500 uppercase">{t('actions')}</th>
+                    <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                      <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('number')}</th>
+                      <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('type')}</th>
+                      <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('client')}</th>
+                      <th className="text-end py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('total')}</th>
+                      <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('date')}</th>
+                      <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('status')}</th>
+                      <th className="text-end py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
                       Array.from({ length: 5 }).map((_, i) => (
-                        <tr key={i} className="border-b border-slate-50 animate-pulse">
-                          <td className="py-3 px-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
-                          <td className="py-3 px-3"><div className="h-4 w-16 bg-slate-200 rounded-full" /></td>
-                          <td className="py-3 px-3"><div className="h-4 w-28 bg-slate-200 rounded" /></td>
-                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-slate-200 rounded ml-auto" /></td>
-                          <td className="py-3 px-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
-                          <td className="py-3 px-3"><div className="h-4 w-14 bg-slate-200 rounded-full" /></td>
-                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-slate-200 rounded ml-auto" /></td>
+                        <tr key={i} className="border-b border-[rgba(245,237,214,0.04)] animate-pulse">
+                          <td className="py-3 px-3"><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-16 bg-[var(--navy-3)] rounded-full" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-28 bg-[var(--navy-3)] rounded" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ml-auto" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></td>
+                          <td className="py-3 px-3"><div className="h-4 w-14 bg-[var(--navy-3)] rounded-full" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ml-auto" /></td>
                         </tr>
                       ))
                     ) : docs.length === 0 ? (
-                      <tr><td colSpan={7} className="py-8 text-center text-slate-400">{t('noDocs')}</td></tr>
+                      <tr><td colSpan={7} className="py-8 text-center text-[var(--sand-muted)]">{t('noDocs')}</td></tr>
                     ) : docs.map(doc => (
-                      <tr key={doc.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition">
-                        <td className="py-3 px-3 font-semibold text-slate-900">{doc.number}</td>
+                      <tr key={doc.id} className="border-b border-[rgba(245,237,214,0.04)] hover:bg-[rgba(245,237,214,0.02)] transition">
+                        <td className="py-3 px-3 font-semibold text-[var(--sand)]">{doc.number}</td>
                         <td className="py-3 px-3">
-                          <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-slate-100 text-slate-600')}>
+                          <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
                             {TYPE_LABELS[doc.type.toLowerCase()] || doc.type}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-slate-600">{doc.client || '—'}</td>
-                        <td className="py-3 px-3 text-end font-bold text-slate-900">{doc.total} <span className="text-xs font-normal text-slate-400">{tc('currency')}</span></td>
-                        <td className="py-3 px-3 text-slate-500">{doc.date}</td>
+                        <td className="py-3 px-3 text-[var(--sand-2)]">{doc.client || '—'}</td>
+                        <td className="py-3 px-3 text-end font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
+                        <td className="py-3 px-3 text-[var(--sand-muted)]">{doc.date}</td>
                         <td className="py-3 px-3 relative">
                           <button
                             onClick={() => setStatusDropdownOpen(statusDropdownOpen === doc.id ? null : doc.id)}
-                            className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer hover:opacity-80 transition', STATUS_COLORS[doc.status] || 'bg-slate-100 text-slate-600')}
+                            className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer hover:opacity-80 transition', STATUS_COLORS[doc.status] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}
                           >
                             {tc(doc.status?.toLowerCase()) || doc.status}
                           </button>
                           {statusDropdownOpen === doc.id && (
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setStatusDropdownOpen(null)} />
-                              <div className="absolute left-0 top-full mt-1 z-20 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden min-w-[140px]">
+                              <div className="absolute left-0 top-full mt-1 z-20 bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-xl overflow-hidden min-w-[140px]">
                                 {STATUS_OPTIONS.map(s => (
                                   <button
                                     key={s}
                                     onClick={() => handleStatusChange(doc.id, s)}
                                     className={cn(
-                                      'w-full text-left px-3 py-2 text-xs font-semibold hover:bg-slate-50 transition',
-                                      s === doc.status && 'bg-blue-50 text-blue-600'
+                                      'w-full text-left px-3 py-2 text-xs font-semibold hover:bg-[var(--navy-3)] transition',
+                                      s === doc.status && 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]'
                                     )}
                                   >
                                     {tc(s.toLowerCase())}
@@ -326,13 +326,13 @@ export default function DocumentsPage() {
                         </td>
                         <td className="py-3 px-3 text-end">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title={t('edit')}>
+                            <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition" title={t('edit')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             </button>
-                            <button onClick={() => handleDuplicate(doc.id)} className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition" title={t('duplicate')}>
+                            <button onClick={() => handleDuplicate(doc.id)} className="p-1.5 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition" title={t('duplicate')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                             </button>
-                            <button onClick={() => setDeleteTarget(doc)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title={tc('delete')}>
+                            <button onClick={() => setDeleteTarget(doc)} className="p-1.5 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition" title={tc('delete')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                           </div>
@@ -349,42 +349,42 @@ export default function DocumentsPage() {
                   Array.from({ length: 4 }).map((_, i) => (
                     <Card key={i} className="p-3 space-y-3 animate-pulse">
                       <div className="flex items-start justify-between">
-                        <div className="space-y-1.5"><div className="h-4 w-24 bg-slate-200 rounded" /><div className="h-3 w-20 bg-slate-100 rounded" /></div>
-                        <div className="h-5 w-16 bg-slate-200 rounded-full" />
+                        <div className="space-y-1.5"><div className="h-4 w-24 bg-[var(--navy-3)] rounded" /><div className="h-3 w-20 bg-[var(--navy-4)] rounded" /></div>
+                        <div className="h-5 w-16 bg-[var(--navy-3)] rounded-full" />
                       </div>
-                      <div className="flex items-center justify-between"><div className="h-4 w-16 bg-slate-200 rounded-full" /><div className="h-4 w-20 bg-slate-200 rounded" /></div>
-                      <div className="flex items-center justify-between"><div className="h-3 w-20 bg-slate-100 rounded" /><div className="flex gap-1"><div className="h-8 w-8 bg-slate-200 rounded-lg" /><div className="h-8 w-8 bg-slate-200 rounded-lg" /><div className="h-8 w-8 bg-slate-200 rounded-lg" /></div></div>
+                      <div className="flex items-center justify-between"><div className="h-4 w-16 bg-[var(--navy-3)] rounded-full" /><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></div>
+                      <div className="flex items-center justify-between"><div className="h-3 w-20 bg-[var(--navy-4)] rounded" /><div className="flex gap-1"><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /></div></div>
                     </Card>
                   ))
                 ) : docs.length === 0 ? (
-                  <Card className="py-8 text-center text-slate-400">{t('noDocs')}</Card>
+                  <Card className="py-8 text-center text-[var(--sand-muted)]">{t('noDocs')}</Card>
                 ) : docs.map(doc => (
                   <Card key={doc.id} className="space-y-3 p-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-bold text-slate-900">{doc.number}</p>
-                        <p className="text-xs text-slate-400">{doc.client || '—'}</p>
+                        <p className="font-bold text-[var(--sand)]">{doc.number}</p>
+                        <p className="text-xs text-[var(--sand-muted)]">{doc.client || '—'}</p>
                       </div>
-                      <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', STATUS_COLORS[doc.status] || 'bg-slate-100 text-slate-600')}>
+                      <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', STATUS_COLORS[doc.status] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
                         {tc(doc.status?.toLowerCase()) || doc.status}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-slate-100 text-slate-600')}>
+                      <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
                         {TYPE_LABELS[doc.type] || doc.type}
                       </span>
-                      <span className="font-bold text-slate-900">{doc.total} <span className="text-xs font-normal text-slate-400">{tc('currency')}</span></span>
+                      <span className="font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-400">{doc.date}</span>
+                      <span className="text-xs text-[var(--sand-muted)]">{doc.date}</span>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
-                        <button onClick={() => handleDuplicate(doc.id)} className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button onClick={() => handleDuplicate(doc.id)} className="p-2 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
-                        <button onClick={() => setDeleteTarget(doc)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button onClick={() => setDeleteTarget(doc)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
@@ -399,7 +399,7 @@ export default function DocumentsPage() {
                   <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
                     {tc('back')}
                   </Button>
-                  <span className="text-sm text-slate-500 font-medium px-3">{page} / {totalPages}</span>
+                  <span className="text-sm text-[var(--sand-muted)] font-medium px-3">{page} / {totalPages}</span>
                   <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
                     {t('next')}
                   </Button>
@@ -412,7 +412,7 @@ export default function DocumentsPage() {
 
       {/* Delete Confirmation Modal */}
       <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title={tc('yesDelete')}>
-        <p className="text-sm text-slate-500 mb-4">
+        <p className="text-sm text-[var(--sand-muted)] mb-4">
           {t('deleteConfirm')} <strong>{deleteTarget?.number}</strong> ?
         </p>
         <div className="flex gap-2">
