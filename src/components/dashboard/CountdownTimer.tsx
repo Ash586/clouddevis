@@ -26,7 +26,7 @@ export function CountdownTimer() {
     <div className="countdown-banner">
       <span className="countdown-icon">⏰</span>
       <span>
-        <strong>{t('trialDaysLeft', { count: daysLeft })}</strong> — {daysLeft <= 3 ? t('upgradeSoon') : t('upgradeHint')}
+        <strong>{t('trialDaysLeft', { count: daysLeft })}</strong> — {daysLeft <= 3 ? t('trialUrgent') : t('trialUpgradeHint')}
       </span>
       <Link href="/dashboard/subscription" className="countdown-cta">
         {t('upgrade')} ←

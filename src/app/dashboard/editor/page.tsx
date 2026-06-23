@@ -116,10 +116,10 @@ function EditorContent() {
 
   const computedScale = previewZoom === 'fit' ? fitScale : previewZoom;
   const previewReadyChecks = useMemo(() => [
-    { label: tp('previewChecks.client') || 'Client', done: Boolean(doc.clientInfo.name?.trim()), section: 'client' as SectionId },
-    { label: tp('previewChecks.items') || 'Articles', done: doc.items.length > 0, section: 'prestations' as SectionId },
-    { label: tp('previewChecks.date') || 'Date', done: Boolean(doc.date), section: 'general' as SectionId },
-  ], [doc.clientInfo.name, doc.items.length, doc.date, tp]);
+    { label: te('previewChecks.client') || 'Client', done: Boolean(doc.clientInfo.name?.trim()), section: 'client' as SectionId },
+    { label: te('previewChecks.items') || 'Articles', done: doc.items.length > 0, section: 'prestations' as SectionId },
+    { label: te('previewChecks.date') || 'Date', done: Boolean(doc.date), section: 'general' as SectionId },
+  ], [doc.clientInfo.name, doc.items.length, doc.date, te]);
   const completedPreviewChecks = previewReadyChecks.filter(check => check.done).length;
 
   useEffect(() => {

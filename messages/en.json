@@ -4,6 +4,8 @@
     "loading": "Loading…",
     "loadingEditor": "Loading editor…",
     "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
@@ -234,6 +236,18 @@
       "emailTaken": "This email is already in use"
     }
   },
+  "calc": {
+    "title": "VAT Calculator",
+    "subtitle": "Estimate VAT and stamp duty",
+    "totalHT": "Amount (excl. tax)",
+    "tvaRate": "VAT rate",
+    "docType": "Document type",
+    "invoice": "Invoice",
+    "quote": "Quote",
+    "tva": "VAT",
+    "timbreFiscal": "Stamp duty",
+    "totalTTC": "Total (incl. tax)"
+  },
   "dashboard": {
     "welcome": "Hello 👋",
     "goodMorning": "Good morning",
@@ -301,6 +315,7 @@
   },
   "editor": {
     "loading": "Loading…",
+    "saveError": "Save error. Check your connection.",
     "businessMode": "Business Mode",
     "artisanMode": "Artisan Mode",
     "documentTypeInvoice": "Invoice",
@@ -529,6 +544,7 @@
       "category": "Category",
       "noCategory": "— No category —",
       "addLine": "+ Add line",
+      "items": "items",
       "qtyLabel": "Qty:",
       "puLabel": "Price:",
       "vatLabel": "VAT:",

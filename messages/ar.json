@@ -4,6 +4,8 @@
     "loading": "جاري التحميل…",
     "loadingEditor": "جاري تحميل المحرر…",
     "save": "حفظ",
+    "saving": "جاري الحفظ…",
+    "saved": "تم الحفظ",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "delete": "حذف",
@@ -234,6 +236,18 @@
       "emailTaken": "هذا البريد مستخدم بالفعل"
     }
   },
+  "calc": {
+    "title": "حاسبة الضريبة",
+    "subtitle": "تقدير مبلغ الضريبة والطابع الضريبي",
+    "totalHT": "المبلغ غير شامل الضريبة",
+    "tvaRate": "نسبة الضريبة",
+    "docType": "نوع الوثيقة",
+    "invoice": "فاتورة",
+    "quote": "تقدير",
+    "tva": "ضريبة القيمة المضافة",
+    "timbreFiscal": "الطابع الضريبي",
+    "totalTTC": "المجموع شامل الضريبة"
+  },
   "dashboard": {
     "welcome": "مرحباً 👋",
     "goodMorning": "صباح الخير",
@@ -301,6 +315,7 @@
   },
   "editor": {
     "loading": "جارٍ التحميل…",
+    "saveError": "خطأ في الحفظ. تحقق من اتصالك.",
     "businessMode": "وضع الشركة",
     "artisanMode": "وضع الحرفي",
     "documentTypeInvoice": "فاتورة",
@@ -529,6 +544,7 @@
       "category": "التصنيف",
       "noCategory": "— بدون تصنيف —",
       "addLine": "+ إضافة بند",
+      "items": "بنود",
       "qtyLabel": "الكمية:",
       "puLabel": "س.و:",
       "vatLabel": "ضريبة:",

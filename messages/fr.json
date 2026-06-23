@@ -4,6 +4,8 @@
     "loading": "Chargement…",
     "loadingEditor": "Chargement de l'éditeur…",
     "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "delete": "Supprimer",
@@ -234,6 +236,18 @@
       "emailTaken": "Cet email est déjà utilisé"
     }
   },
+  "calc": {
+    "title": "Calculateur de TVA",
+    "subtitle": "Estimez le montant de TVA et du timbre fiscal",
+    "totalHT": "Montant HT",
+    "tvaRate": "Taux TVA",
+    "docType": "Type de document",
+    "invoice": "Facture",
+    "quote": "Devis",
+    "tva": "TVA",
+    "timbreFiscal": "Timbre fiscal",
+    "totalTTC": "Total TTC"
+  },
   "dashboard": {
     "welcome": "Bonjour 👋",
     "goodMorning": "Bonjour",
@@ -301,6 +315,7 @@
   },
   "editor": {
     "loading": "Chargement…",
+    "saveError": "Erreur d'enregistrement. Vérifiez votre connexion.",
     "businessMode": "Mode Entreprise",
     "artisanMode": "Mode Artisan",
     "documentTypeInvoice": "Facture",
@@ -529,6 +544,7 @@
       "category": "Catégorie",
       "noCategory": "— Sans catégorie —",
       "addLine": "+ Ajouter une ligne",
+      "items": "articles",
       "qtyLabel": "Qté:",
       "puLabel": "PU:",
       "vatLabel": "TVA:",
