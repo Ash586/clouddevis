@@ -125,7 +125,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           className={cn(
             'flex-1 py-3 rounded-xl text-sm font-semibold transition-all',
             form.name.trim()
-              ? 'bg-[#0B3D2E] text-white active:scale-[0.98]'
+              ? 'bg-[var(--green-2)] text-white active:scale-[0.98]'
               : 'bg-[var(--navy-3)] text-[var(--sand-muted)] cursor-not-allowed',
           )}
         >
@@ -211,7 +211,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               setEditingClient(null);
               setShowForm(true);
             }}
-            className="w-10 h-10 rounded-xl bg-[#0B3D2E] flex items-center justify-center text-white active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
           >
             <IconUserPlus size={18} />
           </button>

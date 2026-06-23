@@ -103,7 +103,7 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 'min-h-[120px] active:scale-[0.97] transition-all duration-200',
                 'border-2',
                 isSelected
-                  ? 'border-[#0B3D2E] bg-[rgba(42,127,111,0.12)]'
+                  ? 'border-[var(--green-2)] bg-[rgba(42,127,111,0.12)]'
                   : 'border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]',
               )}
             >
@@ -111,7 +111,7 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 className={cn(
                   'w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-200',
                   isSelected
-                    ? 'bg-[#0B3D2E] text-white'
+                    ? 'bg-[var(--green-2)] text-white'
                     : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
                 )}
               >
@@ -121,7 +121,7 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 <p
                   className={cn(
                     'text-sm font-semibold transition-colors duration-200',
-                    isSelected ? 'text-[#0B3D2E]' : 'text-[var(--sand)]',
+                    isSelected ? 'text-[var(--green-3)]' : 'text-[var(--sand)]',
                   )}
                 >
                   {card.label}

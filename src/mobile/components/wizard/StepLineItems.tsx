@@ -175,7 +175,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               {/* Index */}
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                style={{ background: 'rgba(11, 61, 46, 0.15)', color: '#0B3D2E' }}
+                style={{ background: 'rgba(0,149,77, 0.15)', color: 'var(--green-2)' }}
               >
                 {index + 1}
               </div>
@@ -346,7 +346,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                     'flex-1 h-10 rounded-xl flex items-center justify-center text-sm font-semibold',
                     'border transition-all duration-200 cursor-pointer',
                     watchedTva === opt.value
-                      ? 'bg-[#0B3D2E] border-[#0B3D2E] text-white'
+                      ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
                       : 'bg-[var(--navy-3)] border-[rgba(245,237,214,0.08)] text-[var(--sand-muted)]',
                   )}
                 >
@@ -393,8 +393,8 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                 'active:scale-[0.97] transition-transform',
               )}
               style={{
-                background: '#0B3D2E',
-                boxShadow: '0 2px 12px rgba(11, 61, 46, 0.3)',
+                background: 'var(--green-2)',
+                boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
               }}
             >
               {editingItem ? 'Enregistrer' : 'Ajouter'}

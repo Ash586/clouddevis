@@ -36,7 +36,7 @@ const DOC_ICONS: Record<DocumentType, typeof IconFileText> = {
 };
 
 const DOC_COLORS: Record<DocumentType, string> = {
-  DEVIS: '#0B3D2E',
+  DEVIS: '#00954D',
   FACTURE: '#2563EB',
   PROFORMA: '#7C3AED',
   BC: '#D97706',

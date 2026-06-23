@@ -229,7 +229,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       </div>
 
       {/* ── Secondary quick links ── */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <SecondaryLink icon={<Users size={16} />} label={t('addClient')} sub={`${stats.totalClients} ${t('statRegistered')}`} onClick={() => router.push('/dashboard/clients')} />
         <SecondaryLink icon={<BarChart3 size={16} />} label={t('viewReports')} sub={t('viewReportsDesc')} onClick={() => router.push('/dashboard/reports')} />
         <SecondaryLink icon={<CreditCardIcon size={16} />} label={t('manageSubscription')} sub={stats.trialDaysRemaining > 0 ? t('trialActive') : t('viewPlans')} onClick={() => router.push('/dashboard/subscription')} />
@@ -290,7 +290,36 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Mobile card list — full info + always-visible delete (touch has no hover) */}
+            <div className="sm:hidden">
+              {docs.map((doc) => {
+                const cfg = DOC_TYPE_CONFIG[doc.type.toLowerCase()];
+                return (
+                  <div key={doc.id} onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)}
+                    className="flex items-center gap-3 px-5 py-3 border-t border-[rgba(245,237,214,0.04)] active:bg-[rgba(245,237,214,0.03)] transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${cfg?.bg || ''} ${cfg?.text || ''} ${cfg?.border || ''}`}>
+                          {cfg?.label || doc.type}
+                        </span>
+                        <span className="font-mono text-[11px] text-[var(--sand-muted)] truncate">{doc.number || '—'}</span>
+                      </div>
+                      <p className="text-sm font-semibold text-[var(--sand)] truncate">{doc.client || '—'}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-sm font-bold text-[var(--sand)] whitespace-nowrap">{doc.total} {tc('currency')}</span>
+                      <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
+                      className="shrink-0 -mr-1 p-2 text-red-400/70 active:text-red-400 active:bg-red-400/10 rounded-lg transition-colors" aria-label={tc('delete')}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="overflow-x-auto hidden sm:block">
               <table className="w-full">
                 <thead>
               <tr className="text-left border-b border-[rgba(245,237,214,0.06)]">

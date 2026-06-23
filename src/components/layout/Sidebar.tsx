@@ -272,11 +272,11 @@ function SidebarInner() {
 
       {!mobileOpen && (
         <button onClick={() => setMobileOpen(true)}
-          className="flex md:hidden fixed bottom-6 right-6 z-[140] w-14 h-14 bg-[var(--green-2)] text-white rounded-full shadow-2xl items-center justify-center hover:bg-[var(--green-3)] transition active:scale-95"
+          className="flex md:hidden fixed bottom-6 right-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(245,237,214,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
           aria-label="Menu">
 
-          <Menu size={24} />
+          <Menu size={22} />
         </button>
       )}
     </>

@@ -29,9 +29,9 @@ export function WizardProgress({ currentStep, totalSteps = 4 }: WizardProgressPr
             className={cn(
               'h-2 rounded-full transition-colors duration-300',
               isActive
-                ? 'w-8 bg-[#0B3D2E]'
+                ? 'w-8 bg-[var(--green-2)]'
                 : isDone
-                  ? 'w-2 bg-[#0B3D2E]'
+                  ? 'w-2 bg-[var(--green-2)]'
                   : 'w-2 bg-[var(--navy-3)]',
             )}
           />

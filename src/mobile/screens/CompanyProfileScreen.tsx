@@ -125,7 +125,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             </p>
             <button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 rounded-xl bg-[#0B3D2E] text-white text-sm font-semibold active:scale-95 transition-transform"
+              className="px-4 py-2 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-95 transition-transform"
             >
               Configurer ma société
             </button>
@@ -201,7 +201,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 onClick={handleSave}
                 className={cn(
                   'w-full py-3.5 rounded-xl text-sm font-semibold',
-                  'bg-[#0B3D2E] text-white active:scale-[0.98] transition-transform',
+                  'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
                 )}
               >
                 Enregistrer

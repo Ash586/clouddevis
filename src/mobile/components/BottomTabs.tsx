@@ -50,37 +50,41 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-[44px]',
+                'relative flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px]',
                 'transition-colors duration-200',
                 'active:scale-95 transform',
               )}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon
-                size={22}
-                stroke={isActive ? 2.2 : 1.8}
+              {/* Active indicator bar (top) */}
+              {isActive && (
+                <span className="absolute top-0 h-0.5 w-8 rounded-full bg-[var(--green-3)]" />
+              )}
+              <span
                 className={cn(
-                  'transition-colors duration-200',
-                  isActive ? 'text-[#0B3D2E]' : 'text-[var(--sand-muted)]',
+                  'flex items-center justify-center w-9 h-7 rounded-lg transition-all duration-200',
+                  isActive && 'bg-[rgba(0,149,77,0.12)]',
                 )}
-              />
+              >
+                <Icon
+                  size={21}
+                  stroke={isActive ? 2.2 : 1.8}
+                  className={cn(
+                    'transition-colors duration-200',
+                    isActive ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]',
+                  )}
+                />
+              </span>
               <span
                 className={cn(
                   'text-[10px] font-semibold leading-tight truncate',
                   'transition-colors duration-200',
-                  isActive ? 'text-[#0B3D2E]' : 'text-[var(--sand-muted)]',
+                  isActive ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]',
                 )}
               >
                 {tab.label}
               </span>
-              {/* Active indicator dot */}
-              {isActive && (
-                <span
-                  className="absolute top-1 w-1 h-1 rounded-full"
-                  style={{ background: '#0B3D2E' }}
-                />
-              )}
             </button>
           );
         })}

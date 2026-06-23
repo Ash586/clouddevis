@@ -112,7 +112,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
         {onSeeAll && (
           <button
             onClick={onSeeAll}
-            className="text-xs font-medium text-[#0B3D2E] active:opacity-60 transition-opacity"
+            className="text-xs font-semibold text-[var(--green-3)] active:opacity-60 transition-opacity"
           >
             Voir tout
           </button>
@@ -143,11 +143,8 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               )}
             >
               {/* Document type icon */}
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(11, 61, 46, 0.15)' }}
-              >
-                <Icon size={18} stroke={1.8} className="text-[#0B3D2E]" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[rgba(0,149,77,0.12)]">
+                <Icon size={18} stroke={1.8} className="text-[var(--green-3)]" />
               </div>
 
               {/* Client name + doc number */}

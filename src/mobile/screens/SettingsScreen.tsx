@@ -85,7 +85,7 @@ export function SettingsScreen() {
                 className={cn(
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
                   settings.language === lang
-                    ? 'bg-[#0B3D2E] text-white border-[#0B3D2E]'
+                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
                     : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)]',
                 )}
               >
@@ -109,7 +109,7 @@ export function SettingsScreen() {
                 className={cn(
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
                   settings.defaultTvaRate === rate
-                    ? 'bg-[#0B3D2E] text-white border-[#0B3D2E]'
+                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
                     : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)]',
                 )}
               >
@@ -132,7 +132,7 @@ export function SettingsScreen() {
             <div
               className={cn(
                 'w-12 h-7 rounded-full transition-colors relative',
-                settings.autoSync ? 'bg-[#0B3D2E]' : 'bg-[var(--navy-3)]',
+                settings.autoSync ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-3)]',
               )}
             >
               <div

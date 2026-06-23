@@ -28,10 +28,7 @@ export function HomeHeader({
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5">
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white"
-          style={{ background: '#0B3D2E' }}
-        >
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white bg-gradient-to-br from-[var(--green)] to-[var(--teal)]">
           CD
         </div>
         <span className="text-lg font-bold text-[var(--sand)]" style={{ fontFamily: 'Sora, sans-serif' }}>
@@ -68,7 +65,7 @@ export function HomeHeader({
           className={cn(
             'w-10 h-10 rounded-full flex items-center justify-center',
             'text-sm font-bold text-white',
-            'bg-gradient-to-br from-[#0B3D2E] to-[#2A7F6F]',
+            'bg-gradient-to-br from-[var(--green-2)] to-[#2A7F6F]',
           )}
         >
           {userInitials}

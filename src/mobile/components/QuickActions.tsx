@@ -32,12 +32,9 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
           'min-h-[44px] active:scale-[0.97] transition-transform',
           'text-white font-semibold text-sm',
-          'shadow-lg',
+          'bg-gradient-to-br from-[var(--green-2)] to-[var(--green)]',
+          'shadow-lg shadow-[rgba(0,149,77,0.3)]',
         )}
-        style={{
-          background: '#0B3D2E',
-          boxShadow: '0 4px 20px rgba(11, 61, 46, 0.35)',
-        }}
       >
         <IconPlus size={24} stroke={2.2} />
         <span>Nouveau devis</span>

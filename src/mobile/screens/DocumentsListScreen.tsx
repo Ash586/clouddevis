@@ -221,7 +221,7 @@ export function DocumentsListScreen({
               className={cn(
                 'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
                 showSearch
-                  ? 'bg-[#0B3D2E] text-white'
+                  ? 'bg-[var(--green-2)] text-white'
                   : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
               )}
             >
@@ -229,7 +229,7 @@ export function DocumentsListScreen({
             </button>
             <button
               onClick={onNewDocument}
-              className="w-10 h-10 rounded-xl bg-[#0B3D2E] flex items-center justify-center text-white active:scale-95 transition-transform"
+              className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
             >
               <IconFilePlus size={18} />
             </button>
@@ -282,7 +282,7 @@ export function DocumentsListScreen({
                   'flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',
                   'transition-all duration-200 border',
                   isActive
-                    ? 'bg-[#0B3D2E] text-white border-[#0B3D2E]'
+                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
                     : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)] active:bg-[var(--navy-2)]',
                 )}
               >

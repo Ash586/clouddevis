@@ -28,11 +28,8 @@ export function StatCards({ monthlyCount, paidCount }: StatCardsProps) {
         )}
       >
         <div className="flex items-center gap-2.5 mb-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'rgba(11, 61, 46, 0.2)' }}
-          >
-            <IconFileText size={16} stroke={2} className="text-[#0B3D2E]" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[rgba(0,149,77,0.12)]">
+            <IconFileText size={16} stroke={2} className="text-[var(--green-3)]" />
           </div>
           <span className="text-xs font-medium text-[var(--sand-muted)]">Ce mois</span>
         </div>

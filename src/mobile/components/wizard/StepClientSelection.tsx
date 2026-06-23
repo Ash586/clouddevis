@@ -137,9 +137,9 @@ export function StepClientSelection({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(11,61,46,0.12)] border border-[rgba(11,61,46,0.25)]"
+            className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(0,149,77,0.12)] border border-[rgba(0,149,77,0.25)]"
           >
-            <IconUser size={16} className="text-[#0B3D2E] flex-shrink-0" />
+            <IconUser size={16} className="text-[var(--green-3)] flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--sand)] truncate">
                 {selectedClient.name}
@@ -339,8 +339,8 @@ export function StepClientSelection({
               'active:scale-[0.97] transition-transform',
             )}
             style={{
-              background: '#0B3D2E',
-              boxShadow: '0 2px 12px rgba(11, 61, 46, 0.3)',
+              background: 'var(--green-2)',
+              boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
             }}
           >
             Sélectionner ce client

@@ -149,7 +149,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
         {/* Header bar */}
         <div
           className="flex items-center gap-3 p-4"
-          style={{ background: '#0B3D2E' }}
+          style={{ background: 'var(--green-2)' }}
         >
           <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
             <IconFileText size={20} className="text-white" />
@@ -248,8 +248,8 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
             'disabled:opacity-50 disabled:cursor-not-allowed',
           )}
           style={{
-            background: '#0B3D2E',
-            boxShadow: '0 4px 20px rgba(11, 61, 46, 0.35)',
+            background: 'var(--green-2)',
+            boxShadow: '0 4px 20px rgba(0,149,77, 0.35)',
           }}
         >
           {generating ? 'Génération...' : 'Générer PDF'}
@@ -344,8 +344,8 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                   'active:scale-[0.97] transition-all',
                 )}
                 style={{
-                  background: '#0B3D2E',
-                  boxShadow: '0 2px 12px rgba(11, 61, 46, 0.3)',
+                  background: 'var(--green-2)',
+                  boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
                 }}
               >
                 Enregistrer le document
