@@ -5,6 +5,7 @@ import { hashPassword, createSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
+import { t } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
@@ -26,15 +27,15 @@ async function postHandler(req: Request) {
       }
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-    const rateCheck = await checkRateLimit(`register:${ip}`, 3, 60000);
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
+    const rateCheck = await checkRateLimit(`register:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
+      return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return NextResponse.json({ error: 'Cet email est déjà utilisé' }, { status: 409 });
+      return NextResponse.json({ error: t(req, 'emailTaken') }, { status: 409 });
     }
 
     const hashed = await hashPassword(password);

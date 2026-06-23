@@ -85,20 +85,23 @@ function SidebarInner() {
   }
 
   function isActive(path: string) { return pathname === path; }
-  function isDocumentsActive(type?: string) { 
-    return pathname === '/dashboard/documents' && searchParams?.get('type') === type; 
+  function isDocumentsActive(type?: string) {
+    const upperType = type ? TYPE_MAP[type] || type.toUpperCase() : type;
+    return pathname === '/dashboard/documents' && searchParams?.get('type') === upperType;
   }
 
   function navigateTo(type: string) {
     setDocumentsOpen(true);
     setMobileOpen(false);
-    router.push(`/dashboard/editor?type=${type}`);
+    const upperType = TYPE_MAP[type] || type.toUpperCase();
+    router.push(`/dashboard/editor?type=${upperType}`);
   }
 
   function filterDocumentsByType(type: string) {
     setDocumentsOpen(true);
     setMobileOpen(false);
-    router.push(`/dashboard/documents?type=${type}`);
+    const upperType = TYPE_MAP[type] || type.toUpperCase();
+    router.push(`/dashboard/documents?type=${upperType}`);
   }
 
   const userName = user?.name || tc('user');

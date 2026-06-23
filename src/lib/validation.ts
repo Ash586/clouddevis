@@ -60,8 +60,8 @@ export function validateDocumentBody(body: Record<string, unknown>): ValidationR
         if (item.quantity !== undefined && (Number(item.quantity) <= 0 || !Number.isFinite(Number(item.quantity)))) {
           errors[`items.${i}.qty`] = `Ligne ${i + 1} : la quantité doit être un nombre supérieur à 0.`;
         }
-        if (item.unitPrice !== undefined && (Number(item.unitPrice) <= 0 || Number(item.unitPrice) > 1000000)) {
-          errors[`items.${i}.price`] = `Ligne ${i + 1} : le prix unitaire doit être compris entre 0 et 1 000 000 DA.`;
+        if (item.unitPrice !== undefined && (Number(item.unitPrice) <= 0 || Number(item.unitPrice) > 10000000)) {
+          errors[`items.${i}.price`] = `Ligne ${i + 1} : le prix unitaire doit être compris entre 0 et 10 000 000 DA.`;
         }
       });
     }
@@ -138,8 +138,8 @@ export function validateLineItem(item: { designation?: string; quantity?: number
   }
   if (!item.unitPrice || item.unitPrice <= 0 || !Number.isFinite(item.unitPrice)) {
     errors.unitPrice = 'Prix unitaire invalide. Saisissez un montant supérieur à 0 DA.';
-  } else if (item.unitPrice > 1000000) {
-    errors.unitPrice = 'Le prix unitaire ne peut pas dépasser 1 000 000 DA.';
+  } else if (item.unitPrice > 10000000) {
+    errors.unitPrice = 'Le prix unitaire ne peut pas dépasser 10 000 000 DA.';
   }
   return { valid: Object.keys(errors).length === 0, errors };
 }

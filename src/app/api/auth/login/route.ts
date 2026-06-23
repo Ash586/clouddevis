@@ -5,6 +5,7 @@ import { verifyPassword, createSession } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
+import { t } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
@@ -17,24 +18,24 @@ async function postHandler(req: Request) {
 
     const { email, password, rememberMe } = body;
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
     const rateCheck = await checkRateLimit(`login:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
+      return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
+      return NextResponse.json({ error: t(req, 'invalidCredentials') }, { status: 401 });
     }
 
     const valid = await verifyPassword(password, user.password);
     if (!valid) {
-      return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 });
+      return NextResponse.json({ error: t(req, 'invalidCredentials') }, { status: 401 });
     }
 
     if (user.suspended) {
-      return NextResponse.json({ error: 'Votre compte a été suspendu. Contactez le support.' }, { status: 403 });
+      return NextResponse.json({ error: t(req, 'userSuspended') }, { status: 403 });
     }
 
     await createSession({

@@ -39,7 +39,6 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
         id: client.id, name: client.name, address: client.address,
         phone: client.phone, email: client.email,
         nif: client.nif, nis: client.nis, rc: client.rc, ai: client.ai,
-        ice: client.ice, matriculeFiscal: client.matriculeFiscal, siret: client.siret,
         createdAt: client.createdAt.toLocaleDateString('fr-DZ'),
       },
       stats: {
@@ -98,9 +97,6 @@ async function putHandler(_req: Request, { params }: { params: Promise<{ id: str
         ...(nis !== undefined && { nis: nis?.trim() || null }),
         ...(rc !== undefined && { rc: rc?.trim() || null }),
         ...(ai !== undefined && { ai: ai?.trim() || null }),
-        ...(ice !== undefined && { ice: ice?.trim() || null }),
-        ...(matriculeFiscal !== undefined && { matriculeFiscal: matriculeFiscal?.trim() || null }),
-        ...(siret !== undefined && { siret: siret?.trim() || null }),
       },
     });
 

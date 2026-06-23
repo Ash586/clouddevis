@@ -147,9 +147,6 @@ model Client {
   nis       String?
   rc        String?
   ai        String?  // Artisan Identification
-  ice       String?  // Maroc
-  matriculeFiscal String? // Tunisie
-  siret     String?  // France
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

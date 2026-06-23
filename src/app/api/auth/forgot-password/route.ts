@@ -5,6 +5,7 @@ import { checkRateLimit } from '@/lib/rateLimit';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
+import { t } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
@@ -12,13 +13,13 @@ async function postHandler(req: Request) {
     const { email } = await req.json();
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json({ error: 'Email requis' }, { status: 400 });
+      return NextResponse.json({ error: t(req, 'emailRequired') }, { status: 400 });
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
     const rateCheck = await checkRateLimit(`forgot:${email}:${ip}`, 3, 60000);
     if (!rateCheck.allowed) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans une minute.' }, { status: 429 });
+      return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

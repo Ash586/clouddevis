@@ -198,10 +198,7 @@
       "it": "IT"
     },
     "countries": {
-      "dz": "Algeria",
-      "tn": "Tunisia",
-      "ma": "Morocco",
-      "fr": "France"
+      "dz": "Algeria"
     },
     "languageOptions": {
       "fr": "Français",

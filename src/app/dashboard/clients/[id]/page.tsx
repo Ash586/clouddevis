@@ -19,9 +19,6 @@ interface ClientInfo {
   nif: string | null;
   nis: string | null;
   rc: string | null;
-  ice: string | null;
-  matriculeFiscal: string | null;
-  siret: string | null;
   createdAt: string;
 }
 
@@ -145,13 +142,6 @@ export default function ClientDetailPage() {
                     {client.rc && <span className="px-2 py-1 bg-[var(--navy-3)] rounded-lg font-medium">RC: {client.rc}</span>}
                   </div>
                 </div>
-                {(client.ice || client.matriculeFiscal || client.siret) && (
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--sand-muted)]">
-                    {client.ice && <span>ICE: {client.ice}</span>}
-                    {client.matriculeFiscal && <span>MF: {client.matriculeFiscal}</span>}
-                    {client.siret && <span>SIRET: {client.siret}</span>}
-                  </div>
-                )}
               </Card>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

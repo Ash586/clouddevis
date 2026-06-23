@@ -99,8 +99,6 @@ export const ClientSchema = z.object({
   phone: z.string().min(8, 'Numéro de téléphone invalide').max(20),
   email: z.string().email('Email invalide').optional().or(z.literal('')),
   address: z.string().max(500).optional().default(''),
-  ice: z.string().optional(),
-  siret: z.string().optional(),
 });
 
 /**

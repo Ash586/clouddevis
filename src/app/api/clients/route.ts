@@ -104,9 +104,6 @@ async function postHandler(req: Request) {
           nis: nis?.trim() || null,
           rc: rc?.trim() || null,
           ai: ai?.trim() || null,
-          ice: ice?.trim() || null,
-          matriculeFiscal: matriculeFiscal?.trim() || null,
-          siret: siret?.trim() || null,
         },
       });
       return NextResponse.json({ id: updated.id, name: updated.name, updated: true });
@@ -123,9 +120,6 @@ async function postHandler(req: Request) {
         nis: nis?.trim() || null,
         rc: rc?.trim() || null,
         ai: ai?.trim() || null,
-        ice: ice?.trim() || null,
-        matriculeFiscal: matriculeFiscal?.trim() || null,
-        siret: siret?.trim() || null,
       },
     });
 

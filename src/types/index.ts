@@ -1,4 +1,4 @@
-export type Country = 'algeria' | 'tunisia' | 'morocco' | 'france';
+export type Country = 'algeria';
 export type SectorId =
   | 'btp' | 'demengement' | 'nettoyage' | 'hotellerie'
   | 'reparation_auto' | 'sante' | 'formation' | 'immobilier'
@@ -6,7 +6,7 @@ export type SectorId =
   | 'professions_liberales' | 'informatique';
 export type DocumentType = 'devis' | 'proforma' | 'bc' | 'br' | 'facture' | 'intervention' | 'attachement';
 export type WorkflowState = 'draft' | 'accepted' | 'progress' | 'delivered';
-export type TaxRegimeId = 'tva_19' | 'tva_9' | 'tva_0' | 'tva_7_tn' | 'tva_20_ma' | 'tva_20_fr';
+export type TaxRegimeId = 'tva_19' | 'tva_9' | 'tva_0';
 export type PaymentMode = 'cheque' | 'virement' | 'especes' | 'cb';
 export type Language = 'fr' | 'ar' | 'en';
 export type UserMode = 'artisan' | 'entreprise';
