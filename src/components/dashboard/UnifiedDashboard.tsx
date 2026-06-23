@@ -135,15 +135,23 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
     <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-6 py-6">
       <DeleteModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={() => deleteTarget && onDelete(deleteTarget)} />
 
-      {/* ── Header ── */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-sora font-extrabold text-[var(--sand)]">{greeting}, {userName}</h1>
-          <span className="px-2.5 py-0.5 rounded-full bg-[var(--green-glow)] text-[var(--green-3)] text-[10px] font-bold uppercase tracking-wider border border-[rgba(37,99,235,0.2)]">
-            {isEnt ? t('businessMode') : t('artisanMode')}
-          </span>
+      {/* ── Hero band ── */}
+      <div className="relative overflow-hidden rounded-3xl mb-6 p-6 sm:p-8 bg-gradient-to-br from-[var(--green-2)] via-[var(--green)] to-[#1E3A8A] shadow-xl shadow-[rgba(37,99,235,0.22)]">
+        <div className="absolute -top-20 -right-12 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-[var(--teal)]/20 blur-3xl pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+          <div className="min-w-0">
+            <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-white text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm mb-3">
+              {isEnt ? t('businessMode') : t('artisanMode')}
+            </span>
+            <h1 className="text-2xl sm:text-[30px] font-sora font-extrabold text-white leading-tight">{greeting}, {userName}</h1>
+            <p className="text-sm text-white/75 mt-1.5">{t('subtitle')}</p>
+          </div>
+          <button onClick={() => router.push('/dashboard/editor?type=devis')}
+            className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-[var(--green-2)] text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-[0.98]">
+            <Plus size={18} /> {t('newQuote')}
+          </button>
         </div>
-        <p className="text-sm text-[var(--sand-muted)]">{t('subtitle')}</p>
       </div>
 
       {/* ── Trial Banner ── */}
@@ -398,13 +406,29 @@ function KpiCard({ label, value, sub, icon, suffix, color = 'default', hero = fa
   };
   const c = colorMap[color];
 
+  if (hero) {
+    return (
+      <div className="relative overflow-hidden rounded-2xl p-5 h-full bg-gradient-to-br from-[var(--green-2)] to-[var(--green)] shadow-lg shadow-[rgba(37,99,235,0.2)]">
+        <div className="absolute -top-10 -right-8 w-40 h-40 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="relative">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/15 text-white mb-3">{icon}</div>
+          <p className="text-[11px] font-bold text-white/70 uppercase tracking-wider mb-1">{label}</p>
+          <p className="font-sora font-extrabold text-white leading-tight text-2xl">
+            {value}{suffix ? <span className="text-sm font-bold text-white/70 ml-1">{suffix}</span> : ''}
+          </p>
+          {sub && <p className="text-[11px] text-white/60 mt-1">{sub}</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Card className={cn('p-4 sm:p-5', hero && 'bg-gradient-to-br from-[rgba(37,99,235,0.08)] to-transparent border-[rgba(37,99,235,0.18)]')}>
+    <Card className="p-4 sm:p-5 h-full hover:-translate-y-0.5 hover:shadow-lg transition-all">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.iconBg} ${c.iconText} mb-3`}>
         {icon}
       </div>
       <p className="text-[11px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-1">{label}</p>
-      <p className={cn('font-sora font-extrabold text-[var(--sand)] leading-tight', hero ? 'text-2xl' : 'text-xl')}>
+      <p className="font-sora font-extrabold text-[var(--sand)] leading-tight text-xl">
         {value}{suffix ? <span className="text-sm font-bold text-[var(--sand-muted)] ml-1">{suffix}</span> : ''}
       </p>
       {sub && <p className="text-[11px] text-[var(--sand-muted)] mt-1">{sub}</p>}
