@@ -59,7 +59,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
             >
               {/* Active indicator bar (top) */}
               {isActive && (
-                <span className="absolute top-0 h-0.5 w-8 rounded-full bg-[var(--green-3)]" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-[var(--green-3)]" />
               )}
               <span
                 className={cn(
