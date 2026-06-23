@@ -47,6 +47,7 @@ async function putHandler(req: Request, { params }: { params: Promise<{ id: stri
     const items = ((doc.items as Array<Record<string, unknown>>) || []).map((i) => ({
       id: String(i.id || ''),
       designation: String(i.designation || ''),
+      description: (i.description as string) || undefined,
       quantity: Number(i.quantity) || 0,
       unit: String(i.unit || 'unité'),
       unitPrice: Number(i.unitPrice) || 0,
@@ -76,6 +77,53 @@ async function putHandler(req: Request, { params }: { params: Promise<{ id: stri
     const documentType = String(doc.documentType || 'devis').toLowerCase();
     const typeValue = DOC_TYPE_MAP[documentType] || 'DEVIS';
 
+    const rawCustomFields = (typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}) as Record<string, unknown>;
+
+    // Build _editorMeta — all fields missing dedicated columns in Document model
+    const editorMeta: Record<string, unknown> = {
+      clientInfo: doc.clientInfo || {},
+      artisanInfo: doc.artisanInfo || null,
+      discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
+      stampDuty: doc.stampDuty || { rate: 1, minAmount: 5, maxAmount: 2500 },
+      paymentDetails: doc.paymentDetails || { terms: '', iban: '' },
+      chantierAddress: doc.chantierAddress || '',
+      chantierType: doc.chantierType || '',
+      chantierSurface: doc.chantierSurface || 0,
+      chantierEtat: doc.chantierEtat || '',
+      chantierProtection: doc.chantierProtection || '',
+      materiauxMarque: doc.materiauxMarque || '',
+      materiauxType: doc.materiauxType || '',
+      materiauxCouleur: doc.materiauxCouleur || '',
+      materiauxQte: doc.materiauxQte || 0,
+      garantieMO: doc.garantieMO || '',
+      garantieMateriaux: doc.garantieMateriaux || '',
+      garantieNotes: doc.garantieNotes || '',
+      companyTagline: doc.companyTagline || '',
+      companyCapital: doc.companyCapital || '',
+      rcNumber: doc.rcNumber || '',
+      nisNumber: doc.nisNumber || '',
+      aiNumber: doc.aiNumber || '',
+      rib: doc.rib || '',
+      bankName: doc.bankName || '',
+      bankAgency: doc.bankAgency || '',
+      ccpNumber: doc.ccpNumber || '',
+      validityDays: doc.validityDays ?? 30,
+      reference: doc.reference || '',
+      showWatermark: doc.showWatermark || false,
+      objet: doc.objet || '',
+      docCity: doc.docCity || '',
+      companyPhone: doc.companyPhone || '',
+      sigClientSubtitle: doc.sigClientSubtitle || '',
+      sigClientNameFr: doc.sigClientNameFr || '',
+      sigClientRole: doc.sigClientRole || '',
+      sigClientRoleFr: doc.sigClientRoleFr || '',
+      sigClientNameAr: doc.sigClientNameAr || '',
+      sigCompanyNameFr: doc.sigCompanyNameFr || '',
+      sigDirectionNameFr: doc.sigDirectionNameFr || '',
+      sigDirectionRole: doc.sigDirectionRole || '',
+      sigDirectionNameAr: doc.sigDirectionNameAr || '',
+    };
+
     const updated = await prisma.document.update({
       where: { id },
       data: {
@@ -83,15 +131,19 @@ async function putHandler(req: Request, { params }: { params: Promise<{ id: stri
         type: typeValue,
         number: String(doc.documentNumber || ''),
         date: doc.date ? new Date(String(doc.date)) : new Date(),
+        validUntil: doc.validUntil ? new Date(String(doc.validUntil)) : undefined,
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
+        bcRef: (doc.bcRef as string) || null,
+        brRef: (doc.brRef as string) || null,
         items: JSON.stringify(items),
         companyInfo: doc.companyInfo && typeof doc.companyInfo === 'object' && Object.keys(doc.companyInfo).length > 0 ? doc.companyInfo as object : undefined,
         logoPosition: typeof doc.logoPosition === 'string' ? doc.logoPosition : undefined,
         customFields: JSON.stringify({
-          ...(typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}),
+          ...rawCustomFields,
           sectionOrder: Array.isArray(doc.sectionOrder) ? doc.sectionOrder : [],
           hiddenBlocks: Array.isArray(doc.hiddenBlocks) ? doc.hiddenBlocks : [],
+          _editorMeta: editorMeta,
         }),
         subTotalHT: result.subTotalHT,
         tvaAmount: result.tvaAmount,
@@ -103,6 +155,18 @@ async function putHandler(req: Request, { params }: { params: Promise<{ id: stri
         notes: (doc.notes as string) || null,
       },
     });
+
+    // Sync client tax fields (nif, nis, rc, ai) from document clientInfo
+    if (existingClientId && clientInfo) {
+      const updateData: Record<string, string | null> = {};
+      if (clientInfo.nif !== undefined) updateData.nif = String(clientInfo.nif).trim() || null;
+      if (clientInfo.nis !== undefined) updateData.nis = String(clientInfo.nis).trim() || null;
+      if (clientInfo.rc !== undefined) updateData.rc = String(clientInfo.rc).trim() || null;
+      if (clientInfo.ai !== undefined) updateData.ai = String(clientInfo.ai).trim() || null;
+      if (Object.keys(updateData).length > 0) {
+        await prisma.client.update({ where: { id: existingClientId }, data: updateData });
+      }
+    }
 
     return NextResponse.json({ id: updated.id, number: updated.number });
   } catch (error) {

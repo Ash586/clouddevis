@@ -176,20 +176,83 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
         } catch {} 
         return null; 
       })();
-          setDoc(prev => ({
-            ...prev,
-            items,
-            customFields,
-            documentType: (d.type || 'DEVIS').toLowerCase(),
-            documentNumber: d.number || '',
-            date: d.date?.split('T')[0] || prev.date,
-            tvaRate: d.subTotalHT > 0 ? Math.round(d.tvaAmount / d.subTotalHT * 100) : 0,
-            paymentMode: d.paymentMode || prev.paymentMode,
-            mode: d.mode?.toLowerCase?.() === 'entreprise' ? 'entreprise' : 'artisan',
-            notes: d.notes || '',
-            companyInfo: companyInfo || prev.companyInfo,
-            logoPosition: d.logoPosition || prev.logoPosition || 'right',
-          }));
+          setDoc(prev => {
+            // Extract _editorMeta from customFields — contains all fields with no dedicated column
+            const meta = (customFields._editorMeta || {}) as Record<string, unknown>;
+            const editorMeta = meta as Record<string, unknown>;
+
+            return {
+              ...prev,
+              items,
+              customFields,
+              documentType: (d.type || 'DEVIS').toLowerCase(),
+              documentNumber: d.number || '',
+              date: d.date?.split('T')[0] || prev.date,
+              tvaRate: d.subTotalHT > 0 ? Math.round(d.tvaAmount / d.subTotalHT * 100) : 0,
+              paymentMode: d.paymentMode || prev.paymentMode,
+              mode: d.mode?.toLowerCase?.() === 'entreprise' ? 'entreprise' : 'artisan',
+              notes: d.notes || '',
+              companyInfo: companyInfo || prev.companyInfo,
+              logoPosition: d.logoPosition || prev.logoPosition || 'right',
+              validUntil: d.validUntil ? String(d.validUntil).split('T')[0] : (editorMeta.validUntil as string) || prev.validUntil,
+              bcRef: d.bcRef || (editorMeta.bcRef as string) || prev.bcRef,
+              brRef: d.brRef || (editorMeta.brRef as string) || prev.brRef,
+              // Restore clientInfo from _editorMeta (tax fields snapshot)
+              clientInfo: {
+                ...prev.clientInfo,
+                ...(editorMeta.clientInfo as Record<string, unknown> || {}),
+              } as DocumentState['clientInfo'],
+              // Restore artisanInfo
+              artisanInfo: (editorMeta.artisanInfo as DocumentState['artisanInfo']) || prev.artisanInfo,
+              // Restore discount
+              discount: (editorMeta.discount as DocumentState['discount']) || prev.discount,
+              // Restore stampDuty
+              stampDuty: (editorMeta.stampDuty as DocumentState['stampDuty']) || prev.stampDuty,
+              // Restore paymentDetails
+              paymentDetails: (editorMeta.paymentDetails as DocumentState['paymentDetails']) || prev.paymentDetails,
+              // Restore chantier
+              chantierAddress: (editorMeta.chantierAddress as string) || prev.chantierAddress,
+              chantierType: (editorMeta.chantierType as string) || prev.chantierType,
+              chantierSurface: (editorMeta.chantierSurface as number) ?? prev.chantierSurface,
+              chantierEtat: (editorMeta.chantierEtat as string) || prev.chantierEtat,
+              chantierProtection: (editorMeta.chantierProtection as string) || prev.chantierProtection,
+              // Restore materiaux
+              materiauxMarque: (editorMeta.materiauxMarque as string) || prev.materiauxMarque,
+              materiauxType: (editorMeta.materiauxType as string) || prev.materiauxType,
+              materiauxCouleur: (editorMeta.materiauxCouleur as string) || prev.materiauxCouleur,
+              materiauxQte: (editorMeta.materiauxQte as number) ?? prev.materiauxQte,
+              // Restore garanties
+              garantieMO: (editorMeta.garantieMO as string) || prev.garantieMO,
+              garantieMateriaux: (editorMeta.garantieMateriaux as string) || prev.garantieMateriaux,
+              garantieNotes: (editorMeta.garantieNotes as string) || prev.garantieNotes,
+              // Restore devis-specific fields
+              companyTagline: (editorMeta.companyTagline as string) || prev.companyTagline,
+              companyCapital: (editorMeta.companyCapital as string) || prev.companyCapital,
+              rcNumber: (editorMeta.rcNumber as string) || prev.rcNumber,
+              nisNumber: (editorMeta.nisNumber as string) || prev.nisNumber,
+              aiNumber: (editorMeta.aiNumber as string) || prev.aiNumber,
+              rib: (editorMeta.rib as string) || prev.rib,
+              bankName: (editorMeta.bankName as string) || prev.bankName,
+              bankAgency: (editorMeta.bankAgency as string) || prev.bankAgency,
+              ccpNumber: (editorMeta.ccpNumber as string) || prev.ccpNumber,
+              validityDays: (editorMeta.validityDays as number) ?? prev.validityDays,
+              reference: (editorMeta.reference as string) || prev.reference,
+              showWatermark: (editorMeta.showWatermark as boolean) ?? prev.showWatermark,
+              objet: (editorMeta.objet as string) || prev.objet,
+              docCity: (editorMeta.docCity as string) || prev.docCity,
+              // Restore signature fields
+              companyPhone: (editorMeta.companyPhone as string) || prev.companyPhone,
+              sigClientSubtitle: (editorMeta.sigClientSubtitle as string) || prev.sigClientSubtitle,
+              sigClientNameFr: (editorMeta.sigClientNameFr as string) || prev.sigClientNameFr,
+              sigClientRole: (editorMeta.sigClientRole as string) || prev.sigClientRole,
+              sigClientRoleFr: (editorMeta.sigClientRoleFr as string) || prev.sigClientRoleFr,
+              sigClientNameAr: (editorMeta.sigClientNameAr as string) || prev.sigClientNameAr,
+              sigCompanyNameFr: (editorMeta.sigCompanyNameFr as string) || prev.sigCompanyNameFr,
+              sigDirectionNameFr: (editorMeta.sigDirectionNameFr as string) || prev.sigDirectionNameFr,
+              sigDirectionRole: (editorMeta.sigDirectionRole as string) || prev.sigDirectionRole,
+              sigDirectionNameAr: (editorMeta.sigDirectionNameAr as string) || prev.sigDirectionNameAr,
+            };
+          });
         }
       })
       .catch(() => {})

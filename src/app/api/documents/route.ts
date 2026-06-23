@@ -165,8 +165,9 @@ async function postHandler(req: Request) {
     if (!Array.isArray(rawItems)) {
       return NextResponse.json({ error: 'items doit être un tableau' }, { status: 400 });
     }
-    const items: Array<{ id: string; designation: string; quantity: number; unit: string; unitPrice: number; category: string | null }> = rawItems.map((i) => ({
-      id: String(i.id || ''), designation: String(i.designation || ''), quantity: Number(i.quantity) || 0,
+    const items: Array<{ id: string; designation: string; description?: string; quantity: number; unit: string; unitPrice: number; category: string | null }> = rawItems.map((i) => ({
+      id: String(i.id || ''), designation: String(i.designation || ''), description: (i.description as string) || undefined,
+      quantity: Number(i.quantity) || 0,
       unit: String(i.unit || 'unité'), unitPrice: Number(i.unitPrice) || 0, category: (i.category as string) || null,
     }));
 
@@ -195,22 +196,83 @@ async function postHandler(req: Request) {
     const documentType = String(doc.documentType || 'devis').toLowerCase();
     const typeValue = DOC_TYPE_MAP[documentType] || 'DEVIS';
 
+    const rawCustomFields = (typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}) as Record<string, unknown>;
+
+    // Build _editorMeta — all fields missing dedicated columns in Document model
+    const editorMeta: Record<string, unknown> = {
+      // client tax fields (stored on Client model, also snapshot here for loaded docs)
+      clientInfo: doc.clientInfo || {},
+      // artisan mode
+      artisanInfo: doc.artisanInfo || null,
+      // discount
+      discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
+      // stamp duty
+      stampDuty: doc.stampDuty || { rate: 1, minAmount: 5, maxAmount: 2500 },
+      // payment details
+      paymentDetails: doc.paymentDetails || { terms: '', iban: '' },
+      // chantier
+      chantierAddress: doc.chantierAddress || '',
+      chantierType: doc.chantierType || '',
+      chantierSurface: doc.chantierSurface || 0,
+      chantierEtat: doc.chantierEtat || '',
+      chantierProtection: doc.chantierProtection || '',
+      // materiaux
+      materiauxMarque: doc.materiauxMarque || '',
+      materiauxType: doc.materiauxType || '',
+      materiauxCouleur: doc.materiauxCouleur || '',
+      materiauxQte: doc.materiauxQte || 0,
+      // garanties
+      garantieMO: doc.garantieMO || '',
+      garantieMateriaux: doc.garantieMateriaux || '',
+      garantieNotes: doc.garantieNotes || '',
+      // devis-specific company info
+      companyTagline: doc.companyTagline || '',
+      companyCapital: doc.companyCapital || '',
+      rcNumber: doc.rcNumber || '',
+      nisNumber: doc.nisNumber || '',
+      aiNumber: doc.aiNumber || '',
+      rib: doc.rib || '',
+      bankName: doc.bankName || '',
+      bankAgency: doc.bankAgency || '',
+      ccpNumber: doc.ccpNumber || '',
+      validityDays: doc.validityDays ?? 30,
+      reference: doc.reference || '',
+      showWatermark: doc.showWatermark || false,
+      objet: doc.objet || '',
+      docCity: doc.docCity || '',
+      // signature fields
+      companyPhone: doc.companyPhone || '',
+      sigClientSubtitle: doc.sigClientSubtitle || '',
+      sigClientNameFr: doc.sigClientNameFr || '',
+      sigClientRole: doc.sigClientRole || '',
+      sigClientRoleFr: doc.sigClientRoleFr || '',
+      sigClientNameAr: doc.sigClientNameAr || '',
+      sigCompanyNameFr: doc.sigCompanyNameFr || '',
+      sigDirectionNameFr: doc.sigDirectionNameFr || '',
+      sigDirectionRole: doc.sigDirectionRole || '',
+      sigDirectionNameAr: doc.sigDirectionNameAr || '',
+    };
+
     const created = await prisma.document.create({
       data: {
         userId: session.userId,
         type: typeValue,
         number: String(doc.documentNumber || ''),
         date: doc.date ? new Date(String(doc.date)) : new Date(),
+        validUntil: doc.validUntil ? new Date(String(doc.validUntil)) : undefined,
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
+        bcRef: (doc.bcRef as string) || null,
+        brRef: (doc.brRef as string) || null,
         items: JSON.stringify(items),
         companyInfo: doc.companyInfo && typeof doc.companyInfo === 'object' && Object.keys(doc.companyInfo).length > 0 ? doc.companyInfo as object : undefined,
         logoPosition: typeof doc.logoPosition === 'string' ? doc.logoPosition : undefined,
         clientId: existingClientId,
         customFields: JSON.stringify({
-          ...(typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}),
+          ...rawCustomFields,
           sectionOrder: Array.isArray(doc.sectionOrder) ? doc.sectionOrder : [],
           hiddenBlocks: Array.isArray(doc.hiddenBlocks) ? doc.hiddenBlocks : [],
+          _editorMeta: editorMeta,
         }),
         subTotalHT: result.subTotalHT, tvaAmount: result.tvaAmount,
         timbreFiscal: result.timbreFiscal, totalTTC: result.totalTTC,
@@ -221,6 +283,18 @@ async function postHandler(req: Request) {
 
     // Increment doc count
     await prisma.user.update({ where: { id: session.userId }, data: { docCountThisMonth: { increment: 1 } } });
+
+    // Sync client tax fields (nif, nis, rc, ai) from document clientInfo
+    if (existingClientId && clientInfo) {
+      const updateData: Record<string, string | null> = {};
+      if (clientInfo.nif !== undefined) updateData.nif = String(clientInfo.nif).trim() || null;
+      if (clientInfo.nis !== undefined) updateData.nis = String(clientInfo.nis).trim() || null;
+      if (clientInfo.rc !== undefined) updateData.rc = String(clientInfo.rc).trim() || null;
+      if (clientInfo.ai !== undefined) updateData.ai = String(clientInfo.ai).trim() || null;
+      if (Object.keys(updateData).length > 0) {
+        await prisma.client.update({ where: { id: existingClientId }, data: updateData });
+      }
+    }
 
     return NextResponse.json({ id: created.id, number: created.number });
   } catch (error) {
