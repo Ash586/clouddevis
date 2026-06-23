@@ -181,7 +181,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
               className={cn(
                 'absolute top-4 left-4 z-10',
                 'flex items-center gap-1 px-3 py-2 rounded-lg',
-                'bg-[rgba(245,237,214,0.08)] text-[var(--sand)]',
+                'bg-[rgba(15,39,71,0.08)] text-[var(--sand)]',
                 'active:scale-95 transition-transform',
               )}
               aria-label="Retour"

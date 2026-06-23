@@ -156,7 +156,7 @@ export default function ClientsPage() {
                 placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-4 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-4 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               />
 
               {loading ? (
@@ -177,7 +177,7 @@ export default function ClientsPage() {
                     <Card className="overflow-x-auto p-0">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                          <tr className="border-b border-[rgba(15,39,71,0.06)]">
                             <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('name')}</th>
                             <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('phone')}</th>
                             <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('email')}</th>
@@ -189,7 +189,7 @@ export default function ClientsPage() {
                         </thead>
                         <tbody>
                           {clients.map(client => (
-                            <tr key={client.id} className="border-b border-[rgba(245,237,214,0.04)] hover:bg-[rgba(245,237,214,0.02)] transition">
+                            <tr key={client.id} className="border-b border-[rgba(15,39,71,0.04)] hover:bg-[rgba(15,39,71,0.02)] transition">
                               <td className="px-4 py-3">
                                 <button onClick={() => router.push(`/dashboard/clients/${client.id}`)} className="font-semibold text-[var(--sand)] hover:text-blue-400 transition text-start">
                                   {client.name}
@@ -296,7 +296,7 @@ export default function ClientsPage() {
             <input
               value={form.name}
               onChange={e => setField('name', e.target.value)}
-              className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+              className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               placeholder={t('namePlaceholder')}
             />
           </div>
@@ -305,7 +305,7 @@ export default function ClientsPage() {
             <input
               value={form.address}
               onChange={e => setField('address', e.target.value)}
-              className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+              className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               placeholder={t('addressPlaceholder')}
             />
           </div>
@@ -315,7 +315,7 @@ export default function ClientsPage() {
               <input
                 value={form.phone}
                 onChange={e => setField('phone', e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                 placeholder={t('phonePlaceholder')}
               />
             </div>
@@ -324,7 +324,7 @@ export default function ClientsPage() {
               <input
                 value={form.email}
                 onChange={e => setField('email', e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                 placeholder={t('emailPlaceholder')}
               />
             </div>
@@ -335,7 +335,7 @@ export default function ClientsPage() {
               <input
                 value={form.nif}
                 onChange={e => setField('nif', e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               />
             </div>
             <div>
@@ -343,7 +343,7 @@ export default function ClientsPage() {
               <input
                 value={form.nis}
                 onChange={e => setField('nis', e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               />
             </div>
             <div>
@@ -351,7 +351,7 @@ export default function ClientsPage() {
               <input
                 value={form.rc}
                 onChange={e => setField('rc', e.target.value)}
-                className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               />
             </div>
           </div>

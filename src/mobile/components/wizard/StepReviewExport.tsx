@@ -143,7 +143,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           'rounded-2xl overflow-hidden',
-          'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)]',
+          'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]',
         )}
       >
         {/* Header bar */}
@@ -166,7 +166,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
         </div>
 
         {/* Client info */}
-        <div className="p-4 border-b border-[rgba(245,237,214,0.06)]">
+        <div className="p-4 border-b border-[rgba(15,39,71,0.06)]">
           <p className="text-[10px] text-[var(--sand-muted)] uppercase tracking-wide mb-1">
             Client
           </p>
@@ -221,7 +221,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 <span>{formatDA(totals.timbreAmount)}</span>
               </div>
             )}
-            <div className="h-px bg-[rgba(245,237,214,0.08)]" />
+            <div className="h-px bg-[rgba(15,39,71,0.08)]" />
             <div className="flex justify-between text-sm font-bold text-[var(--sand)]">
               <span>TTC</span>
               <span>{formatDA(totals.totalTTC)}</span>
@@ -249,7 +249,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
           )}
           style={{
             background: 'var(--green-2)',
-            boxShadow: '0 4px 20px rgba(0,149,77, 0.35)',
+            boxShadow: '0 4px 20px rgba(37,99,235, 0.35)',
           }}
         >
           {generating ? 'Génération...' : 'Générer PDF'}
@@ -281,7 +281,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 onClick={handleWhatsApp}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -295,7 +295,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               <button
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -309,7 +309,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               <button
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -324,7 +324,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 onClick={handlePrint}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -345,7 +345,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 )}
                 style={{
                   background: 'var(--green-2)',
-                  boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
+                  boxShadow: '0 2px 12px rgba(37,99,235, 0.3)',
                 }}
               >
                 Enregistrer le document

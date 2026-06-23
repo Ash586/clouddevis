@@ -36,9 +36,9 @@ export default function ArticlePage({ params }: { params: { category: string; ar
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-[11px] text-[#999] mb-6">
-        <Link href="/help" className="hover:text-[#0B3D2E] transition">Centre d&apos;aide</Link>
+        <Link href="/help" className="hover:text-[#1E40AF] transition">Centre d&apos;aide</Link>
         <span>/</span>
-        <Link href={`/help/${params.category}`} className="hover:text-[#0B3D2E] transition">{cat.title}</Link>
+        <Link href={`/help/${params.category}`} className="hover:text-[#1E40AF] transition">{cat.title}</Link>
         <span>/</span>
         <span className="text-[#161616] font-semibold">{article.title}</span>
       </nav>
@@ -68,19 +68,19 @@ export default function ArticlePage({ params }: { params: { category: string; ar
         {prev ? (
           <Link
             href={`/help/${params.category}/${prev.slug}`}
-            className="flex-1 bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#0B3D2E]/20 transition group text-left"
+            className="flex-1 bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#1E40AF]/20 transition group text-left"
           >
             <div className="text-[9px] text-[#999] uppercase tracking-wider font-bold mb-1">&larr; Précédent</div>
-            <div className="text-[12px] font-semibold text-[#161616] group-hover:text-[#0B3D2E] transition">{prev.title}</div>
+            <div className="text-[12px] font-semibold text-[#161616] group-hover:text-[#1E40AF] transition">{prev.title}</div>
           </Link>
         ) : <div className="flex-1" />}
         {next ? (
           <Link
             href={`/help/${params.category}/${next.slug}`}
-            className="flex-1 bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#0B3D2E]/20 transition group text-right"
+            className="flex-1 bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#1E40AF]/20 transition group text-right"
           >
             <div className="text-[9px] text-[#999] uppercase tracking-wider font-bold mb-1">Suivant &rarr;</div>
-            <div className="text-[12px] font-semibold text-[#161616] group-hover:text-[#0B3D2E] transition">{next.title}</div>
+            <div className="text-[12px] font-semibold text-[#161616] group-hover:text-[#1E40AF] transition">{next.title}</div>
           </Link>
         ) : <div className="flex-1" />}
       </div>

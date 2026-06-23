@@ -20,7 +20,7 @@ export function StickyMobileCTA() {
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       <div className="bg-[var(--navy-2)]/95 backdrop-blur-lg border-t border-[var(--border)] px-4 py-3">
         <Link href="/auth/register" onClick={() => track(PAGE_EVENTS.CTA_CLICK, { location: 'sticky_mobile', label: 'Créer un devis' })}
-          className="flex items-center justify-center gap-2 w-full py-3 min-h-[48px] rounded-xl bg-[var(--green-2)] text-white text-sm font-bold shadow-lg shadow-[rgba(0,122,64,0.3)] active:scale-[0.98] transition no-underline">
+          className="flex items-center justify-center gap-2 w-full py-3 min-h-[48px] rounded-xl bg-[var(--green-2)] text-white text-sm font-bold shadow-lg shadow-[rgba(37,99,235,0.3)] active:scale-[0.98] transition no-underline">
           <FileText size={16} />
           Créer un devis
         </Link>

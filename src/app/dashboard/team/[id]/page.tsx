@@ -86,9 +86,9 @@ export default function TeamDetailPage() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
                     placeholder={t('inviteEmailPlaceholder')}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                   <select value={inviteRole} onChange={e => setInviteRole(e.target.value)}
-                    className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
+                    className="px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm bg-[var(--navy-3)]">
                     <option value="MEMBER">{t('roleMember')}</option>
                     <option value="ADMIN">{t('roleAdmin')}</option>
                   </select>

@@ -54,7 +54,7 @@ export function HelpFAQ({ lang }: Props) {
                       <div className="px-4 pb-4">
                         <p className="text-[12px] text-[#444] leading-[1.7]">{item.a}</p>
                         {FAQ_LINKS[categoryKey] && (
-                          <Link href={FAQ_LINKS[categoryKey]!} className="inline-flex items-center gap-1 text-[11px] font-semibold mt-2 hover:underline" style={{ color: '#0B3D2E' }}>
+                          <Link href={FAQ_LINKS[categoryKey]!} className="inline-flex items-center gap-1 text-[11px] font-semibold mt-2 hover:underline" style={{ color: '#1E40AF' }}>
                             {t('readMore')} →
                           </Link>
                         )}

@@ -42,7 +42,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
                 className="flex flex-col items-center justify-center gap-0.5 w-16 h-full relative"
                 aria-label="Nouveau document"
               >
-                <div className="w-11 h-11 rounded-xl bg-[var(--green)] flex items-center justify-center text-white shadow-lg shadow-[rgba(0,149,77,0.3)] active:scale-95 transition-transform">
+                <div className="w-11 h-11 rounded-xl bg-[var(--green)] flex items-center justify-center text-white shadow-lg shadow-[rgba(37,99,235,0.3)] active:scale-95 transition-transform">
                   <Plus size={22} strokeWidth={2.5} />
                 </div>
               </button>

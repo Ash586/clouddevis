@@ -25,7 +25,7 @@ export function useToast() {
 }
 
 const typeStyles: Record<Toast['type'], string> = {
-  success: 'bg-[var(--green-bg)] text-[var(--green-3)] border-[rgba(0,149,77,0.25)]',
+  success: 'bg-[var(--green-bg)] text-[var(--green-3)] border-[rgba(37,99,235,0.25)]',
   error: 'bg-[rgba(232,84,46,0.1)] text-[var(--stamp-red)] border-[rgba(232,84,46,0.25)]',
   info: 'bg-[rgba(74,158,255,0.1)] text-[#4a9eff] border-[rgba(74,158,255,0.25)]',
   warning: 'bg-[rgba(245,158,11,0.1)] text-[var(--cd-warning)] border-[rgba(245,158,11,0.25)]',

@@ -20,17 +20,17 @@ export default function FAQPage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-[11px] text-[#999] mb-6">
-        <Link href="/help" className="hover:text-[#0B3D2E] transition">{t('helpCenter')}</Link>
+        <Link href="/help" className="hover:text-[#1E40AF] transition">{t('helpCenter')}</Link>
         <span>/</span>
         <span className="text-[#161616] font-semibold">{t('faqTitle')}</span>
       </nav>
 
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-[20px]" style={{ background: '#0B3D2E10' }}>
+        <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center text-[20px]" style={{ background: '#1E40AF10' }}>
           ❓
         </div>
-        <h1 className="text-xl font-black tracking-tight mb-2" style={{ color: '#0B3D2E' }}>{t('faqTitle')}</h1>
+        <h1 className="text-xl font-black tracking-tight mb-2" style={{ color: '#1E40AF' }}>{t('faqTitle')}</h1>
         <p className="text-[12px] text-[#999]">{t('faqSubtitle')}</p>
       </div>
 
@@ -43,7 +43,7 @@ export default function FAQPage() {
         <a
           href="mailto:support@clouddevis.com"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold text-white transition hover:opacity-90"
-          style={{ background: '#0B3D2E' }}
+          style={{ background: '#1E40AF' }}
         >
           {t('contactSupport')}
         </a>

@@ -51,7 +51,7 @@ interface ReportsData {
 
 const TYPE_COLORS: Record<string, string> = {
   DEVIS: 'bg-blue-400/10 text-blue-400',
-  FACTURE: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  FACTURE: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]',
   PROFORMA: 'bg-purple-400/10 text-purple-400',
   BC: 'bg-amber-400/10 text-amber-400',
   BR: 'bg-teal-400/10 text-teal-400',
@@ -181,7 +181,7 @@ export default function ReportsPage() {
                         type="date"
                         value={customFrom}
                         onChange={e => setCustomFrom(e.target.value)}
-                        className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                        className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                       />
                     </div>
                     <div>
@@ -190,7 +190,7 @@ export default function ReportsPage() {
                         type="date"
                         value={customTo}
                         onChange={e => setCustomTo(e.target.value)}
-                        className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                        className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                       />
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export default function ReportsPage() {
                       <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('byType')}</h2>
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                          <tr className="border-b border-[rgba(15,39,71,0.06)]">
                             <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('type')}</th>
                             <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('count')}</th>
                             <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('total')}</th>
@@ -258,7 +258,7 @@ export default function ReportsPage() {
                         </thead>
                         <tbody>
                           {data.byType.map(r => (
-                            <tr key={r.type} className="border-b border-[rgba(245,237,214,0.04)]">
+                            <tr key={r.type} className="border-b border-[rgba(15,39,71,0.04)]">
                               <td className="py-2 px-3">
                                 <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.type] || 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
                                   {r.type}
@@ -280,14 +280,14 @@ export default function ReportsPage() {
                       <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('byStatus')}</h2>
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                          <tr className="border-b border-[rgba(15,39,71,0.06)]">
                             <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('status')}</th>
                             <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('count')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.byStatus.map(r => (
-                            <tr key={r.status} className="border-b border-[rgba(245,237,214,0.04)]">
+                            <tr key={r.status} className="border-b border-[rgba(15,39,71,0.04)]">
                               <td className="py-2 px-3">
                                 <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[r.status] || 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
                                   {tc(r.status?.toLowerCase()) || r.status}
@@ -311,7 +311,7 @@ export default function ReportsPage() {
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                            <tr className="border-b border-[rgba(15,39,71,0.06)]">
                               <th className="text-start py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('name')}</th>
                               <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{t('docCount')}</th>
                               <th className="text-end py-2 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('total')}</th>
@@ -319,7 +319,7 @@ export default function ReportsPage() {
                           </thead>
                           <tbody>
                             {data.topClients.map((r, i) => (
-                              <tr key={i} className="border-b border-[rgba(245,237,214,0.04)]">
+                              <tr key={i} className="border-b border-[rgba(15,39,71,0.04)]">
                                 <td className="py-2 px-3 font-semibold text-[var(--sand)]">{r.name}</td>
                                 <td className="py-2 px-3 text-end text-[var(--sand-2)]">{r.count}</td>
                                 <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{r.total.toLocaleString()} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>

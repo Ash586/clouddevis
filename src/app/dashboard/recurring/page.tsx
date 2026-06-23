@@ -91,15 +91,15 @@ export default function RecurringInvoicesPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     <input type="text" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                       placeholder={t('form.namePlaceholder')}
-                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                     <select value={form.documentType} onChange={e => setForm(p => ({ ...p, documentType: e.target.value }))}
-                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm bg-[var(--navy-3)]">
                       <option value="FACTURE">Facture</option>
                       <option value="DEVIS">Devis</option>
                       <option value="PROFORMA">Proforma</option>
                     </select>
                     <select value={form.frequency} onChange={e => setForm(p => ({ ...p, frequency: e.target.value }))}
-                      className="px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm bg-[var(--navy-3)]">
+                      className="px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm bg-[var(--navy-3)]">
                       <option value="WEEKLY">{t('eachWeek')}</option>
                       <option value="MONTHLY">{t('eachMonth')}</option>
                       <option value="QUARTERLY">{t('eachQuarter')}</option>
@@ -108,7 +108,7 @@ export default function RecurringInvoicesPage() {
                     <div>
                       <label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-1">{t('form.nextDate')}</label>
                       <input type="date" value={form.nextDate} onChange={e => setForm(p => ({ ...p, nextDate: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
+                        className="w-full px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -135,7 +135,7 @@ export default function RecurringInvoicesPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-bold text-[var(--sand)]">{inv.name}</p>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${inv.active ? 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]' : 'bg-[var(--navy-3)] text-[var(--sand-muted)]'}`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${inv.active ? 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]' : 'bg-[var(--navy-3)] text-[var(--sand-muted)]'}`}>
                               {inv.active ? t('active') : t('paused')}
                             </span>
                           </div>

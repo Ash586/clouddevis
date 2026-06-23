@@ -22,13 +22,13 @@ export function HelpPopular({ lang }: Props) {
         <Link
           key={a.slug}
           href={`/help/${a.category}/${a.slug}`}
-          className="flex items-center justify-between bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#0B3D2E]/20 transition group"
+          className="flex items-center justify-between bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#1E40AF]/20 transition group"
         >
           <div className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: '#0B3D2E10', color: '#0B3D2E' }}>
+            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: '#1E40AF10', color: '#1E40AF' }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
             </span>
-            <span className="text-[12px] font-semibold text-[#161616] group-hover:text-[#0B3D2E] transition">
+            <span className="text-[12px] font-semibold text-[#161616] group-hover:text-[#1E40AF] transition">
               {lang === 'ar' ? a.titleAr : lang === 'en' ? a.titleEn : a.titleFr}
             </span>
           </div>

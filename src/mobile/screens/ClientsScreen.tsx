@@ -69,7 +69,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.name}
           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
           placeholder="Nom du client"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]"
         />
       </div>
       <div>
@@ -79,7 +79,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.nif}
           onChange={(e) => setForm((p) => ({ ...p, nif: e.target.value }))}
           placeholder="123456789012345"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]"
         />
       </div>
       <div>
@@ -89,7 +89,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.phone}
           onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
           placeholder="0555 12 34 56"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]"
         />
       </div>
       <div>
@@ -99,7 +99,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
           placeholder="client@example.com"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]"
         />
       </div>
       <div>
@@ -109,7 +109,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.address}
           onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
           placeholder="123 Rue Principale, Alger"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]"
         />
       </div>
       <div className="flex gap-2 pt-2">
@@ -231,8 +231,8 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
             className={cn(
               'w-full pl-10 pr-4 py-2.5 rounded-xl text-sm',
               'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-              'border border-[rgba(245,237,214,0.06)]',
-              'focus:outline-none focus:border-[rgba(0,149,77,0.3)]',
+              'border border-[rgba(15,39,71,0.06)]',
+              'focus:outline-none focus:border-[rgba(37,99,235,0.3)]',
             )}
           />
         </div>
@@ -281,7 +281,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                 return (
                   <motion.div
                     key={client.id}
-                    className="mb-3 rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] p-4"
+                    className="mb-3 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] p-4"
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -317,7 +317,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 mt-3 pt-3 border-t border-[rgba(245,237,214,0.06)]">
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-[rgba(15,39,71,0.06)]">
                       <button
                         onClick={() => handleEdit(client)}
                         className="flex-1 py-2 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-[0.98] transition-transform"

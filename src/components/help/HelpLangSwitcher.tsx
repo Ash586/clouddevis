@@ -40,13 +40,13 @@ export function HelpLangSwitcher({ current, onChange }: Props) {
                 key={lang.code}
                 onClick={() => { onChange(lang.code); setOpen(false); }}
                 className={`flex items-center gap-2 w-full px-3 py-2 text-[11.5px] font-medium transition hover:bg-[#F8F7F4] ${
-                  lang.code === current ? 'bg-[#F0EFEC] text-[#0B3D2E]' : 'text-[#444]'
+                  lang.code === current ? 'bg-[#F0EFEC] text-[#1E40AF]' : 'text-[#444]'
                 }`}
               >
                 <span>{lang.flag}</span>
                 <span>{lang.label}</span>
                 {lang.code === current && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0B3D2E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ml-auto">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ml-auto">
                     <path d="M5 12l5 5L20 7" />
                   </svg>
                 )}

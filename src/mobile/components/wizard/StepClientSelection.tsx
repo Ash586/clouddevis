@@ -137,7 +137,7 @@ export function StepClientSelection({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(0,149,77,0.12)] border border-[rgba(0,149,77,0.25)]"
+            className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(37,99,235,0.12)] border border-[rgba(37,99,235,0.25)]"
           >
             <IconUser size={16} className="text-[var(--green-3)] flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -174,7 +174,7 @@ export function StepClientSelection({
           placeholder="Rechercher un client..."
           className={cn(
             'w-full h-12 pl-10 pr-4 rounded-xl',
-            'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)]',
+            'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]',
             'text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
             'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
             'transition-all duration-200',
@@ -191,7 +191,7 @@ export function StepClientSelection({
               onClick={() => handleSelectClient(client)}
               className={cn(
                 'flex items-center gap-3 p-3.5 rounded-xl text-left',
-                'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
                 'min-h-[56px]',
               )}
@@ -218,7 +218,7 @@ export function StepClientSelection({
           onClick={() => setShowNewClientForm(true)}
           className={cn(
             'flex items-center justify-center gap-2 h-12 rounded-xl',
-            'border-2 border-dashed border-[rgba(245,237,214,0.12)]',
+            'border-2 border-dashed border-[rgba(15,39,71,0.12)]',
             'text-sm font-semibold text-[var(--sand-muted)]',
             'active:scale-[0.97] transition-all',
           )}
@@ -231,7 +231,7 @@ export function StepClientSelection({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmit(onSubmitNewClient)}
-          className="flex flex-col gap-3 p-4 rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)]"
+          className="flex flex-col gap-3 p-4 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]"
         >
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-semibold text-[var(--sand)]">Nouveau client</p>
@@ -253,7 +253,7 @@ export function StepClientSelection({
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.name ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+                errors.name ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
               )}
             />
             {errors.name && (
@@ -279,7 +279,7 @@ export function StepClientSelection({
                     ? 'border-emerald-400/50'
                     : nifValid === false
                       ? 'border-red-400/50'
-                      : 'border-[rgba(245,237,214,0.08)]',
+                      : 'border-[rgba(15,39,71,0.08)]',
                 )}
               />
               {nifValid === true && (
@@ -296,7 +296,7 @@ export function StepClientSelection({
             placeholder="RC (optionnel)"
             className={cn(
               'w-full h-11 px-3.5 rounded-xl text-sm',
-              'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)]',
+              'bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)]',
               'text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
               'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
             )}
@@ -311,7 +311,7 @@ export function StepClientSelection({
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.phone ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+                errors.phone ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
               )}
             />
             {errors.phone && (
@@ -327,7 +327,7 @@ export function StepClientSelection({
               'w-full h-11 px-3.5 rounded-xl text-sm',
               'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
               'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-              errors.email ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+              errors.email ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
             )}
           />
 
@@ -340,7 +340,7 @@ export function StepClientSelection({
             )}
             style={{
               background: 'var(--green-2)',
-              boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
+              boxShadow: '0 2px 12px rgba(37,99,235, 0.3)',
             }}
           >
             Sélectionner ce client

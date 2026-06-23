@@ -139,12 +139,12 @@ function RegisterForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--navy)]">
-      <div className="w-full max-w-[420px] bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-xl p-6 sm:p-5.5">
+      <div className="w-full max-w-[420px] bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-xl p-6 sm:p-5.5">
         <div className="text-center mb-5">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center text-lg font-extrabold text-[var(--sand)]">CD</div>
             <button type="button" onClick={toggleTheme}
-              className="w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]"
+              className="w-11 h-11 rounded-[10px] flex items-center justify-center cursor-pointer shrink-0 transition bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] text-[var(--green-3)] hover:bg-[var(--navy-4)]"
               aria-label={isDark ? 'Passer en mode clair' : 'Passer en mode sombre'}>
               {isDark ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -165,7 +165,7 @@ function RegisterForm() {
         </div>
 
         {refCode && (
-          <div className="bg-[var(--green-glow)] text-[var(--green-3)] text-[12px] font-semibold text-center rounded-lg py-2 px-3 mb-4 border border-[rgba(0,149,77,0.2)]">
+          <div className="bg-[var(--green-glow)] text-[var(--green-3)] text-[12px] font-semibold text-center rounded-lg py-2 px-3 mb-4 border border-[rgba(37,99,235,0.2)]">
             <span>Invitation partenaire appliquée : {refCode}</span>
           </div>
         )}
@@ -200,14 +200,14 @@ function RegisterForm() {
                 <input id="reg-name" type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Votre nom" required autoComplete="name"
                   aria-invalid={error ? 'true' : undefined}
                   aria-describedby={error ? errorId : undefined}
-                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
               <div>
                 <label htmlFor="reg-email" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Email</label>
                 <input id="reg-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="exemple@email.com" required autoComplete="email"
                   aria-invalid={error ? 'true' : undefined}
                   aria-describedby={error ? errorId : undefined}
-                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
               <div>
                 <label htmlFor="reg-password" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
@@ -215,7 +215,7 @@ function RegisterForm() {
                   <input id="reg-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 caractères" required minLength={6} autoComplete="new-password"
                     aria-invalid={error ? 'true' : undefined}
                     aria-describedby={`${error ? errorId + ' ' : ''}${pwStrengthId}`}
-                    className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                    className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
                   <button type="button" onClick={() => setShowPw(!showPw)}
                     aria-label={showPw ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-[var(--sand-muted)] hover:text-[var(--sand)] p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center transition rounded-xl hover:bg-[var(--navy-4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-glow)]">
@@ -238,7 +238,7 @@ function RegisterForm() {
                 <input id="reg-confirm-password" type={showPw ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={6} autoComplete="new-password"
                   aria-invalid={error ? 'true' : undefined}
                   aria-describedby={error ? errorId : undefined}
-                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
             </>
           )}
@@ -252,7 +252,7 @@ function RegisterForm() {
                   {(['artisan', 'entreprise'] as const).map(m => (
                     <button key={m} type="button" onClick={() => setMode(m)}
                       role="radio" aria-checked={mode === m}
-                      className={`flex-1 py-2.5 rounded-lg text-[13px] font-semibold border transition min-h-[44px] ${mode === m ? 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(245,237,214,0.15)]' : 'bg-transparent text-[var(--sand-muted)] border-[rgba(245,237,214,0.08)] hover:bg-[var(--navy-4)]'}`}>
+                      className={`flex-1 py-2.5 rounded-lg text-[13px] font-semibold border transition min-h-[44px] ${mode === m ? 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(15,39,71,0.15)]' : 'bg-transparent text-[var(--sand-muted)] border-[rgba(15,39,71,0.08)] hover:bg-[var(--navy-4)]'}`}>
                       {m === 'artisan' ? 'Artisan' : 'Entreprise'}
                     </button>
                   ))}
@@ -261,14 +261,14 @@ function RegisterForm() {
               <div>
                 <label htmlFor="reg-sector" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Secteur d&apos;activité</label>
                 <select id="reg-sector" value={sector} onChange={e => setSector(e.target.value)}
-                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]">
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]">
                   {SECTORS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                 </select>
               </div>
               <div>
                 <label htmlFor="reg-country" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Pays</label>
                 <select id="reg-country" value={country} onChange={e => setCountry(e.target.value)}
-                  className="w-full bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]">
+                  className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none cursor-pointer min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]">
                   {COUNTRIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
@@ -282,18 +282,18 @@ function RegisterForm() {
               <div>
                 <label htmlFor="reg-company-name" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Raison sociale</label>
                 <input id="reg-company-name" type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Nom de l'entreprise" autoComplete="organization"
-                  className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                  className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div><label htmlFor="reg-rc" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">RC</label><input id="reg-rc" type="text" value={companyRc} onChange={e => setCompanyRc(e.target.value)} placeholder="00-00-0000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
-                <div><label htmlFor="reg-nif" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIF</label><input id="reg-nif" type="text" value={companyNif} onChange={e => setCompanyNif(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
-                <div><label htmlFor="reg-nis" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIS</label><input id="reg-nis" type="text" value={companyNis} onChange={e => setCompanyNis(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
-                <div><label htmlFor="reg-ai" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">AI</label><input id="reg-ai" type="text" value={companyAi} onChange={e => setCompanyAi(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
+                <div><label htmlFor="reg-rc" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">RC</label><input id="reg-rc" type="text" value={companyRc} onChange={e => setCompanyRc(e.target.value)} placeholder="00-00-0000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
+                <div><label htmlFor="reg-nif" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIF</label><input id="reg-nif" type="text" value={companyNif} onChange={e => setCompanyNif(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
+                <div><label htmlFor="reg-nis" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">NIS</label><input id="reg-nis" type="text" value={companyNis} onChange={e => setCompanyNis(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
+                <div><label htmlFor="reg-ai" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">AI</label><input id="reg-ai" type="text" value={companyAi} onChange={e => setCompanyAi(e.target.value)} placeholder="000000000000000" autoComplete="off" className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" /></div>
               </div>
               <div>
                 <label htmlFor="reg-capital" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Capital</label>
                 <input id="reg-capital" type="text" value={companyCapital} onChange={e => setCompanyCapital(e.target.value)} placeholder="1 000 000" autoComplete="off"
-                  className="w-full bg-[var(--navy-2)] border border-[rgba(245,237,214,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
+                  className="w-full bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
             </div>
           )}
@@ -302,18 +302,18 @@ function RegisterForm() {
           <div className="flex gap-2 mt-1">
             {step > 1 && (
               <button type="button" onClick={prevStep}
-                className="flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.08)] transition hover:bg-[var(--navy-3)] active:scale-[0.98]">
+                className="flex items-center justify-center gap-1 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(15,39,71,0.08)] transition hover:bg-[var(--navy-3)] active:scale-[0.98]">
                 <ChevronLeft size={16} aria-hidden="true" /> Retour
               </button>
             )}
             {step < totalSteps ? (
               <button type="button" onClick={nextStep}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-lg text-sm font-bold bg-[var(--green-2)] text-white border-none cursor-pointer transition hover:bg-[var(--green-3)] active:scale-[0.98] shadow-lg shadow-[rgba(0,122,64,0.3)]">
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 min-h-[44px] rounded-lg text-sm font-bold bg-[var(--green-2)] text-white border-none cursor-pointer transition hover:bg-[var(--green-3)] active:scale-[0.98] shadow-lg shadow-[rgba(37,99,235,0.3)]">
                 Suivant <ChevronRight size={16} aria-hidden="true" />
               </button>
             ) : (
               <button type="button" disabled={loading} onClick={handleSubmit}
-                className="flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-bold border border-[rgba(245,237,214,0.08)] cursor-pointer bg-[var(--navy-3)] text-[var(--sand)] transition hover:bg-[var(--navy-4)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
+                className="flex-1 py-2.5 min-h-[44px] rounded-lg text-sm font-bold border border-[rgba(15,39,71,0.08)] cursor-pointer bg-[var(--navy-3)] text-[var(--sand)] transition hover:bg-[var(--navy-4)] disabled:opacity-50 disabled:cursor-default active:scale-[0.98]">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 size={16} className="animate-spin" />

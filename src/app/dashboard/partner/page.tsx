@@ -49,7 +49,7 @@ export default function PartnerDashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--navy)' }}>
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,98,51,0.1)' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(30,64,175,0.1)' }}>
             <ShieldCheck className="w-8 h-8" style={{ color: 'var(--green-3)' }} />
           </div>
           <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Vous n&apos;êtes pas encore partenaire</h1>
@@ -57,7 +57,7 @@ export default function PartnerDashboardPage() {
           <button
             onClick={() => router.push('/dashboard/partner/apply')}
             className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white min-h-[44px]"
-            style={{ background: 'var(--green-2, #006233)' }}
+            style={{ background: 'var(--green-2, #1E40AF)' }}
           >
             Devenir partenaire
           </button>
@@ -100,7 +100,7 @@ export default function PartnerDashboardPage() {
   const payoutProgress = Math.min(100, Math.round((pendingAmount / minPayout) * 100));
 
   const cardBg = 'var(--navy-2, #111827)';
-  const cardBorder = 'rgba(245,237,214,0.06)';
+  const cardBorder = 'rgba(15,39,71,0.06)';
   const textColor = 'var(--sand)';
   const mutedColor = 'var(--sand-muted)';
 
@@ -111,7 +111,7 @@ export default function PartnerDashboardPage() {
           <div>
             <h1 className="text-2xl font-bold" style={{ color: textColor }}>Espace Partenaire</h1>
             <p className="text-sm mt-1" style={{ color: mutedColor }}>
-              {isSuper && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold mr-2" style={{ background: 'rgba(0,98,51,0.15)', color: 'var(--green-3)' }}>Super Affiliate</span>}
+              {isSuper && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold mr-2" style={{ background: 'rgba(30,64,175,0.15)', color: 'var(--green-3)' }}>Super Affiliate</span>}
               Taux de commission : <span className="font-bold" style={{ color: 'var(--green-3)' }}>{data.stats.commissionRate || 20}%</span>
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function PartnerDashboardPage() {
               onClick={handleCopyLink}
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
               style={{
-                background: copiedLink ? 'var(--green-3)' : 'var(--green-2, #006233)',
+                background: copiedLink ? 'var(--green-3)' : 'var(--green-2, #1E40AF)',
                 color: '#fff',
                 border: 'none',
               }}
@@ -211,7 +211,7 @@ export default function PartnerDashboardPage() {
             {data.stats.nextPayoutAvailable ? (
               <button
                 className="px-4 py-2 rounded-lg text-xs font-semibold text-white min-h-[44px]"
-                style={{ background: 'var(--green-2, #006233)' }}
+                style={{ background: 'var(--green-2, #1E40AF)' }}
               >
                 Demander un paiement
               </button>

@@ -5,8 +5,8 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variants = {
-  default: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.1)]',
-  success: 'bg-[var(--green-bg)] text-[var(--green-3)] border-[rgba(0,149,77,0.2)]',
+  default: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(15,39,71,0.1)]',
+  success: 'bg-[var(--green-bg)] text-[var(--green-3)] border-[rgba(37,99,235,0.2)]',
   warning: 'bg-[rgba(245,158,11,0.1)] text-[var(--cd-warning)] border-[rgba(245,158,11,0.2)]',
   danger: 'bg-[rgba(232,84,46,0.1)] text-[var(--stamp-red)] border-[rgba(232,84,46,0.2)]',
   info: 'bg-[rgba(74,158,255,0.1)] text-[var(--cd-info)] border-[rgba(74,158,255,0.2)]',

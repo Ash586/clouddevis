@@ -42,10 +42,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value ?? 'fr';
-  const theme = cookieStore.get('theme')?.value as 'dark' | 'light' | undefined;
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
-    <html lang={locale} dir={dir} data-theme={theme ?? 'dark'} suppressHydrationWarning className={inter.variable}>
+    <html lang={locale} dir={dir} data-theme="light" suppressHydrationWarning className={inter.variable}>
       <body className="min-h-screen antialiased flex flex-col">
         <noscript>
           <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif', background: '#0B0F1A', color: '#F5EDD6' }}>
@@ -56,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </p>
           </div>
         </noscript>
-        <ThemeProvider initialTheme={theme ?? 'dark'}>
+        <ThemeProvider initialTheme="light">
           <I18nClientProvider initialLocale={locale}>
             <AppErrorBoundary>
               {children}

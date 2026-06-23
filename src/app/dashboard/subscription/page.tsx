@@ -27,10 +27,10 @@ function WiseTransferSection() {
   }, []);
   if (!wise?.configured) return null;
   return (
-    <Card className="p-5 border-[rgba(0,149,77,0.2)] bg-[rgba(0,149,77,0.05)]">
+    <Card className="p-5 border-[rgba(37,99,235,0.2)] bg-[rgba(37,99,235,0.05)]">
       <h3 className="font-bold text-[var(--sand)] mb-2">💳 Paiement par virement Wise</h3>
       <p className="text-xs text-[var(--sand-muted)] mb-3">{wise.instructions}</p>
-      <div className="bg-[var(--navy-2)] rounded-xl border border-[rgba(245,237,214,0.1)] p-3 text-xs space-y-1 text-[var(--sand-2)]">
+      <div className="bg-[var(--navy-2)] rounded-xl border border-[rgba(15,39,71,0.1)] p-3 text-xs space-y-1 text-[var(--sand-2)]">
         <p><span className="font-bold text-[var(--sand-muted)]">Bénéficiaire :</span> {wise.beneficiary}</p>
         <p><span className="font-bold text-[var(--sand-muted)]">IBAN :</span> <code className="bg-[var(--navy-4)] px-1.5 py-0.5 rounded text-[var(--green-3)] font-mono">{wise.iban}</code></p>
         {wise.bic && <p><span className="font-bold text-[var(--sand-muted)]">BIC :</span> {wise.bic}</p>}
@@ -149,11 +149,11 @@ export default function SubscriptionPage() {
 
             {/* Storage & Team */}
             <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.1)]">
+              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(15,39,71,0.1)]">
                 <p className="text-lg font-black text-[var(--sand)]">{usage?.docsThisMonth || 0}</p>
                 <p className="text-[10px] text-[var(--sand-muted)]">{t('statDocs') || 'Documents'}</p>
               </div>
-              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.1)]">
+              <div className="p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(15,39,71,0.1)]">
                 <p className="text-lg font-black text-[var(--sand)]">{plan?.limits?.teamMembers || 1}</p>
                 <p className="text-[10px] text-[var(--sand-muted)]">{t('teamLimit', { count: plan?.limits?.teamMembers || 1 }) || 'Utilisateurs'}</p>
               </div>

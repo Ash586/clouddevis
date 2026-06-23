@@ -85,7 +85,7 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
           {PLAN_ORDER.filter(id => id !== 'enterprise').map(id => {
             const plan = PLANS[id];
             return (
-              <Card key={id} className={`p-4 cursor-pointer hover:ring-2 hover:ring-[var(--green-glow)] transition ${plan.highlighted ? 'border-[var(--green-2)] bg-[rgba(0,149,77,0.05)] ring-2 ring-[rgba(0,149,77,0.15)]' : 'border-[rgba(245,237,214,0.08)]'}`}>
+              <Card key={id} className={`p-4 cursor-pointer hover:ring-2 hover:ring-[var(--green-glow)] transition ${plan.highlighted ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.05)] ring-2 ring-[rgba(37,99,235,0.15)]' : 'border-[rgba(15,39,71,0.08)]'}`}>
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-bold text-[var(--sand)] text-sm">{plan.name.fr}</h3>
                   {plan.highlighted && <span className="text-[10px] font-bold text-[var(--green-3)] bg-[var(--green-glow)] px-2 py-0.5 rounded-full">{s('popular') || 'Populaire'}</span>}

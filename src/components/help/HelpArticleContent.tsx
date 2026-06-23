@@ -7,7 +7,7 @@ function parseMarkdown(md: string): string {
 
   // Headers
   html = html.replace(/^### (.+)$/gm, '<h3 class="text-[14px] font-bold text-[#161616] mt-6 mb-2">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 class="text-[16px] font-black text-[#0B3D2E] mt-8 mb-3">$1</h2>');
+  html = html.replace(/^## (.+)$/gm, '<h2 class="text-[16px] font-black text-[#1E40AF] mt-8 mb-3">$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h1 class="text-[20px] font-black text-[#161616] mt-0 mb-4">$1</h1>');
 
   // Bold and italic
@@ -15,7 +15,7 @@ function parseMarkdown(md: string): string {
   html = html.replace(/\*(.+?)\*/g, '<em class="italic text-[#666]">$1</em>');
 
   // Inline code
-  html = html.replace(/`(.+?)`/g, '<code class="text-[11px] px-1.5 py-0.5 rounded bg-[#F0EFEC] text-[#0B3D2E] font-mono">$1</code>');
+  html = html.replace(/`(.+?)`/g, '<code class="text-[11px] px-1.5 py-0.5 rounded bg-[#F0EFEC] text-[#1E40AF] font-mono">$1</code>');
 
   // Blockquotes
   html = html.replace(/^> (.+)$/gm, '<blockquote class="border-l-3 pl-4 py-2 my-3 text-[12px] text-[#666] italic" style="border-color: #C4A35A">$1</blockquote>');

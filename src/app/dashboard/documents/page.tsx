@@ -40,7 +40,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const TYPE_COLORS: Record<string, string> = {
   DEVIS: 'bg-blue-400/10 text-blue-400',
-  FACTURE: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  FACTURE: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]',
   PROFORMA: 'bg-purple-400/10 text-purple-400',
   BC: 'bg-amber-400/10 text-amber-400',
   BR: 'bg-teal-400/10 text-teal-400',
@@ -52,7 +52,7 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
   ACCEPTED: 'bg-blue-400/10 text-blue-400',
   PROGRESS: 'bg-amber-400/10 text-amber-400',
-  DELIVERED: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  DELIVERED: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]',
 };
 
 const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
@@ -171,7 +171,7 @@ export default function DocumentsPage() {
                       onChange={e => setSearch(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
                       placeholder={t('searchPlaceholder')}
-                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                      className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                   <div>
@@ -179,7 +179,7 @@ export default function DocumentsPage() {
                     <select
                       value={typeFilter}
                       onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                      className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     >
                       <option value="">{t('allTypes')}</option>
                       <option value="DEVIS">Devis</option>
@@ -196,7 +196,7 @@ export default function DocumentsPage() {
                     <select
                       value={statusFilter}
                       onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                      className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     >
                       <option value="">{t('allStatuses')}</option>
                       <option value="DRAFT">{tc('draft')}</option>
@@ -213,7 +213,7 @@ export default function DocumentsPage() {
                       type="date"
                       value={dateFrom}
                       onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                      className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                   <div>
@@ -222,7 +222,7 @@ export default function DocumentsPage() {
                       type="date"
                       value={dateTo}
                       onChange={e => { setDateTo(e.target.value); setPage(1); }}
-                      className="w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
+                      className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
                     />
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function DocumentsPage() {
               <Card className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                    <tr className="border-b border-[rgba(15,39,71,0.06)]">
                       <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('number')}</th>
                       <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('type')}</th>
                       <th className="text-start py-3 px-3 text-xs font-semibold text-[var(--sand-muted)] uppercase">{tc('client')}</th>
@@ -274,7 +274,7 @@ export default function DocumentsPage() {
                   <tbody>
                     {loading ? (
                       Array.from({ length: 5 }).map((_, i) => (
-                        <tr key={i} className="border-b border-[rgba(245,237,214,0.04)] animate-pulse">
+                        <tr key={i} className="border-b border-[rgba(15,39,71,0.04)] animate-pulse">
                           <td className="py-3 px-3"><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-16 bg-[var(--navy-3)] rounded-full" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-28 bg-[var(--navy-3)] rounded" /></td>
@@ -287,7 +287,7 @@ export default function DocumentsPage() {
                     ) : docs.length === 0 ? (
                       <tr><td colSpan={7} className="py-8 text-center text-[var(--sand-muted)]">{t('noDocs')}</td></tr>
                     ) : docs.map(doc => (
-                      <tr key={doc.id} className="border-b border-[rgba(245,237,214,0.04)] hover:bg-[rgba(245,237,214,0.02)] transition">
+                      <tr key={doc.id} className="border-b border-[rgba(15,39,71,0.04)] hover:bg-[rgba(15,39,71,0.02)] transition">
                         <td className="py-3 px-3 font-semibold text-[var(--sand)]">{doc.number}</td>
                         <td className="py-3 px-3">
                           <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
@@ -307,14 +307,14 @@ export default function DocumentsPage() {
                           {statusDropdownOpen === doc.id && (
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setStatusDropdownOpen(null)} />
-                              <div className="absolute left-0 top-full mt-1 z-20 bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-xl overflow-hidden min-w-[140px]">
+                              <div className="absolute left-0 top-full mt-1 z-20 bg-[var(--navy-3)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-xl overflow-hidden min-w-[140px]">
                                 {STATUS_OPTIONS.map(s => (
                                   <button
                                     key={s}
                                     onClick={() => handleStatusChange(doc.id, s)}
                                     className={cn(
                                       'w-full text-left px-3 py-2 text-xs font-semibold hover:bg-[var(--navy-3)] transition',
-                                      s === doc.status && 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]'
+                                      s === doc.status && 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]'
                                     )}
                                   >
                                     {tc(s.toLowerCase())}

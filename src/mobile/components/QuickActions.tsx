@@ -33,7 +33,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'min-h-[44px] active:scale-[0.97] transition-transform',
           'text-white font-semibold text-sm',
           'bg-gradient-to-br from-[var(--green-2)] to-[var(--green)]',
-          'shadow-lg shadow-[rgba(0,149,77,0.3)]',
+          'shadow-lg shadow-[rgba(37,99,235,0.3)]',
         )}
       >
         <IconPlus size={24} stroke={2.2} />
@@ -50,7 +50,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
           'min-h-[44px] active:scale-[0.97] transition-transform',
           'bg-[var(--navy-3)] text-[var(--sand)] font-semibold text-sm',
-          'border border-[rgba(245,237,214,0.08)]',
+          'border border-[rgba(15,39,71,0.08)]',
         )}
       >
         <IconReceipt size={22} stroke={1.8} />
@@ -67,7 +67,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
           'min-h-[44px] active:scale-[0.97] transition-transform',
           'bg-[var(--navy-3)] text-[var(--sand)] font-semibold text-sm',
-          'border border-[rgba(245,237,214,0.08)]',
+          'border border-[rgba(15,39,71,0.08)]',
         )}
       >
         <IconCopy size={22} stroke={1.8} />

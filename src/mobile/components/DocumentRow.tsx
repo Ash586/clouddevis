@@ -36,7 +36,7 @@ const DOC_ICONS: Record<DocumentType, typeof IconFileText> = {
 };
 
 const DOC_COLORS: Record<DocumentType, string> = {
-  DEVIS: '#00954D',
+  DEVIS: '#1D4ED8',
   FACTURE: '#2563EB',
   PROFORMA: '#7C3AED',
   BC: '#D97706',
@@ -219,7 +219,7 @@ export function DocumentRow({
         onMouseLeave={handleTouchEnd}
         className={cn(
           'relative flex items-center gap-3 p-3 rounded-2xl',
-          'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+          'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
           'active:cursor-grabbing select-none touch-pan-y',
         )}
         initial={{ opacity: 0, y: 12 }}

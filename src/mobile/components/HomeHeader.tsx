@@ -65,7 +65,7 @@ export function HomeHeader({
           className={cn(
             'w-10 h-10 rounded-full flex items-center justify-center',
             'text-sm font-bold text-white',
-            'bg-gradient-to-br from-[var(--green-2)] to-[#2A7F6F]',
+            'bg-gradient-to-br from-[var(--green-2)] to-[#0EA5E9]',
           )}
         >
           {userInitials}

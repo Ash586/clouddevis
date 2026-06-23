@@ -128,7 +128,7 @@ export default function DashboardPage() {
         {/* Mobile primary FAB — stacked above the nav-menu trigger, same right edge */}
         <button
           onClick={() => router.push('/dashboard/editor')}
-          className="md:hidden fixed right-5 z-[140] h-14 px-5 rounded-full bg-[var(--green-2)] text-white shadow-lg shadow-[rgba(0,149,77,0.35)] flex items-center gap-2 text-sm font-bold active:scale-95 transition-transform hover:bg-[var(--green-3)]"
+          className="md:hidden fixed right-5 z-[140] h-14 px-5 rounded-full bg-[var(--green-2)] text-white shadow-lg shadow-[rgba(37,99,235,0.35)] flex items-center gap-2 text-sm font-bold active:scale-95 transition-transform hover:bg-[var(--green-3)]"
           style={{ bottom: 'calc(5.25rem + env(safe-area-inset-bottom, 0px))' }}
           title="Nouveau document"
           aria-label="Nouveau document"

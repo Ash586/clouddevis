@@ -39,7 +39,7 @@ const QUICK_DOCS = [
 
 const QUICK_DOC_COLORS: Record<string, string> = {
   blue: 'bg-blue-400/10 text-blue-400 hover:bg-blue-400/20',
-  green: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)] hover:bg-[rgba(0,149,77,0.2)]',
+  green: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.2)]',
   purple: 'bg-purple-400/10 text-purple-400 hover:bg-purple-400/20',
   amber: 'bg-amber-400/10 text-amber-400 hover:bg-amber-400/20',
   teal: 'bg-teal-400/10 text-teal-400 hover:bg-teal-400/20',
@@ -116,7 +116,7 @@ function SidebarInner() {
       {/* User Pill */}
       <div className="relative mb-4">
         <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(245,237,214,0.1)] hover:bg-[var(--navy-4)] transition-all min-h-[44px]">
+          className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(15,39,71,0.1)] hover:bg-[var(--navy-4)] transition-all min-h-[44px]">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center text-white text-sm font-black shrink-0 shadow-lg">
             {userInitial}
           </div>
@@ -131,7 +131,7 @@ function SidebarInner() {
 
         {userDropdownOpen && (
           <>
-            <div className="absolute top-full start-0 end-0 mt-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
+            <div className="absolute top-full start-0 end-0 mt-2 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
               <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
@@ -140,7 +140,7 @@ function SidebarInner() {
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
-              <div className="h-px bg-[rgba(245,237,214,0.08)] mx-4" />
+              <div className="h-px bg-[rgba(15,39,71,0.08)] mx-4" />
               <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition min-h-[44px]">
                 <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
@@ -154,14 +154,14 @@ function SidebarInner() {
       {/* New Document Button */}
       <div className="relative mb-4">
         <button onClick={() => setQuickCreateOpen(!quickCreateOpen)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--green)] text-white text-sm font-bold hover:bg-[var(--green-2)] transition-all active:scale-[0.98] shadow-lg shadow-[rgba(0,149,77,0.2)] min-h-[44px]">
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--green)] text-white text-sm font-bold hover:bg-[var(--green-2)] transition-all active:scale-[0.98] shadow-lg shadow-[rgba(37,99,235,0.2)] min-h-[44px]">
           <Plus size={16} />
           {s('newDocument')}
         </button>
 
         {quickCreateOpen && (
           <>
-            <div className="absolute left-0 right-0 top-full mt-2 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
+            <div className="absolute left-0 right-0 top-full mt-2 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
               <div className="px-3 pt-3 pb-1 text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">
                 {s('quickCreate')}
               </div>
@@ -172,7 +172,7 @@ function SidebarInner() {
                   <span>{s(`docTypes.${qd.type}`)}</span>
                 </button>
               ))}
-              <div className="h-px bg-[rgba(245,237,214,0.08)] mx-3" />
+              <div className="h-px bg-[rgba(15,39,71,0.08)] mx-3" />
               <button onClick={() => { navigateTo('devis'); setQuickCreateOpen(false); }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <PenLine size={16} />
@@ -197,7 +197,7 @@ function SidebarInner() {
           <div>
             <button onClick={() => setDocumentsOpen(!documentsOpen)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
-                documentsOpen ? 'bg-[rgba(0,149,77,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
+                documentsOpen ? 'bg-[rgba(37,99,235,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.04)] hover:text-[var(--sand)]'
               }`}>
               <FileText size={18} />
               <span className="flex-1 text-start">{s('documents')}</span>
@@ -205,7 +205,7 @@ function SidebarInner() {
             </button>
 
             {documentsOpen && (
-              <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(245,237,214,0.1)] pl-2 animate-in">
+              <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(15,39,71,0.1)] pl-2 animate-in">
                 <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
                     pathname === '/dashboard/documents' && !searchParams?.get('type') 
@@ -251,14 +251,14 @@ function SidebarInner() {
 
   return (
     <>
-      <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-4 bg-[var(--navy)] border-r border-[rgba(245,237,214,0.08)]">
+      <aside className="hidden md:flex md:flex-col w-[260px] flex-shrink-0 sticky top-0 h-screen p-4 bg-[var(--navy)] border-r border-[rgba(15,39,71,0.08)]">
         {sidebarContent()}
       </aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-[150] md:hidden">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 right-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-l border-[rgba(245,237,214,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <aside className="fixed inset-y-0 right-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-l border-[rgba(15,39,71,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             <button onClick={() => setMobileOpen(false)}
               className="absolute top-4 left-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center">
               <X size={18} />
@@ -272,7 +272,7 @@ function SidebarInner() {
 
       {!mobileOpen && (
         <button onClick={() => setMobileOpen(true)}
-          className="flex md:hidden fixed bottom-6 right-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(245,237,214,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
+          className="flex md:hidden fixed bottom-6 right-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(15,39,71,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
           aria-label="Menu">
 
@@ -296,7 +296,7 @@ function NavItem({ icon, label, active, onClick, badge }: { icon: React.ReactNod
   return (
     <button onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
-        active ? 'bg-[rgba(0,149,77,0.12)] text-[var(--green-3)] shadow-[inset_0_0_0_1px_rgba(0,149,77,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(245,237,214,0.04)] hover:text-[var(--sand)]'
+        active ? 'bg-[rgba(37,99,235,0.12)] text-[var(--green-3)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.04)] hover:text-[var(--sand)]'
       }`}>
       <span className={active ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]'}>{icon}</span>
       <span className="flex-1 text-start">{label}</span>

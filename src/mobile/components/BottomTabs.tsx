@@ -64,7 +64,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
               <span
                 className={cn(
                   'flex items-center justify-center w-9 h-7 rounded-lg transition-all duration-200',
-                  isActive && 'bg-[rgba(0,149,77,0.12)]',
+                  isActive && 'bg-[rgba(37,99,235,0.12)]',
                 )}
               >
                 <Icon

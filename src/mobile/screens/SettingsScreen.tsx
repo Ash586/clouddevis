@@ -72,7 +72,7 @@ export function SettingsScreen() {
       <div className="flex-1 overflow-y-auto px-5 pb-24 space-y-4">
 
         {/* ── Language ──────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] overflow-hidden">
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-3">
             <IconLanguage size={18} className="text-[var(--sand-muted)]" />
             <span className="text-sm font-semibold text-[var(--sand)]">Langue</span>
@@ -86,7 +86,7 @@ export function SettingsScreen() {
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
                   settings.language === lang
                     ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)]',
+                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(15,39,71,0.06)]',
                 )}
               >
                 {lang === 'FR' ? 'Français' : lang === 'AR' ? 'العربية' : 'English'}
@@ -96,7 +96,7 @@ export function SettingsScreen() {
         </div>
 
         {/* ── Default TVA Rate ─────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] overflow-hidden">
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-3">
             <IconReceipt size={18} className="text-[var(--sand-muted)]" />
             <span className="text-sm font-semibold text-[var(--sand)]">TVA par défaut</span>
@@ -110,7 +110,7 @@ export function SettingsScreen() {
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
                   settings.defaultTvaRate === rate
                     ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.06)]',
+                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(15,39,71,0.06)]',
                 )}
               >
                 {rate}%
@@ -120,7 +120,7 @@ export function SettingsScreen() {
         </div>
 
         {/* ── Auto Sync ────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]">
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]">
           <button
             onClick={() => handleSettingChange('autoSync', !settings.autoSync)}
             className="w-full px-4 py-3 flex items-center gap-3"
@@ -146,7 +146,7 @@ export function SettingsScreen() {
         </div>
 
         {/* ── Data Summary ─────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] p-4">
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] p-4">
           <div className="flex items-center gap-2 mb-3">
             <IconInfoCircle size={16} className="text-[var(--sand-muted)]" />
             <span className="text-xs font-semibold text-[var(--sand-muted)]">Données locales</span>
@@ -168,7 +168,7 @@ export function SettingsScreen() {
         </div>
 
         {/* ── Clear All Data ───────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)] overflow-hidden">
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
           {showClearConfirm ? (
             <div className="p-4">
               <p className="text-sm font-semibold text-red-400 mb-2">

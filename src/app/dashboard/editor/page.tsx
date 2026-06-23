@@ -372,7 +372,7 @@ function EditorContent() {
       case 'design':
         return <CollapsibleSection title={te('sections.design')} sectionId="design" {...dragProps} {...s()}>
           {mode === 'entreprise' && !hiddenFields.has('logo') && <div className="space-y-2">
-            <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.08)]">
+            <div className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(15,39,71,0.08)]">
               <input type="file" accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -398,7 +398,7 @@ function EditorContent() {
             {!hiddenFields.has('logoPosition') && doc.companyInfo?.logo && (
               <div className="flex items-center gap-3 px-1">
                 <span className="text-[10px] font-bold text-[var(--sand-muted)]">{te('logoPosition') || 'Position'}</span>
-                <div className="flex bg-[var(--navy-4)] rounded-lg p-0.5 border border-[rgba(245,237,214,0.1)]">
+                <div className="flex bg-[var(--navy-4)] rounded-lg p-0.5 border border-[rgba(15,39,71,0.1)]">
                   <button onClick={() => updateDoc('logoPosition', 'left')}
                     className={`px-3 py-1.5 text-[10px] font-bold rounded-md transition ${doc.logoPosition === 'left' ? 'bg-blue-600 text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]'}`}>
                     {te('logoLeft') || 'Gauche'}
@@ -495,7 +495,7 @@ function EditorContent() {
               <input type="text" placeholder="76/2025" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.reference ?? ''} onChange={(e) => updateDoc('reference', e.target.value)} />
             </div>
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 mt-2 space-y-2">
+          <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 mt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">Coordonnées Bancaires</h4>
             <div>
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">RIB</label>
@@ -516,13 +516,13 @@ function EditorContent() {
               <input type="text" placeholder="007 99999 0000391699 70" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] font-mono outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.ccpNumber ?? ''} onChange={(e) => updateDoc('ccpNumber', e.target.value)} />
             </div>
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 mt-2">
+          <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 mt-2">
             <div className="grid grid-cols-2 gap-2 items-end">
               <div>
                 <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Validité (jours)</label>
                 <input type="number" min="1" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validityDays ?? 30} onChange={(e) => updateDoc('validityDays', parseInt(e.target.value) || 30)} />
               </div>
-              <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.08)] cursor-pointer">
+              <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(15,39,71,0.08)] cursor-pointer">
                 <input type="checkbox" className="w-3.5 h-3.5 rounded text-[var(--green-3)]" checked={doc.showWatermark ?? false} onChange={(e) => updateDoc('showWatermark', e.target.checked)} />
                 <span className="text-[10px] font-bold text-[var(--sand-muted)]">Filigrane DEVIS</span>
               </label>
@@ -542,7 +542,7 @@ function EditorContent() {
           {!hiddenFields.has('clientName') && <ClientCombobox value={doc.clientInfo.name} onSelect={(c) => updateClientInfo({ name: c.name, address: c.address ?? doc.clientInfo.address, phone: c.phone ?? doc.clientInfo.phone, email: c.email ?? doc.clientInfo.email, nif: c.nif ?? doc.clientInfo.nif, nis: c.nis ?? doc.clientInfo.nis, rc: c.rc ?? doc.clientInfo.rc, ai: c.ai ?? doc.clientInfo.ai })} placeholder={te('client.clientName')} />}
           {!hiddenFields.has('clientAddress') && <textarea placeholder={te('client.clientAddress')} className="w-full border p-2 rounded-lg text-[11px] h-12 resize-none outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.address ?? ''} onChange={(e) => updateClientInfo({ address: e.target.value })} />}
           {!hiddenFields.has('clientPhone') && <input type="text" placeholder={te('client.clientPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.phone ?? ''} onChange={(e) => updateClientInfo({ phone: e.target.value })} />}
-          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
+          <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 space-y-2">
             <div className="flex items-center gap-1.5">
               <Shield size={12} className="text-[var(--green-3)]" />
               <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.taxIds') || 'Identifiants fiscaux'}</h4>
@@ -579,13 +579,13 @@ function EditorContent() {
           </div>
           {!hiddenFields.has('clientEmail') && <div className="flex items-center gap-2 pt-1">
             <input type="text" placeholder={te('client.companyEmail')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.email ?? ''} onChange={(e) => updateClientInfo({ email: e.target.value })} /></div>}
-          {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
+          {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.yourInfo')}</h4>
             <input type="text" placeholder={te('client.yourName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.name} onChange={(e) => updateArtisanInfo({ name: e.target.value })} />
             <input type="text" placeholder={te('client.yourAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.address} onChange={(e) => updateArtisanInfo({ address: e.target.value })} />
             <input type="text" placeholder={te('client.yourPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.phone ?? ''} onChange={(e) => updateArtisanInfo({ phone: e.target.value })} />
           </div>}
-          {mode === 'entreprise' && doc.companyInfo && <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-2">
+          {mode === 'entreprise' && doc.companyInfo && <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 space-y-2">
             <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.yourCompany')}</h4>
             <input type="text" placeholder={te('client.companyName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyInfo.name} onChange={(e) => updateCompanyInfo({ name: e.target.value })} />
             <input type="text" placeholder={te('client.companyAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.companyInfo.address} onChange={(e) => updateCompanyInfo({ address: e.target.value })} />
@@ -677,7 +677,7 @@ function EditorContent() {
               </div>
             </div>
             {newItem.designation && newItem.unitPrice > 0 && (
-              <div className="flex items-center justify-between px-2.5 py-1.5 bg-[var(--green-glow)] rounded-lg ring-1 ring-[rgba(0,149,77,0.2)]">
+              <div className="flex items-center justify-between px-2.5 py-1.5 bg-[var(--green-glow)] rounded-lg ring-1 ring-[rgba(37,99,235,0.2)]">
                 <span className="text-[10px] text-[var(--green-3)] font-medium">{te('prestations.lineTotal') || 'Total ligne'}</span>
                 <span className="text-[13px] font-bold text-[var(--green-3)]">{(newItem.quantity * newItem.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}</span>
               </div>
@@ -692,7 +692,7 @@ function EditorContent() {
               onDragLeave={() => setDragOverIdx(null)}
               onDrop={() => { if (dragIdx !== null && dragIdx !== idx) { moveItem(dragIdx, idx); } setDragIdx(null); setDragOverIdx(null); }}
               onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
-              className={`bg-[var(--navy-3)] p-2 sm:p-3 rounded-xl border space-y-1.5 transition-all ${dragOverIdx === idx ? 'border-[var(--green-2)] shadow-md scale-[1.02]' : 'border-[rgba(245,237,214,0.1)]'} ${dragIdx === idx ? 'opacity-40' : ''}`}>
+              className={`bg-[var(--navy-3)] p-2 sm:p-3 rounded-xl border space-y-1.5 transition-all ${dragOverIdx === idx ? 'border-[var(--green-2)] shadow-md scale-[1.02]' : 'border-[rgba(15,39,71,0.1)]'} ${dragIdx === idx ? 'opacity-40' : ''}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 flex-1 min-w-0">
                   <span className="text-[var(--sand-muted)] cursor-grab active:cursor-grabbing text-[14px] select-none px-0.5" title={te('dragToReorder') || 'Drag to reorder'} role="img" aria-label="Drag handle">⠿</span>
@@ -702,8 +702,8 @@ function EditorContent() {
                   </div>
                 </div>
                 <div className="flex items-center gap-0.5 shrink-0 ml-1">
-                  <button onClick={() => idx > 0 && moveItem(idx, idx - 1)} disabled={idx === 0} className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(245,237,214,0.08)] transition" title="Move up" aria-label="Move item up"><ChevronRight size={14} className="rotate-[270deg]" /></button>
-                  <button onClick={() => idx < doc.items.length - 1 && moveItem(idx, idx + 1)} disabled={idx === doc.items.length - 1} className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(245,237,214,0.08)] transition" title="Move down" aria-label="Move item down"><ChevronRight size={14} className="rotate-90" /></button>
+                  <button onClick={() => idx > 0 && moveItem(idx, idx - 1)} disabled={idx === 0} className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move up" aria-label="Move item up"><ChevronRight size={14} className="rotate-[270deg]" /></button>
+                  <button onClick={() => idx < doc.items.length - 1 && moveItem(idx, idx + 1)} disabled={idx === doc.items.length - 1} className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move down" aria-label="Move item down"><ChevronRight size={14} className="rotate-90" /></button>
                   <button onClick={() => handleRemoveItem(item.id)} className="text-red-500 hover:text-red-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(232,84,46,0.08)]0/10 transition" title="Delete" aria-label="Delete item"><Trash2 size={15} /></button>
                 </div>
               </div>
@@ -717,7 +717,7 @@ function EditorContent() {
             </div>
           ))}
           {!addingItem && <div className="flex gap-2">
-            <button onClick={startNewItem} className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-[rgba(245,237,214,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>
+            <button onClick={startNewItem} className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-[rgba(15,39,71,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[11px] min-h-[44px]">{te('prestations.addLine')}</button>
             <button onClick={async () => {
               setCatalogLoading(true); setShowCatalog(true);
               try {
@@ -737,14 +737,14 @@ function EditorContent() {
                 setCatalogItems(all);
               } catch { setCatalogItems([]); }
               setCatalogLoading(false);
-            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-[rgba(0,149,77,0.25)] rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px] flex items-center justify-center" title={te('catalog') || 'Catalogue'}><Package size={16} /></button>
+            }} className="py-3 sm:py-2.5 px-3 border-2 border-dashed border-[rgba(37,99,235,0.25)] rounded-xl text-[var(--green-3)] font-bold hover:bg-[var(--green-glow)] transition text-[11px] min-h-[44px] flex items-center justify-center" title={te('catalog') || 'Catalogue'}><Package size={16} /></button>
           </div>}
           {/* Catalog Modal */}
           {showCatalog && (
             <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/20 backdrop-blur-sm" onClick={() => setShowCatalog(false)}>
               <div className="bg-[var(--navy-2)] w-full sm:max-w-md sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
-                <div className="px-4 py-3 border-b border-[rgba(245,237,214,0.08)] flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-[rgba(15,39,71,0.08)] flex items-center justify-between">
                   <h3 className="text-[13px] font-semibold text-[var(--sand)]">{te('catalog') || 'Catalogue articles'}</h3>
                   <button onClick={() => setShowCatalog(false)} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1">✕</button>
                 </div>
@@ -758,7 +758,7 @@ function EditorContent() {
                       setNewItem({ id: '', designation: item.designation, quantity: 1, unit: item.unit, unitPrice: item.unitPrice, category: item.category ?? '' });
                       setAddingItem(true);
                       setShowCatalog(false);
-                    }} className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(245,237,214,0.12)] transition flex items-center justify-between gap-2">
+                    }} className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(15,39,71,0.12)] transition flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="text-[11px] font-medium text-[var(--sand-2)] truncate">{item.designation}</div>
                         {item.category && <div className="text-[8px] text-[var(--sand-muted)] uppercase mt-0.5">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</div>}
@@ -783,7 +783,7 @@ function EditorContent() {
             {!hiddenFields.has('remiseReason') && <div><label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">{te('remise.reason')}</label>
               <input type="text" placeholder={te('remise.reasonPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.reason} onChange={(e) => updateDiscount({ reason: e.target.value })} /></div>}
           </div>
-          {doc.discount.value > 0 && <div className="text-[10px] text-[var(--green-3)] bg-[rgba(0,149,77,0.08)] p-2 rounded-lg font-medium">
+          {doc.discount.value > 0 && <div className="text-[10px] text-[var(--green-3)] bg-[rgba(37,99,235,0.08)] p-2 rounded-lg font-medium">
             {te('remise.display')} {doc.discount.type === 'percentage' ? `${doc.discount.value}%` : `${formatCurrency(doc.discount.value, tc('currency'))}`}{doc.discount.reason ? ` (${doc.discount.reason})` : ''} : -{formatCurrency(results.discountAmount, tc('currency'))}</div>}
         </CollapsibleSection>;
 
@@ -814,13 +814,13 @@ function EditorContent() {
             {!hiddenFields.has('paymentIban') && <div className="col-span-2"><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.iban')}</label>
               <input type="text" placeholder={te('paiement.ibanPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] font-mono outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.paymentDetails.iban} onChange={(e) => updatePaymentDetails({ iban: e.target.value })} /></div>}
           </div>
-          <div className="border-t border-[rgba(245,237,214,0.08)] pt-2 space-y-1">
+          <div className="border-t border-[rgba(15,39,71,0.08)] pt-2 space-y-1">
             <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.totalHT')}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></div>
             {results.discountAmount > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.remise')}</span><span className="font-semibold text-red-500">-{formatCurrency(results.discountAmount, tc('currency'))}</span></div>}
             {results.tvaRate > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.vatLine', { rate: results.tvaRate })}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></div>}
             {results.timbreFiscal > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.stampDuty')}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></div>}
             {results.acompte > 0 && <div className="flex justify-between text-[10px] text-[var(--sand-muted)]"><span>{te('paiement.depositPaid')}</span><span className="font-semibold text-red-500">-{formatCurrency(results.acompte, tc('currency'))}</span></div>}
-            <div className="flex justify-between text-[11px] font-bold text-[var(--sand)] border-t border-[rgba(245,237,214,0.1)] pt-1"><span>{te('paiement.netToPay')}</span><span className="text-[var(--green-3)]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
+            <div className="flex justify-between text-[11px] font-bold text-[var(--sand)] border-t border-[rgba(15,39,71,0.1)] pt-1"><span>{te('paiement.netToPay')}</span><span className="text-[var(--green-3)]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
           </div>
         </CollapsibleSection>;
 
@@ -955,20 +955,20 @@ function EditorContent() {
         )}
 
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
-        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[rgba(245,237,214,0.08)] z-50 shrink-0 gap-3">
+        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[rgba(15,39,71,0.08)] z-50 shrink-0 gap-3">
           {/* Left: Nav back + Doc type selector */}
           <button onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={18} className="rotate-180" />
           </button>
           <div className="relative shrink-0">
             <button onClick={() => setShowTypeMenu(v => !v)}
-              className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[rgba(0,149,77,0.2)]">
+              className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[rgba(37,99,235,0.2)]">
               {doc.documentType === 'devis' ? <FileText size={15} /> : doc.documentType === 'facture' ? <Receipt size={15} /> : doc.documentType === 'proforma' ? <ClipboardList size={15} /> : doc.documentType === 'bc' ? <FileStack size={15} /> : doc.documentType === 'br' ? <Package size={15} /> : doc.documentType === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
               <span>{te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}</span>
               <ChevronDown size={13} className={cn('transition-transform', showTypeMenu && 'rotate-180')} />
             </button>
             {showTypeMenu && (
-              <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[190px]">
+              <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[190px]">
                 {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
                   <button key={t} onClick={() => { setDoc(prev => ({ ...prev, documentType: t, documentNumber: generateDocumentNumber(t, prev.mode) })); setShowTypeMenu(false); }}
                     className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition min-h-[38px]', doc.documentType === t ? 'bg-[var(--green-glow)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
@@ -1001,7 +1001,7 @@ function EditorContent() {
             )}
             <button onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
             <button onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
-            <div className="w-px h-6 bg-[rgba(245,237,214,0.1)] mx-1.5" />
+            <div className="w-px h-6 bg-[rgba(15,39,71,0.1)] mx-1.5" />
             <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span className="hidden sm:inline">{tc('save')}</span>
@@ -1014,18 +1014,18 @@ function EditorContent() {
         </div>
 
         {/* ═══════════════ MOBILE BOTTOM BAR ═══════════════ */}
-        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
+        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
           {/* Action row */}
           <div className="flex items-center gap-1.5 px-2 py-1">
             <button onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>{tc('save')}</span>
             </button>
-             <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97] disabled:opacity-50">
+             <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97] disabled:opacity-50">
                <Download size={14} />
                <span>{te('downloadPdf')}</span>
             </button>
-            <button onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.1)] transition active:scale-[0.97]">
+            <button onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97]">
               <MoreHorizontal size={18} />
             </button>
           </div>
@@ -1049,12 +1049,12 @@ function EditorContent() {
 
           {/* ──── LEFT RAIL (desktop, hidden by default) ──── */}
           {showSectionNav && (
-            <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[rgba(245,237,214,0.08)] w-[72px] shrink-0 overflow-y-auto">
+            <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[rgba(15,39,71,0.08)] w-[72px] shrink-0 overflow-y-auto">
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
                 <button key={item.id} onClick={() => { setActiveSection(item.id); setMobileTab('editor'); }}
-                  className={cn('w-full flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all border-2', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] border-[var(--green-3)] shadow-[0_0_12px_rgba(0,149,77,0.25)]' : 'text-[var(--sand-muted)] border-transparent hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                  className={cn('w-full flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all border-2', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] border-[var(--green-3)] shadow-[0_0_12px_rgba(37,99,235,0.25)]' : 'text-[var(--sand-muted)] border-transparent hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
                   <item.icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                   <span className="text-[9px] font-bold leading-tight text-center tracking-tight truncate w-full">{item.label}</span>
                 </button>
@@ -1062,7 +1062,7 @@ function EditorContent() {
             })}
           </nav>)}
           {/* ──── EDITOR PANEL ──── */}
-          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[rgba(245,237,214,0.08)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
+          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[rgba(15,39,71,0.08)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
             {/* Validation errors banner */}
             {itemErrors && (
               <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
@@ -1095,7 +1095,7 @@ function EditorContent() {
             </div>
             {/* ──── BOTTOM TOTALS BAR (hidden on mobile non-editor tabs) ──── */}
             {mobileTab === 'editor' && (
-            <div className="shrink-0 border-t border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
+            <div className="shrink-0 border-t border-[rgba(15,39,71,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
               <div className="flex items-center gap-3 sm:gap-4 text-[11px] min-w-0 flex-1">
                 <span className="shrink-0"><span className="text-[var(--sand-muted)]">HT </span><span className="font-bold text-[var(--sand)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></span>
                 {results.tvaRate > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}% </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></span>}
@@ -1106,7 +1106,7 @@ function EditorContent() {
                   <AlertTriangle size={11} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
                 </button>
               )}
-              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[rgba(0,149,77,0.2)]">
+              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[rgba(37,99,235,0.2)]">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--green-3)]/80">{te('paiement.netToPay') || 'Net'}</span>
                 <span className="font-black text-[var(--green-3)] text-sm whitespace-nowrap">{formatCurrency(results.netAPayer, tc('currency'))}</span>
               </div>
@@ -1123,10 +1123,10 @@ function EditorContent() {
                 {results.tvaRate > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}%</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></div>}
                 {results.timbreFiscal > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('paiement.stampDuty')}</span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></div>}
                 {results.acompte > 0 && <div className="flex justify-between"><span className="text-[var(--sand-muted)]">{te('paiement.depositPaid')}</span><span className="font-semibold text-red-400">-{formatCurrency(results.acompte, tc('currency'))}</span></div>}
-                <div className="flex justify-between pt-2 border-t border-[rgba(245,237,214,0.1)]"><span className="font-bold text-[var(--sand)]">{te('paiement.netToPay')}</span><span className="font-black text-[var(--green-3)] text-[13px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
+                <div className="flex justify-between pt-2 border-t border-[rgba(15,39,71,0.1)]"><span className="font-bold text-[var(--sand)]">{te('paiement.netToPay')}</span><span className="font-black text-[var(--green-3)] text-[13px]">{formatCurrency(results.netAPayer, tc('currency'))}</span></div>
               </div>
               {/* Validation state */}
-              <div className="border-t border-[rgba(245,237,214,0.08)] pt-3 space-y-2">
+              <div className="border-t border-[rgba(15,39,71,0.08)] pt-3 space-y-2">
                 <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('validationState') || 'État de validation'}</h4>
                 <div className="space-y-1.5">
                   <div className={cn('flex items-center gap-2 text-[11px] p-2 rounded-lg', doc.clientInfo.name ? 'text-[var(--green-3)] bg-[var(--green-glow)]' : 'text-[var(--sand-muted)] bg-[var(--navy-3)]')}>
@@ -1148,7 +1148,7 @@ function EditorContent() {
 
           {/* ──── PREVIEW PANEL ──── */}
           <div className={cn('lg:flex flex-1 min-w-0 flex-col bg-[#121826]', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
-            <div className="no-print shrink-0 flex items-center gap-3 border-b border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]/95 px-4 py-2.5">
+            <div className="no-print shrink-0 flex items-center gap-3 border-b border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]/95 px-4 py-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--green-glow)] text-[var(--green-3)]">
                 <MonitorCheck size={17} />
               </div>
@@ -1167,8 +1167,8 @@ function EditorContent() {
                     {showReadyChecks && (
                       <>
                         <div className="fixed inset-0 z-[99]" onClick={() => setShowReadyChecks(false)} />
-                        <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl p-2 z-[100] min-w-[200px]">
-                          <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(245,237,214,0.08)]">{te('validationState') || 'État de validation'}</div>
+                        <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl p-2 z-[100] min-w-[200px]">
+                          <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(15,39,71,0.08)]">{te('validationState') || 'État de validation'}</div>
                           {previewReadyChecks.map((check, i) => (
                             <button key={i} onClick={() => { setActiveSection(check.section); setMobileTab('editor'); setShowReadyChecks(false); }}
                               className={cn('w-full flex items-center gap-2 px-2 py-2 rounded-lg text-[11px] font-medium transition text-left', check.done ? 'text-[var(--green-3)]' : 'text-amber-400 hover:bg-[var(--navy-4)]')}>
@@ -1193,11 +1193,11 @@ function EditorContent() {
                   <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
                   <button onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
                 </div>
-                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[rgba(0,149,77,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
+                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[rgba(37,99,235,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
               </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}
-            <div id="preview-scroll" className="preview-container flex-1 overflow-auto bg-[radial-gradient(circle_at_top,_rgba(42,127,111,0.14),_transparent_34%),linear-gradient(180deg,#151c2c_0%,#0f1421_100%)] p-3 sm:p-6 print:bg-white print:p-0 print:overflow-visible">
+            <div id="preview-scroll" className="preview-container flex-1 overflow-auto bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.14),_transparent_34%),linear-gradient(180deg,#151c2c_0%,#0f1421_100%)] p-3 sm:p-6 print:bg-white print:p-0 print:overflow-visible">
               <div className="mx-auto flex w-max min-w-full justify-center">
                 <div className="print-area-wrapper origin-top transition-transform duration-200"
                   style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
@@ -1214,9 +1214,9 @@ function EditorContent() {
       {/* ──── CUSTOMIZATION MODAL ──── */}
       {showCustomizer && (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowCustomizer(false)}>
-          <div className="bg-[var(--navy-2)] w-full sm:max-w-2xl sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-[rgba(245,237,214,0.08)]" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[rgba(245,237,214,0.1)]" /></div>
-            <div className="px-5 py-4 border-b border-[rgba(245,237,214,0.08)] flex items-center justify-between">
+          <div className="bg-[var(--navy-2)] w-full sm:max-w-2xl sm:mx-3 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-[rgba(15,39,71,0.08)]" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[rgba(15,39,71,0.1)]" /></div>
+            <div className="px-5 py-4 border-b border-[rgba(15,39,71,0.08)] flex items-center justify-between">
               <div>
                 <h3 className="text-[16px] font-bold text-[var(--sand)] tracking-tight">
                   {te('customizeTitle')}
@@ -1256,7 +1256,7 @@ function EditorContent() {
                       id: 'docInfo',
                       icon: <FileText size={16} />,
                       label: 'Document',
-                      color: 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(245,237,214,0.08)]',
+                      color: 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(15,39,71,0.08)]',
                       fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef'],
                       section: 'general',
                     },
@@ -1345,7 +1345,7 @@ function EditorContent() {
                       id: 'notes',
                       icon: <ScrollText size={16} />,
                       label: 'Notes',
-                      color: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.08)]',
+                      color: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(15,39,71,0.08)]',
                       fields: ['notes', 'mentionsLegales', 'conditionsGenerales'],
                       section: 'notes',
                     },
@@ -1363,7 +1363,7 @@ function EditorContent() {
                   }).map(group => {
                     const visibleCount = group.fields.filter(f => !hiddenFields.has(f)).length;
                     return (
-                      <details key={group.id} className="group rounded-xl border border-[rgba(245,237,214,0.08)] overflow-hidden">
+                      <details key={group.id} className="group rounded-xl border border-[rgba(15,39,71,0.08)] overflow-hidden">
                         <summary className={`flex items-center gap-3 px-3.5 py-3 cursor-pointer select-none transition hover:bg-[var(--navy-3)] bg-[var(--navy-2)] ${group.color.split(' ').slice(0, 2).join(' ')}`}>
                           <span className={`flex items-center justify-center w-8 h-8 rounded-lg ${group.color}`}>{group.icon}</span>
                           <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{group.label}</span>
@@ -1376,7 +1376,7 @@ function EditorContent() {
                               const isHidden = hiddenFields.has(fieldId);
                               const label = te(`fields.${fieldId}`) || te(`general.${fieldId}`) || te(`client.${fieldId}`) || te(`prestations.${fieldId}`) || te(`paiement.${fieldId}`) || te(`chantier.${fieldId}`) || te(`materiaux.${fieldId}`) || te(`garanties.${fieldId}`) || te(`remise.${fieldId}`) || te(`mode.${fieldId}`) || fieldId;
                               return (
-                                <label key={fieldId} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition text-[11px] ${isHidden ? 'bg-[var(--navy-2)] text-[var(--sand-muted)] border border-[rgba(245,237,214,0.08)] opacity-50' : 'bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(245,237,214,0.12)] font-medium shadow-sm'}`}>
+                                <label key={fieldId} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer transition text-[11px] ${isHidden ? 'bg-[var(--navy-2)] text-[var(--sand-muted)] border border-[rgba(15,39,71,0.08)] opacity-50' : 'bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(15,39,71,0.12)] font-medium shadow-sm'}`}>
                                   <input type="checkbox" checked={!isHidden} onChange={() => {
                                     setFieldPrefs(prev => {
                                       const current = { ...prev };
@@ -1404,7 +1404,7 @@ function EditorContent() {
                     );
                   })}
                   {customSections.length > 0 && (
-                    <details className="group rounded-xl border border-[rgba(245,237,214,0.08)] overflow-hidden">
+                    <details className="group rounded-xl border border-[rgba(15,39,71,0.08)] overflow-hidden">
                       <summary className="flex items-center gap-3 px-3.5 py-3 cursor-pointer select-none transition hover:bg-[var(--navy-3)] bg-[var(--navy-2)]">
                         <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--navy-3)] text-amber-400"><Briefcase size={16} /></span>
                         <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{te('customSections') || 'Mes sections'}</span>
@@ -1441,20 +1441,20 @@ function EditorContent() {
                     </details>
                   )}
                   <button onClick={() => { setEditingSection({ id: '', label: '', fields: [] }); setShowSectionCreator(true); }}
-                    className="w-full mt-2 py-3 border-2 border-dashed border-[rgba(245,237,214,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-3)] transition text-[12px] flex items-center justify-center gap-2">
+                    className="w-full mt-2 py-3 border-2 border-dashed border-[rgba(15,39,71,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-3)] transition text-[12px] flex items-center justify-center gap-2">
                     <Plus size={14} />
                     {te('addCustomSection') ?? '+ Ajouter ma propre section'}
                   </button>
                 </>
               )}
             </div>
-            <div className="px-5 py-3 border-t border-[rgba(245,237,214,0.08)] flex items-center justify-between bg-[var(--navy-2)]">
+            <div className="px-5 py-3 border-t border-[rgba(15,39,71,0.08)] flex items-center justify-between bg-[var(--navy-2)]">
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-1.5 cursor-pointer select-none">
                   <input type="checkbox" checked={showSectionNav} onChange={() => setShowSectionNav(v => !v)} className="w-3.5 h-3.5 rounded text-[var(--green-3)]" />
                   <span className="text-[10px] font-medium text-[var(--sand-muted)]">{te('showSectionNav') || 'Navigateur sections'}</span>
                 </label>
-                <div className="w-px h-4 bg-[rgba(245,237,214,0.08)]" />
+                <div className="w-px h-4 bg-[rgba(15,39,71,0.08)]" />
                 <button onClick={() => {
                   const all = Object.fromEntries(ALL_SECTIONS.map(s => {
                     if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];

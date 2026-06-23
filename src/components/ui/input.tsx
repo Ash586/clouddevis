@@ -30,7 +30,7 @@ export function Input({ label, error, className, id, type, showPasswordToggle, .
           aria-describedby={error ? errId : undefined}
           autoComplete={type === 'email' ? 'email' : type === 'password' ? (props.autoComplete || 'current-password') : props.autoComplete}
           className={cn(
-            'w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3.5 py-2.5 text-sm text-[var(--sand)]',
+            'w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-2)] px-3.5 py-2.5 text-sm text-[var(--sand)]',
             'placeholder:text-[var(--sand-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-glow)] focus-visible:border-[var(--green-2)]',
             'transition-all duration-200',
             isPassword && 'pr-12 rtl:pl-12 rtl:pr-3.5',

@@ -73,7 +73,7 @@ export default function TeamsPage() {
                   <div className="flex gap-2">
                     <input type="text" value={newName} onChange={e => setNewName(e.target.value)}
                       placeholder={t('teamNamePlaceholder')}
-                      className="flex-1 px-4 py-2.5 rounded-xl border border-[rgba(245,237,214,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]" />
                     <Button onClick={handleCreate} disabled={!newName.trim()}>{tc('save')}</Button>
                     <Button variant="outline" onClick={() => setShowCreate(false)}>{tc('cancel')}</Button>
                   </div>

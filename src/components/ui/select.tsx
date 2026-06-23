@@ -18,7 +18,7 @@ export function Select({ label, options, className, id, ...props }: Props) {
       <select
         id={iid}
         className={cn(
-          'w-full rounded-xl border border-[rgba(245,237,214,0.1)] bg-[var(--navy-2)] px-3.5 py-2.5 text-sm text-[var(--sand)]',
+          'w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-2)] px-3.5 py-2.5 text-sm text-[var(--sand)]',
           'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all',
           className
         )}

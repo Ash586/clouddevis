@@ -124,7 +124,7 @@ function SubscriptionTab({ userId, memberSince: ms }: { userId: string; memberSi
             { label: t('statClients') || 'Clients', value: subData?.usage?.totalClients ?? '-' },
             { label: t('statSince') || 'Membre depuis', value: ms },
           ].map(s => (
-            <div key={s.label} className="text-center p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.1)]">
+            <div key={s.label} className="text-center p-3 bg-[var(--navy-3)] rounded-xl border border-[rgba(15,39,71,0.1)]">
               <p className="text-lg font-black text-[var(--sand)]">{s.value}</p>
               <p className="text-xs text-[var(--sand-muted)] mt-0.5">{s.label}</p>
             </div>
@@ -379,7 +379,7 @@ export default function ProfilePage() {
                     <Card className="p-4 sm:p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-sm font-black text-[var(--sand)] uppercase tracking-wider">{t('businessMode') || 'Mode professionnel'}</h2>
-                        <div className="flex bg-[var(--navy-4)] rounded-lg p-0.5 border border-[rgba(245,237,214,0.1)]">
+                        <div className="flex bg-[var(--navy-4)] rounded-lg p-0.5 border border-[rgba(15,39,71,0.1)]">
                           <button onClick={() => setMode('ARTISAN')}
                             className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${mode === 'ARTISAN' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand-2)]'}`}>
                             🔨 {t('artisan') || 'Artisan'}
@@ -509,7 +509,7 @@ export default function ProfilePage() {
 
                     <Card className="p-4 sm:p-6">
                       <h2 className="text-sm font-black text-[var(--sand)] mb-4 uppercase tracking-wider">{t('sessions') || 'Sessions actives'}</h2>
-                      <div className="flex items-center justify-between py-2 border-b border-[rgba(245,237,214,0.06)] last:border-0">
+                      <div className="flex items-center justify-between py-2 border-b border-[rgba(15,39,71,0.06)] last:border-0">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-[var(--navy-4)] rounded-lg flex items-center justify-center text-xs">🌐</div>
                           <div>

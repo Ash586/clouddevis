@@ -107,7 +107,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
       </div>
 
       {value && (
-        <div className="mt-1.5 flex items-center gap-1.5 bg-[var(--green-glow)] border border-[rgba(0,149,77,0.2)] rounded-lg px-2.5 py-1.5">
+        <div className="mt-1.5 flex items-center gap-1.5 bg-[var(--green-glow)] border border-[rgba(37,99,235,0.2)] rounded-lg px-2.5 py-1.5">
           <User size={12} className="text-[var(--green-3)] shrink-0" />
           <span className="text-[11px] font-bold text-[var(--green-3)] flex-1 truncate">{value}</span>
           <button onClick={() => onSelect({ id: '', name: '' })} className="text-[var(--green-3)] hover:text-red-400 transition shrink-0">
@@ -117,12 +117,12 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
       )}
 
       {open && results.length > 0 && (
-        <div ref={listRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl z-[70] max-h-[240px] overflow-y-auto">
+        <div ref={listRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl z-[70] max-h-[240px] overflow-y-auto">
           {loading && <div className="px-3 py-2 text-[10px] text-[var(--sand-muted)]">Recherche...</div>}
           {!loading && results.map((client, i) => (
             <button key={client.id} onClick={() => select(client)}
               className={cn(
-                'w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition border-b border-[rgba(245,237,214,0.04)] last:border-0',
+                'w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition border-b border-[rgba(15,39,71,0.04)] last:border-0',
                 i === highlightIdx ? 'bg-[var(--navy-4)]' : 'hover:bg-[var(--navy-3)]',
               )}>
               <div className="w-7 h-7 rounded-lg bg-[var(--green-glow)] flex items-center justify-center shrink-0">
@@ -142,7 +142,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
       )}
 
       {open && query.trim() && !loading && results.length === 0 && (
-        <div ref={listRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--navy-2)] border border-[rgba(245,237,214,0.1)] rounded-xl shadow-2xl z-[70] px-3 py-4 text-center">
+        <div ref={listRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl z-[70] px-3 py-4 text-center">
           <p className="text-[11px] text-[var(--sand-muted)]">Aucun client trouvé</p>
           <p className="text-[9px] text-[var(--sand-muted)] mt-1">Entrez le nom pour créer un nouveau client</p>
         </div>

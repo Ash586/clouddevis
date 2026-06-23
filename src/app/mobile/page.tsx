@@ -19,7 +19,7 @@ export default function MobilePreviewPage() {
     <div
       className={cn(
         'min-h-screen flex flex-col items-center justify-center',
-        'bg-gradient-to-br from-[#0B0F1A] via-[#111827] to-[#0B3D2E]',
+        'bg-gradient-to-br from-[#0B0F1A] via-[#111827] to-[#1E40AF]',
         'p-4',
       )}
     >
@@ -31,7 +31,7 @@ export default function MobilePreviewPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-2xl font-bold text-[var(--sand)]">
-            CloudDevis <span className="text-[#00954D]">Mobile</span>
+            CloudDevis <span className="text-[#1D4ED8]">Mobile</span>
           </h1>
           <p className="text-sm text-[var(--sand-muted)] mt-1">
             Aperçu de l&apos;application mobile
@@ -56,14 +56,14 @@ export default function MobilePreviewPage() {
             <div className="fixed top-4 right-4 z-[70] flex gap-2">
               <button
                 onClick={() => setKey((k) => k + 1)}
-                className="w-10 h-10 rounded-full bg-[rgba(245,237,214,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
+                className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Réinitialiser"
               >
                 <IconRefresh size={18} />
               </button>
               <button
                 onClick={() => setFullscreen(false)}
-                className="w-10 h-10 rounded-full bg-[rgba(245,237,214,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
+                className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Quitter le plein écran"
               >
                 <IconMinimize size={18} />
@@ -85,7 +85,7 @@ export default function MobilePreviewPage() {
                 'relative rounded-[3rem] overflow-hidden',
                 'bg-[#1a1a2e] p-2',
                 'shadow-2xl shadow-black/40',
-                'border border-[rgba(245,237,214,0.08)]',
+                'border border-[rgba(15,39,71,0.08)]',
               )}
               style={{
                 width: '390px',
@@ -114,10 +114,10 @@ export default function MobilePreviewPage() {
                 onClick={() => setKey((k) => k + 1)}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-xl',
-                  'bg-[rgba(245,237,214,0.08)] text-[var(--sand-muted)]',
+                  'bg-[rgba(15,39,71,0.08)] text-[var(--sand-muted)]',
                   'text-xs font-semibold',
                   'active:scale-95 transition-transform',
-                  'hover:bg-[rgba(245,237,214,0.12)] hover:text-[var(--sand)]',
+                  'hover:bg-[rgba(15,39,71,0.12)] hover:text-[var(--sand)]',
                 )}
               >
                 <IconRefresh size={14} />
@@ -127,10 +127,10 @@ export default function MobilePreviewPage() {
                 onClick={() => setFullscreen(true)}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-xl',
-                  'bg-[#0B3D2E] text-white',
+                  'bg-[#1E40AF] text-white',
                   'text-xs font-semibold',
                   'active:scale-95 transition-transform',
-                  'hover:bg-[#00954D]',
+                  'hover:bg-[#1D4ED8]',
                 )}
               >
                 <IconMaximize size={14} />

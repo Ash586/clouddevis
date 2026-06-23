@@ -25,7 +25,7 @@ export function HelpHome() {
 
       {/* Hero */}
       <div className="text-center mb-10">
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-3" style={{ color: '#0B3D2E' }}>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-3" style={{ color: '#1E40AF' }}>
           {t('title')}
         </h1>
         <p className="text-[13px] text-[#666] max-w-lg mx-auto">
@@ -46,11 +46,11 @@ export function HelpHome() {
               href={`/help/${cat}`}
               className="group flex items-start gap-3 p-4 rounded-xl border border-[#E4E0D8] hover:border-[#C4A35A] hover:shadow-sm transition bg-white"
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: 'linear-gradient(135deg, #0B3D2E10, #0B3D2E08)' }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: 'linear-gradient(135deg, #1E40AF10, #1E40AF08)' }}>
                 {HELP_T[lang].categories[cat].icon}
               </div>
               <div>
-                <div className="text-[12.5px] font-bold text-[#161616] group-hover:text-[#0B3D2E] transition">
+                <div className="text-[12.5px] font-bold text-[#161616] group-hover:text-[#1E40AF] transition">
                   {HELP_T[lang].categories[cat].title}
                 </div>
                 <div className="text-[11px] text-[#999] mt-0.5">

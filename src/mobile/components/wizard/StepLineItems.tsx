@@ -168,14 +168,14 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               onClick={() => openEditSheet(item)}
               className={cn(
                 'flex items-center gap-3 p-3.5 rounded-2xl text-left w-full',
-                'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
               )}
             >
               {/* Index */}
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                style={{ background: 'rgba(0,149,77, 0.15)', color: 'var(--green-2)' }}
+                style={{ background: 'rgba(37,99,235, 0.15)', color: 'var(--green-2)' }}
               >
                 {index + 1}
               </div>
@@ -204,7 +204,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
         onClick={openNewSheet}
         className={cn(
           'flex items-center justify-center gap-2 h-12 rounded-xl',
-          'border-2 border-dashed border-[rgba(245,237,214,0.12)]',
+          'border-2 border-dashed border-[rgba(15,39,71,0.12)]',
           'text-sm font-semibold text-[var(--sand-muted)]',
           'active:scale-[0.97] transition-all',
         )}
@@ -231,7 +231,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
       <div
         className={cn(
           'sticky bottom-0 -mx-5 px-5 pt-3 pb-4',
-          'bg-[var(--navy)] border-t border-[rgba(245,237,214,0.08)]',
+          'bg-[var(--navy)] border-t border-[rgba(15,39,71,0.08)]',
         )}
       >
         <div className="flex flex-col gap-1.5">
@@ -249,7 +249,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               <span>{formatDA(totals.timbreAmount)}</span>
             </div>
           )}
-          <div className="h-px bg-[rgba(245,237,214,0.08)] my-1" />
+          <div className="h-px bg-[rgba(15,39,71,0.08)] my-1" />
           <div className="flex justify-between text-sm font-bold text-[var(--sand)]">
             <span>Total TTC</span>
             <span>{formatDA(totals.totalTTC)}</span>
@@ -276,7 +276,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.label ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+                errors.label ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
               )}
             />
             {errors.label && (
@@ -296,7 +296,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                   'w-full h-11 px-3.5 rounded-xl text-sm',
                   'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                   'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                  errors.quantity ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+                  errors.quantity ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
                 )}
               />
             </div>
@@ -304,7 +304,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               {...register('unit')}
               className={cn(
                 'h-11 px-3 rounded-xl text-sm',
-                'bg-[var(--navy-3)] border border-[rgba(245,237,214,0.08)]',
+                'bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)]',
                 'text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
               )}
             >
@@ -327,7 +327,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.unitPrice ? 'border-red-400/50' : 'border-[rgba(245,237,214,0.08)]',
+                errors.unitPrice ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
               )}
             />
             {errors.unitPrice && (
@@ -347,7 +347,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                     'border transition-all duration-200 cursor-pointer',
                     watchedTva === opt.value
                       ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
-                      : 'bg-[var(--navy-3)] border-[rgba(245,237,214,0.08)] text-[var(--sand-muted)]',
+                      : 'bg-[var(--navy-3)] border-[rgba(15,39,71,0.08)] text-[var(--sand-muted)]',
                   )}
                 >
                   <input
@@ -394,7 +394,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               )}
               style={{
                 background: 'var(--green-2)',
-                boxShadow: '0 2px 12px rgba(0,149,77, 0.3)',
+                boxShadow: '0 2px 12px rgba(37,99,235, 0.3)',
               }}
             >
               {editingItem ? 'Enregistrer' : 'Ajouter'}

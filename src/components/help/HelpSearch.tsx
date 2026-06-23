@@ -53,7 +53,7 @@ export function HelpSearch({ lang }: Props) {
 
   return (
     <div ref={ref} className="relative max-w-xl mx-auto">
-      <div className="flex items-center bg-white border border-[#E4E0D8] rounded-xl px-4 py-3 shadow-sm focus-within:shadow-md focus-within:border-[#0B3D2E] transition">
+      <div className="flex items-center bg-white border border-[#E4E0D8] rounded-xl px-4 py-3 shadow-sm focus-within:shadow-md focus-within:border-[#1E40AF] transition">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mr-2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
@@ -79,7 +79,7 @@ export function HelpSearch({ lang }: Props) {
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8F7F4] transition border-b border-[#F0EFEC] last:border-0"
             >
-              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ background: '#0B3D2E' }}>
+              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ background: '#1E40AF' }}>
                 {CAT_ICONS[a.category] || '📖'}
               </span>
               <div>
@@ -94,7 +94,7 @@ export function HelpSearch({ lang }: Props) {
       {open && query.length >= 2 && results.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E4E0D8] rounded-xl shadow-lg p-6 text-center z-50">
           <div className="text-[13px] text-[#999]">{t('noResults')} &ldquo;{query}&rdquo;</div>
-          <Link href="#contact" onClick={() => setOpen(false)} className="text-[12px] font-semibold mt-2 inline-block" style={{ color: '#0B3D2E' }}>{t('contactSupport')} &rarr;</Link>
+          <Link href="#contact" onClick={() => setOpen(false)} className="text-[12px] font-semibold mt-2 inline-block" style={{ color: '#1E40AF' }}>{t('contactSupport')} &rarr;</Link>
         </div>
       )}
     </div>

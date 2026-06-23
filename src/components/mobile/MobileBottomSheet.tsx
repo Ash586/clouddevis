@@ -34,7 +34,7 @@ export function MobileBottomSheet({ open, onClose, title, children }: MobileBott
       <div className="sheet-content">
         <div className="sheet-handle" />
         {title && (
-          <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-[rgba(245,237,214,0.08)]">
+          <div className="flex items-center justify-between px-5 pt-2 pb-3 border-b border-[rgba(15,39,71,0.08)]">
             <h3 className="text-sm font-bold text-[var(--sand)]">{title}</h3>
             <button onClick={onClose} className="p-2 -mr-2 text-[var(--sand-muted)] hover:text-[var(--sand)] rounded-lg transition mobile-touch">
               <X size={18} />

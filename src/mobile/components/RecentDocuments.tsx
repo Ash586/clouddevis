@@ -84,7 +84,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
         <div
           className={cn(
             'rounded-2xl p-8 text-center',
-            'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+            'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
           )}
         >
           <IconFileText size={32} stroke={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
@@ -137,13 +137,13 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               onClick={() => onDocumentTap?.(doc)}
               className={cn(
                 'flex items-center gap-3 w-full p-3.5 rounded-2xl',
-                'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
                 'min-h-[56px] text-left',
               )}
             >
               {/* Document type icon */}
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[rgba(0,149,77,0.12)]">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[rgba(37,99,235,0.12)]">
                 <Icon size={18} stroke={1.8} className="text-[var(--green-3)]" />
               </div>
 

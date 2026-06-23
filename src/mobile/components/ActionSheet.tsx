@@ -114,7 +114,7 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
             >
               {/* ── Handle bar ─────────────────────────────────── */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 rounded-full bg-[rgba(245,237,214,0.2)]" />
+                <div className="w-10 h-1 rounded-full bg-[rgba(15,39,71,0.2)]" />
               </div>
 
               {/* ── Document info header ───────────────────────── */}

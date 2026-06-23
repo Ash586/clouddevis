@@ -73,7 +73,7 @@ export default function PartnerApplyPage() {
   }
 
   const cardBg = 'var(--navy-2, #111827)';
-  const cardBorder = 'rgba(245,237,214,0.06)';
+  const cardBorder = 'rgba(15,39,71,0.06)';
   const textColor = 'var(--sand)';
   const mutedColor = 'var(--sand-muted)';
   const inputBg = 'var(--navy-3, #1C2537)';
@@ -91,7 +91,7 @@ export default function PartnerApplyPage() {
 
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,98,51,0.15)' }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(30,64,175,0.15)' }}>
               <TrendingUp className="w-5 h-5" style={{ color: 'var(--green-3)' }} />
             </div>
             <div>
@@ -225,7 +225,7 @@ export default function PartnerApplyPage() {
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
               style={{
-                background: 'var(--green-2, #006233)',
+                background: 'var(--green-2, #1E40AF)',
                 color: '#fff',
                 border: 'none',
                 cursor: loading ? 'default' : 'pointer',

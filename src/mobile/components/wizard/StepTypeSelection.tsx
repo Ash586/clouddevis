@@ -103,8 +103,8 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 'min-h-[120px] active:scale-[0.97] transition-all duration-200',
                 'border-2',
                 isSelected
-                  ? 'border-[var(--green-2)] bg-[rgba(0,149,77,0.1)]'
-                  : 'border-[rgba(245,237,214,0.08)] bg-[var(--navy-2)]',
+                  ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.1)]'
+                  : 'border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]',
               )}
             >
               <div

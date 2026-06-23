@@ -181,7 +181,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                       'border transition-colors',
                       errors[field]
                         ? 'border-red-400/50 focus:border-red-400'
-                        : 'border-[rgba(245,237,214,0.06)] focus:border-[rgba(0,149,77,0.3)]',
+                        : 'border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]',
                     )}
                   />
                 ) : (
@@ -214,13 +214,13 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 onClick={onGoToClients}
                 className={cn(
                   'w-full flex items-center justify-between px-4 py-3.5 rounded-xl',
-                  'bg-[var(--navy-2)] border border-[rgba(245,237,214,0.06)]',
+                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.98] transition-transform',
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[rgba(0,149,77,0.1)] flex items-center justify-center">
-                    <IconUsers size={18} className="text-[#00954D]" />
+                  <div className="w-10 h-10 rounded-xl bg-[rgba(37,99,235,0.1)] flex items-center justify-center">
+                    <IconUsers size={18} className="text-[#1D4ED8]" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-semibold text-[var(--sand)]">Gérer les clients</p>

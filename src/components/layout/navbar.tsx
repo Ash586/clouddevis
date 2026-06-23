@@ -6,10 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/hooks/useUser';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { Menu, X, Home, Sun, Moon } from 'lucide-react';
+import { Menu, X, Home } from 'lucide-react';
 
 const LANG_LABELS: Record<string, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
 const LANGS = ['fr', 'ar', 'en'] as const;
@@ -18,7 +17,6 @@ export function Navbar() {
   const t = useTranslations('navbar');
   const router = useRouter();
   const { lang, setLang } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
   const { user, loading, refresh } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -30,7 +28,7 @@ export function Navbar() {
 
   const links = loading ? null : user ? (
     <>
-      <Button variant="outline" size="sm" className="bg-[rgba(245,237,214,0.06)] border-[rgba(245,237,214,0.1)] text-[var(--sand)] hover:bg-[rgba(245,237,214,0.1)]" onClick={() => { router.push('/dashboard'); setMobileOpen(false); }}>
+      <Button variant="outline" size="sm" className="bg-[rgba(15,39,71,0.06)] border-[rgba(15,39,71,0.1)] text-[var(--sand)] hover:bg-[rgba(15,39,71,0.1)]" onClick={() => { router.push('/dashboard'); setMobileOpen(false); }}>
         <Home size={15} />
         {t('dashboard')}
       </Button>
@@ -50,7 +48,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-[100] bg-[var(--navy)]/85 backdrop-blur-xl border-b border-[rgba(245,237,214,0.08)]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <nav className="sticky top-0 z-[100] bg-[var(--navy)]/85 backdrop-blur-xl border-b border-[rgba(15,39,71,0.08)]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
           <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
@@ -62,7 +60,7 @@ export function Navbar() {
               {links}
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-6 sm:border-l border-[rgba(245,237,214,0.1)]">
+            <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-6 sm:border-l border-[rgba(15,39,71,0.1)]">
               <button
                 onClick={() => {
                   const next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
@@ -72,15 +70,6 @@ export function Navbar() {
                 title={lang === 'fr' ? t('langFr') : lang === 'ar' ? t('langAr') : t('langEn')}
               >
                 {LANG_LABELS[lang]}
-              </button>
-
-              <button
-                onClick={toggleTheme}
-                className="theme-toggle p-1.5 rounded-lg transition-all bg-[var(--navy-3)] text-[var(--green-3)] hover:bg-[var(--navy-4)] min-h-[36px] min-w-[36px] flex items-center justify-center"
-                title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
-                aria-label={theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
-              >
-                {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </button>
 
               {user && <NotificationBell />}

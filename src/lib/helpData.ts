@@ -17,7 +17,7 @@ export interface HelpCategory {
 }
 
 export const CATEGORIES: HelpCategory[] = [
-  { id: 'getting-started', title: 'Démarrage rapide', description: 'Premiers pas avec CloudDevis', icon: '🚀', color: '#0B3D2E' },
+  { id: 'getting-started', title: 'Démarrage rapide', description: 'Premiers pas avec CloudDevis', icon: '🚀', color: '#1E40AF' },
   { id: 'documents', title: 'Créer des documents', description: 'Devis, factures, proformas', icon: '📄', color: '#1A6B4F' },
   { id: 'billing', title: 'Facturation & paiement', description: 'Gestion des paiements', icon: '💰', color: '#C4A35A' },
   { id: 'legal', title: 'Conformité légale', description: 'NIF, RC, TVA, Timbre fiscal', icon: '⚖️', color: '#2E60B0' },

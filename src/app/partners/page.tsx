@@ -17,14 +17,14 @@ export default function PartnersPage() {
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" className="text-sm font-semibold min-h-[44px] flex items-center px-4 no-underline" style={{ color: 'var(--sand-muted)' }}>Connexion</Link>
-            <Link href="/auth/register" className="text-sm font-semibold px-4 py-2.5 rounded-lg text-white min-h-[44px] flex items-center no-underline" style={{ background: 'var(--green-2, #006233)' }}>S&apos;inscrire</Link>
+            <Link href="/auth/register" className="text-sm font-semibold px-4 py-2.5 rounded-lg text-white min-h-[44px] flex items-center no-underline" style={{ background: 'var(--green-2, #1E40AF)' }}>S&apos;inscrire</Link>
           </div>
         </div>
       </nav>
 
       <section className="px-4 sm:px-6 pt-12 sm:pt-20 pb-16">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold mb-6" style={{ background: 'rgba(0,98,51,0.1)', color: 'var(--green-3)', border: '1px solid rgba(0,98,51,0.2)' }}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold mb-6" style={{ background: 'rgba(30,64,175,0.1)', color: 'var(--green-3)', border: '1px solid rgba(30,64,175,0.2)' }}>
             <TrendingUp className="w-4 h-4" />
             Programme d&apos;affiliation CloudDevis
           </div>
@@ -38,7 +38,7 @@ export default function PartnersPage() {
             <button
               onClick={() => router.push('/auth/register?intent=partner')}
               className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-white min-h-[44px] transition-all active:scale-[0.98]"
-              style={{ background: 'var(--green-2, #006233)' }}
+              style={{ background: 'var(--green-2, #1E40AF)' }}
             >
               Rejoindre le programme <ArrowRight className="w-4 h-4" />
             </button>
@@ -48,7 +48,7 @@ export default function PartnersPage() {
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-6 py-3.5 rounded-xl text-sm font-semibold min-h-[44px]"
-              style={{ background: 'var(--navy-2, #111827)', color: 'var(--sand-muted)', border: '1px solid rgba(245,237,214,0.08)' }}
+              style={{ background: 'var(--navy-2, #111827)', color: 'var(--sand-muted)', border: '1px solid rgba(15,39,71,0.08)' }}
             >
               En savoir plus
             </button>
@@ -65,7 +65,7 @@ export default function PartnersPage() {
               { icon: <Clock className="w-6 h-6" />, value: '30 jours', label: 'Durée d\'attribution', color: '#a78bfa' },
               { icon: <CreditCard className="w-6 h-6" />, value: '2 000 DA', label: 'Paiement minimum', color: 'var(--green-3)' },
             ].map((stat, i) => (
-              <div key={i} className="rounded-xl p-5 text-center" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(245,237,214,0.06)' }}>
+              <div key={i} className="rounded-xl p-5 text-center" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(15,39,71,0.06)' }}>
                 <div className="flex justify-center mb-3" style={{ color: stat.color }}>{stat.icon}</div>
                 <p className="text-2xl font-black mb-1" style={{ color: 'var(--sand)' }}>{stat.value}</p>
                 <p className="text-[11px] font-semibold" style={{ color: 'var(--sand-muted)' }}>{stat.label}</p>
@@ -84,8 +84,8 @@ export default function PartnersPage() {
               { step: '2', icon: <Users className="w-6 h-6" />, title: 'Inscriptions via votre lien', desc: 'Les nouveaux utilisateurs qui s\'inscrivent avec votre lien sont automatiquement associés à votre compte.' },
               { step: '3', icon: <DollarSign className="w-6 h-6" />, title: 'Gagnez des commissions', desc: 'Dès qu\'un parrainé active un abonnement payant, vous recevez 20% de commission.' },
             ].map((item, i) => (
-              <div key={i} className="rounded-xl p-6 relative" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(245,237,214,0.06)' }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-4 text-sm font-bold" style={{ background: 'rgba(0,98,51,0.15)', color: 'var(--green-3)' }}>{item.step}</div>
+              <div key={i} className="rounded-xl p-6 relative" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(15,39,71,0.06)' }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center mb-4 text-sm font-bold" style={{ background: 'rgba(30,64,175,0.15)', color: 'var(--green-3)' }}>{item.step}</div>
                 <div className="mb-3" style={{ color: 'var(--green-3)' }}>{item.icon}</div>
                 <h3 className="text-base font-bold mb-2" style={{ color: 'var(--sand)' }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--sand-muted)' }}>{item.desc}</p>
@@ -97,7 +97,7 @@ export default function PartnersPage() {
 
       <section className="px-4 sm:px-6 pb-20">
         <div className="max-w-3xl mx-auto">
-          <div className="rounded-xl p-8" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(245,237,214,0.06)' }}>
+          <div className="rounded-xl p-8" style={{ background: 'var(--navy-2, #111827)', border: '1px solid rgba(15,39,71,0.06)' }}>
             <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--sand)' }}>Règles de transparence</h2>
             <div className="space-y-4">
               {[
@@ -124,14 +124,14 @@ export default function PartnersPage() {
           <button
             onClick={() => router.push('/auth/register?intent=partner')}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-white min-h-[44px] mx-auto transition-all active:scale-[0.98]"
-            style={{ background: 'var(--green-2, #006233)' }}
+            style={{ background: 'var(--green-2, #1E40AF)' }}
           >
             Commencer maintenant <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>
 
-      <footer className="px-4 sm:px-6 py-8" style={{ borderTop: '1px solid rgba(245,237,214,0.06)' }}>
+      <footer className="px-4 sm:px-6 py-8" style={{ borderTop: '1px solid rgba(15,39,71,0.06)' }}>
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-sm no-underline" style={{ color: 'var(--sand-muted)' }}>CloudDevis</Link>
           <div className="flex gap-4">

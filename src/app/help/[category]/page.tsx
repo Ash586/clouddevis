@@ -22,7 +22,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-[11px] text-[#999] mb-6">
-        <Link href="/help" className="hover:text-[#0B3D2E] transition">Centre d&apos;aide</Link>
+        <Link href="/help" className="hover:text-[#1E40AF] transition">Centre d&apos;aide</Link>
         <span>/</span>
         <span className="text-[#161616] font-semibold">{cat.title}</span>
       </nav>
@@ -44,14 +44,14 @@ export default function CategoryPage({ params }: { params: { category: string } 
           <Link
             key={a.slug}
             href={`/help/${params.category}/${a.slug}`}
-            className="flex items-center justify-between bg-white border border-[#E4E0D8] rounded-lg px-4 py-3.5 hover:shadow-sm hover:border-[#0B3D2E]/20 transition group"
+            className="flex items-center justify-between bg-white border border-[#E4E0D8] rounded-lg px-4 py-3.5 hover:shadow-sm hover:border-[#1E40AF]/20 transition group"
           >
             <div className="flex items-center gap-3">
               <span className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: cat.color + '10', color: cat.color }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
               </span>
               <div>
-                <div className="text-[13px] font-semibold text-[#161616] group-hover:text-[#0B3D2E] transition">{a.title}</div>
+                <div className="text-[13px] font-semibold text-[#161616] group-hover:text-[#1E40AF] transition">{a.title}</div>
                 <div className="text-[11px] text-[#999] mt-0.5">{a.description}</div>
               </div>
             </div>

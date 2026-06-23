@@ -48,7 +48,7 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
   ACCEPTED: 'bg-blue-400/10 text-blue-400',
   PROGRESS: 'bg-amber-400/10 text-amber-400',
-  DELIVERED: 'bg-[rgba(0,149,77,0.1)] text-[var(--green-3)]',
+  DELIVERED: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]',
 };
 
 export default function ClientDetailPage() {
@@ -180,7 +180,7 @@ export default function ClientDetailPage() {
                   <Card className="overflow-x-auto p-0">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-[rgba(245,237,214,0.06)]">
+                        <tr className="border-b border-[rgba(15,39,71,0.06)]">
                           <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('number')}</th>
                           <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{t('type')}</th>
                           <th className="text-start px-4 py-3 font-semibold text-[var(--sand-muted)] text-xs uppercase tracking-wide">{tc('status')}</th>
@@ -190,7 +190,7 @@ export default function ClientDetailPage() {
                       </thead>
                       <tbody>
                         {documents.map(doc => (
-                          <tr key={doc.id} className="border-b border-[rgba(245,237,214,0.04)] hover:bg-[rgba(245,237,214,0.02)] transition">
+                          <tr key={doc.id} className="border-b border-[rgba(15,39,71,0.04)] hover:bg-[rgba(15,39,71,0.02)] transition">
                             <td className="px-4 py-3 font-medium text-[var(--sand)]">{doc.number}</td>
                             <td className="px-4 py-3 text-[var(--sand-2)]">{TYPE_LABELS[doc.type] ?? doc.type}</td>
                             <td className="px-4 py-3">

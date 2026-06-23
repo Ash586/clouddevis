@@ -13,10 +13,10 @@ export function Button({ variant = 'primary', size = 'md', loading, disabled, cl
   const base = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-glow)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navy)]';
 
   const variants: Record<string, string> = {
-    primary: 'bg-[var(--green-2)] hover:bg-[var(--green-3)] text-white shadow-lg shadow-[rgba(0,122,64,0.3)] hover:shadow-[rgba(0,149,77,0.4)] hover:-translate-y-0.5',
-    secondary: 'bg-[var(--navy-3)] hover:bg-[var(--navy-4)] text-[var(--sand)] border border-[rgba(245,237,214,0.1)]',
-    ghost: 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[rgba(245,237,214,0.06)]',
-    outline: 'bg-transparent border border-[rgba(245,237,214,0.14)] text-[var(--sand-2)] hover:bg-[rgba(245,237,214,0.06)] hover:text-[var(--sand)]',
+    primary: 'bg-[var(--green-2)] hover:bg-[var(--green-3)] text-white shadow-lg shadow-[rgba(37,99,235,0.3)] hover:shadow-[rgba(37,99,235,0.4)] hover:-translate-y-0.5',
+    secondary: 'bg-[var(--navy-3)] hover:bg-[var(--navy-4)] text-[var(--sand)] border border-[rgba(15,39,71,0.1)]',
+    ghost: 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[rgba(15,39,71,0.06)]',
+    outline: 'bg-transparent border border-[rgba(15,39,71,0.14)] text-[var(--sand-2)] hover:bg-[rgba(15,39,71,0.06)] hover:text-[var(--sand)]',
     gold: 'bg-[var(--gold)] hover:bg-[var(--gold-2)] text-[var(--navy)] shadow-lg shadow-[rgba(212,168,67,0.25)] hover:shadow-[rgba(212,168,67,0.4)] hover:-translate-y-0.5',
     danger: 'bg-[var(--stamp-red)] hover:bg-[#d0461e] text-white shadow-lg shadow-[rgba(232,84,46,0.25)] hover:shadow-[rgba(232,84,46,0.4)] hover:-translate-y-0.5',
   };

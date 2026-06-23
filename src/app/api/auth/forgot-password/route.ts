@@ -60,7 +60,7 @@ async function postHandler(req: Request) {
           <p>Bonjour ${safeName},</p>
           <p>Vous avez demandé la réinitialisation de votre mot de passe sur ${appName}.</p>
           <p>Ce lien expirera dans <strong>1 heure</strong>.</p>
-          <a href="${resetUrl}" style="display: inline-block; background: #006233; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 16px 0;">
+          <a href="${resetUrl}" style="display: inline-block; background: #1E40AF; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 16px 0;">
             Réinitialiser mon mot de passe
           </a>
           <p style="color: #666; font-size: 13px;">Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
