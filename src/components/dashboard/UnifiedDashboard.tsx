@@ -71,13 +71,13 @@ const DOC_TYPE_CONFIG: Record<string, { label: string; bg: string; text: string;
 };
 
 const QUICK_CREATE_TYPES = [
-  { type: 'devis', labelKey: 'devis', icon: FileText, iconBg: 'bg-blue-400/10', textColor: 'text-blue-400' },
-  { type: 'facture', labelKey: 'facture', icon: Receipt, iconBg: 'bg-[rgba(37,99,235,0.12)]', textColor: 'text-[var(--green-3)]' },
-  { type: 'proforma', labelKey: 'proforma', icon: ClipboardList, iconBg: 'bg-purple-400/10', textColor: 'text-purple-400' },
-  { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack, iconBg: 'bg-amber-400/10', textColor: 'text-amber-400' },
-  { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText, iconBg: 'bg-teal-400/10', textColor: 'text-teal-400' },
-  { type: 'intervention', labelKey: 'intervention', icon: Wrench, iconBg: 'bg-rose-400/10', textColor: 'text-rose-400' },
-  { type: 'attachement', labelKey: 'attachement', icon: FilePen, iconBg: 'bg-indigo-400/10', textColor: 'text-indigo-400' },
+  { type: 'devis', labelKey: 'devis', icon: FileText },
+  { type: 'facture', labelKey: 'facture', icon: Receipt },
+  { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
+  { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack },
+  { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText },
+  { type: 'intervention', labelKey: 'intervention', icon: Wrench },
+  { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ];
 
 const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'INTERVENTION', 'ATTACHEMENT'] as const;
@@ -225,12 +225,13 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', bon_reception:'BR', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
             return (
               <button key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
-                className="group flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] hover:border-[rgba(15,39,71,0.14)] hover:bg-[var(--navy-3)] transition-all active:scale-[0.98] text-start">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${qd.iconBg} ${qd.textColor}`}>
+                className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] hover:border-[var(--green-2)]/30 hover:bg-[var(--navy-3)] hover:shadow-lg hover:shadow-[rgba(37,99,235,0.08)] transition-all duration-300 active:scale-[0.97] text-start overflow-hidden">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[var(--green-glow)]/0 to-[var(--green-glow)]/0 group-hover:from-[var(--green-glow)]/40 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[var(--green-glow)] text-[var(--green-3)] group-hover:bg-[var(--green-3)] group-hover:text-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[rgba(37,99,235,0.25)]">
                   <qd.icon size={19} />
                 </div>
-                <div className="min-w-0">
-                  <div className="text-sm font-bold text-[var(--sand)] truncate">{t(`docTypes.${qd.labelKey}`)}</div>
+                <div className="relative min-w-0">
+                  <div className="text-sm font-bold text-[var(--sand)] group-hover:text-[var(--green-3)] transition-colors duration-300 truncate">{t(`docTypes.${qd.labelKey}`)}</div>
                   <div className="text-[11px] text-[var(--sand-muted)]">{count} {t('created')}</div>
                 </div>
               </button>
