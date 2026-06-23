@@ -132,7 +132,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
   const draftDoc = stats.recentDraft;
 
   return (
-    <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-6 py-6">
+    <main className="flex-1 max-w-6xl mx-auto w-full px-5 sm:px-6 pt-6 pb-24 md:pb-6">
       <DeleteModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={() => deleteTarget && onDelete(deleteTarget)} />
 
       {/* ── Hero band ── */}
@@ -159,7 +159,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
         const urgent = stats.trialDaysRemaining <= 2;
         return (
           <Card className={`p-4 mb-6 border ${urgent ? 'border-red-400/30 bg-gradient-to-r from-[rgba(239,68,68,0.08)] to-transparent' : 'border-[rgba(212,168,67,0.2)] bg-gradient-to-r from-[rgba(212,168,67,0.06)] to-transparent'}`}>
-            <div className="flex items-center gap-4">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${urgent ? 'bg-red-400/10 animate-pulse' : 'bg-[rgba(212,168,67,0.1)]'}`}>
                 <Clock size={20} className={urgent ? 'text-red-400' : 'text-[var(--gold)]'} />
               </div>
@@ -168,8 +168,11 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                   {t('trialDaysLeft', { count: stats.trialDaysRemaining })}
                 </p>
                 <p className="text-xs text-[var(--sand-muted)]">{urgent ? (t('trialUrgent') || 'Votre accès expire bientôt ! Passez à un forfait payant.') : t('trialUpgradeHint')}</p>
+                <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')} className="mt-3 sm:hidden w-full justify-center">
+                  {t('upgrade')} <ArrowRight size={14} className="ml-1" />
+                </Button>
               </div>
-              <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')}>
+              <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')} className="hidden sm:inline-flex shrink-0">
                 {t('upgrade')} <ArrowRight size={14} className="ml-1" />
               </Button>
             </div>

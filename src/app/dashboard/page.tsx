@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
@@ -20,7 +19,6 @@ interface DocSummary {
 }
 
 export default function DashboardPage() {
-  const router = useRouter();
   const [docs, setDocs] = useState<DocSummary[]>([]);
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
@@ -124,19 +122,6 @@ export default function DashboardPage() {
             onSortChange={handleSortChange}
           />
         </TrialGate>
-
-        {/* Mobile primary FAB — stacked above the nav-menu trigger, same right edge */}
-        <button
-          onClick={() => router.push('/dashboard/editor')}
-          className="md:hidden fixed right-5 z-[140] h-14 px-5 rounded-full bg-[var(--green-2)] text-white shadow-lg shadow-[rgba(37,99,235,0.35)] flex items-center gap-2 text-sm font-bold active:scale-95 transition-transform hover:bg-[var(--green-3)]"
-          style={{ bottom: 'calc(5.25rem + env(safe-area-inset-bottom, 0px))' }}
-          title="Nouveau document"
-          aria-label="Nouveau document"
-        >
-          <span className="text-xl leading-none">+</span>
-          <span>Nouveau</span>
-        </button>
-
       </div>
     </div>
     </div>
