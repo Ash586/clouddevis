@@ -18,7 +18,7 @@ import { generateBonCommandeHTML } from '@/lib/generateBonCommandeHTML';
 import { generateInterventionHTML } from '@/lib/generateInterventionHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions } from '@/types';
-import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef, DocumentType } from '@/types';
+import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
 import { track } from '@/lib/analytics';
@@ -30,7 +30,7 @@ import {
   ChevronDown, MonitorCheck,
   Receipt, ScrollText, ClipboardList, FileStack, Wrench, Pen,
 } from 'lucide-react';
-import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, URL_TYPE_MAP, sectionFocusMap } from '@/components/editor/EditorConstants';
+import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, normalizeDocTypeParam, sectionFocusMap } from '@/components/editor/EditorConstants';
 import { CustomSectionRenderer } from '@/components/editor/sections/CustomSectionRenderer';
 import { CustomizationModal } from '@/components/editor/CustomizationModal';
 
@@ -38,8 +38,7 @@ function EditorContent() {
   const sp = useSearchParams();
   const modeParam = sp.get('mode') as UserMode | null;
   const docIdParam = sp.get('id');
-  const rawTypeParam = sp.get('type');
-  const typeParam = rawTypeParam ? (URL_TYPE_MAP[rawTypeParam] ?? rawTypeParam as DocumentType) : null;
+  const typeParam = normalizeDocTypeParam(sp.get('type'));
   const { showToast } = useToast();
   const {
     doc, setDoc, mode, setMode,

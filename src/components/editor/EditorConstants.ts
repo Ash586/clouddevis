@@ -29,6 +29,24 @@ export const URL_TYPE_MAP: Record<string, DocumentType> = {
   bon_reception: 'br',
 };
 
+/** All valid internal document types */
+const VALID_DOC_TYPES: DocumentType[] = ['devis', 'proforma', 'bc', 'br', 'facture', 'intervention', 'attachement'];
+
+/**
+ * Normalize a raw `?type=` URL param into a valid internal DocumentType.
+ * Handles any casing (e.g. "BC", "bc"), the user-friendly aliases in
+ * URL_TYPE_MAP (e.g. "bon_commande"), and the uppercase DB enum values the
+ * sidebar emits (e.g. "DEVIS", "BR"). Returns null for unknown values so the
+ * editor falls back to its default type.
+ */
+export function normalizeDocTypeParam(raw: string | null | undefined): DocumentType | null {
+  if (!raw) return null;
+  const lower = raw.toLowerCase();
+  if (URL_TYPE_MAP[lower]) return URL_TYPE_MAP[lower];
+  if (VALID_DOC_TYPES.includes(lower as DocumentType)) return lower as DocumentType;
+  return null;
+}
+
 /** Icon component resolver for document types */
 export function getDocTypeIcon(type: DocumentType) {
   const icons = {
