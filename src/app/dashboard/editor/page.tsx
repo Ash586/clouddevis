@@ -169,6 +169,7 @@ function EditorContent() {
 
   const prefFields: Record<string, string[]> = {
     ...Object.fromEntries(DEFAULT_SECTION_ORDER.map(s => [s, userPrefsForType?.[s] ?? defaultsForType[s] ?? [...SECTION_FIELDS[s]]])),
+    ...Object.fromEntries(relevantSections.filter(s => !DEFAULT_SECTION_ORDER.includes(s)).map(s => [s, userPrefsForType?.[s] ?? defaultsForType[s] ?? [...(SECTION_FIELDS[s] ?? [])]])),
     ...Object.fromEntries(customSections.map(cs => [cs.id, userPrefsForType?.[cs.id] ?? cs.fields.map(f => f.id)])),
   };
   const hiddenFields = new Set<string>();
@@ -562,7 +563,7 @@ function EditorContent() {
                 if (s === 'design' || s === 'signature') return true;
                 const sectionFields = SECTION_FIELDS[s];
                 if (!sectionFields) return customSections.some(cs => cs.id === s);
-                return sectionFields.some(f => !hiddenFields.has(f));
+                return sectionFields.length === 0 || sectionFields.some(f => !hiddenFields.has(f));
               }).map(s => (
                 <div key={s} data-section-id={s} className="scroll-mt-4">{renderSection(s)}</div>
               ))}
