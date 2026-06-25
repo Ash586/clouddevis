@@ -37,13 +37,16 @@
   /* ── Text (deep navy-blue on white) ── */
   --sand:      #0F2747;  /* primary text */
   --sand-2:    #33425C;  /* secondary text */
-  --sand-muted:#6B7A93;  /* muted text */
+  --sand-muted:#5A6B85;  /* muted text — darkened for WCAG AA on white/navy-3 */
 
   /* ── Primary accent = BLUE ── */
   --green:     #1E40AF;  /* blue-800 — deep (gradient start) */
   --green-2:   #2563EB;  /* blue-600 — primary buttons */
   --green-3:   #1D4ED8;  /* blue-700 — foreground accent / chips */
   --green-glow:rgba(37,99,235,0.18);
+  --accent-ring:rgba(37,99,235,0.22);   /* focus/active ring on accent chips */
+  --accent-glow:rgba(37,99,235,0.25);   /* soft glow on active nav item */
+  --preview-stage:#121826;              /* dark canvas behind the white A4 paper */
   --gold:      #C77D11;  /* amber-ish — warnings/trial */
   --gold-2:    #E0961E;
   --gold-bg:   rgba(199,125,17,0.12);

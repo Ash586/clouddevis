@@ -200,6 +200,8 @@ async function postHandler(req: Request) {
 
     // Build _editorMeta — all fields missing dedicated columns in Document model
     const editorMeta: Record<string, unknown> = {
+      // persist tvaRate explicitly so load doesn't reverse-compute from computed amounts
+      tvaRate: Number(doc.tvaRate) || 0,
       // client tax fields (stored on Client model, also snapshot here for loaded docs)
       clientInfo: doc.clientInfo || {},
       // artisan mode

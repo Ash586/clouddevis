@@ -70,6 +70,7 @@ function EditorContent() {
   const [showGrid, setShowGrid] = useState(false);
   const [showReadyChecks, setShowReadyChecks] = useState(false);
   const [showSectionNav, setShowSectionNav] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -79,6 +80,13 @@ function EditorContent() {
   // Left rail navigation config
   const relevantSections = DOC_TYPE_SECTIONS[doc.documentType] ?? DEFAULT_SECTION_ORDER;
   const ALL_SECTIONS: string[] = [...relevantSections, ...customSections.map(s => s.id).filter(id => !relevantSections.includes(id))];
+  // Editor render order: surface the primary task (line items) then the client first,
+  // regardless of the canonical DOC_TYPE_SECTIONS order (which still drives the PDF).
+  const EDITOR_PRIORITY = ['prestations', 'client'];
+  const orderedSections = [
+    ...EDITOR_PRIORITY.filter(s => relevantSections.includes(s)),
+    ...relevantSections.filter(s => !EDITOR_PRIORITY.includes(s)),
+  ];
   const sectionNavItems = useMemo(() => {
     const allItems = [
       { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
@@ -316,6 +324,26 @@ function EditorContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc.documentType]);
 
+  // Track which section is in view via IntersectionObserver
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-section-id');
+            if (id) setActiveSection(id as SectionId);
+          }
+        }
+      },
+      { root: container, rootMargin: '-20% 0px -60% 0px', threshold: 0 },
+    );
+    const nodes = container.querySelectorAll('[data-section-id]');
+    nodes.forEach(n => observer.observe(n));
+    return () => observer.disconnect();
+  });
+
   // Update preview focus when active section changes
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -408,14 +436,14 @@ function EditorContent() {
         )}
 
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
-        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[rgba(15,39,71,0.08)] z-50 shrink-0 gap-3">
+        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[var(--border-2)] shadow-[var(--shadow-sm)] z-50 shrink-0 gap-3">
           {/* Left: Nav back + Doc type selector */}
           <button onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={18} className="rotate-180" />
           </button>
           <div className="relative shrink-0">
             <button onClick={() => setShowTypeMenu(v => !v)}
-              className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[rgba(37,99,235,0.2)]">
+              className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[var(--accent-ring)]">
               {doc.documentType === 'devis' ? <FileText size={15} /> : doc.documentType === 'facture' ? <Receipt size={15} /> : doc.documentType === 'proforma' ? <ClipboardList size={15} /> : doc.documentType === 'bc' ? <FileStack size={15} /> : doc.documentType === 'br' ? <Package size={15} /> : doc.documentType === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
               <span>{te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}</span>
               <ChevronDown size={13} className={cn('transition-transform', showTypeMenu && 'rotate-180')} />
@@ -441,7 +469,7 @@ function EditorContent() {
             {saving ? (
               <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--green-3)]"><Loader2 size={12} className="animate-spin" />{te('saving')}</span>
             ) : (
-              <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-green-400" />Enregistré</span>
+              <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--cd-success))]" />Enregistré</span>
             )}
           </div>
 
@@ -469,7 +497,7 @@ function EditorContent() {
         </div>
 
         {/* ═══════════════ MOBILE BOTTOM BAR ═══════════════ */}
-        <div className="lg:hidden no-print shrink-0 border-t border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
+        <div className="lg:hidden no-print shrink-0 border-t border-[var(--border-2)] shadow-[0_-1px_2px_rgba(15,39,71,0.06)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
           {/* Action row */}
           <div className="flex items-center gap-1.5 px-2 py-1">
             <button onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
@@ -502,22 +530,26 @@ function EditorContent() {
         {/* ═══════════════ MAIN AREA ═══════════════ */}
         <div className="flex-1 flex overflow-hidden min-h-0">
 
-          {/* ──── LEFT RAIL (desktop, hidden by default) ──── */}
-          {showSectionNav && (
-            <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[rgba(15,39,71,0.08)] w-[72px] shrink-0 overflow-y-auto">
+          {/* ──── LEFT RAIL (always visible on lg+) ──── */}
+          <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[var(--border-2)] w-[72px] shrink-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
-                <button key={item.id} onClick={() => { setActiveSection(item.id); setMobileTab('editor'); }}
-                  className={cn('w-full flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all border-2', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] border-[var(--green-3)] shadow-[0_0_12px_rgba(37,99,235,0.25)]' : 'text-[var(--sand-muted)] border-transparent hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
+                <button key={item.id} onClick={() => {
+                  setActiveSection(item.id);
+                  setMobileTab('editor');
+                  const el = scrollContainerRef.current?.querySelector(`[data-section-id="${item.id}"]`);
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                  className={cn('w-full flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl transition-all border-[1.5px]', active ? 'bg-[var(--green-glow)] text-[var(--green-3)] border-[rgba(37,99,235,0.3)] shadow-[0_0_14px_var(--accent-glow)]' : 'text-[var(--sand-muted)] border-transparent hover:text-[var(--sand)] hover:bg-[var(--navy-3)]')}>
                   <item.icon size={18} strokeWidth={active ? 2.2 : 1.8} />
                   <span className="text-[9px] font-bold leading-tight text-center tracking-tight truncate w-full">{item.label}</span>
                 </button>
               );
             })}
-          </nav>)}
+          </nav>
           {/* ──── EDITOR PANEL ──── */}
-          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[rgba(15,39,71,0.08)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
+          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[var(--border-2)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
             {/* Validation errors banner */}
             {itemErrors && (
               <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
@@ -525,32 +557,28 @@ function EditorContent() {
                 <button onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
               </div>
             )}
-            {/* Scrollable section area - shows all sections when nav hidden, one section when nav visible */}
-            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
-              {showSectionNav ? renderSection(activeSection) : (
-                <>
-                  {relevantSections.filter(s => {
-                    if (s === 'design' || s === 'signature') return true;
-                    const sectionFields = SECTION_FIELDS[s];
-                    if (!sectionFields) return customSections.some(cs => cs.id === s);
-                    return sectionFields.some(f => !hiddenFields.has(f));
-                  }).map(s => (
-                    <div key={s} className="scroll-mt-16">{renderSection(s)}</div>
-                  ))}
-                  {customSections.map(cs => {
-                    if (relevantSections.includes(cs.id)) {
-                      const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
-                      if (!hasVisible) return null;
-                      return <div key={cs.id} className="scroll-mt-16">{renderSection(cs.id)}</div>;
-                    }
-                    return null;
-                  })}
-                </>
-              )}
+            {/* Scrollable section area */}
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
+              {orderedSections.filter(s => {
+                if (s === 'design' || s === 'signature') return true;
+                const sectionFields = SECTION_FIELDS[s];
+                if (!sectionFields) return customSections.some(cs => cs.id === s);
+                return sectionFields.some(f => !hiddenFields.has(f));
+              }).map(s => (
+                <div key={s} data-section-id={s} className="scroll-mt-4">{renderSection(s)}</div>
+              ))}
+              {customSections.map(cs => {
+                if (relevantSections.includes(cs.id)) {
+                  const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
+                  if (!hasVisible) return null;
+                  return <div key={cs.id} data-section-id={cs.id} className="scroll-mt-4">{renderSection(cs.id)}</div>;
+                }
+                return null;
+              })}
             </div>
             {/* ──── BOTTOM TOTALS BAR (hidden on mobile non-editor tabs) ──── */}
             {mobileTab === 'editor' && (
-            <div className="shrink-0 border-t border-[rgba(15,39,71,0.1)] bg-[var(--navy-2)] px-3 sm:px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
+            <div className="shrink-0 border-t border-[var(--border-2)] shadow-[0_-1px_2px_rgba(15,39,71,0.06)] bg-[var(--navy-2)] px-3 sm:px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
               <div className="flex items-center gap-3 sm:gap-4 text-[11px] min-w-0 flex-1">
                 <span className="shrink-0"><span className="text-[var(--sand-muted)]">HT </span><span className="font-bold text-[var(--sand)]">{formatCurrency(results.subTotalHT, tc('currency'))}</span></span>
                 {results.tvaRate > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">TVA {results.tvaRate}% </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.tvaAmount, tc('currency'))}</span></span>}
@@ -561,7 +589,7 @@ function EditorContent() {
                   <AlertTriangle size={11} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
                 </button>
               )}
-              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[rgba(37,99,235,0.2)]">
+              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[var(--accent-ring)]">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--green-3)]/80">{te('paiement.netToPay') || 'Net'}</span>
                 <span className="font-black text-[var(--green-3)] text-sm whitespace-nowrap">{formatCurrency(results.netAPayer, tc('currency'))}</span>
               </div>
@@ -602,8 +630,8 @@ function EditorContent() {
           )}
 
           {/* ──── PREVIEW PANEL ──── */}
-          <div className={cn('lg:flex flex-1 min-w-0 flex-col bg-[#121826]', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
-            <div className="no-print shrink-0 flex items-center gap-3 border-b border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]/95 px-4 py-2.5">
+          <div className={cn('lg:flex flex-1 min-w-0 flex-col bg-[var(--preview-stage)]', mobileTab === 'preview' ? 'flex' : 'hidden lg:flex')}>
+            <div className="no-print shrink-0 flex items-center gap-3 border-b border-[var(--border-2)] bg-[var(--navy-2)]/95 px-4 py-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--green-glow)] text-[var(--green-3)]">
                 <MonitorCheck size={17} />
               </div>
@@ -648,7 +676,7 @@ function EditorContent() {
                   <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
                   <button onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
                 </div>
-                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[rgba(37,99,235,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
+                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[var(--accent-ring)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
               </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}

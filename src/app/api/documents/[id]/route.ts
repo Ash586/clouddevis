@@ -81,6 +81,7 @@ async function putHandler(req: Request, { params }: { params: Promise<{ id: stri
 
     // Build _editorMeta — all fields missing dedicated columns in Document model
     const editorMeta: Record<string, unknown> = {
+      tvaRate: Number(doc.tvaRate) || 0,
       clientInfo: doc.clientInfo || {},
       artisanInfo: doc.artisanInfo || null,
       discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
