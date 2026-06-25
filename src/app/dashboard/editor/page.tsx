@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
 import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
 import { getSection } from '@/components/editor/sections/SectionProps';
+import '@/components/editor/sections';
 import { useEditor } from '@/hooks/useEditor';
 import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useToast } from '@/components/ui/toast';
@@ -70,6 +71,8 @@ function EditorContent() {
   const [showReadyChecks, setShowReadyChecks] = useState(false);
   const [showSectionNav, setShowSectionNav] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const prefsFetched = useRef(false);
+  const sectionsFetched = useRef(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -129,8 +132,12 @@ function EditorContent() {
   ], [doc.clientInfo.name, doc.items.length, doc.date, te]);
   const completedPreviewChecks = previewReadyChecks.filter(check => check.done).length;
 
+  const prefsFetched = useRef(false);
+  const sectionsFetched = useRef(false);
+
   useEffect(() => {
-    if (docIdParam) return;
+    if (docIdParam || prefsFetched.current) return;
+    prefsFetched.current = true;
     fetch('/api/user/preferences')
       .then(r => r.ok ? r.json() : { fields: null })
       .then(data => {
@@ -141,10 +148,11 @@ function EditorContent() {
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [docIdParam]);
 
   useEffect(() => {
+    if (sectionsFetched.current) return;
+    sectionsFetched.current = true;
     fetch('/api/user/custom-sections')
       .then(r => r.ok ? r.json() : { sections: [] })
       .then(data => {
@@ -158,7 +166,6 @@ function EditorContent() {
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // حقل preferences: FieldPrefs[documentType][section] = fieldId[]
@@ -325,10 +332,11 @@ function EditorContent() {
   }, [doc.documentType]);
 
   // Track which section is in view via IntersectionObserver
+  const observerRef = useRef<IntersectionObserver | null>(null);
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
@@ -340,9 +348,20 @@ function EditorContent() {
       { root: container, rootMargin: '-20% 0px -60% 0px', threshold: 0 },
     );
     const nodes = container.querySelectorAll('[data-section-id]');
-    nodes.forEach(n => observer.observe(n));
-    return () => observer.disconnect();
-  });
+    nodes.forEach(n => observerRef.current!.observe(n));
+    const mutationObserver = new MutationObserver(() => {
+      const newNodes = container.querySelectorAll('[data-section-id]');
+      newNodes.forEach(n => {
+        if (!observerRef.current) return;
+        try { observerRef.current.observe(n); } catch {}
+      });
+    });
+    mutationObserver.observe(container, { childList: true, subtree: true });
+    return () => {
+      observerRef.current?.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [scrollContainerRef]);
 
   // Update preview focus when active section changes
   useEffect(() => {
