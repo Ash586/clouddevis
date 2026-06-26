@@ -5,9 +5,19 @@ import { logger } from '@/lib/logger';
 import { verifyWebhookSignature, parseWebhookEvent } from '@/lib/lemon-squeezy';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
+const MAX_BODY_BYTES = 1_048_576; // 1 MB
+
 async function postHandler(req: Request) {
   try {
+    const contentLength = parseInt(req.headers.get('content-length') || '0', 10);
+    if (contentLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
+
     const body = await req.text();
+    if (body.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
     const signature = req.headers.get('x-signature') || '';
 
     if (!verifyWebhookSignature(body, signature)) {

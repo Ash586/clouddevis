@@ -83,7 +83,7 @@ export default function PricingPage() {
                     <h3 className="text-base font-bold text-slate-900">{tName}</h3>
                     <div className="mt-2">
                       <span className="text-2xl sm:text-3xl font-black text-slate-900">{formatPrice(plan.price)}</span>
-                      <span className="text-xs text-slate-400 ml-1">{t('perMonth')}</span>
+                      <span className="text-xs text-slate-400 ms-1">{t('perMonth')}</span>
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1">{plan.description.fr}</p>
                   </div>
@@ -211,7 +211,7 @@ export default function PricingPage() {
                 >
                   <span className="text-sm font-semibold text-slate-800">{t(item.q as string)}</span>
                   <ChevronDown
-                    className={cn('w-4 h-4 text-slate-400 transition-transform shrink-0 ml-4', openFaq === i && 'rotate-180')}
+                    className={cn('w-4 h-4 text-slate-400 transition-transform shrink-0 ms-4', openFaq === i && 'rotate-180')}
                   />
                 </button>
                 {openFaq === i && (

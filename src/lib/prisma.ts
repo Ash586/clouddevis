@@ -2,6 +2,24 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import { round2 } from '@/lib/calculations';
+import { encryptField, decryptField } from '@/lib/fieldCrypto';
+
+// Fields to encrypt at rest for Client and Company models
+const FISCAL_FIELDS = ['nif', 'nis', 'rc', 'ai'] as const;
+type FiscalRecord = Partial<Record<typeof FISCAL_FIELDS[number], string | null>>;
+
+function encryptFiscal(data: FiscalRecord): void {
+  for (const k of FISCAL_FIELDS) {
+    if (typeof data[k] === 'string') data[k] = encryptField(data[k]);
+  }
+}
+
+function decryptFiscal<T extends FiscalRecord>(record: T): T {
+  for (const k of FISCAL_FIELDS) {
+    if (typeof record[k] === 'string') record[k] = decryptField(record[k]);
+  }
+  return record;
+}
 
 const globalForPrisma = globalThis as unknown as { prisma: ReturnType<typeof createPrismaClient> | undefined };
 
@@ -50,6 +68,36 @@ function createPrismaClient() {
           return query(args);
         },
       },
+      client: {
+        async create({ args, query }) {
+          encryptFiscal(args.data as FiscalRecord);
+          return query(args);
+        },
+        async update({ args, query }) {
+          encryptFiscal(args.data as FiscalRecord);
+          return query(args);
+        },
+        async upsert({ args, query }) {
+          encryptFiscal(args.create as FiscalRecord);
+          encryptFiscal(args.update as FiscalRecord);
+          return query(args);
+        },
+      },
+      company: {
+        async create({ args, query }) {
+          encryptFiscal(args.data as FiscalRecord);
+          return query(args);
+        },
+        async update({ args, query }) {
+          encryptFiscal(args.data as FiscalRecord);
+          return query(args);
+        },
+        async upsert({ args, query }) {
+          encryptFiscal(args.create as FiscalRecord);
+          encryptFiscal(args.update as FiscalRecord);
+          return query(args);
+        },
+      },
       lineItem: {
         async create({ args, query }) {
           const data = args.data as { quantity?: number; unitPrice?: number; totalHT?: number };
@@ -81,7 +129,25 @@ function createPrismaClient() {
       },
     },
   });
-  return extended;
+  // Decrypt fiscal fields transparently on every read
+  const withDecrypt = extended.$extends({
+    result: {
+      client: {
+        nif: { needs: { nif: true }, compute: (r) => decryptField(r.nif) },
+        nis: { needs: { nis: true }, compute: (r) => decryptField(r.nis) },
+        rc:  { needs: { rc:  true }, compute: (r) => decryptField(r.rc)  },
+        ai:  { needs: { ai:  true }, compute: (r) => decryptField(r.ai)  },
+      },
+      company: {
+        nif: { needs: { nif: true }, compute: (r) => decryptField(r.nif) },
+        nis: { needs: { nis: true }, compute: (r) => decryptField(r.nis) },
+        rc:  { needs: { rc:  true }, compute: (r) => decryptField(r.rc)  },
+        ai:  { needs: { ai:  true }, compute: (r) => decryptField(r.ai)  },
+      },
+    },
+  });
+
+  return withDecrypt;
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

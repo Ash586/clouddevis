@@ -7,7 +7,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { WizardProgress } from '../components/wizard/WizardProgress';
@@ -112,7 +112,7 @@ export function WizardScreen({ onExit }: WizardScreenProps) {
           )}
           aria-label="Retour"
         >
-          <IconArrowLeft size={20} />
+          <ArrowLeft size={20} />
         </button>
 
         {/* Step title */}

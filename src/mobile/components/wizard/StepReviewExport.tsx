@@ -6,16 +6,7 @@
 // ============================================================
 
 import { useState, useCallback } from 'react';
-import {
-  IconFileText,
-  IconReceipt,
-  IconBrandWhatsapp,
-  IconMail,
-  IconDownload,
-  IconPrinter,
-  IconShare,
-  IconCheck,
-} from '@tabler/icons-react';
+import { FileText, Receipt, MessageCircle, Mail, Download, Printer, Share2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
@@ -153,7 +144,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
           style={{ background: 'var(--green-2)' }}
         >
           <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-            <IconFileText size={20} className="text-white" />
+            <FileText size={20} className="text-white" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-bold text-white">
@@ -268,7 +259,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
           >
             {/* Success banner */}
             <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <IconCheck size={16} className="text-emerald-400" />
+              <Check size={16} className="text-emerald-400" />
               <p className="text-xs text-emerald-400 font-semibold">PDF généré avec succès</p>
             </div>
 
@@ -286,7 +277,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 )}
               >
                 <div className="w-10 h-10 rounded-xl bg-[#25D366]/15 flex items-center justify-center">
-                  <IconBrandWhatsapp size={20} className="text-[#25D366]" />
+                  <MessageCircle size={20} className="text-[#25D366]" />
                 </div>
                 <span className="text-xs font-semibold text-[var(--sand)]">WhatsApp</span>
               </button>
@@ -299,7 +290,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 )}
               >
                 <div className="w-10 h-10 rounded-xl bg-blue-400/15 flex items-center justify-center">
-                  <IconMail size={20} className="text-blue-400" />
+                  <Mail size={20} className="text-blue-400" />
                 </div>
                 <span className="text-xs font-semibold text-[var(--sand)]">Email</span>
               </button>
@@ -312,7 +303,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 )}
               >
                 <div className="w-10 h-10 rounded-xl bg-[var(--sand)]/10 flex items-center justify-center">
-                  <IconDownload size={20} className="text-[var(--sand)]" />
+                  <Download size={20} className="text-[var(--sand)]" />
                 </div>
                 <span className="text-xs font-semibold text-[var(--sand)]">Télécharger</span>
               </button>
@@ -326,7 +317,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
                 )}
               >
                 <div className="w-10 h-10 rounded-xl bg-amber-400/15 flex items-center justify-center">
-                  <IconPrinter size={20} className="text-amber-400" />
+                  <Printer size={20} className="text-amber-400" />
                 </div>
                 <span className="text-xs font-semibold text-[var(--sand)]">Imprimer</span>
               </button>
@@ -348,7 +339,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               </button>
             ) : (
               <div className="flex items-center justify-center gap-2 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <IconCheck size={16} className="text-emerald-400" />
+                <Check size={16} className="text-emerald-400" />
                 <span className="text-sm font-semibold text-emerald-400">Enregistré</span>
               </div>
             )}

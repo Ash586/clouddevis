@@ -205,7 +205,7 @@ function SidebarInner() {
             </button>
 
             {documentsOpen && (
-              <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(15,39,71,0.1)] pl-2 animate-in">
+              <div className="mt-1 ms-4 space-y-0.5 border-l border-[rgba(15,39,71,0.1)] pl-2 animate-in">
                 <button type="button" onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
                     pathname === '/dashboard/documents' && !searchParams?.get('type') 

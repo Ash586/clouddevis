@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
+import { requireCsrf } from '@/lib/csrf';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';
@@ -10,13 +11,14 @@ import { t } from '@/lib/api-i18n';
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
   try {
+    requireCsrf(req);
     const { email } = await req.json();
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return NextResponse.json({ error: t(req, 'emailRequired') }, { status: 400 });
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
+    const ip = getClientIP(req);
     const rateCheck = await checkRateLimit(`forgot:${email}:${ip}`, 3, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });

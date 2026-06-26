@@ -22,9 +22,16 @@ export function requireCsrf(request: NextRequest | Request): void {
   if (CSRF_EXEMPT_METHODS.has(request.method)) return;
 
   const origin = request.headers.get('origin');
-  if (!origin) return;
+  const referer = request.headers.get('referer');
 
-  if (origin !== ORIGIN && origin !== 'http://localhost:3000') {
+  // Extract origin from Referer when Origin header is absent (e.g. some same-site navigations)
+  const candidate = origin ?? (referer ? new URL(referer).origin : null);
+
+  if (!candidate) {
+    throw new Error('CSRF validation failed: missing origin');
+  }
+
+  if (candidate !== ORIGIN && candidate !== 'http://localhost:3000') {
     throw new Error('CSRF validation failed: invalid origin');
   }
 }

@@ -14,11 +14,11 @@ function ResetForm() {
   const [token, setToken] = useState('');
 
   useEffect(() => {
+    // Token is in the fragment (#token=…) — never in the query string.
+    // Fragments are not sent to the server and don't appear in access logs.
     const hash = window.location.hash.replace('#', '');
     const hashToken = new URLSearchParams(hash).get('token');
-    if (hashToken) { setToken(hashToken); return; }
-    const sp = new URLSearchParams(window.location.search);
-    setToken(sp.get('token') || '');
+    setToken(hashToken || '');
   }, []);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');

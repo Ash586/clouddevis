@@ -5,11 +5,7 @@
 // 3 buttons: Nouveau devis (primary), Facture, Dupliquer
 // ============================================================
 
-import {
-  IconPlus,
-  IconReceipt,
-  IconCopy,
-} from '@tabler/icons-react';
+import { Plus, Receipt, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +32,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'shadow-lg shadow-[rgba(37,99,235,0.3)]',
         )}
       >
-        <IconPlus size={24} stroke={2.2} />
+        <Plus size={24} strokeWidth={2.2} />
         <span>Nouveau devis</span>
       </motion.button>
 
@@ -53,7 +49,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'border border-[rgba(15,39,71,0.08)]',
         )}
       >
-        <IconReceipt size={22} stroke={1.8} />
+        <Receipt size={22} strokeWidth={1.8} />
         <span>Facture</span>
       </motion.button>
 
@@ -70,7 +66,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
           'border border-[rgba(15,39,71,0.08)]',
         )}
       >
-        <IconCopy size={22} stroke={1.8} />
+        <Copy size={22} strokeWidth={1.8} />
         <span>Dupliquer</span>
       </motion.button>
     </div>

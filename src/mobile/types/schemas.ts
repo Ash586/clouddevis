@@ -5,6 +5,10 @@
 
 import { z } from 'zod';
 import { round2 } from '@/lib/calculations';
+import {
+  calculateDocumentFull,
+  shouldApplyTimbre as dgiShouldApplyTimbre,
+} from '@/lib/dgi';
 import type { LineItem } from './index';
 
 // ── DGI Validation Constants ─────────────────────────────────
@@ -160,10 +164,16 @@ export const DocumentSchema = z.object({
   { message: 'Total TTC doit être >= Total HT + TVA', path: ['totalTTC'] }
 ).refine(
   (data) => {
-    // Timbre amount should be 1000 when applied
-    if (data.timbreFiscal) {
-      return data.timbreAmount === 1000;
-    }
+    // timbreFiscal must be false for exempt payment modes
+    const exemptModes = ['cheque', 'virement', 'cb'];
+    if (exemptModes.includes(data.paymentMode)) return !data.timbreFiscal;
+    return true;
+  },
+  { message: 'Timbre fiscal non applicable pour virement/chèque/CB', path: ['timbreFiscal'] }
+).refine(
+  (data) => {
+    // Timbre amount must match flag
+    if (data.timbreFiscal) return data.timbreAmount === 1000;
     return data.timbreAmount === 0;
   },
   { message: 'Montant timbre: 1000 DA si applicable, 0 sinon', path: ['timbreAmount'] }
@@ -212,55 +222,43 @@ export const RegisterSchema = z.object({
 // ── Calculation Helpers ──────────────────────────────────────
 
 /**
- * Calculate document totals from items
+ * Calculate document totals from items — delegates to unified dgi.ts engine.
  */
-export function calculateDocumentTotals(items: LineItem[]): {
+export function calculateDocumentTotals(
+  items: LineItem[],
+  documentType: string = 'FACTURE',
+  acompte: number = 0,
+  paymentMode?: string
+): {
   totalHT: number;
   totalTVA: number;
   totalTTC: number;
+  timbreFiscal: boolean;
+  timbreAmount: number;
+  netAPayer: number;
 } {
-  let totalHT = 0;
-  let totalTVA = 0;
-
-  for (const item of items) {
-    const itemHT = item.quantity * item.unitPrice;
-    const itemTVA = itemHT * item.tvaRate / 100;
-    totalHT += itemHT;
-    totalTVA += itemTVA;
-  }
-
-  const totalTTC = totalHT + totalTVA;
-
+  const result = calculateDocumentFull(items, documentType, { type: 'percentage', value: 0 }, acompte, paymentMode);
   return {
-    totalHT: round2(totalHT),
-    totalTVA: round2(totalTVA),
-    totalTTC: round2(totalTTC),
+    totalHT: result.subTotalHT,
+    totalTVA: result.totalTVA,
+    totalTTC: result.totalTTC,
+    timbreFiscal: result.timbreFiscal,
+    timbreAmount: result.timbreAmount,
+    netAPayer: result.netAPayer,
   };
 }
 
-/**
- * Check if timbre fiscal applies
- * Art. 220 CII: applies to all invoices >= 10,000 DA (excluding devis)
- */
-export function shouldApplyTimbre(
-  documentType: string,
-  totalTTC: number
-): boolean {
-  return documentType !== 'DEVIS' && totalTTC >= 10_000;
-}
+/** Re-exported from dgi.ts — single source of truth for Art. 220 CII logic. */
+export const shouldApplyTimbre = dgiShouldApplyTimbre;
 
-/**
- * Calculate final total with timbre
- */
 export function calculateFinalTotal(
   totalTTC: number,
   timbreFiscal: boolean,
   acompte: number = 0
 ): { timbreAmount: number; netAPayer: number } {
   const timbreAmount = timbreFiscal ? 1000 : 0;
-  const netAPayer = totalTTC + timbreAmount - acompte;
   return {
     timbreAmount,
-    netAPayer: round2(netAPayer),
+    netAPayer: round2(totalTTC + timbreAmount - acompte),
   };
 }

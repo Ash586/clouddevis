@@ -9,12 +9,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  IconSearch,
-  IconFilePlus,
-  IconFiles,
-  IconX,
-} from '@tabler/icons-react';
+import { Search, FilePlus, Files, X } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
@@ -225,12 +220,12 @@ export function DocumentsListScreen({
                   : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
               )}
             >
-              {showSearch ? <IconX size={18} /> : <IconSearch size={18} />}
+              {showSearch ? <X size={18} /> : <Search size={18} />}
             </button>
             <button type="button"               onClick={onNewDocument}
               className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
             >
-              <IconFilePlus size={18} />
+              <FilePlus size={18} />
             </button>
           </div>
         </div>
@@ -246,7 +241,7 @@ export function DocumentsListScreen({
               className="overflow-hidden"
             >
               <div className="relative mb-3">
-                <IconSearch
+                <Search
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
                 />
@@ -312,7 +307,7 @@ export function DocumentsListScreen({
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
-              <IconFiles size={28} className="text-[var(--sand-muted)]" />
+              <Files size={28} className="text-[var(--sand-muted)]" />
             </div>
             <p className="text-sm font-semibold text-[var(--sand-muted)]">
               {searchQuery

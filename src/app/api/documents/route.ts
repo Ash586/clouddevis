@@ -4,11 +4,31 @@ import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
+import { generateDocNumber } from '@/lib/dgi';
 import { TRIAL_DAYS, canCreateDocument, getDocLimit } from '@/lib/subscription';
 import { validateDocumentBody } from '@/lib/validation';
+import { getLang } from '@/lib/api-i18n';
+import { buildEditorMeta } from '@/lib/editorMeta';
 import type { DocumentState } from '@/types';
 
 const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT', bon_commande: 'BC', bon_reception: 'BR' };
+
+const DOC_PREFIX_MAP: Record<string, string> = {
+  DEVIS: 'DEV', FACTURE: 'FAC', PROFORMA: 'PRO', BC: 'BC', BR: 'BR', INTERVENTION: 'INT', ATTACHEMENT: 'ATT',
+};
+
+async function assignDocumentNumber(userId: string, type: string): Promise<string> {
+  const prefix = DOC_PREFIX_MAP[type] ?? 'DOC';
+  const year = new Date().getFullYear();
+  const startsWith = `${prefix}-${year}-`;
+  const last = await prisma.document.findFirst({
+    where: { userId, type: type as 'DEVIS', number: { startsWith } },
+    orderBy: { number: 'desc' },
+    select: { number: true },
+  });
+  const lastSeq = last?.number ? parseInt(last.number.split('-')[2] ?? '0', 10) : 0;
+  return generateDocNumber(type, (isNaN(lastSeq) ? 0 : lastSeq) + 1);
+}
 
 export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
@@ -69,7 +89,16 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
         orderBy,
         skip,
         take: limit,
-        include: { client: { select: { name: true } } },
+        select: {
+          id: true,
+          number: true,
+          type: true,
+          status: true,
+          totalTTC: true,
+          date: true,
+          createdAt: true,
+          client: { select: { name: true } },
+        },
       }),
       prisma.document.count({ where }),
       prisma.document.groupBy({
@@ -97,7 +126,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       documents: docs.map(d => ({
         id: d.id, number: d.number, type: d.type, status: d.status,
         client: d.client?.name || '',
-        total: d.totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        total: d.totalTTC,
         date: d.date.toLocaleDateString('fr-DZ'),
         createdAt: d.createdAt.toLocaleDateString('fr-DZ'),
       })),
@@ -145,7 +174,7 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
     }
 
     const body = await req.json();
-    const validation = validateDocumentBody(body);
+    const validation = validateDocumentBody(body, getLang(req));
     if (!validation.valid) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
@@ -190,64 +219,7 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
 
     const rawCustomFields = (typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}) as Record<string, unknown>;
 
-    // Build _editorMeta — all fields missing dedicated columns in Document model
-    const editorMeta: Record<string, unknown> = {
-      // persist tvaRate explicitly so load doesn't reverse-compute from computed amounts
-      tvaRate: Number(doc.tvaRate) || 0,
-      logoSize: typeof doc.logoSize === 'string' ? doc.logoSize : 'md',
-      // client tax fields (stored on Client model, also snapshot here for loaded docs)
-      clientInfo: doc.clientInfo || {},
-      // artisan mode
-      artisanInfo: doc.artisanInfo || null,
-      // discount
-      discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
-      // stamp duty
-      stampDuty: doc.stampDuty || { rate: 1, minAmount: 5, maxAmount: 2500 },
-      // payment details
-      paymentDetails: doc.paymentDetails || { terms: '', iban: '' },
-      // chantier
-      chantierAddress: doc.chantierAddress || '',
-      chantierType: doc.chantierType || '',
-      chantierSurface: doc.chantierSurface || 0,
-      chantierEtat: doc.chantierEtat || '',
-      chantierProtection: doc.chantierProtection || '',
-      // materiaux
-      materiauxMarque: doc.materiauxMarque || '',
-      materiauxType: doc.materiauxType || '',
-      materiauxCouleur: doc.materiauxCouleur || '',
-      materiauxQte: doc.materiauxQte || 0,
-      // garanties
-      garantieMO: doc.garantieMO || '',
-      garantieMateriaux: doc.garantieMateriaux || '',
-      garantieNotes: doc.garantieNotes || '',
-      // devis-specific company info
-      companyTagline: doc.companyTagline || '',
-      companyCapital: doc.companyCapital || '',
-      rcNumber: doc.rcNumber || '',
-      nisNumber: doc.nisNumber || '',
-      aiNumber: doc.aiNumber || '',
-      rib: doc.rib || '',
-      bankName: doc.bankName || '',
-      bankAgency: doc.bankAgency || '',
-      ccpNumber: doc.ccpNumber || '',
-      validityDays: doc.validityDays ?? 30,
-      reference: doc.reference || '',
-      showWatermark: doc.showWatermark || false,
-      previewTemplate: doc.previewTemplate || 'haussmann',
-      objet: doc.objet || '',
-      docCity: doc.docCity || '',
-      // signature fields
-      companyPhone: doc.companyPhone || '',
-      sigClientSubtitle: doc.sigClientSubtitle || '',
-      sigClientNameFr: doc.sigClientNameFr || '',
-      sigClientRole: doc.sigClientRole || '',
-      sigClientRoleFr: doc.sigClientRoleFr || '',
-      sigClientNameAr: doc.sigClientNameAr || '',
-      sigCompanyNameFr: doc.sigCompanyNameFr || '',
-      sigDirectionNameFr: doc.sigDirectionNameFr || '',
-      sigDirectionRole: doc.sigDirectionRole || '',
-      sigDirectionNameAr: doc.sigDirectionNameAr || '',
-    };
+    const editorMeta = buildEditorMeta(doc as Record<string, unknown>);
 
     const created = await prisma.document.create({
       data: {
@@ -312,7 +284,7 @@ export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
       return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
     }
 
-    const doc = await prisma.document.findFirst({ where: { id, userId: session.userId } });
+    const doc = await prisma.document.findFirst({ where: { id, userId: session.userId }, select: { id: true } });
     if (!doc) return NextResponse.json({ error: 'Document non trouvé' }, { status: 404 });
 
     const updated = await prisma.document.update({

@@ -108,6 +108,7 @@ model Account {
 model Session {
   id        String   @id @default(cuid())
   userId    String
+  jti       String   @unique
   expiresAt DateTime
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -146,8 +147,6 @@ model Client {
   @@index([userId])
   @@index([name])
   @@index([userId, name])
-  @@index([userId, nif])
-  @@index([userId, rc])
 }
 
 // ── Company Model (NEW — separate from User.companyInfo Json) ──
@@ -171,10 +170,9 @@ model Company {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents Document[]
   @@index([userId])
-  @@index([nif])
 }
 
-// ── LineItem Model (NEW — separate from Document.items Json) ──
+// ── LineItem Model — kept for backward-compat DB relation; never queried via prisma.lineItem ──
 model LineItem {
   id         String   @id @default(cuid())
   documentId String
@@ -197,7 +195,7 @@ model Document {
   companyId     String?        // NEW — link to Company model
   type          DocumentType   @default(DEVIS)
   status        DocumentStatus @default(DRAFT)
-  number        String         @default("")
+  number        String?
   date          DateTime       @default(now())
   validUntil    DateTime?
   deliveryDate  DateTime?
@@ -234,6 +232,7 @@ model Document {
   team          Team?          @relation(fields: [teamId], references: [id], onDelete: SetNull)
   lineItems     LineItem[]     // NEW — separate LineItem model
   shares        DocumentShare[]
+  @@unique([userId, number])
   @@index([userId])
   @@index([clientId])
   @@index([companyId])

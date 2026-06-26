@@ -35,9 +35,10 @@ export function generateInterventionHTML({
   <title>Rapport d'Intervention - ${e(doc.documentNumber)}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
+    @page { size: A4; margin: 0 }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; line-height: 1.5; color: #1a1a1a; background: #f5f5f5; }
-    .page { width: 210mm; height: 297mm; background: white; margin: 20px auto; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    body { font-family: 'Inter', sans-serif; line-height: 1.5; color: #1a1a1a; background: white; }
+    .page { width: 210mm; min-height: 297mm; background: white; margin: 0 auto; padding: 32px; }
     .header { border-bottom: 3px solid ${design.primaryHex}; margin-bottom: 24px; padding-bottom: 16px; }
     .header h1 { font-size: 28px; font-weight: 700; color: ${design.primaryHex}; margin-bottom: 12px; }
     .header-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 12px; margin-top: 8px; }

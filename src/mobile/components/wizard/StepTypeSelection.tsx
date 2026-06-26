@@ -5,12 +5,7 @@
 // 2×2 grid of document type cards with large touch targets
 // ============================================================
 
-import {
-  IconFileText,
-  IconReceipt,
-  IconFileInvoice,
-  IconClipboardList,
-} from '@tabler/icons-react';
+import { FileText, Receipt, ReceiptText, ClipboardList, type LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { DocumentType } from '@/mobile/types';
@@ -24,7 +19,7 @@ interface TypeCard {
   type: DocumentType;
   label: string;
   subtitle: string;
-  icon: typeof IconFileText;
+  icon: LucideIcon;
 }
 
 const TYPE_CARDS: TypeCard[] = [
@@ -32,25 +27,25 @@ const TYPE_CARDS: TypeCard[] = [
     type: 'DEVIS',
     label: 'Devis',
     subtitle: 'Estimation / devis',
-    icon: IconFileText,
+    icon: FileText,
   },
   {
     type: 'FACTURE',
     label: 'Facture',
     subtitle: 'Facturation',
-    icon: IconReceipt,
+    icon: Receipt,
   },
   {
     type: 'PROFORMA',
     label: 'Proforma',
     subtitle: 'Facture proforma',
-    icon: IconFileInvoice,
+    icon: ReceiptText,
   },
   {
     type: 'BC',
     label: 'Bon de Commande',
     subtitle: 'Commande',
-    icon: IconClipboardList,
+    icon: ClipboardList,
   },
 ];
 
@@ -115,7 +110,7 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                     : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
                 )}
               >
-                <Icon size={24} stroke={1.8} />
+                <Icon size={24} strokeWidth={1.8} />
               </div>
               <div className="text-center">
                 <p

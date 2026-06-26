@@ -5,7 +5,7 @@
 // Logo left, user avatar right
 // ============================================================
 
-import { IconBell } from '@tabler/icons-react';
+import { Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HomeHeaderProps {
@@ -47,7 +47,7 @@ export function HomeHeader({
           )}
           aria-label="Notifications"
         >
-          <IconBell size={20} stroke={1.8} />
+          <Bell size={20} strokeWidth={1.8} />
           {hasNotifications && (
             <span
               className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border-2"

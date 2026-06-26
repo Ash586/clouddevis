@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
@@ -80,6 +80,9 @@ export default function DocumentsPage() {
 
   const totalRevenue = Object.values(typeBreakdown).reduce((sum, t) => sum + t.total, 0);
 
+  const lastFetchRef = useRef(0);
+  const STALE_MS = 2 * 60 * 1000;
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -101,6 +104,7 @@ export default function DocumentsPage() {
       setTotalDocs(data.pagination.total);
       setStatusBreakdown(data.statusBreakdown);
       setTypeBreakdown(data.typeBreakdown);
+      lastFetchRef.current = Date.now();
     } catch {
       setDocs([]);
     } finally {
@@ -112,7 +116,9 @@ export default function DocumentsPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
-    const onVisible = () => { if (document.visibilityState === 'visible') fetchData(); };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastFetchRef.current > STALE_MS) fetchData();
+    };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [fetchData]);
@@ -278,10 +284,10 @@ export default function DocumentsPage() {
                           <td className="py-3 px-3"><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-16 bg-[var(--navy-3)] rounded-full" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-28 bg-[var(--navy-3)] rounded" /></td>
-                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ml-auto" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ms-auto" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></td>
                           <td className="py-3 px-3"><div className="h-4 w-14 bg-[var(--navy-3)] rounded-full" /></td>
-                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ml-auto" /></td>
+                          <td className="py-3 px-3 text-end"><div className="h-4 w-16 bg-[var(--navy-3)] rounded ms-auto" /></td>
                         </tr>
                       ))
                     ) : docs.length === 0 ? (

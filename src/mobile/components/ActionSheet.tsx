@@ -7,15 +7,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  IconEdit,
-  IconCopy,
-  IconShare,
-  IconDownload,
-  IconPrinter,
-  IconTrash,
-  IconX,
-} from '@tabler/icons-react';
+import { Pencil, Copy, Share2, Download, Printer, Trash2, X, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Document } from '@/mobile/types';
 
@@ -24,18 +16,18 @@ import type { Document } from '@/mobile/types';
 interface Action {
   id: string;
   label: string;
-  icon: typeof IconEdit;
+  icon: LucideIcon;
   color: string;
   destructive?: boolean;
 }
 
 const DOCUMENT_ACTIONS: Action[] = [
-  { id: 'edit', label: 'Modifier', icon: IconEdit, color: '#2563EB' },
-  { id: 'duplicate', label: 'Dupliquer', icon: IconCopy, color: '#059669' },
-  { id: 'share', label: 'Partager', icon: IconShare, color: '#7C3AED' },
-  { id: 'download', label: 'Télécharger PDF', icon: IconDownload, color: '#D97706' },
-  { id: 'print', label: 'Imprimer', icon: IconPrinter, color: '#6B7280' },
-  { id: 'delete', label: 'Supprimer', icon: IconTrash, color: '#EF4444', destructive: true },
+  { id: 'edit', label: 'Modifier', icon: Pencil, color: '#2563EB' },
+  { id: 'duplicate', label: 'Dupliquer', icon: Copy, color: '#059669' },
+  { id: 'share', label: 'Partager', icon: Share2, color: '#7C3AED' },
+  { id: 'download', label: 'Télécharger PDF', icon: Download, color: '#D97706' },
+  { id: 'print', label: 'Imprimer', icon: Printer, color: '#6B7280' },
+  { id: 'delete', label: 'Supprimer', icon: Trash2, color: '#EF4444', destructive: true },
 ];
 
 // ── Props ────────────────────────────────────────────────────
@@ -130,7 +122,7 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
                 <button type="button"                   onClick={onClose}
                   className="w-8 h-8 rounded-full bg-[var(--navy-3)] flex items-center justify-center active:scale-95 transition-transform"
                 >
-                  <IconX size={16} className="text-[var(--sand-muted)]" />
+                  <X size={16} className="text-[var(--sand-muted)]" />
                 </button>
               </div>
 
@@ -156,7 +148,7 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
                         className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                         style={{ backgroundColor: `${action.color}15` }}
                       >
-                        <Icon size={18} stroke={1.8} style={{ color: action.color }} />
+                        <Icon size={18} strokeWidth={1.8} style={{ color: action.color }} />
                       </div>
                       <span
                         className={cn(

@@ -44,7 +44,7 @@ export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
       },
       documents: client.documents.map(d => ({
         id: d.id, number: d.number, type: d.type, status: d.status,
-        total: d.totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
+        total: d.totalTTC,
         date: d.date.toLocaleDateString('fr-DZ'),
       })),
     });

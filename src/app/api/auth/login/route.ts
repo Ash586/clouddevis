@@ -2,23 +2,25 @@ import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession } from '@/lib/auth';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { requireCsrf } from '@/lib/csrf';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
-import { t } from '@/lib/api-i18n';
+import { t, getLang } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
   try {
+    requireCsrf(req);
     const body = await req.json();
-    const validation = validateAuthInput(body, 'login');
+    const validation = validateAuthInput(body, 'login', getLang(req));
     if (!validation.valid) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
 
     const { email, password, rememberMe } = body;
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
+    const ip = getClientIP(req);
     const rateCheck = await checkRateLimit(`login:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });

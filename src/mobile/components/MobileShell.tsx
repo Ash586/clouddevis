@@ -8,7 +8,7 @@
 
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useSyncStore } from '@/stores/syncStore';
@@ -185,7 +185,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
               )}
               aria-label="Retour"
             >
-              <IconArrowLeft size={18} />
+              <ArrowLeft size={18} />
               <span className="text-sm font-medium">Retour</span>
             </button>
 

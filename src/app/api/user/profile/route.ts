@@ -4,6 +4,7 @@ import { withAuth } from '@/lib/auth';
 import { migrateUserCompany } from '@/lib/migrateDeprecated';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { encryptObjectFields, decryptObjectFields, COMPANY_INFO_SENSITIVE_KEYS } from '@/lib/fieldCrypto';
 
 export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
@@ -18,7 +19,15 @@ export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
     });
 
     if (!user) return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 });
-    return NextResponse.json({ user });
+
+    const decrypted = {
+      ...user,
+      companyInfo: decryptObjectFields(
+        user.companyInfo as Record<string, unknown> | null,
+        COMPANY_INFO_SENSITIVE_KEYS as unknown as string[]
+      ),
+    };
+    return NextResponse.json({ user: decrypted });
   } catch (error) {
     logger.error('GET /api/user/profile', { error: String(error) });
     throw error;
@@ -33,6 +42,13 @@ export const PUT = withApiErrorHandling(withAuth(async (req, session) => {
 
     for (const key of allowedFields) {
       if (body[key] !== undefined) data[key] = body[key];
+    }
+
+    if (data.companyInfo && typeof data.companyInfo === 'object') {
+      data.companyInfo = encryptObjectFields(
+        data.companyInfo as Record<string, unknown>,
+        COMPANY_INFO_SENSITIVE_KEYS as unknown as string[]
+      );
     }
 
     if (data.mode && !['ARTISAN', 'ENTREPRISE'].includes(data.mode as string)) {

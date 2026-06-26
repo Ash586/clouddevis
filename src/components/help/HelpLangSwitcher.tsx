@@ -44,7 +44,7 @@ export function HelpLangSwitcher({ current, onChange }: Props) {
                 <span>{lang.flag}</span>
                 <span>{lang.label}</span>
                 {lang.code === current && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ml-auto">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ms-auto">
                     <path d="M5 12l5 5L20 7" />
                   </svg>
                 )}

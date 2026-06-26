@@ -7,16 +7,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  IconArrowLeft,
-  IconSearch,
-  IconUserPlus,
-  IconUsers,
-  IconPhone,
-  IconMail,
-  IconX,
-  IconCheck,
-} from '@tabler/icons-react';
+import { ArrowLeft, Search, UserPlus, Users, Phone, Mail, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
@@ -193,7 +184,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                 className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
                 aria-label="Retour"
               >
-                <IconArrowLeft size={18} />
+                <ArrowLeft size={18} />
               </button>
             )}
             <div>
@@ -209,13 +200,13 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
             }}
             className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
           >
-            <IconUserPlus size={18} />
+            <UserPlus size={18} />
           </button>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <IconSearch
+          <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
           />
@@ -254,7 +245,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
-                <IconUsers size={28} className="text-[var(--sand-muted)]" />
+                <Users size={28} className="text-[var(--sand-muted)]" />
               </div>
               <p className="text-sm font-semibold text-[var(--sand-muted)]">
                 {searchQuery ? 'Aucun résultat' : 'Aucun client'}
@@ -295,13 +286,13 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                         <div className="flex items-center gap-3 mt-2">
                           {client.phone && (
                             <span className="flex items-center gap-1 text-[11px] text-[var(--sand-muted)]">
-                              <IconPhone size={10} />
+                              <Phone size={10} />
                               {client.phone}
                             </span>
                           )}
                           {client.email && (
                             <span className="flex items-center gap-1 text-[11px] text-[var(--sand-muted)]">
-                              <IconMail size={10} />
+                              <Mail size={10} />
                               {client.email}
                             </span>
                           )}
@@ -322,7 +313,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                       <button type="button"                         onClick={() => deleteClient(client.id)}
                         className="py-2 px-3 rounded-xl text-xs font-semibold bg-red-400/10 text-red-400 active:scale-[0.98] transition-transform"
                       >
-                        <IconX size={14} />
+                        <X size={14} />
                       </button>
                     </div>
                   </motion.div>

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "npx prisma generate && next build",
     "build:prod": "npx prisma generate && npx prisma migrate deploy && next build",
+    "analyze": "ANALYZE=true npm run build",
     "db:push": "npx prisma db push",
     "start": "next start",
     "lint": "eslint",
@@ -43,7 +44,6 @@
     "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "^10.59.0",
     "@sentry/replay": "^10.59.0",
-    "@tabler/icons-react": "^3.44.0",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^12.40.0",
     "jose": "^6.2.3",
@@ -59,6 +59,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.9",
     "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",

@@ -2,11 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  IconWifiOff,
-  IconRefresh,
-  IconCheck,
-} from '@tabler/icons-react';
+import { WifiOff, RefreshCw, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSyncStore } from '@/stores/syncStore';
 
@@ -58,7 +54,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
               'bg-emerald-500/15 border-b border-emerald-500/20',
             )}
           >
-            <IconCheck size={14} className="text-emerald-400" />
+            <Check size={14} className="text-emerald-400" />
             <span className="text-xs font-semibold text-emerald-400">
               Synchronisé ✓
             </span>
@@ -80,7 +76,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
             )}
           >
             <div className="flex items-center gap-2">
-              <IconWifiOff size={14} className="text-amber-400 flex-shrink-0" />
+              <WifiOff size={14} className="text-amber-400 flex-shrink-0" />
               <span className="text-xs font-semibold text-amber-400">
                 Hors ligne
                 {pendingCount > 0 && (
@@ -96,7 +92,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
                   'bg-amber-400/10 active:bg-amber-400/20 transition-colors',
                 )}
               >
-                <IconRefresh size={12} className="text-amber-400" />
+                <RefreshCw size={12} className="text-amber-400" />
                 <span className="text-[10px] font-semibold text-amber-400">Réessayer</span>
               </button>
             )}

@@ -1,17 +1,19 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, createSession } from '@/lib/auth';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { createSession } from '@/lib/auth';
+import { requireCsrf } from '@/lib/csrf';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
 import { validateAuthInput } from '@/lib/validation';
 import { logger } from '@/lib/logger';
-import { t } from '@/lib/api-i18n';
+import { t, getLang } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
   try {
+    requireCsrf(req);
     const body = await req.json();
-    const validation = validateAuthInput(body, 'register');
+    const validation = validateAuthInput(body, 'register', getLang(req));
     if (!validation.valid) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
@@ -27,7 +29,7 @@ async function postHandler(req: Request) {
       }
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
+    const ip = getClientIP(req);
     const rateCheck = await checkRateLimit(`register:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });
@@ -38,12 +40,11 @@ async function postHandler(req: Request) {
       return NextResponse.json({ error: t(req, 'emailTaken') }, { status: 409 });
     }
 
-    const hashed = await hashPassword(password);
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password: hashed,
+        password,
         mode: mode === 'entreprise' ? 'ENTREPRISE' : 'ARTISAN',
         sector: sector || null,
         country: country || 'algeria',

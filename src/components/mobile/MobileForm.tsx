@@ -39,7 +39,7 @@ export function MobileForm({ fields, onSubmit, submitLabel = 'Submit', loading =
         <div key={field.name}>
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             {field.label}
-            {field.required && <span className="text-red-500 ml-1">*</span>}
+            {field.required && <span className="text-red-500 ms-1">*</span>}
           </label>
           {field.type === 'textarea' ? (
             <textarea

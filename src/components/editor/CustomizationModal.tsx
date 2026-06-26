@@ -127,13 +127,13 @@ export function CustomizationModal({
           <div>
             <h3 className="text-[16px] font-bold text-[var(--sand)] tracking-tight">
               {te('customizeTitle')}
-              <span className="ml-2 text-[11px] font-semibold text-white bg-[var(--green-3)] px-2 py-0.5 rounded-md align-middle uppercase">
+              <span className="ms-2 text-[11px] font-semibold text-white bg-[var(--green-3)] px-2 py-0.5 rounded-md align-middle uppercase">
                 {te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}
               </span>
             </h3>
             <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">{te('customizeSubtitle') || 'Cliquez sur une catégorie pour voir les champs'}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">✕</button>
+          <button type="button" onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -me-1">✕</button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 bg-[var(--navy-2)]">
           {showSectionCreator ? (
@@ -230,8 +230,8 @@ export function CustomizationModal({
                               return updated;
                             });
                             setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
-                          }} className="text-red-400 hover:text-red-300 ml-1">✕</button>
-                          <button type="button" onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-300 ml-0.5">✎</button>
+                          }} className="text-red-400 hover:text-red-300 ms-1">✕</button>
+                          <button type="button" onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-300 ms-0.5">✎</button>
                         </span>
                       ))}
                     </div>

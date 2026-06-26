@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { DocumentState, LineItem, UserMode, WizardStep, DocumentType } from '@/types';
 import { DEFAULT_SECTION_ORDER } from '@/types';
 import { calculateDocument, generateDocumentNumber, formatDateISO, generateId } from '@/lib/calculations';
+import { parseEditorMeta } from '@/lib/editorMeta';
 
 export const LS_KEY = 'clouddevis-draft';
 
@@ -179,9 +180,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
         return null; 
       })();
           setDoc(prev => {
-            // Extract _editorMeta from customFields — contains all fields with no dedicated column
-            const meta = (customFields._editorMeta || {}) as Record<string, unknown>;
-            const editorMeta = meta as Record<string, unknown>;
+            const editorMeta = parseEditorMeta(customFields._editorMeta);
 
             return {
               ...prev,

@@ -102,7 +102,7 @@ export function PrestationsSection() {
                 {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</span>}
               </div>
             </div>
-            <div className="flex items-center gap-0.5 shrink-0 ml-1">
+            <div className="flex items-center gap-0.5 shrink-0 ms-1">
               <button type="button" onClick={() => idx > 0 && moveItem(idx, idx - 1)} disabled={idx === 0}
                 className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move up" aria-label="Move item up">
                 <ChevronRight size={14} className="rotate-[270deg]" />

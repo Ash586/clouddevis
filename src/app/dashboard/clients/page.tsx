@@ -53,9 +53,12 @@ export default function ClientsPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
+  const [fetchError, setFetchError] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const fetchClients = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
       if (searchQuery) params.set('search', searchQuery);
@@ -64,9 +67,11 @@ export default function ClientsPage() {
         const data = await res.json();
         setClients(data.clients);
         setPagination(data.pagination);
+      } else {
+        setFetchError(true);
       }
     } catch {
-      /* empty */
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -101,6 +106,7 @@ export default function ClientsPage() {
   async function handleSave() {
     if (!form.name.trim()) return;
     setSaving(true);
+    setSaveError(false);
     try {
       const isEdit = !!editTarget;
       const url = isEdit ? `/api/clients/${editTarget.id}` : '/api/clients';
@@ -114,9 +120,11 @@ export default function ClientsPage() {
         setEditTarget(null);
         setForm(EMPTY_FORM);
         fetchClients();
+      } else {
+        setSaveError(true);
       }
     } catch {
-      /* empty */
+      setSaveError(true);
     } finally {
       setSaving(false);
     }
@@ -158,6 +166,12 @@ export default function ClientsPage() {
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-4 py-2.5 text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)] focus:border-[var(--green-2)] transition-all"
               />
+
+              {fetchError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {t('fetchError')}
+                </div>
+              )}
 
               {loading ? (
                 <div className="space-y-3">
@@ -363,6 +377,9 @@ export default function ClientsPage() {
               {saving ? '...' : editTarget ? t('save') : t('add')}
             </Button>
           </div>
+          {saveError && (
+            <p className="mt-2 text-xs text-red-600">{t('saveError')}</p>
+          )}
         </div>
       </Modal>
 

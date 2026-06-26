@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
@@ -14,9 +14,6 @@ import { useEditor } from '@/hooks/useEditor';
 import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
-import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML, generateHaussmannHTML, generateNordicHTML, generateVeloursHTML, generateIndustrielleHTML } from '@/lib/generateDocumentHTML';
-import { generateBonCommandeHTML } from '@/lib/generateBonCommandeHTML';
-import { generateInterventionHTML } from '@/lib/generateInterventionHTML';
 import { getDesign } from '@/lib/documentDesign';
 import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions } from '@/types';
 import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef } from '@/types';
@@ -59,6 +56,7 @@ function EditorContent() {
   const tu = useTranslations('preview.units');
   const tp = useTranslations('preview');
   const tc = useTranslations('common');
+  const locale = useLocale();
 
   const [fieldPrefs, setFieldPrefs] = useState<Record<string, Record<string, string[]>> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -233,28 +231,36 @@ function EditorContent() {
     const catOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
     const design = getDesign(doc.documentType);
-    const html = doc.documentType === 'attachement'
-      ? generateAttachementHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-      : doc.documentType === 'devis'
-      ? (doc.previewTemplate === 'nordic'
-          ? generateNordicHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-          : doc.previewTemplate === 'velours'
-          ? generateVeloursHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-          : doc.previewTemplate === 'industrielle'
-          ? generateIndustrielleHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-          : generateHaussmannHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design }))
-      : doc.documentType === 'bc'
-      ? generateBonCommandeHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-      : doc.documentType === 'intervention'
-      ? generateInterventionHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
-      : generateDocumentHTML({
-        isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels,
-        grouped, uncategorized, catOrder, doc, results,
-        tc: (k: string) => tc(k),
-        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
+    const commonArgs = { doc, results, sf, bv, vb, currency: tc('currency'), design, lang: locale,
+      tc: (k: string) => tc(k),
+      tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>),
+    };
+    let html: string;
+    if (doc.documentType === 'attachement') {
+      const { generateAttachementHTML } = await import('@/lib/generateDocumentHTML');
+      html = generateAttachementHTML(commonArgs);
+    } else if (doc.documentType === 'devis') {
+      const mod = await import('@/lib/generateDocumentHTML');
+      const fn = doc.previewTemplate === 'nordic'   ? mod.generateNordicHTML
+               : doc.previewTemplate === 'velours'  ? mod.generateVeloursHTML
+               : doc.previewTemplate === 'industrielle' ? mod.generateIndustrielleHTML
+               : mod.generateHaussmannHTML;
+      html = fn(commonArgs);
+    } else if (doc.documentType === 'bc') {
+      const { generateBonCommandeHTML } = await import('@/lib/generateBonCommandeHTML');
+      html = generateBonCommandeHTML(commonArgs);
+    } else if (doc.documentType === 'intervention') {
+      const { generateInterventionHTML } = await import('@/lib/generateInterventionHTML');
+      html = generateInterventionHTML(commonArgs);
+    } else {
+      const { generateDocumentHTML } = await import('@/lib/generateDocumentHTML');
+      html = generateDocumentHTML({
+        ...commonArgs,
+        isEnt, docTypeLabel, catLabels, paymentLabels, unitLabels,
+        grouped, uncategorized, catOrder,
         te: (k: string) => te(k),
         tu: (k: string) => tu(k),
-        customSections, currency: tc('currency'),
+        customSections,
         companyTagline: doc.companyTagline,
         companyCapital: doc.companyCapital,
         rcNumber: doc.rcNumber,
@@ -266,7 +272,9 @@ function EditorContent() {
         ccpNumber: doc.ccpNumber,
         validityDays: doc.validityDays,
         reference: doc.reference,
+        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
       });
+    }
 
     if (!printWindow) { window.print(); return; }
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -538,7 +546,7 @@ function EditorContent() {
           </div>
 
           {/* Right: Undo/Redo (always) + lg-only Settings/Save/PDF (mobile bottom bar covers these below lg) */}
-          <div className="flex items-center gap-1 ml-auto">
+          <div className="flex items-center gap-1 ms-auto">
             <button type="button" onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
             <button type="button" onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
             <div className="hidden lg:flex items-center gap-1">
@@ -618,7 +626,7 @@ function EditorContent() {
             {itemErrors && (
               <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
                 <AlertTriangle size={12} /><span>{itemErrors}</span>
-                <button type="button" onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
+                <button type="button" onClick={() => setItemErrors(null)} className="ms-auto text-red-500 hover:text-red-400">✕</button>
               </div>
             )}
             {/* Scrollable section area */}

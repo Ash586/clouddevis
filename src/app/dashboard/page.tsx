@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
@@ -32,6 +32,9 @@ export default function DashboardPage() {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
 
+  const lastFetchRef = useRef(0);
+  const STALE_MS = 2 * 60 * 1000;
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -53,6 +56,7 @@ export default function DashboardPage() {
       setUserMode(dashData.user?.mode || '');
       setCompanyInfo(dashData.user?.companyInfo || null);
       setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
+      lastFetchRef.current = Date.now();
     } catch {
       setDocs([]);
     } finally {
@@ -90,7 +94,9 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    const onVisible = () => { if (document.visibilityState === 'visible') fetchData(); };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastFetchRef.current > STALE_MS) fetchData();
+    };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [fetchData]);

@@ -832,7 +832,9 @@
     "number": "N°",
     "type": "Type",
     "date": "Date",
-    "total": "Total"
+    "total": "Total",
+    "fetchError": "Impossible de charger les clients. Vérifiez votre connexion.",
+    "saveError": "Erreur lors de l'enregistrement. Réessayez."
   },
   "documents": {
     "title": "Documents",

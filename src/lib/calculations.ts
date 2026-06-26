@@ -1,7 +1,6 @@
 import type { DocumentState, CalculationResult } from '@/types';
 import {
-  shouldApplyTimbre,
-  calculateTimbreFiscal,
+  calculateDocumentFull,
   numberToFrenchWords as dgiNumberToFrenchWords,
   numberToArabicWords as dgiNumberToArabicWords,
   formatCurrency as dgiFormatCurrency,
@@ -14,39 +13,31 @@ export function round2(n: number): number {
 }
 
 export function calculateDocument(doc: DocumentState): CalculationResult {
-  const subTotalHT = round2(doc.items.reduce((sum, it) => sum + it.quantity * it.unitPrice, 0));
+  const items = doc.items.map(it => ({
+    quantity: it.quantity,
+    unitPrice: it.unitPrice,
+    tvaRate: doc.tvaRate,
+  }));
 
-  const discountAmount = round2(
-    doc.discount.value > 0
-      ? doc.discount.type === 'percentage'
-        ? subTotalHT * doc.discount.value / 100
-        : doc.discount.value
-      : 0
+  const result = calculateDocumentFull(
+    items,
+    doc.documentType,
+    doc.discount,
+    doc.acompte ?? 0,
+    doc.paymentMode
   );
 
-  const totalHTAfterDiscount = round2(subTotalHT - discountAmount);
-  const tvaAmount = round2(totalHTAfterDiscount * doc.tvaRate / 100);
-  const totalTTC = round2(totalHTAfterDiscount + tvaAmount);
-
-  // Timbre fiscal — fixed 1,000 DA per Art. 220 CII
-  // Applies to all documents except devis and attachements, when total TTC >= 10,000 DA
-  const timbreApplies = shouldApplyTimbre(doc.documentType, totalTTC);
-  const timbreFiscal = calculateTimbreFiscal(timbreApplies);
-
-  const acompte = doc.acompte ?? 0;
-  const netAPayer = round2(totalTTC + timbreFiscal - acompte);
-
   return {
-    subTotalHT,
+    subTotalHT: result.subTotalHT,
     tvaRate: doc.tvaRate,
-    tvaAmount,
-    timbreFiscal,
-    discountAmount,
-    totalHTAfterDiscount,
-    totalTTC,
-    acompte,
-    netAPayer,
-    totalInWords: dgiNumberToFrenchWords(netAPayer),
+    tvaAmount: result.totalTVA,
+    timbreFiscal: result.timbreAmount,
+    discountAmount: result.discountAmount,
+    totalHTAfterDiscount: result.totalHTAfterDiscount,
+    totalTTC: result.totalTTC,
+    acompte: result.acompte,
+    netAPayer: result.netAPayer,
+    totalInWords: dgiNumberToFrenchWords(result.netAPayer),
   };
 }
 

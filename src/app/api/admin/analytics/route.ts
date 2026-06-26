@@ -116,12 +116,12 @@ export const GET = withApiErrorHandling(withAdminAuth(async (req, session) => {
       }
     }
 
-    // Unique sessions
-    const uniqueSessions = await prisma.pageView.findMany({
-      where: { timestamp: { gte: startDate } },
-      select: { sessionId: true },
-    });
-    const uniqueSessionCount = new Set(uniqueSessions.map((s: { sessionId: string | null }) => s.sessionId).filter(Boolean) as string[]).size;
+    // Unique sessions — counted in DB to avoid loading all rows into memory
+    const uniqueSessionResult = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(DISTINCT "sessionId") AS count FROM "PageView"
+      WHERE "timestamp" >= ${startDate}
+    `;
+    const uniqueSessionCount = Number(uniqueSessionResult[0]?.count ?? 0);
 
     // Paid users in period
     const paidUsersInPeriod = await prisma.user.count({

@@ -114,7 +114,7 @@ export default function AdminPartnersPage() {
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        <p className="text-xs font-semibold text-slate-500 self-center mr-1">Statut :</p>
+        <p className="text-xs font-semibold text-slate-500 self-center me-1">Statut :</p>
         {['', 'PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED'].map(s => (
           <button type="button"             key={s}
             onClick={() => { setStatusFilter(s); setPage(1); }}
@@ -126,7 +126,7 @@ export default function AdminPartnersPage() {
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        <p className="text-xs font-semibold text-slate-500 self-center mr-1">Niveau :</p>
+        <p className="text-xs font-semibold text-slate-500 self-center me-1">Niveau :</p>
         {['', 'AFFILIATE', 'SUPER_AFFILIATE'].map(t => (
           <button type="button"             key={t}
             onClick={() => { setTierFilter(t); setPage(1); }}

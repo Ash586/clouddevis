@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconMaximize, IconMinimize, IconRefresh } from '@tabler/icons-react';
+import { Maximize, Minimize, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MobileShell } from '@/mobile/components/MobileShell';
 
@@ -58,13 +58,13 @@ export default function MobilePreviewPage() {
                 className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Réinitialiser"
               >
-                <IconRefresh size={18} />
+                <RefreshCw size={18} />
               </button>
               <button type="button"                 onClick={() => setFullscreen(false)}
                 className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Quitter le plein écran"
               >
-                <IconMinimize size={18} />
+                <Minimize size={18} />
               </button>
             </div>
           </motion.div>
@@ -117,7 +117,7 @@ export default function MobilePreviewPage() {
                   'hover:bg-[rgba(15,39,71,0.12)] hover:text-[var(--sand)]',
                 )}
               >
-                <IconRefresh size={14} />
+                <RefreshCw size={14} />
                 Réinitialiser
               </button>
               <button type="button"                 onClick={() => setFullscreen(true)}
@@ -129,7 +129,7 @@ export default function MobilePreviewPage() {
                   'hover:bg-[#1D4ED8]',
                 )}
               >
-                <IconMaximize size={14} />
+                <Maximize size={14} />
                 Plein écran
               </button>
             </div>

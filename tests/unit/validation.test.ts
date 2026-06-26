@@ -127,9 +127,9 @@ describe('validateDocumentBody', () => {
     expect(result.errors['items.0.qty']).toBeDefined();
   });
 
-  test('item with unitPrice > 1000000 produces error', () => {
+  test('item with unitPrice > 10000000 produces error', () => {
     const result = validateDocumentBody({
-      items: [{ designation: 'Item', quantity: 1, unitPrice: 1000001 }],
+      items: [{ designation: 'Item', quantity: 1, unitPrice: 10000001 }],
     });
     expect(result.valid).toBe(false);
     expect(result.errors['items.0.price']).toBeDefined();
@@ -224,7 +224,7 @@ describe('validateAuthInput - login', () => {
 describe('validateAuthInput - register', () => {
   test('valid register with strong password returns valid true', () => {
     const result = validateAuthInput(
-      { email: 'user@example.com', password: 'Strong1!', name: 'John' },
+      { email: 'user@example.com', password: 'StrongPass1!', name: 'John' },
       'register',
     );
     expect(result.valid).toBe(true);
@@ -236,7 +236,7 @@ describe('validateAuthInput - register', () => {
       'register',
     );
     expect(result.valid).toBe(false);
-    expect(result.errors.password).toMatch(/^Minimum 6 caractères/);
+    expect(result.errors.password).toMatch(/^Minimum 12/);
   });
 
   test('weak password produces errors.password', () => {
@@ -346,11 +346,11 @@ describe('validateLineItem', () => {
     expect(result.errors.unitPrice).toBeDefined();
   });
 
-  test('unitPrice > 1000000 produces errors.unitPrice', () => {
+  test('unitPrice > 10000000 produces errors.unitPrice', () => {
     const result = validateLineItem({
       designation: 'Item',
       quantity: 1,
-      unitPrice: 1000001,
+      unitPrice: 10000001,
     });
     expect(result.valid).toBe(false);
     expect(result.errors.unitPrice).toBeDefined();

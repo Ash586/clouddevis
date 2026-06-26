@@ -9,15 +9,16 @@
 import { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import {
-  IconFileText,
-  IconReceipt,
-  IconFileInvoice,
-  IconClipboardList,
-  IconConfetti,
-  IconEdit,
-  IconCopy,
-  IconTrash,
-} from '@tabler/icons-react';
+  FileText,
+  Receipt,
+  ReceiptText,
+  ClipboardList,
+  PartyPopper,
+  Pencil,
+  Copy,
+  Trash2,
+  type LucideIcon,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
@@ -27,12 +28,12 @@ import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
 const SWIPE_THRESHOLD = -80;
 const ACTION_WIDTH = 76;
 
-const DOC_ICONS: Record<DocumentType, typeof IconFileText> = {
-  DEVIS: IconFileText,
-  FACTURE: IconReceipt,
-  PROFORMA: IconFileInvoice,
-  BC: IconClipboardList,
-  BR: IconConfetti,
+const DOC_ICONS: Record<DocumentType, LucideIcon> = {
+  DEVIS: FileText,
+  FACTURE: Receipt,
+  PROFORMA: ReceiptText,
+  BC: ClipboardList,
+  BR: PartyPopper,
 };
 
 const DOC_COLORS: Record<DocumentType, string> = {
@@ -181,7 +182,7 @@ export function DocumentRow({
           className="h-full flex flex-col items-center justify-center bg-blue-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <IconEdit size={20} stroke={2} />
+          <Pencil size={20} strokeWidth={2} />
           <span className="text-[10px] font-semibold mt-1">Modifier</span>
         </motion.button>
         <motion.button
@@ -190,7 +191,7 @@ export function DocumentRow({
           className="h-full flex flex-col items-center justify-center bg-emerald-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <IconCopy size={20} stroke={2} />
+          <Copy size={20} strokeWidth={2} />
           <span className="text-[10px] font-semibold mt-1">Dupliquer</span>
         </motion.button>
         <motion.button
@@ -199,7 +200,7 @@ export function DocumentRow({
           className="h-full flex flex-col items-center justify-center bg-red-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <IconTrash size={20} stroke={2} />
+          <Trash2 size={20} strokeWidth={2} />
           <span className="text-[10px] font-semibold mt-1">Supprimer</span>
         </motion.button>
       </div>
@@ -232,7 +233,7 @@ export function DocumentRow({
           className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
           style={{ backgroundColor: `${iconColor}15` }}
         >
-          <Icon size={20} stroke={1.8} style={{ color: iconColor }} />
+          <Icon size={20} strokeWidth={1.8} style={{ color: iconColor }} />
         </div>
 
         {/* ── Info ────────────────────────────────────────────── */}

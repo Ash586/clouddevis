@@ -175,11 +175,11 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                 </p>
                 <p className="text-xs text-[var(--sand-muted)]">{urgent ? (t('trialUrgent') || 'Votre accès expire bientôt ! Passez à un forfait payant.') : t('trialUpgradeHint')}</p>
                 <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')} className="mt-3 sm:hidden w-full justify-center">
-                  {t('upgrade')} <ArrowRight size={14} className="ml-1" />
+                  {t('upgrade')} <ArrowRight size={14} className="ms-1" />
                 </Button>
               </div>
               <Button variant={urgent ? 'danger' : 'gold'} onClick={() => router.push('/dashboard/subscription')} className="hidden sm:inline-flex shrink-0">
-                {t('upgrade')} <ArrowRight size={14} className="ml-1" />
+                {t('upgrade')} <ArrowRight size={14} className="ms-1" />
               </Button>
             </div>
           </Card>
@@ -293,10 +293,10 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             {stats.totalDocs === 0 ? (
               <div className="flex items-center justify-center gap-3">
                 <Button variant="primary" onClick={() => router.push('/dashboard/editor?type=devis')}>
-                  <Plus size={16} className="mr-1" /> {t('createFirstDevis')}
+                  <Plus size={16} className="me-1" /> {t('createFirstDevis')}
                 </Button>
                 <Button variant="ghost" onClick={() => router.push('/dashboard/editor?type=facture')}>
-                  <Plus size={16} className="mr-1" /> {t('createFirstFacture')}
+                  <Plus size={16} className="me-1" /> {t('createFirstFacture')}
                 </Button>
               </div>
             ) : (
@@ -329,7 +329,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                       <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
                     </div>
                     <button type="button" onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
-                      className="shrink-0 -mr-1 p-2 text-red-400/70 active:text-red-400 active:bg-red-400/10 rounded-lg transition-colors" aria-label={tc('delete')}>
+                      className="shrink-0 -me-1 p-2 text-red-400/70 active:text-red-400 active:bg-red-400/10 rounded-lg transition-colors" aria-label={tc('delete')}>
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -424,7 +424,7 @@ function KpiCard({ label, value, sub, icon, suffix, color = 'default', hero = fa
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/15 text-white mb-3">{icon}</div>
           <p className="text-[11px] font-bold text-white/70 uppercase tracking-wider mb-1">{label}</p>
           <p className="font-sora font-extrabold text-white leading-tight text-2xl">
-            {value}{suffix ? <span className="text-sm font-bold text-white/70 ml-1">{suffix}</span> : ''}
+            {value}{suffix ? <span className="text-sm font-bold text-white/70 ms-1">{suffix}</span> : ''}
           </p>
           {sub && <p className="text-[11px] text-white/60 mt-1">{sub}</p>}
         </div>
@@ -439,7 +439,7 @@ function KpiCard({ label, value, sub, icon, suffix, color = 'default', hero = fa
       </div>
       <p className="text-[11px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-1">{label}</p>
       <p className="font-sora font-extrabold text-[var(--sand)] leading-tight text-xl">
-        {value}{suffix ? <span className="text-sm font-bold text-[var(--sand-muted)] ml-1">{suffix}</span> : ''}
+        {value}{suffix ? <span className="text-sm font-bold text-[var(--sand-muted)] ms-1">{suffix}</span> : ''}
       </p>
       {sub && <p className="text-[11px] text-[var(--sand-muted)] mt-1">{sub}</p>}
     </Card>

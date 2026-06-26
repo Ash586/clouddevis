@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
-import { hashPassword } from '@/lib/auth';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { revokeAllSessions } from '@/lib/auth';
+import { requireCsrf } from '@/lib/csrf';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 import { t } from '@/lib/api-i18n';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
 async function postHandler(req: Request) {
   try {
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
+    requireCsrf(req);
+    const ip = getClientIP(req);
     const rateCheck = await checkRateLimit(`reset:${ip}`, 10, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: t(req, 'rateLimit') }, { status: 429 });
@@ -39,16 +41,18 @@ async function postHandler(req: Request) {
       return NextResponse.json({ error: t(req, 'tokenExpired') }, { status: 400 });
     }
 
-    const hashed = await hashPassword(password);
     await prisma.user.update({
       where: { id: resetToken.userId },
-      data: { password: hashed },
+      data: { password },
     });
 
     await prisma.passwordResetToken.update({
       where: { id: resetToken.id },
       data: { usedAt: new Date() },
     });
+
+    // Revoke all active sessions — forces re-login on all devices
+    await revokeAllSessions(resetToken.userId);
 
     return NextResponse.json({ success: true, message: t(req, 'passwordResetSuccess') });
   } catch (error) {

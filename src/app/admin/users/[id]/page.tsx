@@ -118,7 +118,7 @@ export default function AdminUserDetailPage() {
           <h1 className="text-2xl font-black text-slate-900">{t('nav.userDetail')}</h1>
           <p className="text-sm text-slate-400">{user.name} — {user.email}</p>
         </div>
-        <div className="ml-auto flex gap-2">
+        <div className="ms-auto flex gap-2">
           <button type="button" onClick={handleSuspendToggle} disabled={actionLoading}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-50 ${user.suspended ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}>
             {actionLoading ? (

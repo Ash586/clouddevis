@@ -7,15 +7,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import {
-  IconBuilding,
-  IconCheck,
-  IconChevronRight,
-  IconEdit,
-  IconPhoto,
-  IconUsers,
-  IconX,
-} from '@tabler/icons-react';
+import { Building, ChevronRight, Pencil, Image, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
@@ -91,7 +83,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             <button type="button"               onClick={() => setIsEditing(!isEditing)}
               className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
             >
-              {isEditing ? <IconX size={18} /> : <IconEdit size={18} />}
+              {isEditing ? <X size={18} /> : <Pencil size={18} />}
             </button>
           )}
         </div>
@@ -114,7 +106,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
-              <IconBuilding size={28} className="text-[var(--sand-muted)]" />
+              <Building size={28} className="text-[var(--sand-muted)]" />
             </div>
             <p className="text-sm font-semibold text-[var(--sand-muted)]">
               Aucune société configurée
@@ -141,12 +133,12 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 {company?.logo ? (
                   <img src={company.logo} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  <IconBuilding size={28} className="text-[var(--sand-muted)]" />
+                  <Building size={28} className="text-[var(--sand-muted)]" />
                 )}
               </div>
               {isEditing && (
                 <button type="button" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-95 transition-transform">
-                  <IconPhoto size={14} />
+                  <Image size={14} />
                   Ajouter un logo
                 </button>
               )}
@@ -216,7 +208,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[rgba(37,99,235,0.1)] flex items-center justify-center">
-                    <IconUsers size={18} className="text-[#1D4ED8]" />
+                    <Users size={18} className="text-[#1D4ED8]" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-semibold text-[var(--sand)]">Gérer les clients</p>
@@ -225,7 +217,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                     </p>
                   </div>
                 </div>
-                <IconChevronRight size={16} className="text-[var(--sand-muted)]" />
+                <ChevronRight size={16} className="text-[var(--sand-muted)]" />
               </button>
             )}
 

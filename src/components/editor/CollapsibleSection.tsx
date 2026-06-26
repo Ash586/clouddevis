@@ -65,7 +65,7 @@ export function CollapsibleSection({
 
         {/* Drag handle */}
         {draggable && (
-          <span className="shrink-0 cursor-grab active:cursor-grabbing text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors p-0.5 -ml-1">
+          <span className="shrink-0 cursor-grab active:cursor-grabbing text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors p-0.5 -ms-1">
             <GripVertical size={15} />
           </span>
         )}
@@ -90,7 +90,7 @@ export function CollapsibleSection({
             {title}
           </span>
           {eyeOff && (
-            <span className="text-[10px] text-[var(--sand-muted)]/60 font-normal ml-1 shrink-0">masqué</span>
+            <span className="text-[10px] text-[var(--sand-muted)]/60 font-normal ms-1 shrink-0">masqué</span>
           )}
         </button>
 

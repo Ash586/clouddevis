@@ -7,16 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import {
-  IconLanguage,
-  IconReceipt,
-  IconMoon,
-  IconCloudOff,
-  IconTrash,
-  IconChevronRight,
-  IconRefresh,
-  IconInfoCircle,
-} from '@tabler/icons-react';
+import { Languages, Receipt, Moon, CloudOff, Trash2, ChevronRight, RefreshCw, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -74,7 +65,7 @@ export function SettingsScreen() {
         {/* ── Language ──────────────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-3">
-            <IconLanguage size={18} className="text-[var(--sand-muted)]" />
+            <Languages size={18} className="text-[var(--sand-muted)]" />
             <span className="text-sm font-semibold text-[var(--sand)]">Langue</span>
           </div>
           <div className="px-4 pb-3 flex gap-2">
@@ -97,7 +88,7 @@ export function SettingsScreen() {
         {/* ── Default TVA Rate ─────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-3">
-            <IconReceipt size={18} className="text-[var(--sand-muted)]" />
+            <Receipt size={18} className="text-[var(--sand-muted)]" />
             <span className="text-sm font-semibold text-[var(--sand)]">TVA par défaut</span>
           </div>
           <div className="px-4 pb-3 flex gap-2">
@@ -122,7 +113,7 @@ export function SettingsScreen() {
           <button type="button"             onClick={() => handleSettingChange('autoSync', !settings.autoSync)}
             className="w-full px-4 py-3 flex items-center gap-3"
           >
-            <IconCloudOff size={18} className="text-[var(--sand-muted)]" />
+            <CloudOff size={18} className="text-[var(--sand-muted)]" />
             <span className="text-sm font-semibold text-[var(--sand)] flex-1 text-left">
               Synchronisation automatique
             </span>
@@ -145,7 +136,7 @@ export function SettingsScreen() {
         {/* ── Data Summary ─────────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] p-4">
           <div className="flex items-center gap-2 mb-3">
-            <IconInfoCircle size={16} className="text-[var(--sand-muted)]" />
+            <Info size={16} className="text-[var(--sand-muted)]" />
             <span className="text-xs font-semibold text-[var(--sand-muted)]">Données locales</span>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -191,11 +182,11 @@ export function SettingsScreen() {
             <button type="button"               onClick={() => setShowClearConfirm(true)}
               className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
             >
-              <IconTrash size={18} className="text-red-400" />
+              <Trash2 size={18} className="text-red-400" />
               <span className="text-sm font-semibold text-red-400 flex-1 text-left">
                 Effacer toutes les données
               </span>
-              <IconChevronRight size={16} className="text-red-400/50" />
+              <ChevronRight size={16} className="text-red-400/50" />
             </button>
           )}
         </div>

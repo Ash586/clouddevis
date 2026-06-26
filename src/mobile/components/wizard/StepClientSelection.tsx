@@ -8,13 +8,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  IconSearch,
-  IconPlus,
-  IconCheck,
-  IconUser,
-  IconX,
-} from '@tabler/icons-react';
+import { Search, Plus, Check, User, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
@@ -139,7 +133,7 @@ export function StepClientSelection({
             exit={{ opacity: 0, height: 0 }}
             className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(37,99,235,0.12)] border border-[rgba(37,99,235,0.25)]"
           >
-            <IconUser size={16} className="text-[var(--green-3)] flex-shrink-0" />
+            <User size={16} className="text-[var(--green-3)] flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--sand)] truncate">
                 {selectedClient.name}
@@ -154,7 +148,7 @@ export function StepClientSelection({
               className="w-7 h-7 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
               aria-label="Retirer le client"
             >
-              <IconX size={14} />
+              <X size={14} />
             </button>
           </motion.div>
         )}
@@ -162,7 +156,7 @@ export function StepClientSelection({
 
       {/* Search bar */}
       <div className="relative">
-        <IconSearch
+        <Search
           size={18}
           className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
         />
@@ -195,7 +189,7 @@ export function StepClientSelection({
               )}
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] flex-shrink-0">
-                <IconUser size={18} stroke={1.8} />
+                <User size={18} strokeWidth={1.8} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[var(--sand)] truncate">
@@ -220,7 +214,7 @@ export function StepClientSelection({
             'active:scale-[0.97] transition-all',
           )}
         >
-          <IconPlus size={18} />
+          <Plus size={18} />
           Nouveau client
         </button>
       ) : (
@@ -281,7 +275,7 @@ export function StepClientSelection({
               />
               {nifValid === true && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                  <IconCheck size={12} className="text-white" strokeWidth={3} />
+                  <Check size={12} className="text-white" strokeWidth={3} />
                 </span>
               )}
             </div>
@@ -348,7 +342,7 @@ export function StepClientSelection({
       {/* Empty state */}
       {!showNewClientForm && filteredClients.length === 0 && (
         <div className="text-center py-6">
-          <IconUser size={32} stroke={1.5} className="text-[var(--sand-muted)] mx-auto mb-2" />
+          <User size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-2" />
           <p className="text-sm text-[var(--sand-muted)]">
             {searchQuery ? 'Aucun client trouvé' : 'Aucun client enregistré'}
           </p>

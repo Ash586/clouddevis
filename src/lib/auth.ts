@@ -33,7 +33,12 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 
 export async function createSession(user: { id: string; email: string; name: string; mode: string; sector: string | null; country: string; language: string; subscriptionStatus: string }, rememberMe = false) {
   const expiry = rememberMe ? '30d' : '7d';
-  const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
+  const maxAgeSec = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
+
+  // Use crypto.randomUUID as a unique JWT ID for revocation
+  const jti = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2);
 
   const token = await new SignJWT({
     userId: user.id,
@@ -48,21 +53,32 @@ export async function createSession(user: { id: string; email: string; name: str
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(expiry)
     .setIssuedAt()
+    .setJti(jti)
     .sign(getSecret());
+
+  // Persist session to DB for revocation support
+  const { prisma } = await import('@/lib/prisma');
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      jti,
+      expiresAt: new Date(Date.now() + maxAgeSec * 1000),
+    },
+  });
 
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge,
+    maxAge: maxAgeSec,
     path: '/',
   });
 
   return token;
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+export async function getSession(): Promise<(SessionUser & { jti?: string }) | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
@@ -78,6 +94,7 @@ export async function getSession(): Promise<SessionUser | null> {
       country: (payload.country as string) || 'algeria',
       language: (payload.language as string) || 'fr',
       subscriptionStatus: (payload.subscriptionStatus as string) || 'TRIAL',
+      jti: payload.jti as string | undefined,
     };
   } catch {
     return null;
@@ -86,23 +103,51 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function clearSession() {
   const cookieStore = await cookies();
+  const session = await getSession();
+
+  // Revoke session in DB if jti is present
+  if (session?.jti) {
+    try {
+      const { prisma } = await import('@/lib/prisma');
+      await prisma.session.deleteMany({ where: { jti: session.jti } });
+    } catch { /* non-fatal — cookie is still cleared */ }
+  }
+
   cookieStore.delete(COOKIE_NAME);
 }
 
-/** Get session and verify user is not suspended. Returns null if suspended. */
+/** Revoke all active sessions for a user (e.g. after password change). */
+export async function revokeAllSessions(userId: string): Promise<void> {
+  const { prisma } = await import('@/lib/prisma');
+  await prisma.session.deleteMany({ where: { userId } });
+}
+
+/** Get session, verify it is not revoked, and verify user is not suspended. */
 export async function getActiveSession(): Promise<SessionUser | null> {
   const session = await getSession();
   if (!session) return null;
 
-  // Dynamic import to avoid edge-compat issues in proxy context
   const { prisma } = await import('@/lib/prisma');
+
+  // Check DB session exists (revocation check) — only for sessions with jti
+  if (session.jti) {
+    const dbSession = await prisma.session.findUnique({
+      where: { jti: session.jti },
+      select: { id: true, expiresAt: true },
+    });
+    if (!dbSession || dbSession.expiresAt < new Date()) return null;
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
     select: { suspended: true },
   });
 
   if (user?.suspended) return null;
-  return session;
+
+  // Strip internal jti before returning to callers
+  const { jti: _jti, ...sessionUser } = session;
+  return sessionUser;
 }
 
 /** Check if a user is suspended by ID */
@@ -138,7 +183,7 @@ type AuthenticatedHandler = (
 export function withAuth(handler: AuthenticatedHandler): any {
   return async (req: NextRequest, ctx?: Record<string, unknown>) => {
     requireCsrf(req);
-    const session = await getSession();
+    const session = await getActiveSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

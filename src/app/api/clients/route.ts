@@ -28,37 +28,46 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
         orderBy: { updatedAt: 'desc' },
         skip,
         take: limit,
-        include: {
-          _count: { select: { documents: true } },
-          documents: {
-            orderBy: { createdAt: 'desc' },
-            take: 1,
-            select: { number: true, totalTTC: true, createdAt: true },
-          },
-        },
+        include: { _count: { select: { documents: true } } },
       }),
       prisma.client.count({ where }),
     ]);
 
+    // Single query for latest document per client (avoids N+1)
+    const clientIds = clients.map(c => c.id);
+    type LastDocRow = { clientId: string; number: string; totalTTC: number; createdAt: Date };
+    const lastDocs = clientIds.length
+      ? await prisma.$queryRaw<LastDocRow[]>`
+          SELECT DISTINCT ON ("clientId") "clientId", "number", "totalTTC", "createdAt"
+          FROM "Document"
+          WHERE "clientId" = ANY(${clientIds}::text[])
+          ORDER BY "clientId", "createdAt" DESC
+        `
+      : [];
+    const lastDocMap = new Map(lastDocs.map(d => [d.clientId, d]));
+
     return NextResponse.json({
-      clients: clients.map(c => ({
-        id: c.id,
-        name: c.name,
-        address: c.address,
-        phone: c.phone,
-        email: c.email,
-        nif: c.nif,
-        nis: c.nis,
-        rc: c.rc,
-        ai: c.ai,
-        docCount: c._count.documents,
-        lastDoc: c.documents[0] ? {
-          number: c.documents[0].number,
-          total: c.documents[0].totalTTC,
-          date: c.documents[0].createdAt.toLocaleDateString('fr-DZ'),
-        } : null,
-        createdAt: c.createdAt.toLocaleDateString('fr-DZ'),
-      })),
+      clients: clients.map(c => {
+        const ld = lastDocMap.get(c.id);
+        return {
+          id: c.id,
+          name: c.name,
+          address: c.address,
+          phone: c.phone,
+          email: c.email,
+          nif: c.nif,
+          nis: c.nis,
+          rc: c.rc,
+          ai: c.ai,
+          docCount: c._count.documents,
+          lastDoc: ld ? {
+            number: ld.number,
+            total: ld.totalTTC,
+            date: new Date(ld.createdAt).toLocaleDateString('fr-DZ'),
+          } : null,
+          createdAt: c.createdAt.toLocaleDateString('fr-DZ'),
+        };
+      }),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {

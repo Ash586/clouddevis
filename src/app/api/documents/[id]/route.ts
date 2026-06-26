@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { calculateDocument } from '@/lib/calculations';
 import { logger } from '@/lib/logger';
 import { validateDocumentBody } from '@/lib/validation';
+import { getLang } from '@/lib/api-i18n';
+import { buildEditorMeta } from '@/lib/editorMeta';
 import { DocumentState } from '@/types';
 
 const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
@@ -25,11 +27,11 @@ export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
 export const PUT = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
     const { id } = await ctx!.params as { id: string };
-    const existing = await prisma.document.findFirst({ where: { id, userId: session.userId } });
+    const existing = await prisma.document.findFirst({ where: { id, userId: session.userId }, select: { id: true } });
     if (!existing) return NextResponse.json({ error: 'Document introuvable' }, { status: 404 });
 
     const body = await req.json();
-    const validation = validateDocumentBody(body);
+    const validation = validateDocumentBody(body, getLang(req));
     if (!validation.valid) {
       return NextResponse.json({ error: Object.values(validation.errors).join(', ') }, { status: 400 });
     }
@@ -71,53 +73,7 @@ export const PUT = withApiErrorHandling(withAuth(async (req, session, ctx) => {
 
     const rawCustomFields = (typeof doc.customFields === 'object' && doc.customFields ? doc.customFields : {}) as Record<string, unknown>;
 
-    // Build _editorMeta — all fields missing dedicated columns in Document model
-    const editorMeta: Record<string, unknown> = {
-      tvaRate: Number(doc.tvaRate) || 0,
-      logoSize: typeof doc.logoSize === 'string' ? doc.logoSize : 'md',
-      clientInfo: doc.clientInfo || {},
-      artisanInfo: doc.artisanInfo || null,
-      discount: doc.discount || { type: 'percentage', value: 0, reason: '' },
-      stampDuty: doc.stampDuty || { rate: 1, minAmount: 5, maxAmount: 2500 },
-      paymentDetails: doc.paymentDetails || { terms: '', iban: '' },
-      chantierAddress: doc.chantierAddress || '',
-      chantierType: doc.chantierType || '',
-      chantierSurface: doc.chantierSurface || 0,
-      chantierEtat: doc.chantierEtat || '',
-      chantierProtection: doc.chantierProtection || '',
-      materiauxMarque: doc.materiauxMarque || '',
-      materiauxType: doc.materiauxType || '',
-      materiauxCouleur: doc.materiauxCouleur || '',
-      materiauxQte: doc.materiauxQte || 0,
-      garantieMO: doc.garantieMO || '',
-      garantieMateriaux: doc.garantieMateriaux || '',
-      garantieNotes: doc.garantieNotes || '',
-      companyTagline: doc.companyTagline || '',
-      companyCapital: doc.companyCapital || '',
-      rcNumber: doc.rcNumber || '',
-      nisNumber: doc.nisNumber || '',
-      aiNumber: doc.aiNumber || '',
-      rib: doc.rib || '',
-      bankName: doc.bankName || '',
-      bankAgency: doc.bankAgency || '',
-      ccpNumber: doc.ccpNumber || '',
-      validityDays: doc.validityDays ?? 30,
-      reference: doc.reference || '',
-      showWatermark: doc.showWatermark || false,
-      previewTemplate: doc.previewTemplate || 'haussmann',
-      objet: doc.objet || '',
-      docCity: doc.docCity || '',
-      companyPhone: doc.companyPhone || '',
-      sigClientSubtitle: doc.sigClientSubtitle || '',
-      sigClientNameFr: doc.sigClientNameFr || '',
-      sigClientRole: doc.sigClientRole || '',
-      sigClientRoleFr: doc.sigClientRoleFr || '',
-      sigClientNameAr: doc.sigClientNameAr || '',
-      sigCompanyNameFr: doc.sigCompanyNameFr || '',
-      sigDirectionNameFr: doc.sigDirectionNameFr || '',
-      sigDirectionRole: doc.sigDirectionRole || '',
-      sigDirectionNameAr: doc.sigDirectionNameAr || '',
-    };
+    const editorMeta = buildEditorMeta(doc as Record<string, unknown>);
 
     const updated = await prisma.document.update({
       where: { id },
@@ -173,7 +129,7 @@ export const PUT = withApiErrorHandling(withAuth(async (req, session, ctx) => {
 export const DELETE = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
     const { id } = await ctx!.params as { id: string };
-    const existing = await prisma.document.findFirst({ where: { id, userId: session.userId } });
+    const existing = await prisma.document.findFirst({ where: { id, userId: session.userId }, select: { id: true } });
     if (!existing) return NextResponse.json({ error: 'Document introuvable' }, { status: 404 });
 
     await prisma.document.delete({ where: { id } });

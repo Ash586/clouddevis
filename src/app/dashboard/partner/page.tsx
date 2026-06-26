@@ -110,7 +110,7 @@ export default function PartnerDashboardPage() {
           <div>
             <h1 className="text-2xl font-bold" style={{ color: textColor }}>Espace Partenaire</h1>
             <p className="text-sm mt-1" style={{ color: mutedColor }}>
-              {isSuper && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold mr-2" style={{ background: 'rgba(30,64,175,0.15)', color: 'var(--green-3)' }}>Super Affiliate</span>}
+              {isSuper && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold me-2" style={{ background: 'rgba(30,64,175,0.15)', color: 'var(--green-3)' }}>Super Affiliate</span>}
               Taux de commission : <span className="font-bold" style={{ color: 'var(--green-3)' }}>{data.stats.commissionRate || 20}%</span>
             </p>
           </div>
@@ -252,7 +252,7 @@ export default function PartnerDashboardPage() {
                 <div key={c.id} className="flex items-center justify-between py-2 border-b text-sm" style={{ borderColor: cardBorder }}>
                   <div>
                     <span className="font-semibold" style={{ color: textColor }}>{c.amount.toLocaleString('fr-DZ')} DA</span>
-                    <span className="ml-2 text-xs" style={{ color: mutedColor }}>{c.type === 'OVERRIDE' ? 'Override' : 'Directe'}</span>
+                    <span className="ms-2 text-xs" style={{ color: mutedColor }}>{c.type === 'OVERRIDE' ? 'Override' : 'Directe'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs" style={{ color: mutedColor }}>{c.createdAt}</span>

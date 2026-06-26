@@ -3,7 +3,9 @@
 // Single source of truth for Algerian tax validation & calculation
 // ============================================================
 
-import { round2 } from '@/lib/calculations';
+function round2(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
 
 // ── Validation Constants ─────────────────────────────────────
 
@@ -163,19 +165,26 @@ export function validateCompanyTaxIds(taxIds: {
  * Rules (Art. 220 CII):
  * - Applies to all documents EXCEPT devis and attachements
  * - Applies when total TTC >= 10,000 DA
+ * - Exempt when payment is by cheque or virement (non-cash)
  * - Amount is fixed at 1,000 DA
  *
  * @param documentType - The type of document
  * @param totalTTC - Total TTC amount
+ * @param paymentMode - Payment mode (especes | cheque | virement | cb)
  * @returns true if timbre fiscal should be applied
  */
 export function shouldApplyTimbre(
   documentType: string,
-  totalTTC: number
+  totalTTC: number,
+  paymentMode?: string
 ): boolean {
   // Devis and attachements are exempt
   const exemptTypes = ['DEVIS', 'devis', 'ATTACHEMENT', 'attachement'];
   if (exemptTypes.includes(documentType)) return false;
+
+  // Cheque and virement are exempt per Art. 220 CII
+  const exemptModes = ['cheque', 'virement'];
+  if (paymentMode && exemptModes.includes(paymentMode.toLowerCase())) return false;
 
   // Must meet threshold
   return totalTTC >= TIMBRE_FISCAL_THRESHOLD;
@@ -209,6 +218,88 @@ export interface DocumentCalculationResult {
   netAPayer: number;
 }
 
+export interface DiscountInput {
+  type: 'percentage' | 'fixed';
+  value: number;
+}
+
+export interface FullDocumentCalculationResult {
+  subTotalHT: number;
+  discountAmount: number;
+  totalHTAfterDiscount: number;
+  totalTVA: number;
+  totalTTC: number;
+  timbreFiscal: boolean;
+  timbreAmount: number;
+  acompte: number;
+  netAPayer: number;
+}
+
+/**
+ * Unified calculation engine — single source of truth for all platforms.
+ * Supports per-item TVA rates, discount (percentage or fixed), paymentMode.
+ */
+export function calculateDocumentFull(
+  items: LineItemInput[],
+  documentType: string,
+  discount: DiscountInput = { type: 'percentage', value: 0 },
+  acompte: number = 0,
+  paymentMode?: string
+): FullDocumentCalculationResult {
+  let subTotalHT = 0;
+  let totalTVA = 0;
+
+  for (const item of items) {
+    const itemHT = item.quantity * item.unitPrice;
+    subTotalHT += itemHT;
+    // TVA applied after discount proportionally per item
+  }
+
+  subTotalHT = round2(subTotalHT);
+
+  const discountAmount = round2(
+    discount.value > 0
+      ? discount.type === 'percentage'
+        ? subTotalHT * discount.value / 100
+        : discount.value
+      : 0
+  );
+
+  const totalHTAfterDiscount = round2(subTotalHT - discountAmount);
+
+  // Recompute TVA on discounted HT, preserving per-item rates weighted by item share
+  if (subTotalHT > 0) {
+    const discountRatio = totalHTAfterDiscount / subTotalHT;
+    for (const item of items) {
+      const itemHT = item.quantity * item.unitPrice;
+      totalTVA += itemHT * discountRatio * item.tvaRate / 100;
+    }
+  } else {
+    for (const item of items) {
+      totalTVA += item.quantity * item.unitPrice * item.tvaRate / 100;
+    }
+  }
+
+  totalTVA = round2(totalTVA);
+  const totalTTC = round2(totalHTAfterDiscount + totalTVA);
+
+  const timbreFiscal = shouldApplyTimbre(documentType, totalTTC, paymentMode);
+  const timbreAmount = calculateTimbreFiscal(timbreFiscal);
+  const netAPayer = round2(totalTTC + timbreAmount - acompte);
+
+  return {
+    subTotalHT,
+    discountAmount,
+    totalHTAfterDiscount,
+    totalTVA,
+    totalTTC,
+    timbreFiscal,
+    timbreAmount,
+    acompte,
+    netAPayer,
+  };
+}
+
 /**
  * Calculate all document totals from line items
  *
@@ -220,7 +311,8 @@ export interface DocumentCalculationResult {
 export function calculateDocumentTotals(
   items: LineItemInput[],
   documentType: string,
-  acompte: number = 0
+  acompte: number = 0,
+  paymentMode?: string
 ): DocumentCalculationResult {
   let subTotalHT = 0;
   let totalTVA = 0;
@@ -239,7 +331,7 @@ export function calculateDocumentTotals(
   const totalTTC = round2(subTotalHT + totalTVA);
 
   // Timbre fiscal
-  const timbreFiscal = shouldApplyTimbre(documentType, totalTTC);
+  const timbreFiscal = shouldApplyTimbre(documentType, totalTTC, paymentMode);
   const timbreAmount = calculateTimbreFiscal(timbreFiscal);
 
   const netAPayer = round2(totalTTC + timbreAmount - acompte);
@@ -336,14 +428,34 @@ export function numberToFrenchWords(n: number): string {
   function toWords(num: number): string {
     if (num === 0) return '';
     let r = '';
-    if (num >= 1000000) { r += toWords(Math.floor(num / 1000000)) + ' million '; num %= 1000000; }
+    if (num >= 1000000) {
+      const m = Math.floor(num / 1000000);
+      r += toWords(m) + (m > 1 ? ' millions ' : ' million ');
+      num %= 1000000;
+    }
     if (num >= 1000) { const k = Math.floor(num / 1000); r += (k === 1 ? 'mille ' : toWords(k) + ' mille '); num %= 1000; }
-    if (num >= 100) { const h = Math.floor(num / 100); r += (h === 1 ? 'cent ' : units[h] + ' cent '); num %= 100; }
+    if (num >= 100) {
+      const h = Math.floor(num / 100);
+      const rem = num % 100;
+      if (h === 1) { r += 'cent '; }
+      else { r += units[h] + (rem === 0 ? ' cents ' : ' cent '); }
+      num = rem;
+    }
     if (num >= 20) {
       const t = Math.floor(num / 10);
       const u = num % 10;
-      if (t === 7 || t === 9) { r += tens[t - 1] + (u > 0 ? '-' + units[10 + u] : '') + ' '; }
-      else { r += tens[t] + (u > 0 ? '-' + units[u] : '') + ' '; }
+      if (t === 7) {
+        // 70-79: soixante-dix à soixante-dix-neuf
+        r += 'soixante-' + units[10 + u] + ' ';
+      } else if (t === 8) {
+        // 80-89: quatre-vingts / quatre-vingt-un …
+        r += 'quatre-vingt' + (u === 0 ? 's' : '-' + units[u]) + ' ';
+      } else if (t === 9) {
+        // 90-99: quatre-vingt-dix à quatre-vingt-dix-neuf
+        r += 'quatre-vingt-' + units[10 + u] + ' ';
+      } else {
+        r += tens[t] + (u > 0 ? '-' + units[u] : '') + ' ';
+      }
     } else if (num > 0) { r += units[num] + ' '; }
     return r;
   }

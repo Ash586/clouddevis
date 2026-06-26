@@ -8,11 +8,7 @@
 import { useState, useCallback } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  IconPlus,
-  IconTrash,
-  IconAlertTriangle,
-} from '@tabler/icons-react';
+import { Plus, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
@@ -208,7 +204,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
           'active:scale-[0.97] transition-all',
         )}
       >
-        <IconPlus size={18} />
+        <Plus size={18} />
         Ajouter un article
       </button>
 
@@ -219,7 +215,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
           animate={{ opacity: 1, height: 'auto' }}
           className="flex items-center gap-2.5 p-3 rounded-xl bg-amber-400/10 border border-amber-400/20"
         >
-          <IconAlertTriangle size={18} className="text-amber-400 flex-shrink-0" />
+          <AlertTriangle size={18} className="text-amber-400 flex-shrink-0" />
           <p className="text-xs text-amber-400">
             <span className="font-semibold">Timbre fiscal</span> — Art. 220 CII : +1 000 DA
           </p>
@@ -381,7 +377,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                   'active:scale-[0.97] transition-transform',
                 )}
               >
-                <IconTrash size={16} />
+                <Trash2 size={16} />
                 Supprimer
               </button>
             )}

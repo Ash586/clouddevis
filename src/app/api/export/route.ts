@@ -21,10 +21,19 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
       orderBy: { createdAt: 'desc' },
     });
 
+    // Sanitize a cell value: escape quotes and strip leading formula chars (=,+,-,@,tab,CR)
+    const csvCell = (v: string | number | null | undefined): string => {
+      const str = String(v ?? '').replace(/"/g, '""');
+      // Prefix with single-quote if value starts with a formula trigger character
+      const safe = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
+      return `"${safe}"`;
+    };
+
     if (format === 'csv') {
       const header = 'Number,Type,Client,Date,Total HT,TVA,Total TTC,Status';
       const rows = documents.map(d =>
-        `"${d.number}","${d.type}","${d.client?.name || ''}","${d.date.toISOString().split('T')[0]}","${d.subTotalHT}","${d.tvaAmount}","${d.totalTTC}","${d.status}"`
+        [d.number, d.type, d.client?.name || '', d.date.toISOString().split('T')[0],
+         d.subTotalHT, d.tvaAmount, d.totalTTC, d.status].map(csvCell).join(',')
       );
       const csv = [header, ...rows].join('\n');
 
@@ -38,16 +47,20 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
 
     if (format === 'xls') {
       // HTML table format that Excel opens natively
+      const xlsEsc = (v: string | number | null | undefined): string => {
+        const str = String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
+      };
       const rows = documents.map(d => `
         <tr>
-          <td>${d.number}</td>
-          <td>${d.type}</td>
-          <td>${d.client?.name || ''}</td>
-          <td>${d.date.toISOString().split('T')[0]}</td>
-          <td>${d.subTotalHT}</td>
-          <td>${d.tvaAmount}</td>
-          <td>${d.totalTTC}</td>
-          <td>${d.status}</td>
+          <td>${xlsEsc(d.number)}</td>
+          <td>${xlsEsc(d.type)}</td>
+          <td>${xlsEsc(d.client?.name || '')}</td>
+          <td>${xlsEsc(d.date.toISOString().split('T')[0])}</td>
+          <td>${xlsEsc(d.subTotalHT)}</td>
+          <td>${xlsEsc(d.tvaAmount)}</td>
+          <td>${xlsEsc(d.totalTTC)}</td>
+          <td>${xlsEsc(d.status)}</td>
         </tr>
       `).join('');
 

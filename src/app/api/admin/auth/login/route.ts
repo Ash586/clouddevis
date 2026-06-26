@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createAdminSession } from '@/lib/adminAuth';
-import { checkRateLimit } from '@/lib/rateLimit';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
 
 function simpleHash(str: string): string {
@@ -23,7 +23,7 @@ async function postHandler(req: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ip = getClientIP(req);
     const userAgent = req.headers.get('user-agent') || 'unknown';
     const rateCheck = await checkRateLimit(`admin:${ip}`, 5, 60000);
     if (!rateCheck.allowed) {

@@ -59,7 +59,7 @@ export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false }:
       {doc.artisanInfo.address && <p className="text-[9px] text-slate-500 leading-relaxed">{doc.artisanInfo.address}</p>}
     </div>
   ) : (
-    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-sm ml-auto">CD</div>
+    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-sm ms-auto">CD</div>
   );
 
   const docInfoBlock = (

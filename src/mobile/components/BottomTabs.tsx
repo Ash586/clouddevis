@@ -5,7 +5,7 @@
 // 4 tabs: Accueil | Documents | Société | Réglages
 // ============================================================
 
-import { IconHome, IconFiles, IconBuilding, IconSettings } from '@tabler/icons-react';
+import { Home, Files, Building, Settings, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type TabId = 'home' | 'documents' | 'company' | 'settings';
@@ -13,14 +13,14 @@ export type TabId = 'home' | 'documents' | 'company' | 'settings';
 interface Tab {
   id: TabId;
   label: string;
-  icon: typeof IconHome;
+  icon: LucideIcon;
 }
 
 const TABS: Tab[] = [
-  { id: 'home', label: 'Accueil', icon: IconHome },
-  { id: 'documents', label: 'Documents', icon: IconFiles },
-  { id: 'company', label: 'Société', icon: IconBuilding },
-  { id: 'settings', label: 'Réglages', icon: IconSettings },
+  { id: 'home', label: 'Accueil', icon: Home },
+  { id: 'documents', label: 'Documents', icon: Files },
+  { id: 'company', label: 'Société', icon: Building },
+  { id: 'settings', label: 'Réglages', icon: Settings },
 ];
 
 interface BottomTabsProps {
@@ -68,7 +68,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
               >
                 <Icon
                   size={21}
-                  stroke={isActive ? 2.2 : 1.8}
+                  strokeWidth={isActive ? 2.2 : 1.8}
                   className={cn(
                     'transition-colors duration-200',
                     isActive ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]',

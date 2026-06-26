@@ -33,8 +33,10 @@ export function generateDocumentHTML(params: {
   ccpNumber?: string;
   validityDays?: number;
   reference?: string;
+  lang?: string;
 }) {
-  const { isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency, companyTagline, companyCapital, rcNumber, nisNumber, aiNumber, rib, bankName, bankAgency, ccpNumber, validityDays, reference } = params;
+  const { isEnt, docTypeLabel, design, vb, sf, bv, catLabels, paymentLabels, unitLabels, grouped, uncategorized, catOrder, doc, results, tc, tp, te, tu, customSections, currency, companyTagline, companyCapital, rcNumber, nisNumber, aiNumber, rib, bankName, bankAgency, ccpNumber, validityDays, reference, lang = 'fr' } = params;
+  const isAr = lang === 'ar'; const dir = isAr ? ' dir="rtl"' : ''; const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
 
   const escHtml = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 
@@ -43,7 +45,7 @@ export function generateDocumentHTML(params: {
       <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#94a3b8;font-weight:700;width:22px">${idx}</td>
       <td style="padding:5px 6px;border-bottom:1px solid #e2e8f0;font-size:10px">${escHtml(item.designation)}</td>
       <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:center;white-space:nowrap">${item.quantity}</td>
-      <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#64748b;white-space:nowrap">${unitLabels[item.unit]||item.unit}</td>
+      <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:9px;text-align:center;color:#64748b;white-space:nowrap">${escHtml(unitLabels[item.unit]||item.unit)}</td>
       <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:right;white-space:nowrap">${item.unitPrice.toLocaleString('fr-DZ')}</td>
       <td style="padding:5px 4px;border-bottom:1px solid #e2e8f0;font-size:10px;text-align:right;font-weight:600;white-space:nowrap">${(item.quantity*item.unitPrice).toLocaleString('fr-DZ')} ${currency}</td>
     </tr>`;
@@ -53,8 +55,8 @@ export function generateDocumentHTML(params: {
   const css = `
     ${S('@page','size:A4;margin:0')}
     ${S('*','margin:0;padding:0;box-sizing:border-box')}
-    ${S('body','font-family:Helvetica,Arial,sans-serif;color:#1e293b;font-size:11px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact')}
-    ${S('.page','width:190mm;margin:0 auto;padding:45px 50px 30px;min-height:100vh;display:flex;flex-direction:column')}
+    ${S('body',`font-family:${isAr ? "'Noto Naskh Arabic'," : ''}Helvetica,Arial,sans-serif;color:#1e293b;font-size:11px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact`)}
+    ${S('.page','width:190mm;margin:0 auto;padding:45px 50px 30px;min-height:297mm;display:flex;flex-direction:column')}
     ${S('.top-section','flex:1')}
     ${S('.header','display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px')}
     ${S('.header .brand','display:flex;align-items:flex-start;gap:12px')}
@@ -127,13 +129,14 @@ export function generateDocumentHTML(params: {
   for (const cat of catOrder) {
     const items = grouped[cat]; if (!items) continue;
     const label = catLabels[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
-    tbody.push(`<tr><td colspan="6" style="padding:10px 4px 3px;border:none"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:` + design.accent + `">` + label + `</div></td></tr>`);
+    tbody.push(`<tr><td colspan="6" style="padding:10px 4px 3px;border:none"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:` + design.accent + `">` + s(label) + `</div></td></tr>`);
     for (const item of items) { idx++; tbody.push(itemRow(item, idx)); }
   }
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>` + docTypeLabel + ` - ` + s(doc.documentNumber) + `</title>
-<style>` + css + `</style></head><body>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>` + docTypeLabel + ` - ` + s(doc.documentNumber) + `</title>
+${isAr ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">' : ''}
+<style>` + css + `</style></head><body${dir}>
 <div class="page">
 
 <div class="top-bar"></div>
@@ -189,6 +192,9 @@ export function generateDocumentHTML(params: {
         ` + (sf('clientName') ? `<strong>` + s(doc.clientInfo.name) + `</strong><br>` : '') + `
         ` + (sf('clientAddress') && doc.clientInfo.address ? `<span class="muted">` + s(doc.clientInfo.address) + `</span><br>` : '') + `
         ` + (doc.clientInfo.nif ? `<span class="muted">${te('client.companyNif')} : ` + s(doc.clientInfo.nif) + `</span><br>` : '') + `
+        ` + (doc.clientInfo.rc ? `<span class="muted">RC : ` + s(doc.clientInfo.rc) + `</span><br>` : '') + `
+        ` + (doc.clientInfo.nis ? `<span class="muted">NIS : ` + s(doc.clientInfo.nis) + `</span><br>` : '') + `
+        ` + (doc.clientInfo.ai ? `<span class="muted">N° AI : ` + s(doc.clientInfo.ai) + `</span><br>` : '') + `
         ` + (sf('clientPhone') && doc.clientInfo.phone ? `<span class="muted">` + s(doc.clientInfo.phone) + `</span><br>` : '') + `
         ` + (sf('clientEmail') && doc.clientInfo.email ? `<span class="muted">` + s(doc.clientInfo.email) + `</span>` : '') + `
       </div>
@@ -300,7 +306,7 @@ export function generateDocumentHTML(params: {
 
 </div>
 <script>
-window.onload=function(){setTimeout(function(){window.print();},300);};
+document.fonts.ready.then(function(){window.print();});
 </script>
 </body></html>`;
 }
@@ -323,8 +329,12 @@ export function generateDevisHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, results, tc, tp, currency, design } = params;
+  const { doc, sf, results, tc, tp, currency, design, lang = 'fr' } = params;
+  const isAr = lang === 'ar';
+  const dir = isAr ? ' dir="rtl"' : '';
+  const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const A = { green:'#0B3D2E', gold:'#C4A35A', dark:'#161616', border:'#E4E0D8', cream:'#FFFBF3' };
   const isEnt = doc.mode === 'entreprise';
@@ -335,13 +345,14 @@ export function generateDevisHTML(params: {
   const PX = 36;
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Devis N° ${e(doc.documentNumber)}</title>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>Devis N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@500;600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <style>
+@page{size:A4;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',Helvetica,Arial,sans-serif;color:#161616;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:190mm;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+body{font-family:'Inter'${arFont},Helvetica,Arial,sans-serif;color:#161616;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}
 .accent-top{height:3px;background:${A.green}}
 .doc-header{display:grid;grid-template-columns:1fr auto;gap:20px;padding:${PX-4}px ${PX}px ${PX-14}px;border-bottom:1px solid ${A.border}}
 .co-name{font-family:'Source Serif 4',Georgia,serif;font-size:22px;font-weight:700;color:#161616;letter-spacing:-0.01em;margin-bottom:2px}
@@ -428,14 +439,14 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
     </div>` : ''}
     <div class="devis-num-box">
       <strong>Lieu &amp; Date</strong>
-      ${doc.docCity || companyAddr ? `${e(doc.docCity || companyAddr?.split('—')[0]?.trim() || '')}, le ${doc.date}` : doc.date}
+      ${doc.docCity || companyAddr ? `${e(doc.docCity || companyAddr?.split('—')[0]?.trim() || '')}, le ${e(doc.date)}` : e(doc.date)}
     </div>
   </div>
 </div>
 
 <div class="title-row">
   <div class="doc-title">Devis <span class="num-part">N° ${e(doc.documentNumber)}</span></div>
-  <div class="date-part"><strong>Date</strong>${doc.date}</div>
+  <div class="date-part"><strong>Date</strong>${e(doc.date)}</div>
 </div>
 
 <div class="info-section">
@@ -443,6 +454,7 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
     <span class="cl-label">Client</span>
     <span class="cl-value">${e(doc.clientInfo.name)}</span>
   </div>` : ''}
+  ${(doc.clientInfo.nif||doc.clientInfo.rc||doc.clientInfo.nis||doc.clientInfo.ai) ? `<div style="font-size:10px;color:#666;margin-bottom:8px;line-height:1.7">${doc.clientInfo.nif?`<span>NIF : ${e(doc.clientInfo.nif)}</span>  `:''} ${doc.clientInfo.rc?`<span>RC : ${e(doc.clientInfo.rc)}</span>  `:''} ${doc.clientInfo.nis?`<span>NIS : ${e(doc.clientInfo.nis)}</span>  `:''} ${doc.clientInfo.ai?`<span>N° AI : ${e(doc.clientInfo.ai)}</span>`:''}</div>` : ''}
   ${(doc.objet || doc.notes) ? `<div class="objet-box">
     <strong>Objet</strong>
     ${e(doc.objet || doc.notes || '')}
@@ -525,7 +537,7 @@ ${totalInWords ? `<div class="montant-section">
   <br>Document généré par <strong>CloudDevis</strong>
 </div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }
 
@@ -539,8 +551,12 @@ export function generateHaussmannHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, vb, bv, results, currency } = params;
+  const { doc, sf, vb, bv, results, currency, lang = 'fr' } = params;
+  const isAr = lang === 'ar';
+  const dir = isAr ? ' dir="rtl"' : '';
+  const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const HM = { green:'#0d4a3e', gold:'#c9a227', text:'#111827', muted:'#4b5563', faint:'#9ca3af', rule:'#e5e7eb' };
   const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -549,10 +565,10 @@ export function generateHaussmannHTML(params: {
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
   const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>DEVIS N° ${e(doc.documentNumber)}</title>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>DEVIS N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Montserrat:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
 <div class="page">
 <div style="padding:40px 44px 20px;text-align:center">
   ${doc.companyInfo?.logo ? `<div style="margin-bottom:10px"><img src="${e(doc.companyInfo.logo)}" style="max-height:60px;max-width:180px;object-fit:contain;margin:0 auto" alt="logo"></div>` : ''}
@@ -579,7 +595,7 @@ export function generateHaussmannHTML(params: {
     ${sf('validUntil') && doc.validUntil ? `<div style="margin-bottom:6px"><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Valable jusqu'au</div><div style="font-size:12px;color:${HM.text}">${e(doc.validUntil)}</div></div>` : ''}
     ${sf('orderRef') && doc.bcRef ? `<div><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Réf. BC</div><div style="font-size:12px;color:${HM.text}">${e(doc.bcRef)}</div></div>` : ''}
   </div>
-  ${vb('client') && doc.clientInfo.name ? `<div style="padding-left:24px"><div style="font-size:9px;font-weight:700;color:${HM.gold};letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Adressé à</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;color:${HM.green};line-height:1.1;margin-bottom:6px">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${HM.muted};line-height:1.6">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc)?`<div style="font-size:10px;color:${HM.faint};margin-top:4px">${doc.clientInfo.nif?`<span>NIF ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC ${e(doc.clientInfo.rc)}</span>`:''}</div>`:''}</div>` : ''}
+  ${vb('client') && doc.clientInfo.name ? `<div style="padding-left:24px"><div style="font-size:9px;font-weight:700;color:${HM.gold};letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Adressé à</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;color:${HM.green};line-height:1.1;margin-bottom:6px">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${HM.muted};line-height:1.6">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc||doc.clientInfo.nis||doc.clientInfo.ai)?`<div style="font-size:10px;color:${HM.faint};margin-top:4px">${doc.clientInfo.nif?`<span>NIF ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC ${e(doc.clientInfo.rc)}</span>`:''} ${doc.clientInfo.nis?`<span style="margin-left:10px">NIS ${e(doc.clientInfo.nis)}</span>`:''} ${doc.clientInfo.ai?`<span style="margin-left:10px">N° AI ${e(doc.clientInfo.ai)}</span>`:''}</div>`:''}</div>` : ''}
 </div>
 ${doc.objet ? `<div style="margin:4px 44px 12px;padding:8px 12px;border-left:2px solid ${HM.gold};font-size:11px;color:${HM.muted};line-height:1.5"><strong style="font-size:9px;color:${HM.gold};text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
 ${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 44px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-top:0.5px solid ${HM.rule};border-bottom:1px solid ${HM.green}"><th style="padding:8px 0;text-align:left;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;letter-spacing:0.1em">Désignation</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:44px">Qté</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:34px">U.</th><th style="padding:8px 6px;text-align:right;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:96px">P.U. HT</th><th style="padding:8px 0;text-align:right;font-size:9px;font-weight:700;color:${HM.gold};text-transform:uppercase;width:108px">Total HT</th></tr></thead><tbody>${doc.items.map(item=>`<tr style="border-bottom:0.5px solid ${HM.rule}"><td style="padding:9px 0;line-height:1.4;vertical-align:top"><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;font-weight:600;color:${HM.text}">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${HM.faint};margin-top:1px">${e(item.description)}</div>`:''}</td><td style="padding:9px 6px;text-align:center;color:${HM.muted}">${item.quantity}</td><td style="padding:9px 6px;text-align:center;color:${HM.faint};font-size:10px">${e(item.unit)}</td><td style="padding:9px 6px;text-align:right;color:${HM.muted}">${fmt(item.unitPrice)}</td><td style="padding:9px 0;text-align:right;font-weight:700;color:${HM.gold}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
@@ -598,7 +614,7 @@ ${doc.notes ? `<div style="margin:10px 44px 0;padding:10px 0;font-size:10.5px;co
 ${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 44px 0;border-top:0.75px solid ${HM.rule};padding-top:22px"><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${HM.green};margin-bottom:8px">Le Client</div><div style="height:64px;border-bottom:0.75px solid ${HM.rule};margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px">Signature & cachet</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:12px;color:${HM.muted}">Bon pour accord</div></div><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${HM.green};margin-bottom:8px">Le Prestataire</div><div style="height:64px;border-bottom:0.75px solid ${HM.rule};margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px">${doc.companyInfo?.signature?`<img src="${e(doc.companyInfo.signature)}" style="max-width:100%;max-height:100%" alt="sig">`:'Signature & cachet'}</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:12px;color:${HM.muted};font-weight:600">${e(companyName)}</div></div></div>` : ''}
 <div style="padding:16px 44px 20px;text-align:center;font-size:9px;color:${HM.faint};line-height:2;margin-top:auto">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${doc.companyPhone?`<span style="margin-left:10px">· Tél : ${e(doc.companyPhone)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin-left:10px">· NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin-left:10px">· RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''}<br><span style="color:#d1d5db">Document généré par CloudDevis</span></div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }
 
@@ -612,8 +628,10 @@ export function generateNordicHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, vb, bv, results, currency } = params;
+  const { doc, sf, vb, bv, results, currency, lang = 'fr' } = params;
+  const isAr = lang === 'ar'; const dir = isAr ? ' dir="rtl"' : ''; const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const NK = { teal:'#0f766e', tealLight:'#f0fdf4', tealBorder:'#bbf7d0', tealDark:'#134e4a', text:'#111827', muted:'#6b7280', faint:'#9ca3af', rule:'#e5e7eb' };
   const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -622,10 +640,10 @@ export function generateNordicHTML(params: {
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
   const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
 <div class="page">
 <div style="height:3px;background:${NK.teal};flex-shrink:0"></div>
 <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:32px 40px 20px">
@@ -645,7 +663,7 @@ export function generateNordicHTML(params: {
   </div>
 </div>
 <div style="height:1px;background:${NK.tealBorder};margin:0 40px"></div>
-${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="margin:20px 40px;background:${NK.tealLight};border-left:3px solid ${NK.teal};padding:12px 16px"><div style="font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px">Client</div><div style="font-size:14px;font-weight:700;color:${NK.text}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${NK.muted};margin-top:2px">${e(doc.clientInfo.address)}</div>`:''} ${doc.clientInfo.nif?`<div style="font-size:10px;color:${NK.faint};margin-top:2px">NIF : ${e(doc.clientInfo.nif)}</div>`:''} ${doc.clientInfo.rc?`<span style="font-size:10px;color:${NK.faint};margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''}</div>` : ''}
+${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="margin:20px 40px;background:${NK.tealLight};border-left:3px solid ${NK.teal};padding:12px 16px"><div style="font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px">Client</div><div style="font-size:14px;font-weight:700;color:${NK.text}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${NK.muted};margin-top:2px">${e(doc.clientInfo.address)}</div>`:''} ${doc.clientInfo.nif?`<div style="font-size:10px;color:${NK.faint};margin-top:2px">NIF : ${e(doc.clientInfo.nif)}</div>`:''} ${doc.clientInfo.rc?`<span style="font-size:10px;color:${NK.faint};margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''} ${doc.clientInfo.nis?`<span style="font-size:10px;color:${NK.faint};margin-left:10px">NIS : ${e(doc.clientInfo.nis)}</span>`:''} ${doc.clientInfo.ai?`<span style="font-size:10px;color:${NK.faint};margin-left:10px">N° AI : ${e(doc.clientInfo.ai)}</span>`:''}</div>` : ''}
 ${doc.objet ? `<div style="margin:0 40px 16px;border-left:2px solid ${NK.tealBorder};padding:8px 12px;font-size:11px;color:${NK.muted};line-height:1.5"><strong style="font-size:9px;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
 ${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 40px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-bottom:2px solid ${NK.teal}"><th style="padding:8px 0 8px 2px;text-align:left;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em">Désignation</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:44px">Qté</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:34px">U.</th><th style="padding:8px 6px;text-align:right;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:96px">P.U. HT</th><th style="padding:8px 0;text-align:right;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:108px">Total HT</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="border-bottom:0.5px solid ${NK.rule};background:${idx%2===1?NK.tealLight:'#fff'}"><td style="padding:9px 0 9px 2px;color:${NK.text};line-height:1.4;vertical-align:top"><div style="font-weight:500">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${NK.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>`:''}</td><td style="padding:9px 6px;text-align:center;color:${NK.muted}">${item.quantity}</td><td style="padding:9px 6px;text-align:center;color:${NK.muted};font-size:10px">${e(item.unit)}</td><td style="padding:9px 6px;text-align:right;color:${NK.muted}">${fmt(item.unitPrice)}</td><td style="padding:9px 0;text-align:right;font-weight:700;color:${NK.tealDark}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
 <div style="display:flex;justify-content:flex-end;padding:16px 40px 0"><div style="width:264px">
@@ -664,7 +682,7 @@ ${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:
 <div style="border-top:1px solid ${NK.tealBorder};margin:16px 40px 0;padding-top:10px"></div>
 <div style="padding:0 40px 14px;font-size:9px;color:${NK.faint};text-align:center;line-height:1.9;margin-top:auto">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin-left:12px">· NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin-left:12px">· RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin-left:12px">· Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#d1fae5">Document généré par CloudDevis</span></div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }
 
@@ -678,8 +696,10 @@ export function generateVeloursHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, vb, bv, results, currency } = params;
+  const { doc, sf, vb, bv, results, currency, lang = 'fr' } = params;
+  const isAr = lang === 'ar'; const dir = isAr ? ' dir="rtl"' : ''; const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const VR = { bordeaux:'#3d0d1c', gold:'#c9a227', goldBorder:'#e8d5b7', cream:'#fdfaf5', text:'#1a0810', muted:'#7c4d5a', faint:'#b08090', rule:'#e8d5b7', roseLight:'#f9e8ee' };
   const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -688,10 +708,10 @@ export function generateVeloursHTML(params: {
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
   const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#1a0810;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{width:190mm;margin:0 auto;min-height:297mm;background:${VR.cream};display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#1a0810;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{width:190mm;margin:0 auto;min-height:297mm;background:${VR.cream};display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
 <div class="page">
 <div style="height:3px;background:${VR.gold};flex-shrink:0"></div>
 <div style="background:${VR.bordeaux};padding:28px 40px;display:flex;justify-content:space-between;align-items:flex-start">
@@ -708,7 +728,7 @@ export function generateVeloursHTML(params: {
 </div>
 <div style="height:2px;background:${VR.gold}"></div>
 <div style="flex:1;padding:20px 40px">
-  ${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="background:#fff;border:1px solid ${VR.goldBorder};padding:14px 18px;margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${VR.gold};font-weight:700;margin-bottom:5px">Adressé à</div><div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:${VR.bordeaux}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${VR.muted};margin-top:3px">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc)?`<div style="font-size:10px;color:${VR.faint};margin-top:2px">${doc.clientInfo.nif?`<span>NIF : ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''}</div>`:''}</div>` : ''}
+  ${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="background:#fff;border:1px solid ${VR.goldBorder};padding:14px 18px;margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${VR.gold};font-weight:700;margin-bottom:5px">Adressé à</div><div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:${VR.bordeaux}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${VR.muted};margin-top:3px">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc||doc.clientInfo.nis||doc.clientInfo.ai)?`<div style="font-size:10px;color:${VR.faint};margin-top:2px">${doc.clientInfo.nif?`<span>NIF : ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''} ${doc.clientInfo.nis?`<span style="margin-left:10px">NIS : ${e(doc.clientInfo.nis)}</span>`:''} ${doc.clientInfo.ai?`<span style="margin-left:10px">N° AI : ${e(doc.clientInfo.ai)}</span>`:''}</div>`:''}</div>` : ''}
   ${doc.objet ? `<div style="padding:8px 14px;border-left:2px solid ${VR.gold};margin-bottom:16px;font-size:11px;color:${VR.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${VR.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
   ${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:18px"><thead><tr style="border-bottom:2px solid ${VR.bordeaux}"><th style="padding:7px 0;text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700">Désignation</th><th style="padding:7px 6px;text-align:center;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:44px">Qté</th><th style="padding:7px 6px;text-align:center;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:34px">U.</th><th style="padding:7px 6px;text-align:right;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:100px">P.U.</th><th style="padding:7px 0;text-align:right;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:108px">Total</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="border-bottom:0.5px solid ${VR.goldBorder};background:${idx%2===1?VR.cream:'#fff'}"><td style="padding:10px 0;font-family:'Playfair Display',Georgia,serif;font-style:italic;color:${VR.text};line-height:1.4;vertical-align:top"><div>${e(item.designation)}</div>${item.description?`<div style="font-family:'Montserrat',Arial,sans-serif;font-style:normal;font-size:9px;color:${VR.muted};margin-top:1px">${e(item.description)}</div>`:''}</td><td style="padding:10px 6px;text-align:center;color:${VR.muted}">${item.quantity}</td><td style="padding:10px 6px;text-align:center;color:${VR.muted};font-size:10px">${e(item.unit)}</td><td style="padding:10px 6px;text-align:right;color:${VR.muted}">${fmt(item.unitPrice)}</td><td style="padding:10px 0;text-align:right;font-weight:700;color:${VR.bordeaux}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table>` : ''}
   <div style="display:flex;justify-content:flex-end"><div style="width:272px">
@@ -727,7 +747,7 @@ export function generateVeloursHTML(params: {
 </div>
 <div style="background:${VR.bordeaux};padding:10px 40px;margin-top:auto"><div style="font-size:9px;color:#c9a090;text-align:center;line-height:1.9">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin:0 8px">·</span><span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin:0 8px">·</span><span>RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin:0 8px">·</span><span>Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#8b4857">Document généré par CloudDevis</span></div></div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }
 
@@ -741,8 +761,10 @@ export function generateIndustrielleHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, vb, bv, results, currency } = params;
+  const { doc, sf, vb, bv, results, currency, lang = 'fr' } = params;
+  const isAr = lang === 'ar'; const dir = isAr ? ' dir="rtl"' : ''; const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const IND = { slate:'#1e293b', slateMid:'#334155', slateLight:'#f1f5f9', slateBody:'#f8fafc', blue:'#2563eb', blueLight:'#93c5fd', blueDeep:'#1d4ed8', blueNav:'#1e40af', text:'#0f172a', muted:'#5a6b85', faint:'#94a3b8', rule:'#e2e8f0', white:'#ffffff' };
   const COL = ['#2563eb','#4b7ae0','#7baef9','#93c5fd','#93c5fd'];
@@ -753,10 +775,10 @@ export function generateIndustrielleHTML(params: {
   const companyPhone = doc.companyPhone || (!isEnt ? (doc.artisanInfo?.phone ?? '') : '');
   const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#0f172a;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#0f172a;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
 <div class="page">
 <div style="display:flex;min-height:148px">
   <div style="background:${IND.slate};width:45%;padding:26px;flex-shrink:0">
@@ -773,7 +795,7 @@ export function generateIndustrielleHTML(params: {
     <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px">${sf('docNumber') && doc.documentNumber?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">N°</span><span style="color:${IND.text};font-weight:600">${e(doc.documentNumber)}</span>`:''} ${sf('issueDate') && doc.date?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Date</span><span style="color:${IND.text}">${e(doc.date)}</span>`:''} ${sf('validUntil') && doc.validUntil?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Validité</span><span style="color:${IND.text}">${e(doc.validUntil)}</span>`:''} ${sf('orderRef') && doc.bcRef?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Réf BC</span><span style="color:${IND.text}">${e(doc.bcRef)}</span>`:''}</div>
   </div>
 </div>
-${vb('client') && doc.clientInfo.name ? `<div style="background:${IND.slateBody};margin:14px 26px;padding:14px 18px"><div style="font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${IND.blue};margin-bottom:9px">Destinataire</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px;font-size:11px"><div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Raison sociale</div><div style="font-weight:700;color:${IND.text}">${e(doc.clientInfo.name)}</div></div> ${doc.clientInfo.address?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Adresse</div><div style="color:${IND.muted}">${e(doc.clientInfo.address)}</div></div>`:''} ${doc.clientInfo.nif?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">NIF</div><div style="color:${IND.muted}">${e(doc.clientInfo.nif)}</div></div>`:''} ${doc.clientInfo.rc?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">RC</div><div style="color:${IND.muted}">${e(doc.clientInfo.rc)}</div></div>`:''}</div></div>` : ''}
+${vb('client') && doc.clientInfo.name ? `<div style="background:${IND.slateBody};margin:14px 26px;padding:14px 18px"><div style="font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${IND.blue};margin-bottom:9px">Destinataire</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px;font-size:11px"><div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Raison sociale</div><div style="font-weight:700;color:${IND.text}">${e(doc.clientInfo.name)}</div></div> ${doc.clientInfo.address?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Adresse</div><div style="color:${IND.muted}">${e(doc.clientInfo.address)}</div></div>`:''} ${doc.clientInfo.nif?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">NIF</div><div style="color:${IND.muted}">${e(doc.clientInfo.nif)}</div></div>`:''} ${doc.clientInfo.rc?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">RC</div><div style="color:${IND.muted}">${e(doc.clientInfo.rc)}</div></div>`:''} ${doc.clientInfo.nis?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">NIS</div><div style="color:${IND.muted}">${e(doc.clientInfo.nis)}</div></div>`:''} ${doc.clientInfo.ai?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">N° AI</div><div style="color:${IND.muted}">${e(doc.clientInfo.ai)}</div></div>`:''}</div></div>` : ''}
 ${doc.objet ? `<div style="margin:0 26px 10px;padding:8px 12px;border-left:3px solid ${IND.blue};background:${IND.slateBody};font-size:11px;color:${IND.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${IND.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
 ${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 26px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr><th style="padding:9px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};border-left:3px solid ${COL[0]}">Désignation</th><th style="padding:9px 8px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:44px;border-left:2px solid ${COL[1]}">Qté</th><th style="padding:9px 8px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:34px;border-left:2px solid ${COL[2]}">U.</th><th style="padding:9px 8px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:96px;border-left:2px solid ${COL[3]}">P.U. HT</th><th style="padding:9px 8px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:108px;border-left:2px solid ${COL[4]}">Montant HT</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="background:${idx%2===0?IND.white:IND.slateBody};border-bottom:0.5px solid ${IND.rule}"><td style="padding:9px 8px;color:${IND.text};line-height:1.4;vertical-align:top;border-left:3px solid ${COL[0]}"><div style="font-weight:500">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${IND.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>`:''}</td><td style="padding:9px 8px;text-align:center;color:${IND.muted};border-left:2px solid ${COL[1]}">${item.quantity}</td><td style="padding:9px 8px;text-align:center;color:${IND.faint};font-size:10px;border-left:2px solid ${COL[2]}">${e(item.unit)}</td><td style="padding:9px 8px;text-align:right;color:${IND.muted};border-left:2px solid ${COL[3]}">${fmt(item.unitPrice)}</td><td style="padding:9px 8px;text-align:right;font-weight:700;color:${IND.blueDeep};border-left:2px solid ${COL[4]}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
 <div style="display:flex;justify-content:flex-end;padding:14px 26px 0"><table style="border-collapse:collapse;width:288px;font-size:11px"><tbody>
@@ -792,7 +814,7 @@ ${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:
 <div style="flex:1"></div>
 <div style="background:${IND.slate};padding:10px 26px;margin-top:18px"><div style="font-size:9px;color:${IND.faint};text-align:center;line-height:1.9">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin:0 8px">·</span><span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin:0 8px">·</span><span>RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin:0 8px">·</span><span>Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#475569">Document généré par CloudDevis</span></div></div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }
 
@@ -806,8 +828,10 @@ export function generateAttachementHTML(params: {
   tp: (key: string, vars?: Record<string, string | number>) => string;
   currency: string;
   design: DocTypeDesign;
+  lang?: string;
 }) {
-  const { doc, sf, bv, vb, tc, tp, design } = params;
+  const { doc, sf, bv, vb, tc, tp, design, lang = 'fr' } = params;
+  const isAr = lang === 'ar'; const dir = isAr ? ' dir="rtl"' : ''; const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
   const escHtml = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const e = (v: string) => escHtml(v);
   const A = { navy:'#1A3A6B', navyLight:'#EEF3FB', navyMid:'#2E60B0', gold:'#C4A35A', green:'#0B3D2E', beige:'#C8C3BA', paperBg:'#F9F8F5', border:'#E4DED5', dark:'#1A1A1A' };
@@ -861,11 +885,12 @@ export function generateAttachementHTML(params: {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Attachement des Travaux - ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:wght@600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <style>
+@page{size:A4;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',Helvetica,Arial,sans-serif;color:#1A1A1A;font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:190mm;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}
 .accent-bar{height:4px;background:linear-gradient(90deg,${A.navy} 0%,${A.navyMid} 60%,${A.gold} 100%)}
 .body{padding:28px 44px;flex:1}
 .co-frame{border:2px solid #1A1A1A;padding:14px 20px;text-align:center;margin-bottom:14px}
@@ -996,6 +1021,6 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
   </div>
 </div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }

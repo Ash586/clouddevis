@@ -81,7 +81,7 @@ export default function RecurringInvoicesPage() {
                   <p className="text-xs sm:text-sm text-[var(--sand-muted)] mt-1">{t('subtitle')}</p>
                 </div>
                 <Button size="sm" onClick={() => setShowCreate(true)}>
-                  <Plus className="w-3.5 h-3.5 mr-1" /> {t('createNew')}
+                  <Plus className="w-3.5 h-3.5 me-1" /> {t('createNew')}
                 </Button>
               </div>
 
@@ -113,7 +113,7 @@ export default function RecurringInvoicesPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button onClick={handleCreate} disabled={!form.name.trim() || !form.nextDate}>
-                      <RefreshCw className="w-3.5 h-3.5 mr-1" /> {t('createSchedule')}
+                      <RefreshCw className="w-3.5 h-3.5 me-1" /> {t('createSchedule')}
                     </Button>
                     <Button variant="outline" onClick={() => setShowCreate(false)}>{tc('cancel')}</Button>
                   </div>

@@ -36,7 +36,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
         limit: plan.limits.teamMembers,
       },
       storage: {
-        usedBytes: Number(user.storageUsedBytes),
+        usedBytes: parseInt(String(user.storageUsedBytes ?? 0), 10),
         limitMB: plan.limits.storageMB,
       },
       plan: {

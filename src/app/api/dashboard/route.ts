@@ -78,7 +78,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       stats: {
         totalDocs,
         monthDocs,
-        totalTTC: totalTTC.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        totalTTC,
         totalClients,
         trialDaysRemaining,
         typeBreakdown,

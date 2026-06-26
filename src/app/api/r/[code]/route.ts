@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { getClientIP } from '@/lib/rateLimit';
 
 function simpleHash(str: string): string {
   let hash = 0;
@@ -28,7 +29,7 @@ async function getHandler(req: Request, { params }: { params: Promise<{ code: st
       return NextResponse.redirect(new URL('/auth/register', baseUrl));
     }
 
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '';
+    const ip = getClientIP(req);
     const userAgent = req.headers.get('user-agent') || '';
     const referrer = req.headers.get('referer') || '';
     const url = new URL(req.url);

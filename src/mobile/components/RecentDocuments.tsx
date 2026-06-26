@@ -6,12 +6,13 @@
 // ============================================================
 
 import {
-  IconFileText,
-  IconReceipt,
-  IconClipboardList,
-  IconFileInvoice,
-  IconConfetti,
-} from '@tabler/icons-react';
+  FileText,
+  Receipt,
+  ClipboardList,
+  ReceiptText,
+  PartyPopper,
+  type LucideIcon,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -19,12 +20,12 @@ import type { Document, DocumentType } from '@/mobile/types';
 
 // ── Document type → icon mapping ──────────────────────────────
 
-const DOC_ICONS: Record<DocumentType, typeof IconFileText> = {
-  DEVIS: IconFileText,
-  FACTURE: IconReceipt,
-  PROFORMA: IconFileInvoice,
-  BC: IconClipboardList,
-  BR: IconConfetti,
+const DOC_ICONS: Record<DocumentType, LucideIcon> = {
+  DEVIS: FileText,
+  FACTURE: Receipt,
+  PROFORMA: ReceiptText,
+  BC: ClipboardList,
+  BR: PartyPopper,
 };
 
 // ── Status → badge variant mapping ────────────────────────────
@@ -87,7 +88,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
             'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
           )}
         >
-          <IconFileText size={32} stroke={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
+          <FileText size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
           <p className="text-sm text-[var(--sand-muted)]">
             Aucun document récent
           </p>
@@ -126,7 +127,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
         className="flex flex-col gap-2.5"
       >
         {recentDocs.map((doc) => {
-          const Icon = DOC_ICONS[doc.type] || IconFileText;
+          const Icon = DOC_ICONS[doc.type] || FileText;
           const status = STATUS_MAP[doc.status] || STATUS_MAP.DRAFT;
 
           return (
@@ -143,7 +144,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
             >
               {/* Document type icon */}
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[rgba(37,99,235,0.12)]">
-                <Icon size={18} stroke={1.8} className="text-[var(--green-3)]" />
+                <Icon size={18} strokeWidth={1.8} className="text-[var(--green-3)]" />
               </div>
 
               {/* Client name + doc number */}

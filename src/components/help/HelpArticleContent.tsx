@@ -21,10 +21,10 @@ function parseMarkdown(md: string): string {
   html = html.replace(/^> (.+)$/gm, '<blockquote class="border-l-3 pl-4 py-2 my-3 text-[12px] text-[#666] italic" style="border-color: #C4A35A">$1</blockquote>');
 
   // Unordered lists
-  html = html.replace(/^- (.+)$/gm, '<li class="text-[12px] text-[#444] leading-relaxed mb-1 ml-4 list-disc">$1</li>');
+  html = html.replace(/^- (.+)$/gm, '<li class="text-[12px] text-[#444] leading-relaxed mb-1 ms-4 list-disc">$1</li>');
 
   // Ordered lists
-  html = html.replace(/^(\d+)\. (.+)$/gm, '<li class="text-[12px] text-[#444] leading-relaxed mb-1 ml-4 list-decimal">$2</li>');
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<li class="text-[12px] text-[#444] leading-relaxed mb-1 ms-4 list-decimal">$2</li>');
 
   // Tables
   html = html.replace(/\|(.+)\|/g, (match) => {

@@ -420,6 +420,45 @@ describe('numberToFrenchWords', () => {
   })
 })
 
+describe('numberToFrenchWords — spelling rules', () => {
+  const w = (n: number) => dgi.numberToFrenchWords(n).toLowerCase()
+
+  test('80 → quatre-vingts (with s)', () => {
+    expect(w(80)).toContain('quatre-vingts')
+  })
+
+  test('81 → quatre-vingt-un (no s)', () => {
+    expect(w(81)).toContain('quatre-vingt-un')
+    expect(w(81)).not.toContain('quatre-vingts')
+  })
+
+  test('90 → quatre-vingt-dix', () => {
+    expect(w(90)).toContain('quatre-vingt-dix')
+  })
+
+  test('91 → quatre-vingt-onze', () => {
+    expect(w(91)).toContain('quatre-vingt-onze')
+  })
+
+  test('200 → deux cents (with s)', () => {
+    expect(w(200)).toContain('deux cents')
+  })
+
+  test('220 → deux cent vingt (no s)', () => {
+    expect(w(220)).toContain('deux cent')
+    expect(w(220)).not.toContain('deux cents')
+  })
+
+  test('2000000 → deux millions (plural)', () => {
+    expect(w(2000000)).toContain('millions')
+  })
+
+  test('1000000 → million (singular)', () => {
+    expect(w(1000000)).toContain('million')
+    expect(w(1000000)).not.toContain('millions')
+  })
+})
+
 describe('numberToArabicWords', () => {
   test('0 returns صفر دينار جزائري', () => {
     expect(dgi.numberToArabicWords(0)).toBe('صفر دينار جزائري')

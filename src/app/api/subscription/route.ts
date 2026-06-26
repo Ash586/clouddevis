@@ -38,7 +38,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       usage: {
         docsThisMonth: user.docCountThisMonth,
         docsLimit: plan.limits.docsPerMonth,
-        storageBytes: Number(user.storageUsedBytes),
+        storageBytes: parseInt(String(user.storageUsedBytes ?? 0), 10),
         storageLimitMB: plan.limits.storageMB,
       },
       trialDaysRemaining,

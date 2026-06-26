@@ -58,9 +58,10 @@ export function generateBonCommandeHTML(params: {
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+@page{size:A4;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',Helvetica,Arial,sans-serif;color:#1A1A1A;font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:190mm;margin:0 auto;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}
 table.items{width:100%;border-collapse:collapse;font-size:12px}
 table.items thead tr{background:${C.dark}}
 table.items thead th{padding:9px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#F5F1E8;white-space:nowrap}
@@ -91,6 +92,10 @@ table.items thead th{padding:9px 12px;font-size:10px;font-weight:600;text-transf
         ${codeG ? `<div><div style="${idK}">Code gestionnaire</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(codeG)}</div></div>` : ''}
         ${doc.clientInfo.address ? `<div><div style="${idK}">Adresse</div><div style="${idV}">${e(doc.clientInfo.address)}</div></div>` : ''}
         ${doc.clientInfo.phone ? `<div><div style="${idK}">T&#233;l&#233;phone / Fax</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(doc.clientInfo.phone)}</div></div>` : ''}
+        ${doc.clientInfo.nif ? `<div><div style="${idK}">NIF</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(doc.clientInfo.nif)}</div></div>` : ''}
+        ${doc.clientInfo.nis ? `<div><div style="${idK}">NIS</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(doc.clientInfo.nis)}</div></div>` : ''}
+        ${doc.clientInfo.rc ? `<div><div style="${idK}">RC</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(doc.clientInfo.rc)}</div></div>` : ''}
+        ${doc.clientInfo.ai ? `<div><div style="${idK}">N° AI</div><div style="${idV};font-family:'JetBrains Mono',monospace">${e(doc.clientInfo.ai)}</div></div>` : ''}
       </div></div>
     </div>
     <div style="border-bottom:1px solid ${C.border}">${idHead('2', 'Prestataire / Fournisseur')}
@@ -119,7 +124,7 @@ table.items thead th{padding:9px 12px;font-size:10px;font-weight:600;text-transf
 ${rows ? `<table class="items"><thead><tr><th style="width:38px;text-align:left">N&#176;</th><th style="text-align:left">D&#233;signation</th><th style="width:46px;text-align:center">Unit&#233;</th><th style="width:58px;text-align:center">Quantit&#233;</th><th style="width:130px;text-align:right">Prix unitaire</th><th style="width:130px;text-align:right">Montant HT</th></tr></thead><tbody>${rows}</tbody></table>` : ''}
 <div style="display:grid;grid-template-columns:1fr 240px;border-top:1px solid ${C.border}">
   <div style="padding:18px 20px;border-right:1px solid ${C.border}">
-    <div style="background:#FDFAF4;border-left:3px solid ${C.gold};border-radius:0 5px 5px 0;padding:11px 14px;margin-bottom:14px"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#888;display:block;margin-bottom:4px">Arr&#234;t&#233;e la pr&#233;sente commande &#224; la somme de</span><div style="font-size:12px;font-style:italic;color:#333;line-height:1.55">${e(numberToFrenchWords(results.totalTTC))} (${money(results.totalTTC)} ${currency})</div></div>
+    <div style="background:#FDFAF4;border-left:3px solid ${C.gold};border-radius:0 5px 5px 0;padding:11px 14px;margin-bottom:14px"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#888;display:block;margin-bottom:4px">Arr&#234;t&#233;e la pr&#233;sente commande &#224; la somme de</span><div style="font-size:12px;font-style:italic;color:#333;line-height:1.55">${e(numberToFrenchWords(results.netAPayer))} (${money(results.netAPayer)} ${currency})</div></div>
     ${(sf('notes') && doc.notes) ? `<div style="font-size:11px;color:#666;line-height:1.7"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:${C.green};display:block;margin-bottom:5px">Conditions &amp; engagements</span>${e(doc.notes)}</div>` : ''}
   </div>
   <div style="padding:18px 20px">
@@ -146,6 +151,6 @@ ${rows ? `<table class="items"><thead><tr><th style="width:38px;text-align:left"
   <strong style="font-family:'Inter',sans-serif;color:#777">R&#233;f. :</strong> ${e(doc.documentNumber)}${tax.nif ? ` &middot; <strong style="font-family:'Inter',sans-serif;color:#777">N.I.F. :</strong> ${e(tax.nif)}` : ''}${tax.rc ? ` &middot; <strong style="font-family:'Inter',sans-serif;color:#777">RC :</strong> ${e(tax.rc)}` : ''}<br>Document g&#233;n&#233;r&#233; par <strong style="font-family:'Inter',sans-serif;color:#777">CloudDevis</strong>
 </div>
 </div>
-<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+<script>document.fonts.ready.then(function(){window.print();});</script>
 </body></html>`;
 }

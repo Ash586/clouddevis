@@ -54,7 +54,7 @@ export function HelpSearch({ lang }: Props) {
   return (
     <div ref={ref} className="relative max-w-xl mx-auto">
       <div className="flex items-center rounded-xl px-4 py-3 transition" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sand-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mr-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sand-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 me-2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
@@ -66,7 +66,7 @@ export function HelpSearch({ lang }: Props) {
           className="flex-1 text-[13px] outline-none bg-transparent" style={{ color: 'var(--sand)' }}
         />
         {query && (
-          <button type="button" onClick={() => { setQuery(''); setOpen(false); }} style={{ color: 'var(--sand-muted)' }} className="hover:opacity-70 text-[14px] ml-2">&times;</button>
+          <button type="button" onClick={() => { setQuery(''); setOpen(false); }} style={{ color: 'var(--sand-muted)' }} className="hover:opacity-70 text-[14px] ms-2">&times;</button>
         )}
       </div>
 
