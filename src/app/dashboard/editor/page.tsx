@@ -8,7 +8,7 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { DocumentPreview } from '@/components/editor/DocumentPreview';
 import { CollapsibleSection } from '@/components/editor/CollapsibleSection';
-import { getSection } from '@/components/editor/sections/SectionProps';
+import { getSection, SectionProvider } from '@/components/editor/sections/SectionProps';
 import '@/components/editor/sections';
 import { useEditor } from '@/hooks/useEditor';
 import { useEditorUndo } from '@/hooks/useEditorUndo';
@@ -27,11 +27,12 @@ import {
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
   MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
-  Grid3X3, Trash2, Plus, MoreHorizontal,
+  Grid3X3, MoreHorizontal,
   ChevronDown, MonitorCheck,
-  Receipt, ScrollText, ClipboardList, FileStack, Wrench, Pen,
+  Receipt, ClipboardList, FileStack, Wrench,
 } from 'lucide-react';
 import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, normalizeDocTypeParam, sectionFocusMap } from '@/components/editor/EditorConstants';
+import { ENABLED_DOC_TYPES } from '@/lib/config';
 import { CustomSectionRenderer } from '@/components/editor/sections/CustomSectionRenderer';
 import { CustomizationModal } from '@/components/editor/CustomizationModal';
 
@@ -131,9 +132,6 @@ function EditorContent() {
     { label: te('previewChecks.date') || 'Date', done: Boolean(doc.date), section: 'general' as SectionId },
   ], [doc.clientInfo.name, doc.items.length, doc.date, te]);
   const completedPreviewChecks = previewReadyChecks.filter(check => check.done).length;
-
-  const prefsFetched = useRef(false);
-  const sectionsFetched = useRef(false);
 
   useEffect(() => {
     if (docIdParam || prefsFetched.current) return;
@@ -311,17 +309,25 @@ function EditorContent() {
     return () => window.removeEventListener('keydown', handler);
   }, [saveDoc, handleDownload, handleUndo, handleRedo]);
 
+  const saveDocRef = useRef<() => Promise<unknown>>(saveDoc);
+  saveDocRef.current = saveDoc;
+
+  const hasContentRef = useRef(false);
+  useEffect(() => {
+    hasContentRef.current = doc.items.length > 0 || Boolean(doc.clientInfo.name);
+  });
+
   // Autosave every 30 seconds — show error toast only on failure
   useEffect(() => {
     const interval = setInterval(() => {
-      if (doc.items.length > 0 || doc.clientInfo.name) {
-        saveDoc().catch(() => {
+      if (hasContentRef.current) {
+        saveDocRef.current().catch(() => {
           showToast(te('saveError') || 'Erreur d\'enregistrement. Vérifiez votre connexion.', 'error');
         });
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [doc.items.length, doc.clientInfo.name, saveDoc]);
+  }, [showToast, te]);
 
   // Reset the pending new-item category when the document type changes if it's
   // no longer one of that type's categories.
@@ -333,6 +339,7 @@ function EditorContent() {
 
   // Track which section is in view via IntersectionObserver
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -341,7 +348,12 @@ function EditorContent() {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-section-id');
-            if (id) setActiveSection(id as SectionId);
+            if (id) {
+              setActiveSection(id as SectionId);
+              setPreviewFocus(sectionFocusMap[id as SectionId] ?? null);
+              clearTimeout(previewTimerRef.current);
+              previewTimerRef.current = setTimeout(() => setPreviewFocus(null), 700);
+            }
           }
         }
       },
@@ -360,21 +372,30 @@ function EditorContent() {
     return () => {
       observerRef.current?.disconnect();
       mutationObserver.disconnect();
+      clearTimeout(previewTimerRef.current);
     };
   }, [scrollContainerRef]);
-
-  // Update preview focus when active section changes
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPreviewFocus(sectionFocusMap[activeSection] ?? null);
-    const timer = setTimeout(() => setPreviewFocus(null), 700);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection]);
 
   const renderSection = (id: SectionId): React.ReactNode => {
     const s = (blockId?: BlockId) => blockId ? { blockId, visible: isBlockVisible(blockId), onToggle: toggleBlock } : { visible: true, onToggle: () => {} };
     const dragProps = { sectionOrder: doc.sectionOrder, moveSection };
+    const sectionProps = {
+      doc, setDoc, mode, hiddenFields,
+      customSections, sectionOrder: doc.sectionOrder, results,
+      addingItem, setAddingItem, newItem, setNewItem,
+      handleAddItem, handleRemoveItem, moveItem, startNewItem,
+      itemErrors, setItemErrors, dragIdx, setDragIdx,
+      dragOverIdx, setDragOverIdx,
+      catalogItems, catalogLoading, setCatalogItems, setCatalogLoading,
+      updateDoc, updateClientInfo, updateCompanyInfo,
+      updateTaxIds, updateArtisanInfo, updateDiscount,
+      updateStampDuty, updatePaymentDetails,
+      setChantierField: setChantierField as (key: string, value: unknown) => void,
+      setMateriauxField: setMateriauxField as (key: string, value: unknown) => void,
+      setGarantieField: setGarantieField as (key: string, value: unknown) => void,
+      updateCustomField, toggleBlock, isBlockVisible,
+      moveSection, te, tp, tu, tc, showToast,
+    };
 
     // Custom section (user-defined)
     const cs = customSections.find(c => c.id === id);
@@ -383,23 +404,9 @@ function EditorContent() {
       if (!hasVisible) return null;
       return (
         <CollapsibleSection title={cs.label} sectionId={cs.id} {...dragProps} {...s()} defaultOpen={true}>
-          <CustomSectionRenderer
-            doc={doc} setDoc={setDoc} mode={mode} hiddenFields={hiddenFields}
-            customSections={customSections} sectionOrder={doc.sectionOrder} results={results}
-            addingItem={addingItem} setAddingItem={setAddingItem} newItem={newItem} setNewItem={setNewItem}
-            handleAddItem={handleAddItem} handleRemoveItem={handleRemoveItem} moveItem={moveItem} startNewItem={startNewItem}
-            itemErrors={itemErrors} setItemErrors={setItemErrors} dragIdx={dragIdx} setDragIdx={setDragIdx}
-            dragOverIdx={dragOverIdx} setDragOverIdx={setDragOverIdx}
-            catalogItems={catalogItems} catalogLoading={catalogLoading} setCatalogItems={setCatalogItems} setCatalogLoading={setCatalogLoading}
-            updateDoc={updateDoc} updateClientInfo={updateClientInfo} updateCompanyInfo={updateCompanyInfo}
-            updateTaxIds={updateTaxIds} updateArtisanInfo={updateArtisanInfo} updateDiscount={updateDiscount}
-            updateStampDuty={updateStampDuty} updatePaymentDetails={updatePaymentDetails}
-            setChantierField={setChantierField as (key: string, value: unknown) => void}
-            setMateriauxField={setMateriauxField as (key: string, value: unknown) => void}
-            setGarantieField={setGarantieField as (key: string, value: unknown) => void}
-            updateCustomField={updateCustomField} toggleBlock={toggleBlock} isBlockVisible={isBlockVisible}
-            moveSection={moveSection} te={te} tp={tp} tu={tu} tc={tc} showToast={showToast}
-          />
+          <SectionProvider {...sectionProps}>
+            <CustomSectionRenderer />
+          </SectionProvider>
         </CollapsibleSection>
       );
     }
@@ -420,23 +427,9 @@ function EditorContent() {
         {...(meta.blockId ? s(meta.blockId as BlockId) : s())}
         defaultOpen={meta.defaultOpen ?? true}
       >
-        <SectionComp
-          doc={doc} setDoc={setDoc} mode={mode} hiddenFields={hiddenFields}
-          customSections={customSections} sectionOrder={doc.sectionOrder} results={results}
-          addingItem={addingItem} setAddingItem={setAddingItem} newItem={newItem} setNewItem={setNewItem}
-          handleAddItem={handleAddItem} handleRemoveItem={handleRemoveItem} moveItem={moveItem} startNewItem={startNewItem}
-          itemErrors={itemErrors} setItemErrors={setItemErrors} dragIdx={dragIdx} setDragIdx={setDragIdx}
-          dragOverIdx={dragOverIdx} setDragOverIdx={setDragOverIdx}
-          catalogItems={catalogItems} catalogLoading={catalogLoading} setCatalogItems={setCatalogItems} setCatalogLoading={setCatalogLoading}
-          updateDoc={updateDoc} updateClientInfo={updateClientInfo} updateCompanyInfo={updateCompanyInfo}
-          updateTaxIds={updateTaxIds} updateArtisanInfo={updateArtisanInfo} updateDiscount={updateDiscount}
-          updateStampDuty={updateStampDuty} updatePaymentDetails={updatePaymentDetails}
-          setChantierField={setChantierField as (key: string, value: unknown) => void}
-          setMateriauxField={setMateriauxField as (key: string, value: unknown) => void}
-          setGarantieField={setGarantieField as (key: string, value: unknown) => void}
-          updateCustomField={updateCustomField} toggleBlock={toggleBlock} isBlockVisible={isBlockVisible}
-          moveSection={moveSection} te={te} tp={tp} tu={tu} tc={tc} showToast={showToast}
-        />
+        <SectionProvider {...sectionProps}>
+          <SectionComp />
+        </SectionProvider>
       </CollapsibleSection>
     );
   };
@@ -457,11 +450,11 @@ function EditorContent() {
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
         <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[var(--border-2)] shadow-[var(--shadow-sm)] z-50 shrink-0 gap-3">
           {/* Left: Nav back + Doc type selector */}
-          <button onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
+          <button type="button" onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={18} className="rotate-180" />
           </button>
           <div className="relative shrink-0">
-            <button onClick={() => setShowTypeMenu(v => !v)}
+            <button type="button" onClick={() => setShowTypeMenu(v => !v)}
               className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[var(--accent-ring)]">
               {doc.documentType === 'devis' ? <FileText size={15} /> : doc.documentType === 'facture' ? <Receipt size={15} /> : doc.documentType === 'proforma' ? <ClipboardList size={15} /> : doc.documentType === 'bc' ? <FileStack size={15} /> : doc.documentType === 'br' ? <Package size={15} /> : doc.documentType === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
               <span>{te(DOC_TYPE_EDITOR_LABELS[doc.documentType] ?? 'documentTypeQuote')}</span>
@@ -469,8 +462,8 @@ function EditorContent() {
             </button>
             {showTypeMenu && (
               <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl p-1.5 z-[60] min-w-[190px]">
-                {(['devis', 'facture', 'proforma', 'bc', 'br', 'intervention', 'attachement'] as const).map(t => (
-                  <button key={t} onClick={() => { setDoc(prev => ({ ...prev, documentType: t, documentNumber: generateDocumentNumber(t, prev.mode) })); setShowTypeMenu(false); }}
+                {ENABLED_DOC_TYPES.map(t => (
+                  <button type="button" key={t} onClick={() => { setDoc(prev => ({ ...prev, documentType: t, documentNumber: generateDocumentNumber(t, prev.mode) })); setShowTypeMenu(false); }}
                     className={cn('w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition min-h-[38px]', doc.documentType === t ? 'bg-[var(--green-glow)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)]')}>
                     {t === 'devis' ? <FileText size={15} /> : t === 'facture' ? <Receipt size={15} /> : t === 'proforma' ? <ClipboardList size={15} /> : t === 'bc' ? <FileStack size={15} /> : t === 'br' ? <Package size={15} /> : t === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
                     {tp(DOC_TYPE_PREVIEW_LABELS[t] ?? 'docTypeQuote')}
@@ -488,17 +481,17 @@ function EditorContent() {
             {saving ? (
               <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--green-3)]"><Loader2 size={12} className="animate-spin" />{te('saving')}</span>
             ) : (
-              <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--cd-success))]" />Enregistré</span>
+              <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--cd-success))]" />{tc('saved')}</span>
             )}
           </div>
 
           {/* Right: Undo/Redo (always) + lg-only Settings/Save/PDF (mobile bottom bar covers these below lg) */}
           <div className="flex items-center gap-1 ml-auto">
-            <button onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
-            <button onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
+            <button type="button" onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
+            <button type="button" onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
             <div className="hidden lg:flex items-center gap-1">
               {!docIdParam && (
-                <button onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
+                <button type="button" onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
                   <Settings size={16} />
                 </button>
               )}
@@ -519,15 +512,15 @@ function EditorContent() {
         <div className="lg:hidden no-print shrink-0 border-t border-[var(--border-2)] shadow-[0_-1px_2px_rgba(15,39,71,0.06)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
           {/* Action row */}
           <div className="flex items-center gap-1.5 px-2 py-1">
-            <button onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
+            <button type="button" onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>{tc('save')}</span>
             </button>
-             <button onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97] disabled:opacity-50">
+             <button type="button" onClick={handleDownload} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--navy-4)] text-[var(--sand)] text-[11px] font-bold border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97] disabled:opacity-50">
                <Download size={14} />
                <span>{te('downloadPdf')}</span>
             </button>
-            <button onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97]">
+            <button type="button" onClick={() => setShowCustomizer(true)} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-[var(--navy-4)] text-[var(--sand-muted)] border border-[rgba(15,39,71,0.1)] transition active:scale-[0.97]">
               <MoreHorizontal size={18} />
             </button>
           </div>
@@ -538,7 +531,7 @@ function EditorContent() {
               { key: 'preview' as const, label: te('editorTabPreview') || 'Aperçu', icon: Eye },
               { key: 'totals' as const, label: te('editorTabTotals') || 'Totaux', icon: Grid3X3 },
             ]).map(tab => (
-              <button key={tab.key} onClick={() => setMobileTab(tab.key)}
+              <button type="button" key={tab.key} onClick={() => setMobileTab(tab.key)}
                 className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] text-[11px] font-bold rounded-xl transition', mobileTab === tab.key ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] active:bg-[var(--navy-4)]')}>
                 <tab.icon size={13} />{tab.label}
               </button>
@@ -554,7 +547,7 @@ function EditorContent() {
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
-                <button key={item.id} onClick={() => {
+                <button type="button" key={item.id} onClick={() => {
                   setActiveSection(item.id);
                   setMobileTab('editor');
                   const el = scrollContainerRef.current?.querySelector(`[data-section-id="${item.id}"]`);
@@ -568,12 +561,12 @@ function EditorContent() {
             })}
           </nav>
           {/* ──── EDITOR PANEL ──── */}
-          <div className={cn('flex-1 lg:flex-none lg:w-[430px] xl:w-[470px] flex flex-col min-w-0 border-r border-[var(--border-2)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
+          <div className={cn('flex-1 lg:max-w-[430px] xl:max-w-[470px] flex flex-col min-w-0 border-r border-[var(--border-2)]', mobileTab !== 'editor' && mobileTab !== 'totals' && 'hidden lg:flex')}>
             {/* Validation errors banner */}
             {itemErrors && (
               <div className="no-print flex items-center gap-2 px-3 py-1 bg-red-900/20 border-b border-red-500/20 text-[10px] text-red-400 shrink-0">
                 <AlertTriangle size={12} /><span>{itemErrors}</span>
-                <button onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
+                <button type="button" onClick={() => setItemErrors(null)} className="ml-auto text-red-500 hover:text-red-400">✕</button>
               </div>
             )}
             {/* Scrollable section area */}
@@ -604,7 +597,7 @@ function EditorContent() {
                 {results.timbreFiscal > 0 && <span className="shrink-0"><span className="text-[var(--sand-muted)]">Timbre </span><span className="font-semibold text-[var(--sand-2)]">{formatCurrency(results.timbreFiscal, tc('currency'))}</span></span>}
               </div>
               {itemErrors && (
-                <button onClick={() => setActiveSection('prestations')} className="flex items-center gap-1 text-[10px] font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded-lg transition shrink-0">
+                <button type="button" onClick={() => setActiveSection('prestations')} className="flex items-center gap-1 text-[10px] font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-2 py-1 rounded-lg transition shrink-0">
                   <AlertTriangle size={11} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
                 </button>
               )}
@@ -659,7 +652,7 @@ function EditorContent() {
                   <h2 className="truncate text-xs font-black uppercase tracking-wide text-[var(--sand)]">{te('previewTitle') || 'Aperçu'}</h2>
                   <span className="rounded-md bg-[var(--navy-4)] px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-[var(--sand-muted)]">A4</span>
                   <div className="relative">
-                    <button onClick={() => setShowReadyChecks(v => !v)} className={cn(
+                    <button type="button" onClick={() => setShowReadyChecks(v => !v)} className={cn(
                       'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold cursor-pointer transition hover:brightness-110',
                       completedPreviewChecks === 3 ? 'bg-emerald-400/10 text-emerald-300' : 'bg-amber-400/10 text-amber-300',
                     )}>
@@ -672,7 +665,7 @@ function EditorContent() {
                         <div className="absolute top-full left-0 mt-1.5 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl p-2 z-[100] min-w-[200px]">
                           <div className="text-[9px] font-bold text-[var(--sand-muted)] uppercase tracking-wider px-2 pb-1.5 border-b border-[rgba(15,39,71,0.08)]">{te('validationState') || 'État de validation'}</div>
                           {previewReadyChecks.map((check, i) => (
-                            <button key={i} onClick={() => { setActiveSection(check.section); setMobileTab('editor'); setShowReadyChecks(false); }}
+                            <button type="button" key={i} onClick={() => { setActiveSection(check.section); setMobileTab('editor'); setShowReadyChecks(false); }}
                               className={cn('w-full flex items-center gap-2 px-2 py-2 rounded-lg text-[11px] font-medium transition text-left', check.done ? 'text-[var(--green-3)]' : 'text-amber-400 hover:bg-[var(--navy-4)]')}>
                               {check.done ? <Check size={12} className="shrink-0" /> : <AlertTriangle size={12} className="shrink-0" />}
                               <span className="flex-1">{check.label}</span>
@@ -691,11 +684,11 @@ function EditorContent() {
 
               <div className="flex shrink-0 items-center gap-2">
                 <div className="flex items-center gap-0.5 rounded-xl bg-[var(--navy-4)] p-1">
-                  <button onClick={() => setPreviewZoom('fit')} className={cn('flex min-h-7 items-center gap-1 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 'fit' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Ajuster"><Maximize size={12} />Fit</button>
-                  <button onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
-                  <button onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
+                  <button type="button" onClick={() => setPreviewZoom('fit')} className={cn('flex min-h-7 items-center gap-1 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 'fit' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Ajuster"><Maximize size={12} />Fit</button>
+                  <button type="button" onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
+                  <button type="button" onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
                 </div>
-                <button onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[var(--accent-ring)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
+                <button type="button" onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[var(--accent-ring)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
               </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
+import { ENABLED_DOC_TYPES } from '@/lib/config';
 import {
   LayoutDashboard,
   FileText,
@@ -29,7 +30,7 @@ import {
   X,
 } from 'lucide-react';
 
-const QUICK_DOCS = [
+const ALL_QUICK_DOCS = [
   { type: 'devis', labelKey: 'devis', icon: FileText },
   { type: 'facture', labelKey: 'facture', icon: Receipt },
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
@@ -38,8 +39,9 @@ const QUICK_DOCS = [
   { type: 'intervention', labelKey: 'intervention', icon: Wrench },
   { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ] as const;
+const QUICK_DOCS = ALL_QUICK_DOCS.filter(d => ENABLED_DOC_TYPES.includes(d.type as never));
 
-const DOCUMENT_TYPES = [
+const ALL_DOCUMENT_TYPES = [
   { id: 'devis', key: 'devis' },
   { id: 'facture', key: 'facture' },
   { id: 'proforma', key: 'proforma' },
@@ -48,6 +50,7 @@ const DOCUMENT_TYPES = [
   { id: 'intervention', key: 'intervention' },
   { id: 'attachement', key: 'attachement' },
 ] as const;
+const DOCUMENT_TYPES = ALL_DOCUMENT_TYPES.filter(d => ENABLED_DOC_TYPES.includes(d.id as never));
 
 const TYPE_MAP: Record<string, string> = {
   devis: 'DEVIS', facture: 'FACTURE', proforma: 'PROFORMA',
@@ -111,7 +114,7 @@ function SidebarInner() {
     <>
       {/* User Pill */}
       <div className="relative mb-4">
-        <button onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+        <button type="button" onClick={() => setUserDropdownOpen(!userDropdownOpen)}
           className="w-full flex items-center gap-3 p-3 rounded-xl bg-[var(--navy-3)] border border-[rgba(15,39,71,0.1)] hover:bg-[var(--navy-4)] transition-all min-h-[44px]">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center text-white text-sm font-black shrink-0 shadow-lg">
             {userInitial}
@@ -128,16 +131,16 @@ function SidebarInner() {
         {userDropdownOpen && (
           <>
             <div className="absolute top-full start-0 end-0 mt-2 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
-              <button onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
+              <button type="button" onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
+              <button type="button" className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
               </button>
               <div className="h-px bg-[rgba(15,39,71,0.08)] mx-4" />
-              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition min-h-[44px]">
+              <button type="button" onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-400/10 transition min-h-[44px]">
                 <LogOut size={16} strokeWidth={1.5} />
                 {t('logout')}
               </button>
@@ -149,7 +152,7 @@ function SidebarInner() {
 
       {/* New Document Button */}
       <div className="relative mb-4">
-        <button onClick={() => setQuickCreateOpen(!quickCreateOpen)}
+        <button type="button" onClick={() => setQuickCreateOpen(!quickCreateOpen)}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--green)] text-white text-sm font-bold hover:bg-[var(--green-2)] transition-all active:scale-[0.98] shadow-lg shadow-[rgba(37,99,235,0.2)] min-h-[44px]">
           <Plus size={16} />
           {s('newDocument')}
@@ -162,7 +165,7 @@ function SidebarInner() {
                 {s('quickCreate')}
               </div>
               {QUICK_DOCS.map((qd) => (
-                <button key={qd.type} onClick={() => { navigateTo(qd.type); setQuickCreateOpen(false); }}
+                <button type="button" key={qd.type} onClick={() => { navigateTo(qd.type); setQuickCreateOpen(false); }}
                   className="group relative w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-all duration-200 min-h-[44px] text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.08)] overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-[var(--green-glow)]/0 to-[var(--green-glow)]/0 group-hover:from-[var(--green-glow)]/60 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
                   <qd.icon size={16} className="relative text-[var(--sand-muted)] group-hover:text-[var(--green-3)] group-hover:scale-110 transition-all duration-200" />
@@ -170,7 +173,7 @@ function SidebarInner() {
                 </button>
               ))}
               <div className="h-px bg-[rgba(15,39,71,0.08)] mx-3" />
-              <button onClick={() => { navigateTo('devis'); setQuickCreateOpen(false); }}
+              <button type="button" onClick={() => { navigateTo('devis'); setQuickCreateOpen(false); }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <PenLine size={16} />
                 {s('customDocument')}
@@ -192,7 +195,7 @@ function SidebarInner() {
         {/* Documents */}
         <NavGroup label={s('groups.documents')}>
           <div>
-            <button onClick={() => setDocumentsOpen(!documentsOpen)}
+            <button type="button" onClick={() => setDocumentsOpen(!documentsOpen)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
                 documentsOpen ? 'bg-[rgba(37,99,235,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.04)] hover:text-[var(--sand)]'
               }`}>
@@ -203,7 +206,7 @@ function SidebarInner() {
 
             {documentsOpen && (
               <div className="mt-1 ml-4 space-y-0.5 border-l border-[rgba(15,39,71,0.1)] pl-2 animate-in">
-                <button onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
+                <button type="button" onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
                   className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
                     pathname === '/dashboard/documents' && !searchParams?.get('type') 
                       ? 'text-[var(--sand)] bg-[var(--navy-3)]' 
@@ -212,7 +215,7 @@ function SidebarInner() {
                   {s('allDocuments')}
                 </button>
                 {DOCUMENT_TYPES.map((dt) => (
-                  <button key={dt.id} onClick={() => filterDocumentsByType(dt.id)}
+                  <button type="button" key={dt.id} onClick={() => filterDocumentsByType(dt.id)}
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
                       isDocumentsActive(dt.id) 
                         ? 'text-[var(--sand)] bg-[var(--navy-3)]' 
@@ -256,8 +259,9 @@ function SidebarInner() {
         <div className="fixed inset-0 z-[150] md:hidden">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
           <aside className="fixed inset-y-0 right-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-l border-[rgba(15,39,71,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-            <button onClick={() => setMobileOpen(false)}
-              className="absolute top-4 left-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center">
+            <button type="button" onClick={() => setMobileOpen(false)}
+              className="absolute top-4 left-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label={s('close') || 'Fermer le menu'}>
               <X size={18} />
             </button>
             <div className="pt-12 flex-1 flex flex-col overflow-hidden">
@@ -268,7 +272,7 @@ function SidebarInner() {
       )}
 
       {!mobileOpen && (
-        <button onClick={() => setMobileOpen(true)}
+        <button type="button" onClick={() => setMobileOpen(true)}
           className="flex md:hidden fixed bottom-6 right-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(15,39,71,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
           aria-label="Menu">
@@ -291,7 +295,7 @@ function NavGroup({ label, children }: { label: string; children: React.ReactNod
 
 function NavItem({ icon, label, active, onClick, badge }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void; badge?: number }) {
   return (
-    <button onClick={onClick}
+    <button type="button" onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] ${
         active ? 'bg-[rgba(37,99,235,0.12)] text-[var(--green-3)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.2)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.04)] hover:text-[var(--sand)]'
       }`}>

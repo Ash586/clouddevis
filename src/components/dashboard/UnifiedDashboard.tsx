@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ENABLED_DOC_TYPES } from '@/lib/config';
 import {
   FileText, Users, FileStack,
   Plus, ArrowRight, PenLine, BarChart3, CreditCardIcon,
@@ -70,7 +71,7 @@ const DOC_TYPE_CONFIG: Record<string, { label: string; bg: string; text: string;
   attachement: { label: 'Attachement', bg: 'bg-orange-400/10', text: 'text-orange-400', border: 'border-orange-400/20' },
 };
 
-const QUICK_CREATE_TYPES = [
+const ALL_QUICK_CREATE_TYPES = [
   { type: 'devis', labelKey: 'devis', icon: FileText },
   { type: 'facture', labelKey: 'facture', icon: Receipt },
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
@@ -79,8 +80,13 @@ const QUICK_CREATE_TYPES = [
   { type: 'intervention', labelKey: 'intervention', icon: Wrench },
   { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ];
+const QUICK_CREATE_TYPES = ALL_QUICK_CREATE_TYPES.filter(d => ENABLED_DOC_TYPES.includes(d.type as never));
 
-const TYPE_FILTERS = ['ALL', 'DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'INTERVENTION', 'ATTACHEMENT'] as const;
+const DOC_TYPE_TO_FILTER: Record<string, string> = {
+  devis: 'DEVIS', facture: 'FACTURE', proforma: 'PROFORMA',
+  bc: 'BC', br: 'BR', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT',
+};
+const TYPE_FILTERS = ['ALL', ...ENABLED_DOC_TYPES.map(t => DOC_TYPE_TO_FILTER[t]).filter(Boolean)] as const;
 
 /* ─── Delete Modal ─── */
 function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () => void; onConfirm: () => void }) {
@@ -98,8 +104,8 @@ function DeleteModal({ open, onClose, onConfirm }: { open: boolean; onClose: () 
           <h3 className="text-base font-bold text-[var(--sand)] mb-2">{tc('deleteModal.title')}</h3>
           <p className="text-xs text-[var(--sand-muted)] mb-6">{tc('deleteModal.description')}</p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button onClick={onClose} className="flex-1 py-3 bg-[var(--navy-3)] text-[var(--sand-muted)] text-sm font-bold rounded-xl hover:bg-[var(--navy-4)] transition order-2 sm:order-1">{tc('deleteModal.cancel')}</button>
-            <button onClick={() => { onConfirm(); onClose(); }} className="flex-1 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition order-1 sm:order-2">{tc('deleteModal.confirm')}</button>
+            <button type="button" onClick={onClose} className="flex-1 py-3 bg-[var(--navy-3)] text-[var(--sand-muted)] text-sm font-bold rounded-xl hover:bg-[var(--navy-4)] transition order-2 sm:order-1">{tc('deleteModal.cancel')}</button>
+            <button type="button" onClick={() => { onConfirm(); onClose(); }} className="flex-1 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition order-1 sm:order-2">{tc('deleteModal.confirm')}</button>
           </div>
         </div>
       </div>
@@ -147,7 +153,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             <h1 className="text-2xl sm:text-[30px] font-sora font-extrabold text-white leading-tight">{greeting}, {userName}</h1>
             <p className="text-sm text-white/75 mt-1.5">{t('subtitle')}</p>
           </div>
-          <button onClick={() => router.push('/dashboard/editor?type=devis')}
+          <button type="button" onClick={() => router.push('/dashboard/editor?type=devis')}
             className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-[var(--green-2)] text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-[0.98]">
             <Plus size={18} /> {t('newQuote')}
           </button>
@@ -199,7 +205,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       {/* ── Continue Draft (contextual) ── */}
       {draftDoc && (
         <div className="flex items-start gap-3 sm:gap-4 p-3.5 mb-6 rounded-2xl bg-gradient-to-r from-[rgba(37,99,235,0.08)] to-transparent border border-[rgba(37,99,235,0.18)]">
-          <button onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
+          <button type="button" onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}
             className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 text-start group">
             <div className="w-10 h-10 rounded-xl bg-[var(--green-glow)] flex items-center justify-center shrink-0">
               <FileEdit size={18} className="text-[var(--green-3)]" />
@@ -210,7 +216,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
             </div>
             <ChevronRight size={18} className="text-[var(--green-3)] shrink-0 group-hover:translate-x-0.5 transition-transform" />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); router.push('/dashboard/documents?status=DRAFT'); }}
+          <button type="button" onClick={(e) => { e.stopPropagation(); router.push('/dashboard/documents?status=DRAFT'); }}
             className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] text-[10px] font-bold hover:bg-[var(--navy-4)] hover:text-[var(--sand)] transition-all">
             {tc('viewAll')}
           </button>
@@ -224,7 +230,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
           {QUICK_CREATE_TYPES.map((qd) => {
             const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', bon_reception:'BR', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
             return (
-              <button key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
+              <button type="button" key={qd.type} onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
                 className="group relative flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] hover:border-[var(--green-2)]/30 hover:bg-[var(--navy-3)] hover:shadow-lg hover:shadow-[rgba(37,99,235,0.08)] transition-all duration-300 active:scale-[0.97] text-start overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[var(--green-glow)]/0 to-[var(--green-glow)]/0 group-hover:from-[var(--green-glow)]/40 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
                 <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[var(--green-glow)] text-[var(--green-3)] group-hover:bg-[var(--green-3)] group-hover:text-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[rgba(37,99,235,0.25)]">
@@ -264,7 +270,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
           {/* Filter Chips */}
           <div className="flex items-center gap-2 flex-wrap mb-4">
             {TYPE_FILTERS.map((tf) => (
-              <button key={tf} onClick={() => onTypeFilterChange(tf)} className={filterChipClass(typeFilter === tf)}>
+              <button type="button" key={tf} onClick={() => onTypeFilterChange(tf)} className={filterChipClass(typeFilter === tf)}>
                 {tf === 'ALL' ? t('allTypes') : DOC_TYPE_CONFIG[tf.toLowerCase()]?.label || tf}
               </button>
             ))}
@@ -294,7 +300,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                 </Button>
               </div>
             ) : (
-              <button onClick={() => { onSearchChange(''); onTypeFilterChange('ALL'); }}
+              <button type="button" onClick={() => { onSearchChange(''); onTypeFilterChange('ALL'); }}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] text-[11px] font-bold hover:bg-[var(--navy-4)] hover:text-[var(--sand)] transition-all">
                 <X size={13} /> {t('clearFilters') || 'Réinitialiser les filtres'}
               </button>
@@ -322,7 +328,7 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                       <span className="text-sm font-bold text-[var(--sand)] whitespace-nowrap">{doc.total} {tc('currency')}</span>
                       <StatusBadge status={doc.status} label={tc(STATUS_LABELS[doc.status] || 'draft')} />
                     </div>
-                    <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
                       className="shrink-0 -mr-1 p-2 text-red-400/70 active:text-red-400 active:bg-red-400/10 rounded-lg transition-colors" aria-label={tc('delete')}>
                       <Trash2 size={16} />
                     </button>
@@ -359,11 +365,11 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
                       </td>
                       <td className="px-6 py-3">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/editor?id=${doc.id}`); }}
+                          <button type="button" onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/editor?id=${doc.id}`); }}
                             className="p-1.5 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.1)] rounded-lg transition-all" title={t('view')}>
                             <Eye size={14} />
                           </button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
+                          <button type="button" onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc.id); }}
                             className="p-1.5 text-red-400/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all" title={tc('delete')}>
                             <Trash2 size={14} />
                           </button>
@@ -380,12 +386,12 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
               <div className="flex items-center justify-between px-6 py-4 border-t border-[rgba(15,39,71,0.06)]">
                 <span className="text-[11px] text-[var(--sand-muted)]">{page} / {totalPages}</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1}
+                  <button type="button" onClick={() => onPageChange(Math.max(1, page - 1))} disabled={page <= 1}
                     className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
                       page <= 1 ? 'opacity-50 cursor-not-allowed border-[rgba(15,39,71,0.04)] text-[var(--sand-muted)]/50 grayscale' : 'border-[rgba(15,39,71,0.06)] hover:border-[rgba(15,39,71,0.14)] text-[var(--sand-muted)] hover:text-[var(--sand)]')}>
                     <ChevronLeft size={14} /> {tc('back')}
                   </button>
-                  <button onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages}
+                  <button type="button" onClick={() => onPageChange(Math.min(totalPages, page + 1))} disabled={page >= totalPages}
                     className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border',
                       page >= totalPages ? 'opacity-50 cursor-not-allowed border-[rgba(37,99,235,0.1)] bg-[rgba(37,99,235,0.05)] text-[var(--green-3)]/50 grayscale' : 'border-[rgba(37,99,235,0.2)] bg-[rgba(37,99,235,0.1)] text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.15)]')}>
                     {t('next')} <ChevronRight size={14} />
@@ -443,7 +449,7 @@ function KpiCard({ label, value, sub, icon, suffix, color = 'default', hero = fa
 /* ─── Secondary quick link ─── */
 function SecondaryLink({ icon, label, sub, onClick }: { icon: React.ReactNode; label: string; sub?: string; onClick: () => void }) {
   return (
-    <button onClick={onClick}
+    <button type="button" onClick={onClick}
       className="group flex items-center gap-2.5 p-3 rounded-xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] hover:border-[rgba(15,39,71,0.14)] hover:bg-[var(--navy-3)] transition-all text-start min-w-0">
       <div className="w-8 h-8 rounded-lg bg-[var(--navy-3)] text-[var(--sand-muted)] group-hover:text-[var(--sand)] flex items-center justify-center shrink-0 transition-colors">
         {icon}
@@ -477,7 +483,7 @@ function SortHeader({ column, label, current, onSort, align }: { column: string;
   const active = current === column;
   return (
     <th className={`px-6 py-3 ${align === 'right' ? 'text-right' : 'text-left'}`}>
-      <button onClick={() => onSort(column)}
+      <button type="button" onClick={() => onSort(column)}
         className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
           active ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]'
         }`}>
