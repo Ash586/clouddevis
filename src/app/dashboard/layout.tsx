@@ -1,18 +1,32 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me')
       .then(r => {
-        if (!r.ok) router.push('/auth/login');
+        if (!r.ok) {
+          router.replace('/auth/login');
+        } else {
+          setAuthChecked(true);
+        }
       })
-      .catch(() => router.push('/auth/login'));
+      .catch(() => router.replace('/auth/login'));
   }, [router]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--navy)]">
+        <Loader2 size={28} className="animate-spin text-[var(--sand-muted)]" />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }
