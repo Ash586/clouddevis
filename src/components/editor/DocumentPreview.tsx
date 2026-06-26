@@ -8,9 +8,10 @@ import { PreviewHeader } from './preview/PreviewHeader';
 import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
 import { PreviewAttachement } from './preview/PreviewAttachement';
-import { PreviewDevis } from './preview/PreviewDevis';
+import { PreviewHaussmann } from './preview/PreviewHaussmann';
 import { PreviewNordic } from './preview/PreviewNordic';
 import { PreviewVelours } from './preview/PreviewVelours';
+import { PreviewIndustrielle } from './preview/PreviewIndustrielle';
 import { PreviewBonCommande } from './preview/PreviewBonCommande';
 import { PreviewIntervention } from './preview/PreviewIntervention';
 import { getDesign } from '@/lib/documentDesign';
@@ -70,6 +71,10 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
 
   const sharedProps = { doc, sf, bv, vb, t, tc: tcommon, tu, results, design, highlight: previewFocus };
 
+  if (doc.previewTemplate === 'haussmann') {
+    return <PreviewHaussmann {...sharedProps} />;
+  }
+
   if (doc.previewTemplate === 'nordic') {
     return <PreviewNordic {...sharedProps} />;
   }
@@ -78,8 +83,12 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     return <PreviewVelours {...sharedProps} />;
   }
 
+  if (doc.previewTemplate === 'industrielle') {
+    return <PreviewIndustrielle {...sharedProps} />;
+  }
+
   if (doc.documentType === 'devis') {
-    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} results={results} design={design} highlight={previewFocus} />;
+    return <PreviewHaussmann {...sharedProps} />;
   }
 
   return (

@@ -7,22 +7,117 @@ import { useSectionContext } from './SectionProps';
 
 const TEMPLATES = [
   {
-    id: 'classic' as const,
-    label: 'Classique',
-    desc: 'Vert forêt · serif',
-    accent: '#0B3D2E',
+    id: 'haussmann' as const,
+    label: 'Haussmann',
+    desc: 'Vert · Cormorant',
+    accent: '#0d4a3e',
+    preview: (
+      <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 5px 3px' }}>
+        {/* Company name centered, italic */}
+        <div style={{ width: '72%', height: 5, background: '#0d4a3e', borderRadius: 2, marginBottom: 3, marginTop: 3, opacity: 0.85 }} />
+        <div style={{ width: '38%', height: 2, background: '#9ca3af', borderRadius: 1, marginBottom: 5 }} />
+        {/* Separator with diamonds */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, width: '92%', marginBottom: 5 }}>
+          <div style={{ flex: 1, height: 0.5, background: '#0d4a3e' }} />
+          <div style={{ width: 4, height: 4, background: '#c9a227', transform: 'rotate(45deg)', flexShrink: 0 }} />
+          <div style={{ width: 14, height: 2.5, background: '#0d4a3e', borderRadius: 1 }} />
+          <div style={{ width: 4, height: 4, background: '#c9a227', transform: 'rotate(45deg)', flexShrink: 0 }} />
+          <div style={{ flex: 1, height: 0.5, background: '#0d4a3e' }} />
+        </div>
+        {/* Two columns */}
+        <div style={{ display: 'flex', gap: 4, width: '92%', marginBottom: 5 }}>
+          <div style={{ flex: 1, borderRight: '0.5px solid #e5e7eb', paddingRight: 3 }}>
+            <div style={{ height: 1.5, background: '#e5e7eb', borderRadius: 1, marginBottom: 2 }} />
+            <div style={{ height: 1.5, background: '#e5e7eb', borderRadius: 1, marginBottom: 2 }} />
+          </div>
+          <div style={{ flex: 1, paddingLeft: 3 }}>
+            <div style={{ height: 3.5, background: '#0d4a3e', borderRadius: 1, marginBottom: 2, opacity: 0.7 }} />
+            <div style={{ height: 1.5, background: '#e5e7eb', borderRadius: 1 }} />
+          </div>
+        </div>
+        {/* Table rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1.5, width: '92%', flex: 1 }}>
+          {[1,2,3].map(i => <div key={i} style={{ height: 2.5, borderBottom: '0.5px solid #e5e7eb' }} />)}
+        </div>
+        {/* Total */}
+        <div style={{ width: '44%', height: 7, background: '#0d4a3e', alignSelf: 'flex-end', marginTop: 4, borderRadius: 1 }} />
+      </div>
+    ),
+  },
+  {
+    id: 'velours' as const,
+    label: 'Velours Rouge',
+    desc: 'Bordeaux · Playfair',
+    accent: '#3d0d1c',
+    preview: (
+      <div style={{ width: '100%', height: '100%', background: '#fdfaf5', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: 2.5, background: '#c9a227' }} />
+        <div style={{ background: '#3d0d1c', padding: '6px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ width: '55%', height: 5, background: '#f0e0c8', borderRadius: 1, marginBottom: 3 }} />
+            <div style={{ width: '32%', height: 1.5, background: '#c9a227', marginBottom: 2 }} />
+            <div style={{ width: '45%', height: 2, background: '#c9a090', borderRadius: 1 }} />
+          </div>
+          <div style={{ flexShrink: 0, textAlign: 'right' }}>
+            <div style={{ border: '1px solid #c9a227', padding: '2px 5px', marginBottom: 3 }}>
+              <div style={{ width: 20, height: 3.5, background: '#f0e0c8', borderRadius: 1 }} />
+            </div>
+            <div style={{ width: 24, height: 2, background: '#f9e8ee', borderRadius: 1, marginLeft: 'auto' }} />
+            <div style={{ width: 18, height: 1.5, background: '#f9e8ee', borderRadius: 1, marginLeft: 'auto', marginTop: 1 }} />
+          </div>
+        </div>
+        <div style={{ height: 1.5, background: '#c9a227' }} />
+        <div style={{ padding: '4px 6px', flex: 1 }}>
+          <div style={{ background: '#fff', border: '0.5px solid #e8d5b7', padding: '3px 4px', marginBottom: 4 }}>
+            <div style={{ width: '60%', height: 3, background: '#3d0d1c', borderRadius: 1 }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {[1,2,3].map(i => <div key={i} style={{ height: 2.5, background: i%2===0 ? '#fdfaf5' : '#fff', borderBottom: '0.5px solid #e8d5b7' }} />)}
+          </div>
+          {/* Gold-bordered total */}
+          <div style={{ marginTop: 4, marginLeft: 'auto', width: '40%', height: 7, border: '1px solid #c9a227', background: '#fff' }} />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: 'industrielle' as const,
+    label: 'Précision Ind.',
+    desc: 'Ardoise · Bleu',
+    accent: '#1e40af',
     preview: (
       <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ height: 4, background: '#0B3D2E' }} />
-        <div style={{ padding: '6px 8px', flex: 1 }}>
-          <div style={{ width: '60%', height: 5, background: '#0B3D2E', borderRadius: 2, marginBottom: 4 }} />
-          <div style={{ width: '40%', height: 3, background: '#e5e7eb', borderRadius: 2, marginBottom: 2 }} />
-          <div style={{ width: '50%', height: 3, background: '#e5e7eb', borderRadius: 2, marginBottom: 6 }} />
-          <div style={{ height: 2, background: '#f3f4f6', marginBottom: 4 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {[1,2,3].map(i => <div key={i} style={{ height: 2.5, background: '#f3f4f6', borderRadius: 1 }} />)}
+        {/* Split header */}
+        <div style={{ display: 'flex', height: 32 }}>
+          <div style={{ width: '45%', background: '#1e293b', padding: '5px 5px', flexShrink: 0 }}>
+            <div style={{ height: 3, background: 'rgba(255,255,255,0.7)', borderRadius: 1, marginBottom: 3, width: '65%' }} />
+            <div style={{ height: 2, background: 'rgba(148,197,253,0.6)', borderRadius: 1, width: '50%', marginBottom: 2 }} />
+            <div style={{ height: 1.5, background: 'rgba(148,197,253,0.4)', borderRadius: 1, width: '55%' }} />
           </div>
-          <div style={{ marginTop: 6, marginLeft: 'auto', width: '40%', height: 10, background: '#0B3D2E', borderRadius: 2 }} />
+          <div style={{ flex: 1, background: '#f1f5f9', padding: '5px 5px' }}>
+            <div style={{ height: 5, background: '#1e293b', borderRadius: 1, marginBottom: 3, width: '50%' }} />
+            <div style={{ height: 1.5, background: '#94a3b8', borderRadius: 1, width: '70%', marginBottom: 1.5 }} />
+            <div style={{ height: 1.5, background: '#94a3b8', borderRadius: 1, width: '55%' }} />
+          </div>
+        </div>
+        {/* Client block */}
+        <div style={{ background: '#f8fafc', margin: '3px 4px', padding: '3px 4px' }}>
+          <div style={{ height: 2.5, background: '#2563eb', borderRadius: 1, marginBottom: 2, width: '40%', opacity: 0.6 }} />
+          <div style={{ height: 2, background: '#0f172a', borderRadius: 1, width: '65%' }} />
+        </div>
+        {/* Table */}
+        <div style={{ padding: '0 4px', flex: 1 }}>
+          <div style={{ height: 5, background: '#334155', borderRadius: 1, marginBottom: 2 }} />
+          {[1,2,3].map(i => (
+            <div key={i} style={{ height: 2.5, background: i%2===0 ? '#f8fafc' : '#fff', borderBottom: '0.5px solid #e2e8f0', display: 'flex', marginBottom: 1 }}>
+              <div style={{ width: 2.5, background: '#2563eb', flexShrink: 0 }} />
+            </div>
+          ))}
+          {/* Totals grid */}
+          <div style={{ marginTop: 4, marginLeft: 'auto', width: '46%' }}>
+            <div style={{ height: 2.5, border: '0.5px solid #e2e8f0', marginBottom: 1 }} />
+            <div style={{ height: 6, background: '#1e40af' }} />
+          </div>
         </div>
       </div>
     ),
@@ -35,51 +130,20 @@ const TEMPLATES = [
     preview: (
       <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column' }}>
         <div style={{ height: 3, background: '#0f766e' }} />
-        <div style={{ padding: '6px 8px', flex: 1 }}>
+        <div style={{ padding: '6px 7px', flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <div style={{ width: '45%', height: 5, background: '#111827', borderRadius: 2 }} />
             <div style={{ width: '28%', height: 5, background: '#0f766e', borderRadius: 2 }} />
           </div>
-          <div style={{ width: '35%', height: 2.5, background: '#e5e7eb', borderRadius: 1, marginBottom: 4 }} />
+          <div style={{ width: '35%', height: 2, background: '#e5e7eb', borderRadius: 1, marginBottom: 3 }} />
           <div style={{ height: 1, background: '#bbf7d0', marginBottom: 4 }} />
           <div style={{ background: '#f0fdf4', borderLeft: '2px solid #0f766e', padding: '3px 4px', marginBottom: 5 }}>
-            <div style={{ width: '60%', height: 2.5, background: '#111827', borderRadius: 1 }} />
+            <div style={{ width: '58%', height: 2.5, background: '#111827', borderRadius: 1 }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {[1,2,3].map(i => <div key={i} style={{ height: 2.5, background: i%2===0 ? '#f0fdf4' : '#fff', borderBottom: '0.5px solid #e5e7eb' }} />)}
           </div>
-          <div style={{ marginTop: 5, marginLeft: 'auto', width: '40%', height: 8, background: '#0f766e', borderRadius: 1 }} />
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'velours' as const,
-    label: 'Velours Rouge',
-    desc: 'Bordeaux · Playfair',
-    accent: '#3d0d1c',
-    preview: (
-      <div style={{ width: '100%', height: '100%', background: '#fdfaf5', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ height: 2.5, background: '#c9a227' }} />
-        <div style={{ background: '#3d0d1c', padding: '6px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ width: '50%', height: 4, background: '#f0e0c8', borderRadius: 1, marginBottom: 3 }} />
-            <div style={{ width: '30%', height: 2, background: '#c9a090', borderRadius: 1 }} />
-          </div>
-          <div style={{ border: '1.5px solid #c9a227', padding: '3px 5px', textAlign: 'center' }}>
-            <div style={{ width: 22, height: 3.5, background: '#f0e0c8', borderRadius: 1, marginBottom: 2 }} />
-            <div style={{ width: 16, height: 2, background: '#c9a227', borderRadius: 1 }} />
-          </div>
-        </div>
-        <div style={{ height: 1.5, background: '#c9a227', opacity: 0.5 }} />
-        <div style={{ padding: '5px 8px', flex: 1 }}>
-          <div style={{ background: '#fff', border: '0.5px solid #e8d5b7', padding: '3px 4px', marginBottom: 4 }}>
-            <div style={{ width: '65%', height: 3, background: '#3d0d1c', borderRadius: 1 }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {[1,2,3].map(i => <div key={i} style={{ height: 2.5, background: i%2===0 ? '#fdfaf5' : '#fff', borderBottom: '0.5px solid #e8d5b7' }} />)}
-          </div>
-          <div style={{ marginTop: 4, marginLeft: 'auto', width: '38%', height: 8, background: '#3d0d1c' }} />
+          <div style={{ marginTop: 5, marginLeft: 'auto', width: '40%', height: 7, background: '#0f766e', borderRadius: 1 }} />
         </div>
       </div>
     ),
@@ -100,7 +164,7 @@ const POS_OPTS = [
 
 export function DesignSection() {
   const { doc, updateCompanyInfo, updateDoc, hiddenFields, showToast } = useSectionContext();
-  const activeTemplate = doc.previewTemplate ?? 'classic';
+  const activeTemplate = doc.previewTemplate ?? 'haussmann';
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 

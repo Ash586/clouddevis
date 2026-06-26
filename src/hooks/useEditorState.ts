@@ -84,7 +84,7 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
     validityDays: 30,
     reference: '',
     showWatermark: false,
-    previewTemplate: 'classic',
+    previewTemplate: 'haussmann',
   };
 
   if (docType === 'attachement') {
@@ -248,7 +248,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
               validityDays: (editorMeta.validityDays as number) ?? prev.validityDays,
               reference: (editorMeta.reference as string) || prev.reference,
               showWatermark: (editorMeta.showWatermark as boolean) ?? prev.showWatermark,
-              previewTemplate: (editorMeta.previewTemplate as 'classic' | 'nordic' | 'velours' | undefined) ?? prev.previewTemplate,
+              previewTemplate: (editorMeta.previewTemplate as 'haussmann' | 'nordic' | 'velours' | 'industrielle' | undefined) ?? prev.previewTemplate,
               objet: (editorMeta.objet as string) || prev.objet,
               docCity: (editorMeta.docCity as string) || prev.docCity,
               // Restore signature fields

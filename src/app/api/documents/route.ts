@@ -233,7 +233,7 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
       validityDays: doc.validityDays ?? 30,
       reference: doc.reference || '',
       showWatermark: doc.showWatermark || false,
-      previewTemplate: doc.previewTemplate || 'classic',
+      previewTemplate: doc.previewTemplate || 'haussmann',
       objet: doc.objet || '',
       docCity: doc.docCity || '',
       // signature fields

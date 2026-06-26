@@ -175,7 +175,7 @@ export interface DocumentState {
   customFields: Record<string, Record<string, unknown>>;
   logoPosition?: 'left' | 'center' | 'right';
   logoSize?: 'sm' | 'md' | 'lg';
-  previewTemplate?: 'classic' | 'nordic' | 'velours';
+  previewTemplate?: 'haussmann' | 'nordic' | 'velours' | 'industrielle';
 
   // DEVIS-specific fields
   companyTagline?: string;

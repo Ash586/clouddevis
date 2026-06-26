@@ -7,13 +7,13 @@ import { formatCurrency } from '@/lib/calculations';
 const VR = {
   bordeaux: '#3d0d1c',
   gold: '#c9a227',
-  goldLight: '#fef9e7',
   goldBorder: '#e8d5b7',
   cream: '#fdfaf5',
   text: '#1a0810',
   muted: '#7c4d5a',
   faint: '#b08090',
   rule: '#e8d5b7',
+  roseLight: '#f9e8ee',
 };
 
 const PLAYFAIR = "var(--font-playfair, 'Playfair Display', Georgia, 'Times New Roman', serif)";
@@ -57,15 +57,22 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
   return (
     <div id="print-area" className="w-[21cm] min-h-[29.7cm] flex flex-col shadow-md print:shadow-none" style={{ background: VR.cream, fontFamily: SANS }}>
-      {/* Gold top stripe */}
+
+      {/* Gold 3px stripe — very top */}
       <div style={{ height: 3, background: VR.gold, flexShrink: 0 }} />
 
       {/* Bordeaux header */}
-      <div style={{ background: VR.bordeaux, padding: '32px 40px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {/* Company left */}
-        <div style={{ flex: 1 }}>
+      <div style={{ background: VR.bordeaux, padding: '28px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {/* Company — Playfair Display 34px white, left */}
+        <div style={{ flex: 1, marginRight: 24 }}>
+          {doc.companyInfo?.logo && (
+            <div style={{ marginBottom: 8 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={doc.companyInfo.logo} style={{ maxHeight: 44, maxWidth: 140, objectFit: 'contain' }} alt="logo" />
+            </div>
+          )}
           {companyName && (
-            <div style={{ fontFamily: PLAYFAIR, fontSize: 28, fontWeight: 700, color: '#f0e0c8', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+            <div style={{ fontFamily: PLAYFAIR, fontSize: 34, fontWeight: 700, color: '#f0e0c8', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
               {companyName}
             </div>
           )}
@@ -73,43 +80,40 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
           <div style={{ fontSize: 10, color: '#c9a090', lineHeight: 1.9 }}>
             {companyAddr && <span>{companyAddr}</span>}
             {doc.companyPhone && <><br /><span>Tél : {doc.companyPhone}</span></>}
+            {!doc.companyPhone && !isEnt && doc.artisanInfo?.phone && <><br /><span>Tél : {doc.artisanInfo.phone}</span></>}
             {isEnt && doc.companyInfo?.taxIds?.nif && (
               <><br /><span>NIF : {doc.companyInfo.taxIds.nif}</span></>
             )}
             {isEnt && doc.companyInfo?.taxIds?.rc && (
-              <><span style={{ margin: '0 8px' }}>·</span><span>RC : {doc.companyInfo.taxIds.rc}</span></>
+              <><span style={{ margin: '0 6px' }}>·</span><span>RC : {doc.companyInfo.taxIds.rc}</span></>
             )}
           </div>
         </div>
 
-        {/* Doc badge right */}
-        <div style={{ border: `2px solid ${VR.gold}`, padding: '14px 22px', textAlign: 'center', marginLeft: 28, flexShrink: 0 }}>
-          <div style={{ fontSize: 9, color: '#c9a090', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 4 }}>Document</div>
-          <div style={{ fontFamily: PLAYFAIR, fontSize: 22, fontWeight: 700, color: '#f0e0c8', letterSpacing: '2px' }}>{docLabel}</div>
-          {sf('docNumber') && doc.documentNumber && (
-            <div style={{ fontSize: 10, color: VR.gold, marginTop: 5 }}>N° {doc.documentNumber}</div>
-          )}
-          {sf('issueDate') && doc.date && (
-            <div style={{ fontSize: 9, color: '#c9a090', marginTop: 2 }}>{doc.date}</div>
-          )}
+        {/* Right: badge (border 1px gold) + number/date below in pale rose */}
+        <div style={{ flexShrink: 0, textAlign: 'right' }}>
+          {/* Badge with 1px gold border */}
+          <div style={{ display: 'inline-block', border: `1px solid ${VR.gold}`, padding: '6px 16px', textAlign: 'center', marginBottom: 8 }}>
+            <div style={{ fontFamily: PLAYFAIR, fontSize: 22, fontWeight: 700, color: '#f0e0c8', letterSpacing: '2px' }}>{docLabel}</div>
+          </div>
+          {/* Number and date BELOW badge, in pale rose */}
+          <div style={{ fontSize: 10, color: VR.roseLight, lineHeight: 1.8 }}>
+            {sf('docNumber') && doc.documentNumber && <div>N° {doc.documentNumber}</div>}
+            {sf('issueDate') && doc.date && <div>{doc.date}</div>}
+            {sf('validUntil') && doc.validUntil && <div style={{ fontSize: 9, color: '#c9a090' }}>Valable : {doc.validUntil}</div>}
+          </div>
         </div>
       </div>
 
-      {/* Gold separator */}
-      <div style={{ height: 2, background: VR.gold, opacity: 0.55 }} />
+      {/* Gold 2px separator under header */}
+      <div style={{ height: 2, background: VR.gold }} />
 
-      {/* Body */}
-      <div style={{ flex: 1, padding: '22px 40px' }}>
+      {/* Body — cream */}
+      <div style={{ flex: 1, padding: '20px 40px' }}>
 
-        {/* Date / validity line */}
-        <div style={{ textAlign: 'right', fontSize: 10, color: VR.muted, marginBottom: 16 }}>
-          {sf('validUntil') && doc.validUntil && `Valable jusqu'au ${doc.validUntil}`}
-          {sf('orderRef') && doc.bcRef && (doc.validUntil ? ` · ` : '') + `Réf BC : ${doc.bcRef}`}
-        </div>
-
-        {/* Client card */}
+        {/* Client — white box with #e8d5b7 border */}
         {vb('client') && bv('clientName', 'clientAddress') && doc.clientInfo.name && (
-          <div style={{ background: '#fff', border: `1px solid ${VR.goldBorder}`, padding: '14px 18px', marginBottom: 22 }}>
+          <div style={{ background: '#fff', border: `1px solid ${VR.goldBorder}`, padding: '14px 18px', marginBottom: 20 }}>
             <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: VR.gold, fontWeight: 700, marginBottom: 5 }}>Adressé à</div>
             <div style={{ fontFamily: PLAYFAIR, fontSize: 16, fontWeight: 700, color: VR.bordeaux }}>{doc.clientInfo.name}</div>
             {doc.clientInfo.address && (
@@ -130,7 +134,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
           </div>
         )}
 
-        {/* Items table */}
+        {/* Items table — bordeaux column titles, alternating white/cream rows */}
         {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, marginBottom: 18 }}>
             <thead>
@@ -161,7 +165,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Totals */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <div style={{ width: 270 }}>
+          <div style={{ width: 272 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 11, color: VR.muted, borderBottom: `0.5px solid ${VR.rule}` }}>
               <span>Sous-total HT</span><span>{formatCurrency(results.subTotalHT, currency)}</span>
             </div>
@@ -180,8 +184,9 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
                 <span>Timbre fiscal</span><span>{formatCurrency(results.timbreFiscal, currency)}</span>
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: VR.bordeaux, color: '#f0e0c8', marginTop: 6 }}>
-              <span style={{ fontFamily: PLAYFAIR, fontSize: 14, fontWeight: 700 }}>Total TTC</span>
+            {/* Total TTC — cadre doré (gold frame) with Playfair Display */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 14px', border: `2px solid ${VR.gold}`, background: '#fff', marginTop: 6 }}>
+              <span style={{ fontFamily: PLAYFAIR, fontSize: 14, fontWeight: 700, fontStyle: 'italic', color: VR.bordeaux }}>Total TTC</span>
               <span style={{ fontFamily: PLAYFAIR, fontSize: 16, fontWeight: 700, color: VR.gold }}>{formatCurrency(results.totalTTC, currency)}</span>
             </div>
             {results.acompte > 0 && (
@@ -206,11 +211,12 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
         )}
 
         {/* Payment */}
-        {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails.terms || doc.paymentDetails.iban) && (
+        {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) && (
           <div style={{ marginTop: 12, padding: '10px 14px', border: `0.5px solid ${VR.goldBorder}`, fontSize: 10.5, color: VR.muted, lineHeight: 1.6 }}>
             <strong style={{ display: 'block', fontSize: 9, color: VR.gold, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Paiement</strong>
             {doc.paymentDetails.terms && <div>{doc.paymentDetails.terms}</div>}
             {doc.paymentDetails.iban && <div style={{ fontSize: 10 }}>RIB : {doc.paymentDetails.iban}</div>}
+            {doc.bankName && <div style={{ fontSize: 10 }}>{doc.bankName}{doc.bankAgency ? ` — ${doc.bankAgency}` : ''}</div>}
           </div>
         )}
 
@@ -244,7 +250,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
         )}
       </div>
 
-      {/* Footer */}
+      {/* Bordeaux footer */}
       <div style={{ background: VR.bordeaux, padding: '10px 40px', marginTop: 'auto' }}>
         <div style={{ fontSize: 9, color: '#c9a090', textAlign: 'center', lineHeight: 1.9 }}>
           {companyAddr && <span>{companyAddr}</span>}
