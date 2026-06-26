@@ -36,13 +36,13 @@ export default function EnterprisePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f4f8]">
+    <div className="min-h-screen" style={{ background: 'var(--sand)' }}>
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <Card className="p-8">
+        <Card className="p-8" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🏢</div>
-            <h1 className="text-2xl font-black text-slate-900">{t('title') || 'CloudDevis Enterprise'}</h1>
-            <p className="text-sm text-slate-500 mt-2">{t('subtitle') || 'Solution sur mesure pour les grandes organisations'}</p>
+            <h1 className="text-2xl font-black" style={{ color: 'var(--sand)' }}>{t('title') || 'CloudDevis Enterprise'}</h1>
+            <p className="text-sm mt-2" style={{ color: 'var(--sand-muted)' }}>{t('subtitle') || 'Solution sur mesure pour les grandes organisations'}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -51,26 +51,28 @@ export default function EnterprisePage() {
               { icon: '🔒', title: t('benefit2Title') || 'Sécurité maximale', desc: t('benefit2Desc') || 'Hébergement dédié, audit de sécurité, conformité RGPD' },
               { icon: '👑', title: t('benefit3Title') || 'Support dédié', desc: t('benefit3Desc') || 'Manager dédié, SLA garantie, disponibilité 24/7' },
             ].map((b, i) => (
-              <div key={i} className="text-center p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <div key={i} className="text-center p-4 rounded-xl" style={{ background: 'var(--navy-3)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
                 <div className="text-3xl mb-2">{b.icon}</div>
-                <h3 className="text-sm font-bold text-slate-800 mb-1">{b.title}</h3>
-                <p className="text-[11px] text-slate-500">{b.desc}</p>
+                <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--sand)' }}>{b.title}</h3>
+                <p className="text-[11px]" style={{ color: 'var(--sand-muted)' }}>{b.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-base font-bold text-slate-800">{t('formTitle') || 'Demander un devis personnalisé'}</h2>
+            <h2 className="text-base font-bold" style={{ color: 'var(--sand)' }}>{t('formTitle') || 'Demander un devis personnalisé'}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">{t('companyName') || 'Nom de l\'entreprise'} *</label>
+                <label className="block text-xs font-bold mb-1" style={{ color: 'var(--sand-muted)' }}>{t('companyName') || 'Nom de l\'entreprise'} *</label>
                 <input type="text" value={form.companyName} onChange={e => setForm(p => ({ ...p, companyName: e.target.value }))}
-                  className="w-full border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                  style={{ background: 'var(--navy-3)', border: '0.5px solid rgba(15,39,71,0.08)', color: 'var(--sand)' }}
+                  className="w-full p-2.5 rounded-lg text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">{t('employees') || 'Nombre d\'employés'} *</label>
+                <label className="block text-xs font-bold mb-1" style={{ color: 'var(--sand-muted)' }}>{t('employees') || 'Nombre d\'employés'} *</label>
                 <select value={form.employees} onChange={e => setForm(p => ({ ...p, employees: e.target.value }))}
-                  className="w-full border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                  style={{ background: 'var(--navy-3)', border: '0.5px solid rgba(15,39,71,0.08)', color: 'var(--sand)' }}
+                  className="w-full p-2.5 rounded-lg text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-2)]">
                   <option value="">—</option>
                   {['10-25', '25-50', '50-100', '100-250', '250-500', '500+'].map(v => (
                     <option key={v} value={v}>{v}</option>
@@ -79,20 +81,22 @@ export default function EnterprisePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">{t('needs') || 'Décrivez vos besoins'} *</label>
+              <label className="block text-xs font-bold mb-1" style={{ color: 'var(--sand-muted)' }}>{t('needs') || 'Décrivez vos besoins'} *</label>
               <textarea value={form.needs} onChange={e => setForm(p => ({ ...p, needs: e.target.value }))} rows={4}
-                className="w-full border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                style={{ background: 'var(--navy-3)', border: '0.5px solid rgba(15,39,71,0.08)', color: 'var(--sand)' }}
+                className="w-full p-2.5 rounded-lg text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-2)] resize-none"
                 placeholder={t('needsPlaceholder') || 'Modules souhaités, nombre d\'utilisateurs, intégrations, etc.'} />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">{t('phone') || 'Téléphone'}</label>
+              <label className="block text-xs font-bold mb-1" style={{ color: 'var(--sand-muted)' }}>{t('phone') || 'Téléphone'}</label>
               <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-                className="w-full border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                style={{ background: 'var(--navy-3)', border: '0.5px solid rgba(15,39,71,0.08)', color: 'var(--sand)' }}
+                className="w-full p-2.5 rounded-lg text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
             </div>
             <Button onClick={handleSubmit} disabled={sending} className="w-full min-h-[44px]">
               {sending ? (tc('loading') || 'Envoi...') : (t('submit') || 'Envoyer la demande')}
             </Button>
-            <p className="text-[10px] text-slate-400 text-center">{t('privacy') || 'Nous ne partagerons jamais vos informations.'}</p>
+            <p className="text-[10px] text-center" style={{ color: 'var(--sand-muted)' }}>{t('privacy') || 'Nous ne partagerons jamais vos informations.'}</p>
           </div>
         </Card>
       </div>

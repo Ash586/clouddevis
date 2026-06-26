@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LandingAnimations, LandingFAQ, LangSwitcher } from '@/components/landing/LandingPageClient';
 import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
+import { PLANS, formatPrice } from '@/lib/pricing';
 
 const FAQ_ITEMS = [
    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
@@ -338,43 +339,48 @@ export default function HomePage() {
                 <p className="section-sub">{"Pas de surprise. Pas d\u2019engagement. Passez à la formule supérieure quand vous en avez besoin."}</p>
               </div>
               <div className="pricing-grid">
-                {[
-                  {
-                    plan: 'Gratuit', amount: '0', period: 'Pour toujours · Sans carte', featured: false,
-                    features: [
-                      { ok: true, text: '5 documents par mois' }, { ok: true, text: 'Tous les types de documents' },
-                      { ok: true, text: 'Export PDF' }, { ok: true, text: 'Calcul TVA automatique' },
-                      { ok: false, text: 'Historique des documents' }, { ok: false, text: 'Logo entreprise personnalisé' },
-                      { ok: false, text: 'Envoi par email' },
-                    ],
-                    cta: 'Commencer gratuitement', ghost: true, href: '/auth/register',
-                  },
-                  {
-                    plan: 'Pro', amount: '2 000', period: 'par mois · Annulable à tout moment', featured: true, popular: 'Le plus populaire',
-                    features: [
-                      { ok: true, text: 'Documents illimités' }, { ok: true, text: 'Tous les types de documents' },
-                      { ok: true, text: 'Export PDF haute qualité' }, { ok: true, text: 'Historique complet' },
-                      { ok: true, text: 'Logo et signature personnalisés' }, { ok: true, text: 'Envoi par email direct' },
-                      { ok: true, text: 'Support prioritaire' },
-                    ],
-                    cta: "Démarrer l\u2019essai gratuit →", ghost: false, href: '/auth/register',
-                  },
-                  {
-                    plan: 'Enterprise', amount: 'Sur mesure', period: 'Devis personnalisé', featured: false, custom: true,
-                    features: [
-                      { ok: true, text: 'Multi-utilisateurs (équipe)' }, { ok: true, text: 'Tableau de bord partagé' },
-                      { ok: true, text: 'Accès API (intégration ERP)' }, { ok: true, text: 'Formation dédiée' },
-                      { ok: true, text: 'SLA garanti' }, { ok: true, text: 'Facturation mensuelle ou annuelle' },
-                      { ok: true, text: 'Gestionnaire de compte dédié' },
-                    ],
-                    cta: 'Nous contacter', ghost: true, href: '/enterprise',
-                  },
-                ].map((p, i) => (
+                {[{
+                  id: 'free', plan: 'Gratuit', amount: '0', period: 'Pour toujours · Sans carte', featured: false,
+                  features: [
+                    { ok: true, text: `${PLANS.free.limits.docsPerMonth} documents par mois` },
+                    { ok: true, text: 'Tous les types de documents' },
+                    { ok: true, text: 'Export PDF' },
+                    { ok: true, text: 'Calcul TVA automatique' },
+                    { ok: false, text: 'Documents illimités' },
+                    { ok: false, text: 'Logo entreprise personnalisé' },
+                    { ok: false, text: 'Envoi par email' },
+                  ],
+                  cta: 'Commencer gratuitement', ghost: true, href: '/auth/register',
+                }, {
+                  id: 'standard', plan: 'Standard', amount: formatPrice(PLANS.standard.price), period: 'par mois · Annulable à tout moment', featured: true, popular: 'Le plus populaire',
+                  features: [
+                    { ok: true, text: 'Documents illimités' },
+                    { ok: true, text: 'Tous les types de documents' },
+                    { ok: true, text: 'Export PDF haute qualité' },
+                    { ok: true, text: `Jusqu'à ${PLANS.standard.limits.teamMembers} utilisateurs` },
+                    { ok: true, text: 'Logo et signature personnalisés' },
+                    { ok: true, text: 'Envoi par email direct' },
+                    { ok: true, text: `${PLANS.standard.limits.storageMB / 1024} Go de stockage` },
+                  ],
+                  cta: "Démarrer l'essai gratuit →", ghost: false, href: '/auth/register',
+                }, {
+                  id: 'enterprise', plan: 'Enterprise', amount: 'Sur mesure', period: 'Devis personnalisé', featured: false, custom: true,
+                  features: [
+                    { ok: true, text: 'Multi-utilisateurs (équipe)' },
+                    { ok: true, text: 'Tableau de bord partagé' },
+                    { ok: true, text: 'Accès API (intégration ERP)' },
+                    { ok: true, text: 'Formation dédiée' },
+                    { ok: true, text: 'SLA garanti' },
+                    { ok: true, text: 'Facturation mensuelle ou annuelle' },
+                    { ok: true, text: 'Gestionnaire de compte dédié' },
+                  ],
+                  cta: 'Nous contacter', ghost: true, href: '/enterprise',
+                }].map((p, i) => (
                   <div key={i} className={`price-card animate-on-scroll ${p.featured ? 'featured' : ''}`}>
                     {p.popular && <div className="price-popular">{p.popular}</div>}
                     <div className="price-plan">{p.plan}</div>
                     <div className="price-amount" style={p.custom ? { fontSize: 28, marginTop: 7 } : {}}>
-                      {p.amount}<span>{!p.custom && ' DA'}</span>
+                      {p.amount}{!p.custom && <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--sand-muted)' }}>/mois</span>}
                     </div>
                     <div className="price-period">{p.period}</div>
                     <div className="price-divider"></div>
@@ -386,7 +392,7 @@ export default function HomePage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={p.href} className={`btn price-cta ${p.ghost ? 'btn-ghost' : 'btn-primary'}`} data-plausible="CTA Click" data-event-location={`pricing_${p.plan.toLowerCase()}`} data-event-label={p.cta}>{p.cta}</Link>
+                    <Link href={p.href} className={`btn price-cta ${p.ghost ? 'btn-ghost' : 'btn-primary'}`} data-plausible="CTA Click" data-event-location={`pricing_${p.id}`} data-event-label={p.cta}>{p.cta}</Link>
                   </div>
                 ))}
               </div>

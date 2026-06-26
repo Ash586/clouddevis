@@ -25,10 +25,10 @@ export function HelpHome() {
 
       {/* Hero */}
       <div className="text-center mb-10">
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-3" style={{ color: '#1E40AF' }}>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-3" style={{ color: 'var(--navy)' }}>
           {t('title')}
         </h1>
-        <p className="text-[13px] text-[#666] max-w-lg mx-auto">
+        <p className="text-[13px] max-w-lg mx-auto" style={{ color: 'var(--sand-muted)' }}>
           {t('subtitle')}
         </p>
       </div>
@@ -38,22 +38,22 @@ export function HelpHome() {
 
       {/* Categories */}
       <section className="mt-10">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#999] mb-4">{t('exploreByCategory')}</h2>
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] mb-4" style={{ color: 'var(--sand-muted)' }}>{t('exploreByCategory')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {CATS.map((cat) => (
             <Link
               key={cat}
               href={`/help/${cat}`}
-              className="group flex items-start gap-3 p-4 rounded-xl border border-[#E4E0D8] hover:border-[#C4A35A] hover:shadow-sm transition bg-white"
+              className="group flex items-start gap-3 p-4 rounded-xl transition" style={{ border: '0.5px solid rgba(15,39,71,0.08)', background: 'var(--navy-2)', color: 'var(--sand)' }}
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: 'linear-gradient(135deg, #1E40AF10, #1E40AF08)' }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style={{ background: 'var(--navy-3)' }}>
                 {HELP_T[lang].categories[cat].icon}
               </div>
               <div>
-                <div className="text-[12.5px] font-bold text-[#161616] group-hover:text-[#1E40AF] transition">
+                <div className="text-[12.5px] font-bold transition" style={{ color: 'var(--sand)' }}>
                   {HELP_T[lang].categories[cat].title}
                 </div>
-                <div className="text-[11px] text-[#999] mt-0.5">
+                <div className="text-[11px] mt-0.5" style={{ color: 'var(--sand-muted)' }}>
                   {HELP_T[lang].categories[cat].desc}
                 </div>
               </div>
@@ -64,7 +64,7 @@ export function HelpHome() {
 
       {/* Popular articles */}
       <section className="mt-12">
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#999] mb-4">{t('popularArticles')}</h2>
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] mb-4" style={{ color: 'var(--sand-muted)' }}>{t('popularArticles')}</h2>
         <HelpPopular lang={lang} />
       </section>
 

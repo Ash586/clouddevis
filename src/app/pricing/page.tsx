@@ -19,12 +19,12 @@ const FAQ_ITEMS = [
 ];
 
 const COMPARISON_FEATURES = [
-  { key: 'documentsMonth', free: '5', standard: '50', pro: 'Illimité', max: 'Illimité' },
-  { key: 'templates', free: 'Basiques', standard: 'Tous', pro: 'Tous', max: 'Personnalisés' },
-  { key: 'pdfExport', free: false, standard: true, pro: true, max: true },
-  { key: 'noWatermark', free: false, standard: true, pro: true, max: true },
-  { key: 'teamMembers', free: '1', standard: '2', pro: '5', max: '15' },
-  { key: 'reports', free: false, standard: false, pro: true, max: true },
+  { key: 'documentsMonth', free: '5', standard: 'Illimité', enterprise: 'Illimité' },
+  { key: 'templates', free: 'Basiques', standard: 'Tous', enterprise: 'Personnalisés' },
+  { key: 'pdfExport', free: false, standard: true, enterprise: true },
+  { key: 'noWatermark', free: false, standard: true, enterprise: true },
+  { key: 'teamMembers', free: '1', standard: '5', enterprise: 'Illimité' },
+  { key: 'reports', free: false, standard: true, enterprise: true },
 ];
 
 const COMPARISON_SECTIONS = [
@@ -141,15 +141,14 @@ export default function PricingPage() {
                   <th className="py-3 pr-4 text-sm font-semibold text-slate-500">{t('feature')}</th>
                   <th className="py-3 px-4 text-sm font-semibold text-slate-900 text-center">{t('freePlanName')}</th>
                   <th className="py-3 px-4 text-sm font-semibold text-blue-600 text-center">{t('standardPlanName')}</th>
-                  <th className="py-3 px-4 text-sm font-semibold text-slate-900 text-center">{t('proPlanName')}</th>
-                  <th className="py-3 pl-4 text-sm font-semibold text-slate-900 text-center">{t('maxPlanName')}</th>
+                  <th className="py-3 pl-4 text-sm font-semibold text-slate-900 text-center">{t('enterpriseCta')}</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON_FEATURES.map(row => (
                   <tr key={row.key} className="border-b border-slate-100">
                     <td className="py-3 pr-4 text-sm text-slate-600">{t(row.key as string)}</td>
-                    {(['free', 'standard', 'pro', 'max'] as const).map(col => (
+                    {(['free', 'standard', 'enterprise'] as const).map(col => (
                       <td key={col} className="py-3 px-4 text-center">
                         {renderCheck(row[col])}
                       </td>
@@ -179,7 +178,7 @@ export default function PricingPage() {
                         <div key={key} className="flex items-center justify-between py-2 border-t border-slate-100 first:border-0">
                           <span className="text-xs text-slate-600">{t(row.key as string)}</span>
                           <div className="flex items-center gap-3">
-                            {(['free', 'standard', 'pro', 'max'] as const).map(col => (
+                            {(['free', 'standard', 'enterprise'] as const).map(col => (
                               <div key={col} className="w-12 text-center" title={t(`${col}PlanName` as string)}>
                                 {renderCheck(row[col])}
                               </div>
@@ -191,8 +190,7 @@ export default function PricingPage() {
                     <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
                       <span className="text-[10px] text-slate-400 w-12">Free</span>
                       <span className="text-[10px] text-blue-600 w-12 text-center">Std</span>
-                      <span className="text-[10px] text-slate-700 w-12 text-center">Pro</span>
-                      <span className="text-[10px] text-slate-700 w-12 text-center">Max</span>
+                      <span className="text-[10px] text-slate-700 w-12 text-center">Ent</span>
                     </div>
                   </div>
                 )}

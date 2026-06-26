@@ -59,6 +59,11 @@ function RegisterForm() {
   const errorId = 'register-error';
   const stepRef = useRef(step);
   stepRef.current = step;
+  const stepLabels: Record<number, string> = {
+    1: 'Compte',
+    2: mode === 'entreprise' ? 'Société' : 'Secteur',
+    3: 'Société',
+  };
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter') {
@@ -160,16 +165,25 @@ function RegisterForm() {
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-2 mb-5" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={totalSteps} aria-label={`Étape ${step} sur ${totalSteps}`}>
-          {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
-            <div key={s} className="flex-1 flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all ${step >= s ? 'bg-[var(--green-2)] text-white' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]'}`}
-                aria-current={step === s ? 'step' : undefined}>
-                {step > s ? <Check size={12} aria-hidden="true" /> : s}
+        <div className="mb-5" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={totalSteps} aria-label={`Étape ${step} sur ${totalSteps}`}>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
+              <div key={s} className="flex-1 flex items-center gap-2">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all ${step >= s ? 'bg-[var(--green-2)] text-white' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]'}`}
+                  aria-current={step === s ? 'step' : undefined}>
+                  {step > s ? <Check size={12} aria-hidden="true" /> : s}
+                </div>
+                {s < totalSteps && <div className={`flex-1 h-0.5 rounded-full transition-all ${step > s ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-4)]'}`} />}
               </div>
-              {s < totalSteps && <div className={`flex-1 h-0.5 rounded-full transition-all ${step > s ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-4)]'}`} />}
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="flex items-center gap-2 mt-1.5">
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map(s => (
+              <div key={s} className="flex-1 text-center text-[10px] font-semibold" style={{ color: step === s ? 'var(--green-2)' : 'var(--sand-muted)' }}>
+                {stepLabels[s]}
+              </div>
+            ))}
+          </div>
         </div>
 
         <form onKeyDown={handleKeyDown} className="flex flex-col gap-3">

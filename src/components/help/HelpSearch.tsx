@@ -53,8 +53,8 @@ export function HelpSearch({ lang }: Props) {
 
   return (
     <div ref={ref} className="relative max-w-xl mx-auto">
-      <div className="flex items-center bg-white border border-[#E4E0D8] rounded-xl px-4 py-3 shadow-sm focus-within:shadow-md focus-within:border-[#1E40AF] transition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mr-2">
+      <div className="flex items-center rounded-xl px-4 py-3 transition" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sand-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mr-2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
         <input
@@ -63,28 +63,28 @@ export function HelpSearch({ lang }: Props) {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => query.length >= 2 && setOpen(true)}
-          className="flex-1 text-[13px] outline-none bg-transparent placeholder:text-[#BBB]"
+          className="flex-1 text-[13px] outline-none bg-transparent" style={{ color: 'var(--sand)' }}
         />
         {query && (
-          <button type="button" onClick={() => { setQuery(''); setOpen(false); }} className="text-[#BBB] hover:text-[#666] text-[14px] ml-2">&times;</button>
+          <button type="button" onClick={() => { setQuery(''); setOpen(false); }} style={{ color: 'var(--sand-muted)' }} className="hover:opacity-70 text-[14px] ml-2">&times;</button>
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E4E0D8] rounded-xl shadow-lg overflow-hidden z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg overflow-hidden z-50" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
           {results.map((a) => (
             <Link
               key={a.slug}
               href={`/help/${a.category}/${a.slug}`}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8F7F4] transition border-b border-[#F0EFEC] last:border-0"
+              className="flex items-center gap-3 px-4 py-3 transition" style={{ borderBottom: '0.5px solid rgba(15,39,71,0.06)' }}
             >
-              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ background: '#1E40AF' }}>
+              <span className="w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-bold shrink-0" style={{ background: 'var(--green-2)', color: 'white' }}>
                 {CAT_ICONS[a.category] || '📖'}
               </span>
               <div>
-                <div className="text-[12px] font-semibold text-[#161616]">{lang === 'ar' ? a.titleAr : lang === 'en' ? a.titleEn : a.titleFr}</div>
-                <div className="text-[10px] text-[#999] capitalize">{a.category}</div>
+                <div className="text-[12px] font-semibold" style={{ color: 'var(--sand)' }}>{lang === 'ar' ? a.titleAr : lang === 'en' ? a.titleEn : a.titleFr}</div>
+                <div className="text-[10px]" style={{ color: 'var(--sand-muted)' }}>{a.category}</div>
               </div>
             </Link>
           ))}
@@ -92,9 +92,9 @@ export function HelpSearch({ lang }: Props) {
       )}
 
       {open && query.length >= 2 && results.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E4E0D8] rounded-xl shadow-lg p-6 text-center z-50">
-          <div className="text-[13px] text-[#999]">{t('noResults')} &ldquo;{query}&rdquo;</div>
-          <Link href="#contact" onClick={() => setOpen(false)} className="text-[12px] font-semibold mt-2 inline-block" style={{ color: '#1E40AF' }}>{t('contactSupport')} &rarr;</Link>
+        <div className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg p-6 text-center z-50" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
+          <div className="text-[13px]" style={{ color: 'var(--sand-muted)' }}>{t('noResults')} &ldquo;{query}&rdquo;</div>
+          <Link href="#contact" onClick={() => setOpen(false)} className="text-[12px] font-semibold mt-2 inline-block" style={{ color: 'var(--green-2)' }}>{t('contactSupport')} &rarr;</Link>
         </div>
       )}
     </div>

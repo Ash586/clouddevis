@@ -40,57 +40,21 @@ export const PLANS: Record<PlanId, Plan> = {
   standard: {
     id: 'standard',
     name: { fr: 'Standard', ar: 'قياسي', en: 'Standard' },
-    price: 1900,
-    priceYearly: 19000,
+    price: 690,
+    priceYearly: 6900,
     description: {
-      fr: 'Pour les petites entreprises en pleine croissance',
-      ar: 'للشركات الصغيرة في طور النمو',
-      en: 'For growing small businesses',
-    },
-    limits: {
-      docsPerMonth: 50,
-      teamMembers: 2,
-      storageMB: 1024,
-      templates: 'all',
-      support: 'email_24h',
-    },
-    highlighted: true,
-  },
-  pro: {
-    id: 'pro',
-    name: { fr: 'Pro', ar: 'محترف', en: 'Pro' },
-    price: 4900,
-    priceYearly: 49000,
-    description: {
-      fr: 'Pour les entreprises moyennes aux besoins avancés',
-      ar: 'للشركات المتوسطة ذات الاحتياجات المتقدمة',
-      en: 'For medium businesses with advanced needs',
+      fr: 'Pour les entreprises qui veulent aller plus loin',
+      ar: 'للشركات التي تريد المزيد',
+      en: 'For businesses that want more',
     },
     limits: {
       docsPerMonth: 'unlimited',
       teamMembers: 5,
       storageMB: 10240,
-      templates: 'custom',
-      support: 'priority_8h',
+      templates: 'all',
+      support: 'email_24h',
     },
-  },
-  max: {
-    id: 'max',
-    name: { fr: 'Max', ar: 'ماكس', en: 'Max' },
-    price: 9900,
-    priceYearly: 99000,
-    description: {
-      fr: 'Pour les entreprises exigeantes, performances maximales',
-      ar: 'للشركات المتطلبة، أداء أقصى',
-      en: 'For demanding businesses, maximum performance',
-    },
-    limits: {
-      docsPerMonth: 'unlimited',
-      teamMembers: 15,
-      storageMB: 51200,
-      templates: 'custom',
-      support: 'priority_8h',
-    },
+    highlighted: true,
   },
   enterprise: {
     id: 'enterprise',
@@ -112,7 +76,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
 };
 
-export const PLAN_ORDER: PlanId[] = ['free', 'standard', 'pro', 'max', 'enterprise'];
+export const PLAN_ORDER: PlanId[] = ['free', 'standard', 'enterprise'];
 
 export function getPlan(id: PlanId): Plan {
   return PLANS[id] || PLANS.free;
@@ -120,10 +84,11 @@ export function getPlan(id: PlanId): Plan {
 
 export function getPlanByStatus(status: string): Plan {
   switch (status) {
-    case 'TRIAL': return PLANS.pro;
-    case 'STANDARD': return PLANS.standard;
-    case 'PRO': return PLANS.pro;
-    case 'MAX': return PLANS.max;
+    case 'TRIAL':
+    case 'STANDARD':
+    case 'PRO':
+    case 'MAX':
+      return PLANS.standard;
     case 'ENTERPRISE': return PLANS.enterprise;
     default: return PLANS.free;
   }

@@ -14,7 +14,7 @@ function getAdminSecret(): Uint8Array {
 }
 
 const PROTECTED_ROUTES = ['/dashboard', '/editor'];
-const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/admin/login', '/admin'];
+const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/admin/login', '/admin'];
 const COOKIE_NAME = 'session';
 const ADMIN_COOKIE = 'admin_session';
 

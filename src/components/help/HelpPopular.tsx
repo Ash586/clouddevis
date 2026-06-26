@@ -22,17 +22,17 @@ export function HelpPopular({ lang }: Props) {
         <Link
           key={a.slug}
           href={`/help/${a.category}/${a.slug}`}
-          className="flex items-center justify-between bg-white border border-[#E4E0D8] rounded-lg px-4 py-3 hover:shadow-sm hover:border-[#1E40AF]/20 transition group"
+          className="flex items-center justify-between rounded-lg px-4 py-3 transition" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}
         >
           <div className="flex items-center gap-3">
-            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: '#1E40AF10', color: '#1E40AF' }}>
+            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: 'var(--navy-3)', color: 'var(--green-2)' }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
             </span>
-            <span className="text-[12px] font-semibold text-[#161616] group-hover:text-[#1E40AF] transition">
+            <span className="text-[12px] font-semibold transition" style={{ color: 'var(--sand)' }}>
               {lang === 'ar' ? a.titleAr : lang === 'en' ? a.titleEn : a.titleFr}
             </span>
           </div>
-          <span className="text-[10px] text-[#BBB]">{a.time} {MIN_LABEL[lang]}</span>
+          <span className="text-[10px]" style={{ color: 'var(--sand-muted)' }}>{a.time} {MIN_LABEL[lang]}</span>
         </Link>
       ))}
     </div>
