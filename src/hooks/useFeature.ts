@@ -2,6 +2,7 @@
 
 import { useUser } from '@/hooks/useUser';
 import { hasFeature, type FeatureId } from '@/lib/features';
+import type { PlanId } from '@/lib/pricing';
 
 export function useFeature() {
   const { user } = useUser();
@@ -20,12 +21,12 @@ export function useFeature() {
   return { check, getPlanId, user };
 }
 
-function planIdFromStatus(status: string): 'free' | 'standard' | 'pro' | 'max' | 'enterprise' {
+function planIdFromStatus(status: string): PlanId {
   switch (status) {
-    case 'TRIAL': return 'pro';
+    case 'TRIAL':
+    case 'PRO':
+    case 'MAX':
     case 'STANDARD': return 'standard';
-    case 'PRO': return 'pro';
-    case 'MAX': return 'max';
     case 'ENTERPRISE': return 'enterprise';
     default: return 'free';
   }
