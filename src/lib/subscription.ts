@@ -46,8 +46,6 @@ export function getSubscriptionStatusLabel(status: string, locale: 'fr' | 'ar' |
     TRIAL: { fr: 'Essai', ar: 'تجربة', en: 'Trial' },
     FREE: { fr: 'Gratuit', ar: 'مجاني', en: 'Free' },
     STANDARD: { fr: 'Standard', ar: 'قياسي', en: 'Standard' },
-    PRO: { fr: 'Pro', ar: 'محترف', en: 'Pro' },
-    MAX: { fr: 'Max', ar: 'ماكس', en: 'Max' },
     ENTERPRISE: { fr: 'Enterprise', ar: 'مؤسسات', en: 'Enterprise' },
     EXPIRED: { fr: 'Expiré', ar: 'منتهي', en: 'Expired' },
   };

@@ -105,13 +105,11 @@ export default function SubscriptionPage() {
 
   const plan = data?.plan;
   const usage = data?.usage;
-  const currentPlanId = data?.status === 'TRIAL' ? 'pro' : (data?.plan?.id || 'free');
+  const currentPlanId = data?.status === 'TRIAL' ? 'standard' : (data?.plan?.id || 'free');
   const statusBadge: Record<string, { variant: 'success' | 'info' | 'warning' | 'default'; label: string }> = {
     TRIAL: { variant: 'warning', label: t('statusTrial') || 'Essai' },
     FREE: { variant: 'default', label: t('statusFree') || 'Gratuit' },
     STANDARD: { variant: 'info', label: t('statusStandard') || 'Standard' },
-    PRO: { variant: 'success', label: t('statusPro') || 'Pro' },
-    MAX: { variant: 'success', label: t('statusMax') || 'Max' },
   };
   const badge = statusBadge[data?.status || 'FREE'] || { variant: 'default' as const, label: data?.status || 'FREE' };
 
@@ -174,7 +172,7 @@ export default function SubscriptionPage() {
 
           {/* All Plans */}
           <h2 className="text-sm font-bold text-[var(--sand-2)]">{t('choosePlan') || 'Choisissez votre offre'}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {PLAN_ORDER.filter(id => id !== 'enterprise').map(id => {
               const p = PLANS[id];
               const isCurrent = currentPlanId === id;

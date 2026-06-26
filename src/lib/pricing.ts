@@ -1,4 +1,4 @@
-export type PlanId = 'free' | 'standard' | 'pro' | 'max' | 'enterprise';
+export type PlanId = 'free' | 'standard' | 'enterprise';
 
 export interface PlanLimit {
   docsPerMonth: number | 'unlimited';
