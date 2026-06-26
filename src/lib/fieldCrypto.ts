@@ -9,7 +9,7 @@
  *   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
  */
 
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 const PREFIX = 'enc:v1:';
 const IV_BYTES = 12;
