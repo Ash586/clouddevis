@@ -46,8 +46,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
           const Icon = tab.icon;
 
           return (
-            <button
-              key={tab.id}
+            <button type="button"               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 'relative flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px]',

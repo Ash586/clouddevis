@@ -21,7 +21,7 @@ async function postHandler(req: Request) {
       return NextResponse.json({ error: t(req, 'tokenPasswordRequired') }, { status: 400 });
     }
 
-    if (password.length < 6) {
+    if (password.length < 12) {
       return NextResponse.json({ error: t(req, 'passwordTooShort') }, { status: 400 });
     }
 

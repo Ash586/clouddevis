@@ -2,11 +2,16 @@
  * Rate limiter backed by Upstash Redis.
  * 
  * Falls back to in-memory Map when UPSTASH_REDIS_REST_URL is not configured.
- * For production, set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env.
+ * The in-memory fallback is local to each Node.js instance (not shared across
+ * Vercel workers). For production with multiple instances, set:
+ *   UPSTASH_REDIS_REST_URL  — e.g. https://your-endpoint.upstash.io
+ *   UPSTASH_REDIS_REST_TOKEN — your Upstash REST API token
  */
 
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+const MAX_MEMORY_ENTRIES = 10_000;
 
 async function upstashIncr(key: string, windowMs: number): Promise<{ count: number; resetAt: number }> {
   const now = Date.now();
@@ -30,7 +35,7 @@ async function upstashIncr(key: string, windowMs: number): Promise<{ count: numb
   return { count, resetAt };
 }
 
-// In-memory fallback for development
+// In-memory fallback for development / single-instance deployments
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 
 try {
@@ -40,7 +45,7 @@ try {
       for (const [key, entry] of rateMap) {
         if (now > entry.resetAt) rateMap.delete(key);
       }
-    }, 5 * 60 * 1000);
+    }, 60_000);
   }
 } catch {
   // Edge runtime may not support setInterval
@@ -51,6 +56,11 @@ function memoryCheck(key: string, maxAttempts: number, windowMs: number): { allo
   const entry = rateMap.get(key);
 
   if (!entry || now > entry.resetAt) {
+    // Evict stale entry before adding a new one if at capacity
+    if (rateMap.size >= MAX_MEMORY_ENTRIES) {
+      const oldest = rateMap.keys().next().value;
+      if (oldest) rateMap.delete(oldest);
+    }
     rateMap.set(key, { count: 1, resetAt: now + windowMs });
     return { allowed: true, remaining: maxAttempts - 1 };
   }
@@ -59,7 +69,8 @@ function memoryCheck(key: string, maxAttempts: number, windowMs: number): { allo
     return { allowed: false, remaining: 0 };
   }
 
-  entry.count++;
+  entry.count += 1;
+  entry.resetAt = now + windowMs; // slide window on each request
   return { allowed: true, remaining: maxAttempts - entry.count };
 }
 

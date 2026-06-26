@@ -226,7 +226,7 @@
       "networkError": "Network error",
       "fillAllFields": "Please fill in all required fields",
       "invalidEmail": "Invalid email address",
-      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordTooShort": "Password must be at least 12 characters",
       "passwordsNoMatch": "Passwords do not match",
       "registerFailed": "Registration error",
       "missingFields": "Missing required fields",
@@ -347,6 +347,12 @@
       "pieces": "Parts",
       "etat": "Device State"
     },
+    "customizer": {
+      "docInfo": "Document",
+      "company": "Company",
+      "devisInfo": "Quote Info",
+      "fiscalite": "Tax"
+    },
     "customize": "Show / Hide",
     "customizeTitle": "What you want to see",
     "customizeSubtitle": "Click a category to see its fields",
@@ -367,6 +373,11 @@
     "sectionCreatorCancel": "Cancel",
     "sectionCreatorSave": "Save section",
     "previewTitle": "Preview",
+    "draftRestored": "Draft restored ✓",
+    "error": {
+      "designationRequired": "✕ Description required",
+      "priceRequired": "✕ Price must be > 0"
+    },
     "editorTabEdit": "Edit",
     "editorTabPreview": "Preview",
     "editorTabTotals": "Totals",
@@ -961,7 +972,7 @@
     "internalError": "Internal error",
     "missingFields": "Missing required fields",
     "invalidEmail": "Invalid email",
-    "passwordTooShort": "Password too short (min 6 characters)",
+    "passwordTooShort": "Password too short (min 12 characters)",
     "emailTaken": "This email is already in use",
     "emailRequiredSingle": "Email is required",
     "resetSent": "If this email exists, a reset link has been sent.",

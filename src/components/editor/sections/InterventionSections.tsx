@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function EquipementSection({ doc, updateCustomField, hiddenFields, te }: SectionProps) {
+export function EquipementSection() {
+  const { doc, updateCustomField, hiddenFields, te } = useSectionContext();
   if (hiddenFields.has('equipement')) return null;
   return (
     <div className="space-y-2">
@@ -27,7 +28,8 @@ export function EquipementSection({ doc, updateCustomField, hiddenFields, te }: 
   );
 }
 
-export function VisiteSection({ doc, updateCustomField, hiddenFields }: SectionProps) {
+export function VisiteSection() {
+  const { doc, updateCustomField, hiddenFields } = useSectionContext();
   if (hiddenFields.has('visite')) return null;
   return (
     <div className="space-y-2">
@@ -57,7 +59,8 @@ export function VisiteSection({ doc, updateCustomField, hiddenFields }: SectionP
   );
 }
 
-export function VerificationsSection({ doc, updateCustomField, hiddenFields }: SectionProps) {
+export function VerificationsSection() {
+  const { doc, updateCustomField, hiddenFields } = useSectionContext();
   if (hiddenFields.has('verifications')) return null;
   return (
     <>
@@ -70,7 +73,8 @@ export function VerificationsSection({ doc, updateCustomField, hiddenFields }: S
   );
 }
 
-export function TravauxSection({ doc, updateCustomField, hiddenFields }: SectionProps) {
+export function TravauxSection() {
+  const { doc, updateCustomField, hiddenFields } = useSectionContext();
   if (hiddenFields.has('travaux')) return null;
   return (
     <>
@@ -83,7 +87,8 @@ export function TravauxSection({ doc, updateCustomField, hiddenFields }: Section
   );
 }
 
-export function PiecesSection({ doc, updateCustomField, hiddenFields }: SectionProps) {
+export function PiecesSection() {
+  const { doc, updateCustomField, hiddenFields } = useSectionContext();
   if (hiddenFields.has('pieces')) return null;
   return (
     <>
@@ -96,7 +101,8 @@ export function PiecesSection({ doc, updateCustomField, hiddenFields }: SectionP
   );
 }
 
-export function EtatSection({ doc, updateCustomField, hiddenFields }: SectionProps) {
+export function EtatSection() {
+  const { doc, updateCustomField, hiddenFields } = useSectionContext();
   if (hiddenFields.has('etat')) return null;
   return (
     <div className="space-y-2">

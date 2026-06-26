@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
 
 const VALID_INVITE_ROLES = ['MEMBER', 'ADMIN'];
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const { email, role } = await req.json();
 
     if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -56,4 +52,4 @@ async function postHandler(req: Request, { params }: { params: Promise<{ id: str
     logger.error('Team invite POST error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -11,8 +11,15 @@ import { Card } from '@/components/ui/card';
 function ResetForm() {
   const t = useTranslations('auth');
   const router = useRouter();
-  const sp = useSearchParams();
-  const token = sp.get('token') || '';
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    const hashToken = new URLSearchParams(hash).get('token');
+    if (hashToken) { setToken(hashToken); return; }
+    const sp = new URLSearchParams(window.location.search);
+    setToken(sp.get('token') || '');
+  }, []);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +29,7 @@ function ResetForm() {
     e.preventDefault();
     setError('');
 
-    if (password.length < 6) { setError(t('errors.passwordTooShort')); return; }
+    if (password.length < 12) { setError(t('errors.passwordTooShort')); return; }
     if (password !== confirm) { setError(t('errors.passwordsNoMatch')); return; }
 
     try {
@@ -82,10 +89,10 @@ function ResetForm() {
           )}
 
           <Input label={t('resetNewPassword')} type="password" value={password}
-            onChange={(e) => setPassword(e.target.value)} placeholder={t('min6Chars')} required minLength={6} />
+            onChange={(e) => setPassword(e.target.value)} placeholder={t('min6Chars')} required minLength={12} />
 
-          <Input label={t('confirmPassword')} type="password" value={confirm}
-            onChange={(e) => setConfirm(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={6} />
+            <Input label={t('confirmPassword')} type="password" value={confirm}
+            onChange={(e) => setConfirm(e.target.value)} placeholder={t('confirmPlaceholder')} required minLength={12} />
 
           <Button className="w-full py-2 sm:py-2.5" type="submit">{t('resetButton')}</Button>
         </form>

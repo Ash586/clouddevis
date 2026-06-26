@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx!.params as { id: string };
     const { email, permission } = await req.json();
 
     if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -44,15 +40,11 @@ async function postHandler(req: Request, { params }: { params: Promise<{ id: str
     logger.error('Document share POST error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx!.params as { id: string };
     const document = await prisma.document.findUnique({ where: { id } });
     if (!document) return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     if (document.userId !== session.userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -70,15 +62,11 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
     logger.error('Document shares GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx!.params as { id: string };
     const { sharedWithId } = await req.json();
 
     const document = await prisma.document.findUnique({ where: { id } });
@@ -94,4 +82,4 @@ async function deleteHandler(req: Request, { params }: { params: Promise<{ id: s
     logger.error('Document share DELETE error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });

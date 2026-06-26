@@ -76,7 +76,7 @@ function RegisterForm() {
     setError('');
     if (!name.trim() || !email.trim() || !password) { setError('Veuillez remplir tous les champs'); return; }
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { setError('Email invalide'); return; }
-    if (password.length < 6) { setError('Mot de passe trop court (min 6 caractères)'); return; }
+    if (password.length < 12) { setError('Mot de passe trop court (min 12 caractères)'); return; }
     if (password !== confirmPassword) { setError('Les mots de passe ne correspondent pas'); return; }
     setLoading(true);
     try {
@@ -120,7 +120,7 @@ function RegisterForm() {
   const pwStrengthId = 'password-strength';
 
   function canNext() {
-    if (step === 1) return name.trim() && email.trim() && password.length >= 6 && password === confirmPassword;
+    if (step === 1) return name.trim() && email.trim() && password.length >= 12 && password === confirmPassword;
     if (step === 2) return true;
     if (step === 3) return true;
     return false;
@@ -193,7 +193,7 @@ function RegisterForm() {
               <div>
                 <label htmlFor="reg-password" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
                 <div className="relative">
-                  <input id="reg-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 caractères" required minLength={6} autoComplete="new-password"
+                  <input id="reg-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 12 caractères" required minLength={12} autoComplete="new-password"
                     aria-invalid={error ? 'true' : undefined}
                     aria-describedby={`${error ? errorId + ' ' : ''}${pwStrengthId}`}
                     className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />
@@ -216,7 +216,7 @@ function RegisterForm() {
               </div>
               <div>
                 <label htmlFor="reg-confirm-password" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Confirmer le mot de passe</label>
-                <input id="reg-confirm-password" type={showPw ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={6} autoComplete="new-password"
+                <input id="reg-confirm-password" type={showPw ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter le mot de passe" required minLength={12} autoComplete="new-password"
                   aria-invalid={error ? 'true' : undefined}
                   aria-describedby={error ? errorId : undefined}
                   className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />

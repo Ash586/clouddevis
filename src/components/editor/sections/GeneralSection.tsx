@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function GeneralSection({ doc, updateDoc, updateStampDuty, updateCustomField, hiddenFields, te }: SectionProps) {
+export function GeneralSection() {
+  const { doc, updateDoc, updateStampDuty, updateCustomField, hiddenFields, te } = useSectionContext();
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-2">

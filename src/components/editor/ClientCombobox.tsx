@@ -99,7 +99,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
             onKeyDown={handleKeyDown}
           />
           {query && (
-            <button onClick={() => { setQuery(''); setResults([]); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--sand-muted)] hover:text-[var(--sand)]">
+            <button type="button" onClick={() => { setQuery(''); setResults([]); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--sand-muted)] hover:text-[var(--sand)]">
               <X size={12} />
             </button>
           )}
@@ -110,7 +110,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
         <div className="mt-1.5 flex items-center gap-1.5 bg-[var(--green-glow)] border border-[rgba(37,99,235,0.2)] rounded-lg px-2.5 py-1.5">
           <User size={12} className="text-[var(--green-3)] shrink-0" />
           <span className="text-[11px] font-bold text-[var(--green-3)] flex-1 truncate">{value}</span>
-          <button onClick={() => onSelect({ id: '', name: '' })} className="text-[var(--green-3)] hover:text-red-400 transition shrink-0">
+          <button type="button" onClick={() => onSelect({ id: '', name: '' })} className="text-[var(--green-3)] hover:text-red-400 transition shrink-0">
             <X size={12} />
           </button>
         </div>
@@ -120,7 +120,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
         <div ref={listRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl z-[70] max-h-[240px] overflow-y-auto">
           {loading && <div className="px-3 py-2 text-[10px] text-[var(--sand-muted)]">Recherche...</div>}
           {!loading && results.map((client, i) => (
-            <button key={client.id} onClick={() => select(client)}
+            <button type="button" key={client.id} onClick={() => select(client)}
               className={cn(
                 'w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition border-b border-[rgba(15,39,71,0.04)] last:border-0',
                 i === highlightIdx ? 'bg-[var(--navy-4)]' : 'hover:bg-[var(--navy-3)]',

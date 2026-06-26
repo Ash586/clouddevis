@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
+import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const POST = withApiErrorHandling(postHandler, { component: 'api', severity: 'medium', userImpact: 'degraded' });
@@ -58,7 +59,7 @@ async function postHandler(req: Request) {
     return NextResponse.json({ success: true, id: pageView.id }, { status: 201 });
   } catch (error) {
     // Don't log tracking errors verbosely — they're non-critical
-    console.error('Page view track error:', String(error));
+    logger.error('Page view track error:', { error: String(error) });
     throw error;
   }
 }

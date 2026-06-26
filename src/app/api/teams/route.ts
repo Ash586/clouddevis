@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const teams = await prisma.team.findMany({
       where: { members: { some: { userId: session.userId } } },
       include: {
@@ -24,14 +20,10 @@ async function getHandler() {
     logger.error('Teams GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const { name } = await req.json();
     if (!name || name.trim().length < 2) {
       return NextResponse.json({ error: 'Team name must be at least 2 characters' }, { status: 400 });
@@ -55,4 +47,4 @@ async function postHandler(req: Request) {
     logger.error('Teams POST error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 type EventProps = Record<string, string | number | boolean>;
 
 type PlausibleFn = (event: string, opts?: { props?: EventProps; callback?: () => void }) => void;
@@ -33,7 +35,7 @@ export function track(event: string, props?: EventProps) {
     if (!window.__plausibleQueue) window.__plausibleQueue = [];
     window.__plausibleQueue.push([event, props]);
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Plausible queued]', event, props ?? '');
+      logger.info('[Plausible queued]', { event, props: props ?? '' });
     }
   }
 }

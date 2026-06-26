@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type { DocumentState, LineItem, BlockId, ClientInfo, CompanyInfo, ArtisanInfo, DiscountInfo, StampDutyConfig, PaymentDetails } from '@/types';
 import { generateId } from '@/lib/calculations';
 import { LS_KEY, createEmptyDoc } from './useEditorState';
@@ -18,7 +18,16 @@ interface EditorActionsDeps {
 }
 
 export function useEditorActions(deps: EditorActionsDeps) {
-  const { doc, setDoc, docId, setDocId, mode, newItem, setNewItem, setAddingItem, setSaving } = deps;
+  const { setDoc, setDocId, mode, setNewItem, setAddingItem, setSaving } = deps;
+
+  const docRef = useRef(deps.doc);
+  docRef.current = deps.doc;
+
+  const newItemRef = useRef(deps.newItem);
+  newItemRef.current = deps.newItem;
+
+  const docIdRef = useRef(deps.docId);
+  docIdRef.current = deps.docId;
 
   const updateDoc = useCallback(<K extends keyof DocumentState>(key: K, value: DocumentState[K]) => {
     setDoc(prev => ({ ...prev, [key]: value }));
@@ -82,8 +91,8 @@ export function useEditorActions(deps: EditorActionsDeps) {
   }, [setDoc]);
 
   const isBlockVisible = useCallback((block: BlockId) => {
-    return !doc.hiddenBlocks.includes(block);
-  }, [doc.hiddenBlocks]);
+    return !docRef.current.hiddenBlocks.includes(block);
+  }, []);
 
   const setChantierField = useCallback(<K extends 'chantierAddress' | 'chantierType' | 'chantierSurface' | 'chantierEtat' | 'chantierProtection'>(key: K, value: DocumentState[K]) => {
     setDoc(prev => ({ ...prev, [key]: value }));
@@ -98,12 +107,13 @@ export function useEditorActions(deps: EditorActionsDeps) {
   }, [setDoc]);
 
   const handleAddItem = useCallback(() => {
-    if (!newItem.designation || newItem.unitPrice <= 0) return;
-    const item: LineItem = { ...newItem, id: generateId() };
-    setDoc(prev => ({ ...prev, items: [...prev.items, item] }));
+    const item = newItemRef.current;
+    if (!item.designation || item.unitPrice <= 0) return;
+    const newLineItem: LineItem = { ...item, id: generateId() };
+    setDoc(prev => ({ ...prev, items: [...prev.items, newLineItem] }));
     setNewItem({ id: '', designation: '', quantity: 1, unit: 'u', unitPrice: 0, category: '' });
     setAddingItem(false);
-  }, [newItem, setDoc, setNewItem, setAddingItem]);
+  }, [setDoc, setNewItem, setAddingItem]);
 
   const handleRemoveItem = useCallback((id: string) => {
     setDoc(prev => ({ ...prev, items: prev.items.filter(i => i.id !== id) }));
@@ -138,20 +148,22 @@ export function useEditorActions(deps: EditorActionsDeps) {
   const resetDoc = useCallback(() => {
     localStorage.removeItem(LS_KEY);
     setDocId(null);
-    setDoc(createEmptyDoc(mode as 'artisan' | 'entreprise', doc.documentType));
-  }, [mode, doc.documentType, setDocId, setDoc]);
+    setDoc(createEmptyDoc(mode as 'artisan' | 'entreprise', docRef.current.documentType));
+  }, [mode, setDocId, setDoc]);
 
   const saveDoc = useCallback(async () => {
     setSaving(true);
     try {
-      const method = docId ? 'PUT' : 'POST';
-      const url = docId ? `/api/documents/${docId}` : '/api/documents';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) });
+      const currentDoc = docRef.current;
+      const currentDocId = docIdRef.current;
+      const method = currentDocId ? 'PUT' : 'POST';
+      const url = currentDocId ? `/api/documents/${currentDocId}` : '/api/documents';
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(currentDoc) });
       if (!res.ok) { const body = await res.text(); throw new Error(`Save failed (${res.status}): ${body}`); }
       const data = await res.json();
       if (method === 'POST') {
-        track(DOC_EVENTS.DOCUMENT_CREATED, { type: doc.documentType, mode: doc.mode });
-        track(DOC_EVENTS.FIRST_INVOICE_CREATED, { type: doc.documentType, mode: doc.mode });
+        track(DOC_EVENTS.DOCUMENT_CREATED, { type: currentDoc.documentType, mode: currentDoc.mode });
+        track(DOC_EVENTS.FIRST_INVOICE_CREATED, { type: currentDoc.documentType, mode: currentDoc.mode });
       }
       setDocId(data.id);
       localStorage.removeItem(LS_KEY);
@@ -159,7 +171,7 @@ export function useEditorActions(deps: EditorActionsDeps) {
     } finally {
       setSaving(false);
     }
-  }, [doc, docId, setDocId, setSaving]);
+  }, [setDocId, setSaving]);
 
   return {
     updateDoc, updateClientInfo, updateCompanyInfo, updateTaxIds, updateArtisanInfo,

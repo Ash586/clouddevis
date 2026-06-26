@@ -94,8 +94,7 @@ export function NotificationBell() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setOpen(!open)}
+      <button type="button"         onClick={() => setOpen(!open)}
         className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
         aria-label={t('bell')}
       >
@@ -113,7 +112,7 @@ export function NotificationBell() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900">{t('title')}</h3>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-[10px] font-semibold text-blue-600 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50 transition">
+              <button type="button" onClick={markAllRead} className="text-[10px] font-semibold text-blue-600 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50 transition">
                 {t('markAllRead')}
               </button>
             )}
@@ -146,11 +145,11 @@ export function NotificationBell() {
                             <p className={`text-[11px] font-bold ${n.read ? 'text-slate-600' : 'text-slate-900'}`}>{n.title}</p>
                             <div className="flex items-center gap-0.5 flex-shrink-0">
                               {!n.read && (
-                                <button onClick={() => markAsRead(n.id)} className="p-1 text-slate-400 hover:text-blue-600 rounded" title={t('markRead')}>
+                                <button type="button" onClick={() => markAsRead(n.id)} className="p-1 text-slate-400 hover:text-blue-600 rounded" title={t('markRead')}>
                                   <Check className="w-3 h-3" />
                                 </button>
                               )}
-                              <button onClick={() => deleteNotification(n.id)} className="p-1 text-slate-400 hover:text-red-500 rounded" title={t('delete')}>
+                              <button type="button" onClick={() => deleteNotification(n.id)} className="p-1 text-slate-400 hover:text-red-500 rounded" title={t('delete')}>
                                 <X className="w-3 h-3" />
                               </button>
                             </div>

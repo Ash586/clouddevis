@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { EnterpriseRequestStatus } from '@prisma/client';
@@ -8,13 +8,9 @@ import { hasPermission } from '@/lib/admin/permissions';
 
 const VALID_REQUEST_STATUSES = ['PENDING', 'APPROVED', 'REJECTED'];
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAdminAuth(async (req, session, ctx) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const request = await prisma.enterpriseRequest.findUnique({
       where: { id },
       include: {
@@ -29,18 +25,15 @@ async function getHandler(req: Request, { params }: { params: Promise<{ id: stri
     logger.error('Fetch enterprise request detail', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(withAdminAuth(async (req, session, ctx) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     if (!hasPermission(session.role, 'subscriptions:write')) {
       return NextResponse.json({ error: 'Permissions insuffisantes' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id } = await ctx.params;
     const body = await req.json();
     const { status, notes } = body as { status?: string; notes?: string };
 
@@ -73,4 +66,4 @@ async function patchHandler(req: Request, { params }: { params: Promise<{ id: st
     logger.error('Update enterprise request', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

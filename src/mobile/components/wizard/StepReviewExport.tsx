@@ -17,13 +17,14 @@ import {
   IconCheck,
 } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
 import { Badge } from '@/components/ui/badge';
 import { generatePDFBase64, printDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
-import { numberToFrenchWords, formatCurrency, formatDateAlgerian } from '@/lib/dgi';
+import { numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
 import type { DocumentType, DocumentStatus } from '@/mobile/types';
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -91,7 +92,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
       setPdfBase64(base64);
       setPdfGenerated(true);
     } catch (err) {
-      console.error('PDF generation failed:', err);
+      logger.error('PDF generation failed:', { error: String(err) });
     } finally {
       setGenerating(false);
     }
@@ -277,8 +278,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
             </p>
             <div className="grid grid-cols-2 gap-2.5">
               {/* WhatsApp */}
-              <button
-                onClick={handleWhatsApp}
+              <button type="button"                 onClick={handleWhatsApp}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
@@ -292,8 +292,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               </button>
 
               {/* Email */}
-              <button
-                className={cn(
+              <button type="button"                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
@@ -306,8 +305,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               </button>
 
               {/* Download */}
-              <button
-                className={cn(
+              <button type="button"                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
                   'active:scale-[0.97] transition-transform',
@@ -320,8 +318,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
               </button>
 
               {/* Print */}
-              <button
-                onClick={handlePrint}
+              <button type="button"                 onClick={handlePrint}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
@@ -337,8 +334,7 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
 
             {/* Save button */}
             {!saved ? (
-              <button
-                onClick={handleSave}
+              <button type="button"                 onClick={handleSave}
                 className={cn(
                   'h-12 rounded-xl text-sm font-semibold text-white mt-1',
                   'active:scale-[0.97] transition-all',

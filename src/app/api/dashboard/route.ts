@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { TRIAL_DAYS } from '@/lib/subscription';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-    }
-
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -99,4 +93,4 @@ async function getHandler() {
     logger.error('GET /api/dashboard error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

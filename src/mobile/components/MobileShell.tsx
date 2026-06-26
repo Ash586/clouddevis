@@ -176,8 +176,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             className="fixed inset-0 z-[60] bg-[var(--navy)]"
           >
             {/* Back button */}
-            <button
-              onClick={handleWizardClose}
+            <button type="button"               onClick={handleWizardClose}
               className={cn(
                 'absolute top-4 left-4 z-10',
                 'flex items-center gap-1 px-3 py-2 rounded-lg',

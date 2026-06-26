@@ -110,8 +110,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
           Récents
         </h3>
         {onSeeAll && (
-          <button
-            onClick={onSeeAll}
+          <button type="button"             onClick={onSeeAll}
             className="text-xs font-semibold text-[var(--green-3)] active:opacity-60 transition-opacity"
           >
             Voir tout

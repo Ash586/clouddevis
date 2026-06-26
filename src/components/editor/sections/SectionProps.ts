@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { createContext, useContext, createElement, type ReactNode } from 'react';
 import type {
   DocumentState, BlockId, SectionId, UserMode, LineItem,
   CustomSectionDef, CalculationResult, ClientInfo, CompanyInfo,
@@ -58,9 +58,21 @@ export interface SectionProps {
   showToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
+const SectionCtx = createContext<SectionProps | null>(null);
+
+export function SectionProvider({ children, ...props }: SectionProps & { children: ReactNode }) {
+  return createElement(SectionCtx.Provider, { value: props }, children);
+}
+
+export function useSectionContext(): SectionProps {
+  const ctx = useContext(SectionCtx);
+  if (!ctx) throw new Error('useSectionContext must be used inside <SectionProvider>');
+  return ctx;
+}
+
 /** A section component receives SectionProps and returns only the *inner content*
  *  (no CollapsibleSection wrapper — the editor adds that). */
-export type SectionComponent = React.ComponentType<SectionProps>;
+export type SectionComponent = React.ComponentType;
 
 /** Metadata for each section: title (literal or i18n key), blockId (optional), defaultOpen */
 export interface SectionMeta {

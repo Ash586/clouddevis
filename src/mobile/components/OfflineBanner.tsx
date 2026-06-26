@@ -90,8 +90,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
             </div>
 
             {onRetry && (
-              <button
-                onClick={onRetry}
+              <button type="button"                 onClick={onRetry}
                 className={cn(
                   'flex items-center gap-1 px-2 py-1 rounded-lg',
                   'bg-amber-400/10 active:bg-amber-400/20 transition-colors',

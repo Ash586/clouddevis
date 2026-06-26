@@ -248,8 +248,7 @@ export default function AdminSystemPage() {
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2"><Shield className="w-4 h-4" />Sauvegardes</h2>
-          <button
-            onClick={handleBackup}
+          <button type="button"             onClick={handleBackup}
             disabled={backupLoading}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
           >

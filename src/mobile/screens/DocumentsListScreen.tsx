@@ -15,6 +15,7 @@ import {
   IconFiles,
   IconX,
 } from '@tabler/icons-react';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
@@ -29,7 +30,7 @@ async function notify(message: string) {
     const { Toast } = await import('@capacitor/toast');
     await Toast.show({ text: message, duration: 'short' });
   } catch {
-    if (typeof window !== 'undefined') console.info(message);
+    if (typeof window !== 'undefined') logger.info(message);
   }
 }
 
@@ -216,8 +217,7 @@ export function DocumentsListScreen({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowSearch(!showSearch)}
+            <button type="button"               onClick={() => setShowSearch(!showSearch)}
               className={cn(
                 'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
                 showSearch
@@ -227,8 +227,7 @@ export function DocumentsListScreen({
             >
               {showSearch ? <IconX size={18} /> : <IconSearch size={18} />}
             </button>
-            <button
-              onClick={onNewDocument}
+            <button type="button"               onClick={onNewDocument}
               className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
             >
               <IconFilePlus size={18} />
@@ -275,8 +274,7 @@ export function DocumentsListScreen({
             const isActive = activeFilter === filter.id;
             const count = counts[filter.id];
             return (
-              <button
-                key={filter.id}
+              <button type="button"                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={cn(
                   'flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',

@@ -159,8 +159,7 @@ export default function ReportsPage() {
               <Card>
                 <div className="flex flex-wrap gap-2">
                   {PERIODS.map(p => (
-                    <button
-                      key={p.value}
+                    <button type="button"                       key={p.value}
                       onClick={() => setPeriod(p.value)}
                       className={cn(
                         'px-4 py-2 rounded-xl text-sm font-semibold transition-all',

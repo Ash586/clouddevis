@@ -1,11 +1,10 @@
 'use client';
 import { formatCurrency } from '@/lib/calculations';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 import type { PaymentMode } from '@/types';
 
-export function PaiementSection({
-  doc, updateDoc, updatePaymentDetails, hiddenFields, results, te, tc,
-}: SectionProps) {
+export function PaiementSection() {
+  const { doc, updateDoc, updatePaymentDetails, hiddenFields, results, te, tc } = useSectionContext();
   return (
     <>
       <div className="grid grid-cols-2 gap-2">

@@ -9,7 +9,7 @@ import {
 } from './dgi';
 
 /** Round to 2 decimals (centimes) to avoid binary floating-point drift on money. */
-function round2(n: number): number {
+export function round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 

@@ -64,7 +64,7 @@ export default function PartnerApplyPage() {
           <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--green-3)' }} />
           <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Demande envoyée !</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Votre demande de partenariat a été reçue. Nous vous contacterons après examen.</p>
-          <button onClick={() => router.push('/dashboard')} className="text-sm font-semibold min-h-[44px] px-6 py-2.5 rounded-lg" style={{ color: 'var(--green-3)' }}>
+          <button type="button" onClick={() => router.push('/dashboard')} className="text-sm font-semibold min-h-[44px] px-6 py-2.5 rounded-lg" style={{ color: 'var(--green-3)' }}>
             Retour au tableau de bord
           </button>
         </div>
@@ -81,8 +81,7 @@ export default function PartnerApplyPage() {
   return (
     <div className="min-h-screen p-4 sm:p-6" style={{ background: 'var(--navy)' }}>
       <div className="max-w-xl mx-auto">
-        <button
-          onClick={() => router.back()}
+        <button type="button"           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm mb-6 min-h-[44px]"
           style={{ color: mutedColor, background: 'transparent', border: 'none', cursor: 'pointer' }}
         >

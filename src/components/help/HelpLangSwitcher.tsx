@@ -20,8 +20,7 @@ export function HelpLangSwitcher({ current, onChange }: Props) {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
+      <button type="button"         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#E4E0D8] hover:border-[#C4A35A] transition text-[11px] font-semibold text-[#444]"
       >
         <span>{active.flag}</span>
@@ -36,8 +35,7 @@ export function HelpLangSwitcher({ current, onChange }: Props) {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 mt-1 bg-white border border-[#E4E0D8] rounded-lg shadow-lg overflow-hidden z-50 min-w-[140px]">
             {LANGS.map((lang) => (
-              <button
-                key={lang.code}
+              <button type="button"                 key={lang.code}
                 onClick={() => { onChange(lang.code); setOpen(false); }}
                 className={`flex items-center gap-2 w-full px-3 py-2 text-[11.5px] font-medium transition hover:bg-[#F8F7F4] ${
                   lang.code === current ? 'bg-[#F0EFEC] text-[#1E40AF]' : 'text-[#444]'

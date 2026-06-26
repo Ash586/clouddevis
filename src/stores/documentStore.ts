@@ -10,7 +10,7 @@ import {
   generateDocNumber,
   type DocumentCalculationResult,
 } from '@/lib/dgi';
-import { generateId } from '@/lib/calculations';
+import { generateId, round2 } from '@/lib/calculations';
 import type {
   Document,
   DocumentType,
@@ -199,7 +199,7 @@ export const useDocumentStore = create<DocumentStore>()(
 
       addItem: (itemData) =>
         set((state) => {
-          const totalHT = Math.round(itemData.quantity * itemData.unitPrice * 100) / 100;
+          const totalHT = round2(itemData.quantity * itemData.unitPrice);
           const newItem: LineItem = {
             id: generateId(),
             ...itemData,
@@ -215,7 +215,7 @@ export const useDocumentStore = create<DocumentStore>()(
             if (item.id !== id) return item;
             const updated = { ...item, ...updates };
             // Recompute totalHT if quantity or unitPrice changed
-            updated.totalHT = Math.round(updated.quantity * updated.unitPrice * 100) / 100;
+            updated.totalHT = round2(updated.quantity * updated.unitPrice);
             return updated;
           });
           const newDoc = { ...state.currentDoc, items: newItems };

@@ -36,8 +36,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
         {NAV_ITEMS.map((item) => {
           if (item.href === '__new__') {
             return (
-              <button
-                key="new"
+              <button type="button"                 key="new"
                 onClick={onNewDoc}
                 className="flex flex-col items-center justify-center gap-0.5 w-16 h-full relative"
                 aria-label="Nouveau document"
@@ -51,8 +50,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
 
           const active = isActive(item.href);
           return (
-            <button
-              key={item.href}
+            <button type="button"               key={item.href}
               onClick={() => router.push(item.href)}
               className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-0"
               aria-label={item.label}

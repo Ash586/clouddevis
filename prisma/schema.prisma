@@ -21,13 +21,6 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
-// ── Mobile-compatible Plan enum (added) ─────────────────────
-enum Plan {
-  FREE
-  PRO
-  ENTERPRISE
-}
-
 enum DocumentType {
   DEVIS
   PROFORMA
@@ -43,14 +36,6 @@ enum DocumentStatus {
   ACCEPTED
   PROGRESS
   DELIVERED
-}
-
-// ── Mobile-compatible DocumentStatus enum (added) ───────────
-enum MobileDocumentStatus {
-  DRAFT
-  SENT
-  PAID
-  CANCELLED
 }
 
 model User {
@@ -72,7 +57,7 @@ model User {
   maxTeamMembers    Int              @default(1)
   suspended         Boolean          @default(false)
   suspendedAt       DateTime?
-  companyInfo       Json?              // { name, address, taxIds:{nif,nis,rc,ai}, capital, logo, signature } (DEPRECATED — use Company model)
+  companyInfo       Json?              // ⛔ DEPRECATED — use Company model. Migrate via migrateUserCompany()
   settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -97,6 +82,12 @@ model User {
   lemonsqueezySubscriptionId String?
   transactions      Transaction[]
   enterpriseRequests EnterpriseRequest[]
+  @@index([subscriptionStatus])
+  @@index([suspended])
+  @@index([lemonsqueezyCustomerId])
+  @@index([lemonsqueezySubscriptionId])
+  @@unique([lemonsqueezyCustomerId])
+  @@unique([lemonsqueezySubscriptionId])
 }
 
 model Account {
@@ -192,7 +183,7 @@ model LineItem {
   unit       String   @default("u") // u, h, j, m2, m3, ml, kg, forfait
   unitPrice  Float
   tvaRate    Int      @default(19) // 0, 9, or 19
-  totalHT    Float    @default(0)  // quantity * unitPrice
+  totalHT    Float    @default(0)  // auto-calculated: quantity * unitPrice (rounded to 2 decimals)
   createdAt  DateTime @default(now())
 
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
@@ -217,7 +208,7 @@ model Document {
   taxRegime     String         @default("tva_19")
   paymentMode   String         @default("cheque")
   language      String         @default("fr") // NEW — FR, AR, EN
-  items         Json           @default("[]") // Keep for backward compat
+  items         Json           @default("[]") // ⛔ BACKWARD-COMPAT — use LineItem model. Migrate via migrateDocumentItems()
   subTotalHT    Float          @default(0)
   tvaAmount     Float          @default(0)
   timbreFiscal  Float          @default(0)
@@ -253,6 +244,9 @@ model Document {
   @@index([userId, type, status, createdAt])
   @@index([userId, mode])
   @@index([userId, country])
+  @@index([teamId])
+  @@index([dueDate])
+  @@index([validUntil])
 }
 
 model Template {
@@ -366,6 +360,12 @@ enum CommissionType {
   OVERRIDE
 }
 
+enum CommissionStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
 enum PayoutStatus {
   PENDING
   PAID
@@ -420,7 +420,7 @@ model Commission {
   amount          Float
   type            CommissionType  @default(DIRECT)
   subscriptionId  String?
-  status          String          @default("PENDING")
+  status          CommissionStatus  @default(PENDING)
   paidAt          DateTime?
   createdAt       DateTime        @default(now())
 
@@ -493,6 +493,7 @@ model ActivityLog {
   @@index([userId])
   @@index([createdAt])
   @@index([action])
+  @@index([entity])
 }
 
 model SystemMetric {
@@ -573,6 +574,7 @@ model PageView {
   @@index([timestamp])
   @@index([country])
   @@index([sessionId])
+  @@index([userId])
 }
 
 model Team {

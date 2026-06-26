@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { generateReferralCode } from '@/lib/partner';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'api', severity: 'medium', userImpact: 'degraded' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const existing = await prisma.partner.findUnique({ where: { userId: session.userId } });
     if (existing) return NextResponse.json({ error: 'Vous êtes déjà partenaire' }, { status: 400 });
 
@@ -38,4 +34,4 @@ async function postHandler(req: Request) {
     logger.error('Partner apply error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'api', severity: 'medium', userImpact: 'degraded' });

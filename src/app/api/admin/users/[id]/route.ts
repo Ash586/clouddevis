@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { handleReferralConversion } from '@/lib/partner';
@@ -9,13 +9,9 @@ import { hasPermission } from '@/lib/admin/permissions';
 const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
 const VALID_MODES = ['ARTISAN', 'ENTREPRISE'];
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAdminAuth(async (_req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -34,18 +30,15 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
     logger.error('Admin user detail error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(withAdminAuth(async (req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     if (!hasPermission(session.role, 'users:write')) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id } = await ctx.params;
     const body = await req.json();
     const { subscriptionStatus, mode } = body;
 
@@ -89,18 +82,15 @@ async function patchHandler(req: Request, { params }: { params: Promise<{ id: st
     logger.error('Admin user update error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(withAdminAuth(async (_req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     if (!hasPermission(session.role, 'users:delete')) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id } = await ctx.params;
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
@@ -121,4 +111,4 @@ async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: 
     logger.error('Admin user delete error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

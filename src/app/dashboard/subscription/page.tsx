@@ -22,9 +22,21 @@ interface SubscriptionData {
 
 function WiseTransferSection() {
   const [wise, setWise] = useState<{ configured: boolean; beneficiary: string; iban: string; bic: string; bank: string; currency: string; instructions: string } | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
   useEffect(() => {
-    fetch('/api/subscribe/wise').then(r => r.ok ? r.json() : null).then(setWise).catch(() => {});
+    fetch('/api/subscribe/wise?plan=ENTERPRISE').then(r => r.ok ? r.json() : null).then(setWise).catch(() => {});
   }, []);
+  if (!wise?.configured) return null;
+  if (!showDetails) return (
+    <Card className="p-5 border-[rgba(37,99,235,0.2)] bg-[rgba(37,99,235,0.05)]">
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-[var(--sand)]">💳 Paiement par virement Wise</h3>
+        <Button variant="secondary" onClick={() => setShowDetails(true)} className="text-xs">
+          Afficher les coordonnées
+        </Button>
+      </div>
+    </Card>
+  );
   if (!wise?.configured) return null;
   return (
     <Card className="p-5 border-[rgba(37,99,235,0.2)] bg-[rgba(37,99,235,0.05)]">

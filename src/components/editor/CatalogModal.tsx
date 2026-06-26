@@ -23,7 +23,7 @@ export function CatalogModal({ open, onClose, loading, items, onSelect, tp, tc, 
         <div className="flex justify-center pt-2 pb-1 sm:hidden"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
         <div className="px-4 py-3 border-b border-[rgba(245,237,214,0.06)] flex items-center justify-between">
           <h3 className="text-[13px] font-semibold text-[var(--sand)]">{te('catalog') || 'Catalogue articles'}</h3>
-          <button onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1">✕</button>
+          <button type="button" onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1">✕</button>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {loading ? (
@@ -31,7 +31,7 @@ export function CatalogModal({ open, onClose, loading, items, onSelect, tp, tc, 
           ) : items.length === 0 ? (
             <div className="text-center py-8 text-[var(--sand-muted)] text-[11px]">{te('catalogEmpty') || 'Aucun article trouvé'}</div>
           ) : items.map((item, i) => (
-            <button key={`${item.designation}-${i}`} onClick={() => onSelect(item)}
+            <button type="button" key={`${item.designation}-${i}`} onClick={() => onSelect(item)}
               className="w-full text-left p-2.5 rounded-xl hover:bg-[var(--navy-4)] border border-transparent hover:border-[rgba(245,237,214,0.15)] transition flex items-center justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <div className="text-[11px] font-medium text-[var(--sand-2)] truncate">{item.designation}</div>

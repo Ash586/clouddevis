@@ -27,7 +27,7 @@ export function SectionCreatorForm({ initialSection, onSave, onCancel, te }: {
               <select className="border p-1.5 rounded-lg text-[10px] outline-none focus:ring-2 focus:ring-blue-500" value={field.type} onChange={e => updateField(idx, { type: e.target.value as CustomFieldType })}>
                 {fieldTypes.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-              <button onClick={() => removeField(idx)} className="text-red-400 hover:text-red-600 px-1">✕</button>
+              <button type="button" onClick={() => removeField(idx)} className="text-red-400 hover:text-red-600 px-1">✕</button>
             </div>
             {field.type === 'select' && (
               <textarea className="w-full border p-1.5 rounded-lg text-[10px] h-12 resize-none outline-none focus:ring-2 focus:ring-blue-500" value={field.options?.join('\n') ?? ''} onChange={e => updateField(idx, { options: e.target.value.split('\n').filter(Boolean) })} placeholder={te('sectionCreatorOptions')} />
@@ -35,10 +35,10 @@ export function SectionCreatorForm({ initialSection, onSave, onCancel, te }: {
           </div>
         ))}
       </div>
-      <button onClick={addField} className="w-full py-1.5 border border-dashed border-slate-300 rounded-lg text-slate-400 hover:bg-slate-50 transition text-[11px] font-medium">+ {te('sectionCreatorAddField')}</button>
+      <button type="button" onClick={addField} className="w-full py-1.5 border border-dashed border-slate-300 rounded-lg text-slate-400 hover:bg-slate-50 transition text-[11px] font-medium">+ {te('sectionCreatorAddField')}</button>
       <div className="flex gap-2 pt-1">
-        <button onClick={onCancel} className="flex-1 py-2 border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-500 hover:bg-slate-50 transition">{te('sectionCreatorCancel')}</button>
-        <button onClick={() => {
+        <button type="button" onClick={onCancel} className="flex-1 py-2 border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-500 hover:bg-slate-50 transition">{te('sectionCreatorCancel')}</button>
+        <button type="button" onClick={() => {
           if (!isValid) return;
           const id = initialSection?.id || `custom_${Date.now()}`;
           onSave({ id, label: label.trim(), fields });

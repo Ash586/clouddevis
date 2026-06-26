@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
 const MIN_PAYOUT = 2000;
 
-export const POST = withApiErrorHandling(postHandler, { component: 'api', severity: 'medium', userImpact: 'degraded' });
-async function postHandler() {
+export const POST = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const partner = await prisma.partner.findUnique({
       where: { userId: session.userId },
       select: { id: true, status: true },
@@ -56,4 +52,4 @@ async function postHandler() {
     logger.error('Partner payout request error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'api', severity: 'medium', userImpact: 'degraded' });

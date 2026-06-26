@@ -2,9 +2,10 @@
 import { AlertTriangle, Shield } from 'lucide-react';
 import { ClientCombobox } from '@/components/editor/ClientCombobox';
 import { validateNIF, validateNIS, validateRC, validateAI } from '@/lib/validation';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function ClientSection({ doc, mode, updateClientInfo, updateCompanyInfo, updateArtisanInfo, updateTaxIds, hiddenFields, te }: SectionProps) {
+export function ClientSection() {
+  const { doc, mode, updateClientInfo, updateCompanyInfo, updateArtisanInfo, updateTaxIds, hiddenFields, te } = useSectionContext();
   return (
     <div className="space-y-2">
       {!hiddenFields.has('clientName') && <ClientCombobox value={doc.clientInfo.name} onSelect={(c) => updateClientInfo({ name: c.name, address: c.address ?? doc.clientInfo.address, phone: c.phone ?? doc.clientInfo.phone, email: c.email ?? doc.clientInfo.email, nif: c.nif ?? doc.clientInfo.nif, nis: c.nis ?? doc.clientInfo.nis, rc: c.rc ?? doc.clientInfo.rc, ai: c.ai ?? doc.clientInfo.ai })} placeholder={te('client.clientName')} />}

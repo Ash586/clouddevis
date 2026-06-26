@@ -298,8 +298,7 @@ export default function DocumentsPage() {
                         <td className="py-3 px-3 text-end font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
                         <td className="py-3 px-3 text-[var(--sand-muted)]">{doc.date}</td>
                         <td className="py-3 px-3 relative">
-                          <button
-                            onClick={() => setStatusDropdownOpen(statusDropdownOpen === doc.id ? null : doc.id)}
+                          <button type="button"                             onClick={() => setStatusDropdownOpen(statusDropdownOpen === doc.id ? null : doc.id)}
                             className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer hover:opacity-80 transition', STATUS_COLORS[doc.status] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}
                           >
                             {tc(doc.status?.toLowerCase()) || doc.status}
@@ -309,8 +308,7 @@ export default function DocumentsPage() {
                               <div className="fixed inset-0 z-10" onClick={() => setStatusDropdownOpen(null)} />
                               <div className="absolute left-0 top-full mt-1 z-20 bg-[var(--navy-3)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-xl overflow-hidden min-w-[140px]">
                                 {STATUS_OPTIONS.map(s => (
-                                  <button
-                                    key={s}
+                                  <button type="button"                                     key={s}
                                     onClick={() => handleStatusChange(doc.id, s)}
                                     className={cn(
                                       'w-full text-left px-3 py-2 text-xs font-semibold hover:bg-[var(--navy-3)] transition',
@@ -326,13 +324,13 @@ export default function DocumentsPage() {
                         </td>
                         <td className="py-3 px-3 text-end">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition" title={t('edit')}>
+                            <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition" title={t('edit')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             </button>
-                            <button onClick={() => handleDuplicate(doc.id)} className="p-1.5 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition" title={t('duplicate')}>
+                            <button type="button" onClick={() => handleDuplicate(doc.id)} className="p-1.5 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition" title={t('duplicate')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                             </button>
-                            <button onClick={() => setDeleteTarget(doc)} className="p-1.5 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition" title={tc('delete')}>
+                            <button type="button" onClick={() => setDeleteTarget(doc)} className="p-1.5 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition" title={tc('delete')}>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                           </div>
@@ -378,13 +376,13 @@ export default function DocumentsPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[var(--sand-muted)]">{doc.date}</span>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
-                        <button onClick={() => handleDuplicate(doc.id)} className="p-2 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button type="button" onClick={() => handleDuplicate(doc.id)} className="p-2 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         </button>
-                        <button onClick={() => setDeleteTarget(doc)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                        <button type="button" onClick={() => setDeleteTarget(doc)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>

@@ -25,8 +25,7 @@ export function MobileMenu({ items, title = 'CloudDevis' }: MobileMenuProps) {
 
   return (
     <>
-      <button
-        onClick={toggle}
+      <button type="button"         onClick={toggle}
         className="fixed top-3 right-3 z-50 p-2.5 rounded-xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] shadow-sm active:bg-[var(--navy-3)] mobile-touch"
         aria-label="Toggle menu"
       >

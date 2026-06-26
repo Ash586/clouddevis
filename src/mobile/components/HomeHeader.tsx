@@ -39,8 +39,7 @@ export function HomeHeader({
       {/* Right side: notification bell + avatar */}
       <div className="flex items-center gap-3">
         {/* Notification bell */}
-        <button
-          onClick={onNotificationTap}
+        <button type="button"           onClick={onNotificationTap}
           className={cn(
             'relative w-10 h-10 rounded-full flex items-center justify-center',
             'bg-[var(--navy-3)] text-[var(--sand-muted)]',

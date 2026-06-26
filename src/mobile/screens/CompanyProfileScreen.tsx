@@ -88,8 +88,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-xl font-bold text-[var(--sand)]">Société</h1>
           {isSetup && (
-            <button
-              onClick={() => setIsEditing(!isEditing)}
+            <button type="button"               onClick={() => setIsEditing(!isEditing)}
               className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
             >
               {isEditing ? <IconX size={18} /> : <IconEdit size={18} />}
@@ -123,8 +122,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px] mb-4">
               Ajoutez les informations de votre entreprise pour générer des documents conformes
             </p>
-            <button
-              onClick={() => setIsEditing(true)}
+            <button type="button"               onClick={() => setIsEditing(true)}
               className="px-4 py-2 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-95 transition-transform"
             >
               Configurer ma société
@@ -147,7 +145,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 )}
               </div>
               {isEditing && (
-                <button className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-95 transition-transform">
+                <button type="button" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-95 transition-transform">
                   <IconPhoto size={14} />
                   Ajouter un logo
                 </button>
@@ -197,8 +195,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
             {/* Save button */}
             {isEditing && (
-              <button
-                onClick={handleSave}
+              <button type="button"                 onClick={handleSave}
                 className={cn(
                   'w-full py-3.5 rounded-xl text-sm font-semibold',
                   'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
@@ -210,8 +207,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
             {/* Clients navigation */}
             {isSetup && onGoToClients && (
-              <button
-                onClick={onGoToClients}
+              <button type="button"                 onClick={onGoToClients}
                 className={cn(
                   'w-full flex items-center justify-between px-4 py-3.5 rounded-xl',
                   'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',

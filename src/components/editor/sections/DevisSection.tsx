@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function DevisSection({ doc, updateDoc, hiddenFields, te }: SectionProps) {
+export function DevisSection() {
+  const { doc, updateDoc, hiddenFields, te } = useSectionContext();
   if (doc.documentType !== 'devis') return null;
   return (
     <div className="space-y-2">

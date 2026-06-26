@@ -66,7 +66,7 @@ export default function AdminReportsPage() {
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', margin: 0 }}>Rapports</h1>
         <div style={{ display: 'flex', gap: 4, background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 3 }}>
           {periods.map(p => (
-            <button key={p.value} onClick={() => setPeriod(p.value)}
+            <button type="button" key={p.value} onClick={() => setPeriod(p.value)}
               style={{
                 padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
                 background: period === p.value ? '#1d202a' : 'transparent',

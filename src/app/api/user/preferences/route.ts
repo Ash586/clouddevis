@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
@@ -13,12 +13,8 @@ function isNewFormat(fields: unknown): fields is Record<string, Record<string, s
   return keys.some(k => VALID_DOC_TYPES.includes(k));
 }
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
       select: { settings: true },
@@ -43,15 +39,11 @@ async function getHandler() {
     logger.error('GET /api/user/preferences', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const PUT = withApiErrorHandling(putHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function putHandler(request: Request) {
+export const PUT = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
-    const body = await request.json();
+    const body = await req.json();
     const fields: Record<string, Record<string, string[]>> = body.fields;
 
     if (!fields || typeof fields !== 'object') {
@@ -74,4 +66,4 @@ async function putHandler(request: Request) {
     logger.error('PUT /api/user/preferences', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withApiErrorHandling(withAdminAuth(async (req, session, ctx) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const er = await prisma.enterpriseRequest.findUnique({ where: { id } });
     if (!er) return NextResponse.json({ error: 'Introuvable' }, { status: 404 });
 
@@ -39,4 +35,4 @@ async function postHandler(req: Request, { params }: { params: Promise<{ id: str
     logger.error('Activate enterprise', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

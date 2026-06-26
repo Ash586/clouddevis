@@ -35,15 +35,13 @@ export default function PartnersPage() {
             Partagez votre lien de parrainage. Quand un utilisateur s&apos;inscrit et souscrit un abonnement payant, vous touchez votre commission.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <button
-              onClick={() => router.push('/auth/register?intent=partner')}
+            <button type="button"               onClick={() => router.push('/auth/register?intent=partner')}
               className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-white min-h-[44px] transition-all active:scale-[0.98]"
               style={{ background: 'var(--green-2, #1E40AF)' }}
             >
               Rejoindre le programme <ArrowRight className="w-4 h-4" />
             </button>
-            <button
-              onClick={() => {
+            <button type="button"               onClick={() => {
                 const el = document.getElementById('how-it-works');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
@@ -121,8 +119,7 @@ export default function PartnersPage() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--sand)' }}>Prêt à gagner des commissions ?</h2>
           <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec CloudDevis.</p>
-          <button
-            onClick={() => router.push('/auth/register?intent=partner')}
+          <button type="button"             onClick={() => router.push('/auth/register?intent=partner')}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-white min-h-[44px] mx-auto transition-all active:scale-[0.98]"
             style={{ background: 'var(--green-2, #1E40AF)' }}
           >

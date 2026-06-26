@@ -87,7 +87,7 @@ function LoginForm() {
           <div>
             <label htmlFor="login-password" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Mot de passe</label>
             <div className="relative">
-              <input id="login-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} autoComplete="current-password"
+              <input id="login-password" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={12} autoComplete="current-password"
                 aria-invalid={hasError ? 'true' : undefined}
                 aria-describedby={hasError ? errorId : undefined}
                 className="w-full bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--sand)] outline-none box-border min-h-[44px] focus-visible:ring-2 focus-visible:ring-[var(--green-2)]" />

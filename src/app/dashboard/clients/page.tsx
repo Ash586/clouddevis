@@ -191,7 +191,7 @@ export default function ClientsPage() {
                           {clients.map(client => (
                             <tr key={client.id} className="border-b border-[rgba(15,39,71,0.04)] hover:bg-[rgba(15,39,71,0.02)] transition">
                               <td className="px-4 py-3">
-                                <button onClick={() => router.push(`/dashboard/clients/${client.id}`)} className="font-semibold text-[var(--sand)] hover:text-blue-400 transition text-start">
+                                <button type="button" onClick={() => router.push(`/dashboard/clients/${client.id}`)} className="font-semibold text-[var(--sand)] hover:text-blue-400 transition text-start">
                                   {client.name}
                                 </button>
                               </td>
@@ -208,10 +208,10 @@ export default function ClientsPage() {
                               </td>
                               <td className="px-4 py-3 text-end">
                                 <div className="flex items-center justify-end gap-1">
-                                  <button onClick={() => openEdit(client)} className="p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 transition" title={t('edit')}>
+                                  <button type="button" onClick={() => openEdit(client)} className="p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 transition" title={t('edit')}>
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                   </button>
-                                  <button onClick={() => setDeleteTarget(client)} className="p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 transition" title={t('delete')}>
+                                  <button type="button" onClick={() => setDeleteTarget(client)} className="p-1.5 rounded-lg text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 transition" title={t('delete')}>
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
                                   </button>
                                 </div>
@@ -228,14 +228,14 @@ export default function ClientsPage() {
                     {clients.map(client => (
                       <Card key={client.id} className="p-3">
                         <div className="flex items-start justify-between">
-                          <button onClick={() => router.push(`/dashboard/clients/${client.id}`)} className="font-semibold text-[var(--sand)] hover:text-blue-400 transition min-h-[36px] flex items-center">
+                          <button type="button" onClick={() => router.push(`/dashboard/clients/${client.id}`)} className="font-semibold text-[var(--sand)] hover:text-blue-400 transition min-h-[36px] flex items-center">
                             {client.name}
                           </button>
                           <div className="flex items-center gap-1">
-                            <button onClick={() => openEdit(client)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                            <button type="button" onClick={() => openEdit(client)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                             </button>
-                            <button onClick={() => setDeleteTarget(client)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                            <button type="button" onClick={() => setDeleteTarget(client)} className="p-2 rounded-lg text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
                             </button>
                           </div>
@@ -379,10 +379,10 @@ export default function ClientsPage() {
           <h3 className="text-sm font-bold text-[var(--sand)] mb-2">{t('deleteConfirm')}</h3>
           <p className="text-xs text-[var(--sand-muted)] mb-5">{t('deleteWarning')}</p>
           <div className="flex gap-2">
-            <button onClick={() => setDeleteTarget(null)} className="flex-1 py-2 bg-[var(--navy-3)] text-[var(--sand-2)] text-sm font-bold rounded-xl hover:bg-[var(--navy-4)] transition">
+            <button type="button" onClick={() => setDeleteTarget(null)} className="flex-1 py-2 bg-[var(--navy-3)] text-[var(--sand-2)] text-sm font-bold rounded-xl hover:bg-[var(--navy-4)] transition">
               {t('cancel')}
             </button>
-            <button onClick={handleDelete} className="flex-1 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition">
+            <button type="button" onClick={handleDelete} className="flex-1 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition">
               {t('delete')}
             </button>
           </div>

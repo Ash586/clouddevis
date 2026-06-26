@@ -57,8 +57,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {isMobile && (
-          <button
-            onClick={onMenuToggle}
+          <button type="button"             onClick={onMenuToggle}
             style={{
               background: 'transparent',
               border: 'none',
@@ -76,8 +75,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button
-          style={{
+        <button type="button"           style={{
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
@@ -88,8 +86,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
         >
           <Bell size={16} />
         </button>
-        <button
-          className="theme-toggle"
+        <button type="button"           className="theme-toggle"
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
           style={{
@@ -106,8 +103,7 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
         >
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <button
-          onClick={handleLogout}
+        <button type="button"           onClick={handleLogout}
           style={{
             background: 'transparent',
             border: '0.5px solid rgba(255,255,255,0.08)',

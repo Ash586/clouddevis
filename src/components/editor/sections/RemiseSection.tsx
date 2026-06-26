@@ -1,8 +1,9 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 import { formatCurrency } from '@/lib/calculations';
 
-export function RemiseSection({ doc, updateDiscount, hiddenFields, results, te, tc }: SectionProps) {
+export function RemiseSection() {
+  const { doc, updateDiscount, hiddenFields, results, te, tc } = useSectionContext();
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-3 gap-2 items-end">

@@ -38,8 +38,7 @@ export function HelpFAQ({ lang }: Props) {
                 const categoryKey = Object.keys(HELP_T[lang].categories)[FAQ_KEYS.indexOf(groupKey)];
                 return (
                   <div key={key}>
-                    <button
-                      onClick={() => setOpenKey(isOpen ? null : key)}
+                    <button type="button"                       onClick={() => setOpenKey(isOpen ? null : key)}
                       className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-[#F8F7F4] transition"
                     >
                       <span className="text-[12.5px] font-semibold text-[#161616] pr-4">{item.q}</span>

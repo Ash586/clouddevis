@@ -113,14 +113,12 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
         />
       </div>
       <div className="flex gap-2 pt-2">
-        <button
-          onClick={onCancel}
+        <button type="button"           onClick={onCancel}
           className="flex-1 py-3 rounded-xl text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]"
         >
           Annuler
         </button>
-        <button
-          onClick={handleSubmit}
+        <button type="button"           onClick={handleSubmit}
           disabled={!form.name.trim()}
           className={cn(
             'flex-1 py-3 rounded-xl text-sm font-semibold transition-all',
@@ -191,8 +189,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             {onBack && (
-              <button
-                onClick={onBack}
+              <button type="button"                 onClick={onBack}
                 className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
                 aria-label="Retour"
               >
@@ -206,8 +203,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => {
+          <button type="button"             onClick={() => {
               setEditingClient(null);
               setShowForm(true);
             }}
@@ -318,14 +314,12 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-3 pt-3 border-t border-[rgba(15,39,71,0.06)]">
-                      <button
-                        onClick={() => handleEdit(client)}
+                      <button type="button"                         onClick={() => handleEdit(client)}
                         className="flex-1 py-2 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-[0.98] transition-transform"
                       >
                         Modifier
                       </button>
-                      <button
-                        onClick={() => deleteClient(client.id)}
+                      <button type="button"                         onClick={() => deleteClient(client.id)}
                         className="py-2 px-3 rounded-xl text-xs font-semibold bg-red-400/10 text-red-400 active:scale-[0.98] transition-transform"
                       >
                         <IconX size={14} />

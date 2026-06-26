@@ -23,79 +23,79 @@ interface CustomizationModalProps {
 }
 
 const CUSTOMIZER_GROUPS: Array<{
-  id: string; icon: React.ReactNode; label: string; color: string;
+  id: string; icon: React.ReactNode; labelKey: string; color: string;
   fields: string[]; section: string; onlyFor?: DocumentType[];
 }> = [
   {
-    id: 'docInfo', icon: <FileText size={16} />, label: 'Document',
+    id: 'docInfo', icon: <FileText size={16} />, labelKey: 'customizer.docInfo',
     color: 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(245,237,214,0.08)]',
     fields: ['docNumber', 'issueDate', 'validUntil', 'orderRef'], section: 'general',
   },
   {
-    id: 'company', icon: <Building2 size={16} />, label: 'Entreprise',
+    id: 'company', icon: <Building2 size={16} />, labelKey: 'customizer.company',
     color: 'bg-[var(--navy-3)] text-blue-400 border-blue-400/20',
     fields: ['businessMode', 'logo', 'logoPosition'], section: 'mode',
   },
   {
-    id: 'clientSection', icon: <User size={16} />, label: 'Client',
+    id: 'clientSection', icon: <User size={16} />, labelKey: 'sections.client',
     color: 'bg-[var(--navy-3)] text-[var(--green-3)] border-[var(--green-3)]/20',
     fields: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
     section: 'client',
   },
   {
-    id: 'devisInfo', icon: <FileText size={16} />, label: 'Informations Devis',
+    id: 'devisInfo', icon: <FileText size={16} />, labelKey: 'customizer.devisInfo',
     color: 'bg-[var(--navy-3)] text-cyan-400 border-cyan-400/20',
     fields: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
     section: 'devis', onlyFor: ['devis'] as DocumentType[],
   },
   {
-    id: 'chantier', icon: <MapPin size={16} />, label: 'Chantier',
+    id: 'chantier', icon: <MapPin size={16} />, labelKey: 'sections.chantier',
     color: 'bg-[var(--navy-3)] text-amber-400 border-amber-400/20',
     fields: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
     section: 'chantier',
   },
   {
-    id: 'materiaux', icon: <Package size={16} />, label: 'Matériaux',
+    id: 'materiaux', icon: <Package size={16} />, labelKey: 'sections.materiaux',
     color: 'bg-[var(--navy-3)] text-orange-400 border-orange-400/20',
     fields: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
     section: 'materiaux',
   },
   {
-    id: 'prestations', icon: <ClipboardList size={16} />, label: 'Prestations',
+    id: 'prestations', icon: <ClipboardList size={16} />, labelKey: 'sections.prestations',
     color: 'bg-[var(--navy-3)] text-cyan-400 border-cyan-400/20',
     fields: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
     section: 'prestations',
   },
   {
-    id: 'remise', icon: <Percent size={16} />, label: 'Remise',
+    id: 'remise', icon: <Percent size={16} />, labelKey: 'sections.remise',
     color: 'bg-[var(--navy-3)] text-pink-400 border-pink-400/20',
     fields: ['remiseType', 'remiseValue', 'remiseReason'], section: 'remise',
   },
   {
-    id: 'garanties', icon: <BadgeCheck size={16} />, label: 'Garanties',
+    id: 'garanties', icon: <BadgeCheck size={16} />, labelKey: 'sections.garanties',
     color: 'bg-[var(--navy-3)] text-teal-400 border-teal-400/20',
     fields: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
     section: 'garanties',
   },
   {
-    id: 'fiscalite', icon: <Receipt size={16} />, label: 'Fiscalité',
+    id: 'fiscalite', icon: <Receipt size={16} />, labelKey: 'customizer.fiscalite',
     color: 'bg-[var(--navy-3)] text-red-400 border-red-400/20',
     fields: ['vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
     section: 'general',
   },
   {
-    id: 'paiement', icon: <CircleDollarSign size={16} />, label: 'Paiement',
+    id: 'paiement', icon: <CircleDollarSign size={16} />, labelKey: 'sections.paiement',
     color: 'bg-[var(--navy-3)] text-violet-400 border-violet-400/20',
     fields: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
     section: 'paiement',
   },
   {
-    id: 'notes', icon: <ScrollText size={16} />, label: 'Notes',
+    id: 'notes', icon: <ScrollText size={16} />, labelKey: 'sections.notes',
     color: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.08)]',
     fields: ['notes', 'mentionsLegales', 'conditionsGenerales'], section: 'notes',
   },
   {
-    id: 'signature', icon: <Pen size={16} />, label: 'Signature',
+    id: 'signature', icon: <Pen size={16} />, labelKey: 'sections.signature',
     color: 'bg-[var(--navy-3)] text-indigo-400 border-indigo-400/20',
     fields: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
     section: 'signature',
@@ -133,7 +133,7 @@ export function CustomizationModal({
             </h3>
             <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">{te('customizeSubtitle') || 'Cliquez sur une catégorie pour voir les champs'}</p>
           </div>
-          <button onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">✕</button>
+          <button type="button" onClick={onClose} className="text-[var(--sand-muted)] hover:text-[var(--sand)] p-1 -mr-1">✕</button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 bg-[var(--navy-2)]">
           {showSectionCreator ? (
@@ -164,7 +164,7 @@ export function CustomizationModal({
                   <details key={group.id} className="group rounded-xl border border-[rgba(245,237,214,0.08)] overflow-hidden">
                     <summary className={`flex items-center gap-3 px-3.5 py-3 cursor-pointer select-none transition hover:bg-[var(--navy-3)] bg-[var(--navy-2)] ${group.color.split(' ').slice(0, 2).join(' ')}`}>
                       <span className={`flex items-center justify-center w-8 h-8 rounded-lg ${group.color}`}>{group.icon}</span>
-                      <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{group.label}</span>
+                      <span className="flex-1 text-[13px] font-semibold text-[var(--sand)]">{te(group.labelKey)}</span>
                       <span className="text-[10px] text-[var(--sand-muted)] font-medium">{visibleCount}/{group.fields.length}</span>
                       <ChevronDown size={14} className="text-[var(--sand-muted)] transition group-open:rotate-180" />
                     </summary>
@@ -213,7 +213,7 @@ export function CustomizationModal({
                       {customSections.map(cs => (
                         <span key={cs.id} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--navy-2)] text-[11px] text-[var(--sand)] border border-amber-400/20 font-medium shadow-sm">
                           {cs.label}
-                          <button onClick={async () => {
+                          <button type="button" onClick={async () => {
                             await fetch(`/api/user/custom-sections?id=${cs.id}`, { method: 'DELETE' });
                             setCustomSections(prev => prev.filter(c => c.id !== cs.id));
                             setFieldPrefs(prev => {
@@ -231,14 +231,14 @@ export function CustomizationModal({
                             });
                             setDoc(prev => ({ ...prev, sectionOrder: prev.sectionOrder.filter(s => s !== cs.id) }));
                           }} className="text-red-400 hover:text-red-300 ml-1">✕</button>
-                          <button onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-300 ml-0.5">✎</button>
+                          <button type="button" onClick={() => { setEditingSection(cs); setShowSectionCreator(true); }} className="text-blue-400 hover:text-blue-300 ml-0.5">✎</button>
                         </span>
                       ))}
                     </div>
                   </div>
                 </details>
               )}
-              <button onClick={() => { setEditingSection({ id: '', label: '', fields: [] }); setShowSectionCreator(true); }}
+              <button type="button" onClick={() => { setEditingSection({ id: '', label: '', fields: [] }); setShowSectionCreator(true); }}
                 className="w-full mt-2 py-3 border-2 border-dashed border-[rgba(245,237,214,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-3)] transition text-[12px] flex items-center justify-center gap-2">
                 <Plus size={14} />
                 {te('addCustomSection') ?? '+ Ajouter ma propre section'}
@@ -253,7 +253,7 @@ export function CustomizationModal({
               <span className="text-[10px] font-medium text-[var(--sand-muted)]">{te('showSectionNav') || 'Navigateur sections'}</span>
             </label>
             <div className="w-px h-4 bg-[rgba(245,237,214,0.08)]" />
-            <button onClick={() => {
+            <button type="button" onClick={() => {
               const all = Object.fromEntries(ALL_SECTIONS.map(s => {
                 if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];
                 const cs = customSections.find(c => c.id === s);
@@ -262,12 +262,12 @@ export function CustomizationModal({
               }));
               setFieldPrefs(prev => ({ ...(prev ?? {}), [doc.documentType]: all }));
             }} className="text-[11px] font-semibold text-[var(--green-3)] hover:text-[var(--green-2)] px-2.5 py-1.5 rounded-lg hover:bg-[var(--green-glow)] transition">{te('selectAll')}</button>
-            <button onClick={() => {
+            <button type="button" onClick={() => {
               const none = Object.fromEntries(ALL_SECTIONS.map(s => [s, []]));
               setFieldPrefs(prev => ({ ...(prev ?? {}), [doc.documentType]: none }));
             }} className="text-[11px] font-semibold text-red-400 hover:text-red-300 px-2.5 py-1.5 rounded-lg hover:bg-[rgba(232,84,46,0.08)] transition">{te('deselectAll')}</button>
           </div>
-          <button onClick={() => {
+          <button type="button" onClick={() => {
             const all = Object.fromEntries(ALL_SECTIONS.map(s => {
               if (SECTION_FIELDS[s]) return [s, [...SECTION_FIELDS[s]]];
               const cs = customSections.find(c => c.id === s);

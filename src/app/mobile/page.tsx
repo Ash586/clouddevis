@@ -54,15 +54,13 @@ export default function MobilePreviewPage() {
 
             {/* Floating controls */}
             <div className="fixed top-4 right-4 z-[70] flex gap-2">
-              <button
-                onClick={() => setKey((k) => k + 1)}
+              <button type="button"                 onClick={() => setKey((k) => k + 1)}
                 className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Réinitialiser"
               >
                 <IconRefresh size={18} />
               </button>
-              <button
-                onClick={() => setFullscreen(false)}
+              <button type="button"                 onClick={() => setFullscreen(false)}
                 className="w-10 h-10 rounded-full bg-[rgba(15,39,71,0.1)] backdrop-blur-md flex items-center justify-center text-[var(--sand)] active:scale-95 transition-transform"
                 title="Quitter le plein écran"
               >
@@ -110,8 +108,7 @@ export default function MobilePreviewPage() {
 
             {/* ── Controls ────────────────────────────────── */}
             <div className="flex items-center justify-center gap-3 mt-4">
-              <button
-                onClick={() => setKey((k) => k + 1)}
+              <button type="button"                 onClick={() => setKey((k) => k + 1)}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-xl',
                   'bg-[rgba(15,39,71,0.08)] text-[var(--sand-muted)]',
@@ -123,8 +120,7 @@ export default function MobilePreviewPage() {
                 <IconRefresh size={14} />
                 Réinitialiser
               </button>
-              <button
-                onClick={() => setFullscreen(true)}
+              <button type="button"                 onClick={() => setFullscreen(true)}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-xl',
                   'bg-[#1E40AF] text-white',

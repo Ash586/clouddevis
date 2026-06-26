@@ -3,6 +3,8 @@
 // Single source of truth for Algerian tax validation & calculation
 // ============================================================
 
+import { round2 } from '@/lib/calculations';
+
 // ── Validation Constants ─────────────────────────────────────
 
 /**
@@ -231,16 +233,16 @@ export function calculateDocumentTotals(
   }
 
   // Round to avoid floating point issues
-  subTotalHT = Math.round(subTotalHT * 100) / 100;
-  totalTVA = Math.round(totalTVA * 100) / 100;
+  subTotalHT = round2(subTotalHT);
+  totalTVA = round2(totalTVA);
 
-  const totalTTC = Math.round((subTotalHT + totalTVA) * 100) / 100;
+  const totalTTC = round2(subTotalHT + totalTVA);
 
   // Timbre fiscal
   const timbreFiscal = shouldApplyTimbre(documentType, totalTTC);
   const timbreAmount = calculateTimbreFiscal(timbreFiscal);
 
-  const netAPayer = Math.round((totalTTC + timbreAmount - acompte) * 100) / 100;
+  const netAPayer = round2(totalTTC + timbreAmount - acompte);
 
   return {
     subTotalHT,

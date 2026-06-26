@@ -140,7 +140,7 @@ export default function AdminSubscriptionsPage() {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} onClick={() => setPage(p)}
+            <button type="button" key={p} onClick={() => setPage(p)}
               style={{
                 width: 34, height: 34, borderRadius: 6, fontSize: 13, fontWeight: 600,
                 border: p === page ? '0.5px solid rgba(255,255,255,0.08)' : 'none',

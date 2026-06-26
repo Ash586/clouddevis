@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import type { Prisma } from '@prisma/client';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const invoices = await prisma.recurringInvoice.findMany({
       where: { userId: session.userId },
       orderBy: { nextDate: 'asc' },
@@ -20,14 +17,10 @@ async function getHandler() {
     logger.error('Recurring GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const body = await req.json();
     const { name, documentType, frequency, nextDate, template, settings } = body;
 
@@ -52,14 +45,10 @@ async function postHandler(req: Request) {
     logger.error('Recurring POST error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request) {
+export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const body = await req.json();
     const { id, name, documentType, frequency, nextDate, template, settings } = body;
 
@@ -69,17 +58,17 @@ async function patchHandler(req: Request) {
     if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     if (invoice.userId !== session.userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const updateData: Record<string, unknown> = {};
-    if (name !== undefined) updateData.name = name;
-    if (documentType !== undefined) updateData.documentType = documentType;
-    if (frequency !== undefined) updateData.frequency = frequency;
-    if (nextDate !== undefined) updateData.nextDate = new Date(nextDate);
-    if (template !== undefined) updateData.template = template;
-    if (settings !== undefined) updateData.settings = settings;
+    const data: Prisma.RecurringInvoiceUpdateInput = {};
+    if (name !== undefined) data.name = name;
+    if (documentType !== undefined) data.documentType = documentType;
+    if (frequency !== undefined) data.frequency = frequency;
+    if (nextDate !== undefined) data.nextDate = new Date(nextDate);
+    if (template !== undefined) data.template = template;
+    if (settings !== undefined) data.settings = settings;
 
     const updated = await prisma.recurringInvoice.update({
       where: { id },
-      data: updateData,
+      data,
     });
 
     return NextResponse.json({ invoice: updated });
@@ -87,4 +76,4 @@ async function patchHandler(req: Request) {
     logger.error('Recurring PATCH error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });

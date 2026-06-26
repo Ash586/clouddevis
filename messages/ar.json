@@ -226,7 +226,7 @@
       "networkError": "خطأ في الشبكة",
       "fillAllFields": "يرجى ملء جميع الحقول المطلوبة",
       "invalidEmail": "البريد الإلكتروني غير صالح",
-      "passwordTooShort": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل",
+      "passwordTooShort": "كلمة المرور يجب أن تحتوي على 12 حرفاً على الأقل",
       "passwordsNoMatch": "كلمتا المرور غير متطابقتين",
       "registerFailed": "خطأ في إنشاء الحساب",
       "missingFields": "حقول مطلوبة ناقصة",
@@ -347,6 +347,12 @@
       "pieces": "الأجزاء",
       "etat": "حالة الجهاز"
     },
+    "customizer": {
+      "docInfo": "المستند",
+      "company": "الشركة",
+      "devisInfo": "معلومات العرض",
+      "fiscalite": "الضرائب"
+    },
     "customize": "إظهار / إخفاء",
     "customizeTitle": "ما تريد رؤيته",
     "customizeSubtitle": "انقر على فئة لرؤية الحقول",
@@ -367,6 +373,11 @@
     "sectionCreatorCancel": "إلغاء",
     "sectionCreatorSave": "حفظ القسم",
     "previewTitle": "معاينة",
+    "draftRestored": "✓ تمت استعادة المسودة",
+    "error": {
+      "designationRequired": "✕ الوصف مطلوب",
+      "priceRequired": "✕ يجب أن يكون السعر > 0"
+    },
     "editorTabEdit": "تحرير",
     "editorTabPreview": "معاينة",
     "editorTabTotals": "المجاميع",
@@ -961,7 +972,7 @@
     "internalError": "خطأ داخلي",
     "missingFields": "حقول مطلوبة ناقصة",
     "invalidEmail": "البريد الإلكتروني غير صالح",
-    "passwordTooShort": "كلمة المرور قصيرة جداً (6 أحرف على الأقل)",
+    "passwordTooShort": "كلمة المرور قصيرة جداً (12 حرفاً على الأقل)",
     "emailTaken": "هذا البريد الإلكتروني مستخدم بالفعل",
     "emailRequiredSingle": "البريد الإلكتروني مطلوب",
     "resetSent": "إذا كان هذا البريد موجوداً، فقد تم إرسال رابط إعادة التعيين.",

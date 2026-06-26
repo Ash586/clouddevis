@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 
 function getSecret() {
-  const secret = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
-  if (!secret) throw new Error('No JWT secret configured. Set ADMIN_JWT_SECRET or JWT_SECRET.');
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) throw new Error('ADMIN_JWT_SECRET environment variable is required');
   return new TextEncoder().encode(secret);
 }
 

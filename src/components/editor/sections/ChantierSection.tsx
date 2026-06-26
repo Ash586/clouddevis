@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function ChantierSection({ doc, setChantierField, hiddenFields, te }: SectionProps) {
+export function ChantierSection() {
+  const { doc, setChantierField, hiddenFields, te } = useSectionContext();
   return (
     <div className="grid grid-cols-2 gap-2">
       {!hiddenFields.has('chantierAddress') && <div className="col-span-2"><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('chantier.address')}</label>

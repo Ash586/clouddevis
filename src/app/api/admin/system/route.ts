@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAdminAuth(async (req, session) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const now = new Date();
     const memUsage = process.memoryUsage();
     const startTime = Date.now() - Math.floor(process.uptime() * 1000);
@@ -91,4 +87,4 @@ async function getHandler() {
     logger.error('Admin system error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

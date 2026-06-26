@@ -145,8 +145,7 @@ function SubscriptionTab({ userId, memberSince: ms }: { userId: string; memberSi
 
 function TabButton({ id, label, activeTab, setActiveTab }: { id: 'info' | 'preferences' | 'security' | 'subscription'; label: string; activeTab: string; setActiveTab: (id: 'info' | 'preferences' | 'security' | 'subscription') => void }) {
   return (
-    <button
-      onClick={() => setActiveTab(id)}
+    <button type="button"       onClick={() => setActiveTab(id)}
       className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200 ${
         activeTab === id
           ? 'bg-[var(--green-2)] text-white shadow-sm'
@@ -361,7 +360,7 @@ export default function ProfilePage() {
                           <label className="block text-xs font-bold text-[var(--sand-muted)] mb-1.5">{t('language') || 'Langue'}</label>
                           <div className="flex gap-1.5">
                             {LANGS.map(l => (
-                              <button key={l.value}
+                              <button type="button" key={l.value}
                                 onClick={() => setLanguage(l.value)}
                                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
                                   language === l.value ? 'bg-[var(--green-2)] text-white shadow-sm' : 'bg-[var(--navy-4)] text-[var(--sand-muted)] hover:text-[var(--sand-2)]'
@@ -380,11 +379,11 @@ export default function ProfilePage() {
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-sm font-black text-[var(--sand)] uppercase tracking-wider">{t('businessMode') || 'Mode professionnel'}</h2>
                         <div className="flex bg-[var(--navy-4)] rounded-lg p-0.5 border border-[rgba(15,39,71,0.1)]">
-                          <button onClick={() => setMode('ARTISAN')}
+                          <button type="button" onClick={() => setMode('ARTISAN')}
                             className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${mode === 'ARTISAN' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand-2)]'}`}>
                             🔨 {t('artisan') || 'Artisan'}
                           </button>
-                          <button onClick={() => setMode('ENTREPRISE')}
+                          <button type="button" onClick={() => setMode('ENTREPRISE')}
                             className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${mode === 'ENTREPRISE' ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand-2)]'}`}>
                             🏢 {t('company') || 'Entreprise'}
                           </button>

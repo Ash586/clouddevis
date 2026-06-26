@@ -54,8 +54,7 @@ export default function PartnerDashboardPage() {
           </div>
           <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Vous n&apos;êtes pas encore partenaire</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez le programme d&apos;affiliation CloudDevis et gagnez des commissions.</p>
-          <button
-            onClick={() => router.push('/dashboard/partner/apply')}
+          <button type="button"             onClick={() => router.push('/dashboard/partner/apply')}
             className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white min-h-[44px]"
             style={{ background: 'var(--green-2, #1E40AF)' }}
           >
@@ -129,8 +128,7 @@ export default function PartnerDashboardPage() {
             >
               {data.partner.code}
             </div>
-            <button
-              onClick={handleCopyCode}
+            <button type="button"               onClick={handleCopyCode}
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
               style={{
                 background: copiedCode ? 'var(--green-3)' : 'var(--navy-3, #1C2537)',
@@ -141,8 +139,7 @@ export default function PartnerDashboardPage() {
               {copiedCode ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               {copiedCode ? 'Copié !' : 'Copier le code'}
             </button>
-            <button
-              onClick={handleCopyLink}
+            <button type="button"               onClick={handleCopyLink}
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold min-h-[44px] transition-all active:scale-[0.98]"
               style={{
                 background: copiedLink ? 'var(--green-3)' : 'var(--green-2, #1E40AF)',
@@ -209,8 +206,7 @@ export default function PartnerDashboardPage() {
           <div className="flex items-center justify-between">
             <p className="text-xs" style={{ color: mutedColor }}>{pendingAmount.toLocaleString('fr-DZ')} DA / {minPayout.toLocaleString('fr-DZ')} DA</p>
             {data.stats.nextPayoutAvailable ? (
-              <button
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white min-h-[44px]"
+              <button type="button"                 className="px-4 py-2 rounded-lg text-xs font-semibold text-white min-h-[44px]"
                 style={{ background: 'var(--green-2, #1E40AF)' }}
               >
                 Demander un paiement

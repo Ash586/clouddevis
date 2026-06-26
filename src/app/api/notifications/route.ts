@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler(req: Request) {
+export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const { searchParams } = new URL(req.url);
     const unreadOnly = searchParams.get('unread') === 'true';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
@@ -42,14 +38,10 @@ async function getHandler(req: Request) {
     logger.error('Notifications GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const body = await req.json();
     const { type, title, message, link } = body;
 
@@ -72,4 +64,4 @@ async function postHandler(req: Request) {
     logger.error('Notifications POST error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

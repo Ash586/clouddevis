@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const invoice = await prisma.recurringInvoice.findUnique({ where: { id } });
 
     if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -21,15 +17,11 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
     logger.error('Recurring GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
 
     const invoice = await prisma.recurringInvoice.findUnique({ where: { id } });
     if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -42,4 +34,4 @@ async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: 
     logger.error('Recurring DELETE error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });

@@ -150,8 +150,7 @@ export function StepClientSelection({
                 </p>
               )}
             </div>
-            <button
-              onClick={onClear}
+            <button type="button"               onClick={onClear}
               className="w-7 h-7 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
               aria-label="Retirer le client"
             >
@@ -186,8 +185,7 @@ export function StepClientSelection({
       {filteredClients.length > 0 && !showNewClientForm && (
         <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto">
           {filteredClients.map((client) => (
-            <button
-              key={client.id}
+            <button type="button"               key={client.id}
               onClick={() => handleSelectClient(client)}
               className={cn(
                 'flex items-center gap-3 p-3.5 rounded-xl text-left',
@@ -214,8 +212,7 @@ export function StepClientSelection({
 
       {/* Nouveau client button / form */}
       {!showNewClientForm ? (
-        <button
-          onClick={() => setShowNewClientForm(true)}
+        <button type="button"           onClick={() => setShowNewClientForm(true)}
           className={cn(
             'flex items-center justify-center gap-2 h-12 rounded-xl',
             'border-2 border-dashed border-[rgba(15,39,71,0.12)]',

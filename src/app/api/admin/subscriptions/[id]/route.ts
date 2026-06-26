@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
 const VALID_SUBSCRIPTION_STATUSES = ['TRIAL', 'FREE', 'BASIC', 'STANDARD', 'PRO', 'MAX', 'ENTERPRISE', 'SUSPENDED'];
 
-export const GET = withApiErrorHandling(getHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
-async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAdminAuth(async (_req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -38,18 +34,15 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
     logger.error('Admin subscription detail error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'billing', severity: 'critical', userImpact: 'blocking' });
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'billing', severity: 'critical', userImpact: 'blocking' });
-async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(withAdminAuth(async (req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     if (session.role !== 'ADMIN' && session.role !== 'EDITOR') {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id } = await ctx.params;
     const body = await req.json();
     const { subscriptionStatus, subscriptionEndAt, trialStartAt } = body;
 
@@ -89,4 +82,4 @@ async function patchHandler(req: Request, { params }: { params: Promise<{ id: st
     logger.error('Admin subscription update error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'billing', severity: 'critical', userImpact: 'blocking' });

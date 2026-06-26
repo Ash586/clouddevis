@@ -164,8 +164,7 @@ export default function PricingPage() {
           <div className="md:hidden space-y-2">
             {COMPARISON_SECTIONS.map(section => (
               <div key={section.title} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setOpenCompSection(openCompSection === section.title ? null : section.title)}
+                <button type="button"                   onClick={() => setOpenCompSection(openCompSection === section.title ? null : section.title)}
                   className="w-full flex items-center justify-between px-4 py-3 text-left min-h-[44px]"
                 >
                   <span className="text-sm font-semibold text-slate-800">{section.title}</span>
@@ -209,8 +208,7 @@ export default function PricingPage() {
           <div className="space-y-3">
             {FAQ_ITEMS.map((item, i) => (
               <Card key={i} className="!p-0 overflow-hidden">
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                <button type="button"                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between px-5 py-4 text-left min-h-[44px]"
                 >
                   <span className="text-sm font-semibold text-slate-800">{t(item.q as string)}</span>

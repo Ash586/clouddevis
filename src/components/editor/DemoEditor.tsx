@@ -118,7 +118,7 @@ export function DemoEditor({ onDownload }: Props) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 h-full gap-4 sm:gap-6">
       {/* Preview toggle on mobile */}
-      <button onClick={() => setShowPreview(!showPreview)}
+      <button type="button" onClick={() => setShowPreview(!showPreview)}
         className="lg:hidden text-[11px] font-semibold text-blue-600 bg-blue-50 px-3 py-2 rounded-xl flex items-center justify-center gap-2">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showPreview ? "M19 9l-7 7-7-7" : "M9 5l7 7-7 7"} /></svg>
         {showPreview ? t('mode') + ' ✕' : t('livePreview')}
@@ -130,8 +130,7 @@ export function DemoEditor({ onDownload }: Props) {
           {/* Mode toggle */}
           <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t('mode')}</span>
-            <button
-              onClick={toggleMode}
+            <button type="button"               onClick={toggleMode}
               className={`relative w-12 h-6 rounded-full transition-colors ${doc.mode === 'entreprise' ? 'bg-blue-600' : 'bg-slate-300'}`}
             >
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${doc.mode === 'entreprise' ? 'translate-x-6' : ''}`} />
@@ -181,7 +180,7 @@ export function DemoEditor({ onDownload }: Props) {
                       <span className="text-[11px] font-bold text-slate-600 whitespace-nowrap self-center min-w-[60px] text-right">
                         {(item.quantity * item.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}
                       </span>
-                      <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 text-sm leading-none mt-0.5">✕</button>
+                      <button type="button" onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 text-sm leading-none mt-0.5">✕</button>
                     </div>
                   </div>
                 </div>

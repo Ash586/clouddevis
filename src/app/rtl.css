@@ -90,12 +90,36 @@
 [dir="rtl"] .space-x-1 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-1\.5 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-2\.5 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-5 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-6 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-7 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-8 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-9 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-10 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-11 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-12 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-14 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
+[dir="rtl"] .space-x-16 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1; }
 [dir="rtl"] .space-x-reverse { --tw-space-x-reverse: 0; }
+
+/* Gap (flex row gap flips in RTL) */
+[dir="rtl"] .gap-x-0 { column-gap: 0; }
+[dir="rtl"] .gap-x-0\.5 { column-gap: 0.125rem; }
+[dir="rtl"] .gap-x-1 { column-gap: 0.25rem; }
+[dir="rtl"] .gap-x-1\.5 { column-gap: 0.375rem; }
+[dir="rtl"] .gap-x-2 { column-gap: 0.5rem; }
+[dir="rtl"] .gap-x-2\.5 { column-gap: 0.625rem; }
+[dir="rtl"] .gap-x-3 { column-gap: 0.75rem; }
+[dir="rtl"] .gap-x-4 { column-gap: 1rem; }
+[dir="rtl"] .gap-x-5 { column-gap: 1.25rem; }
+[dir="rtl"] .gap-x-6 { column-gap: 1.5rem; }
+[dir="rtl"] .gap-x-8 { column-gap: 2rem; }
+[dir="rtl"] .gap-x-10 { column-gap: 2.5rem; }
+
+/* start-* / end-* (logical properties - auto-flip in RTL, no override needed) */
 
 /* Divide */
 [dir="rtl"] .divide-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-divide-x-reverse: 1; }

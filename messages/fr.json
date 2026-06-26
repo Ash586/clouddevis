@@ -226,7 +226,7 @@
       "networkError": "Erreur réseau",
       "fillAllFields": "Veuillez remplir tous les champs requis",
       "invalidEmail": "Adresse email invalide",
-      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 12 caractères",
       "passwordsNoMatch": "Les mots de passe ne correspondent pas",
       "registerFailed": "Erreur d'inscription",
       "missingFields": "Champs requis manquants",
@@ -347,6 +347,12 @@
       "pieces": "Pièces",
       "etat": "État Appareil"
     },
+    "customizer": {
+      "docInfo": "Document",
+      "company": "Entreprise",
+      "devisInfo": "Infos Devis",
+      "fiscalite": "Fiscalité"
+    },
     "customize": "Afficher / Masquer",
     "customizeTitle": "Ce que vous voulez voir",
     "customizeSubtitle": "Cliquez sur une catégorie pour voir les champs",
@@ -367,6 +373,11 @@
     "sectionCreatorCancel": "Annuler",
     "sectionCreatorSave": "Enregistrer la section",
     "previewTitle": "Aperçu",
+    "draftRestored": "Brouillon restauré ✓",
+    "error": {
+      "designationRequired": "✕ Description requise",
+      "priceRequired": "✕ Le prix doit être > 0"
+    },
     "editorTabEdit": "Éditer",
     "editorTabPreview": "Aperçu",
     "editorTabTotals": "Totaux",
@@ -961,7 +972,7 @@
     "internalError": "Erreur interne",
     "missingFields": "Champs requis manquants",
     "invalidEmail": "Email invalide",
-    "passwordTooShort": "Mot de passe trop court (min 6 caractères)",
+    "passwordTooShort": "Mot de passe trop court (min 12 caractères)",
     "emailTaken": "Cet email est déjà utilisé",
     "emailRequiredSingle": "Email requis",
     "resetSent": "Si cet email existe, un lien de réinitialisation a été envoyé.",

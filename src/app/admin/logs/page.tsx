@@ -60,7 +60,7 @@ export default function AdminLogsPage() {
       <div style={card}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
           {actionButtons.map(a => (
-            <button key={a.value} onClick={() => { setActionFilter(a.value); setPage(1); }}
+            <button type="button" key={a.value} onClick={() => { setActionFilter(a.value); setPage(1); }}
               style={{
                 padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 background: actionFilter === a.value ? '#1d202a' : '#282c38',
@@ -114,12 +114,12 @@ export default function AdminLogsPage() {
 
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
-          <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
+          <button type="button" onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
             style={{ padding: '6px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: page === 1 ? 'default' : 'pointer', background: '#282c38', color: page === 1 ? '#656a73' : '#a1a5ad' }}>
             ←
           </button>
           <span style={{ padding: '6px 14px', fontSize: 13, color: '#656a73', fontWeight: 600 }}>{page} / {totalPages}</span>
-          <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
+          <button type="button" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
             style={{ padding: '6px 14px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: page === totalPages ? 'default' : 'pointer', background: '#282c38', color: page === totalPages ? '#656a73' : '#a1a5ad' }}>
             →
           </button>

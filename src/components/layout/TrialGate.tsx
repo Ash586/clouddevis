@@ -61,7 +61,7 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
                   ? `Essai gratuit — ${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''} (se termine le ${trialEndDateStr})`
                   : (s('trialBanner') || 'Période d\'essai — 7 jours')}
                 &ensp;
-                <button onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Passer à un forfait payant'}</button>
+                <button type="button" onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Passer à un forfait payant'}</button>
               </span>
             </div>
           </div>

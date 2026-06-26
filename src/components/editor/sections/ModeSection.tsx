@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function ModeSection({ mode, setDoc, hiddenFields, te }: SectionProps) {
+export function ModeSection() {
+  const { mode, setDoc, hiddenFields, te } = useSectionContext();
   return (
     <>
       {!hiddenFields.has('businessMode') && (

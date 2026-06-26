@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler() {
+export const POST = withApiErrorHandling(withAdminAuth(async (req, session) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     if (session.role === 'VIEWER') return NextResponse.json({ error: 'Permission denied' }, { status: 403 });
 
     const backup = await prisma.backupLog.create({
@@ -27,14 +24,10 @@ async function postHandler() {
     logger.error('Backup trigger error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAdminAuth(async (req, session) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const backups = await prisma.backupLog.findMany({
       orderBy: { startedAt: 'desc' },
       take: 20,
@@ -59,4 +52,4 @@ async function getHandler() {
     logger.error('Backup list error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

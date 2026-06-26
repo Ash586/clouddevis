@@ -127,8 +127,7 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
                     {actionDoc.number}
                   </p>
                 </div>
-                <button
-                  onClick={onClose}
+                <button type="button"                   onClick={onClose}
                   className="w-8 h-8 rounded-full bg-[var(--navy-3)] flex items-center justify-center active:scale-95 transition-transform"
                 >
                   <IconX size={16} className="text-[var(--sand-muted)]" />
@@ -174,8 +173,7 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
 
               {/* ── Cancel button ──────────────────────────────── */}
               <div className="px-3 pb-2 pt-1">
-                <button
-                  onClick={onClose}
+                <button type="button"                   onClick={onClose}
                   className={cn(
                     'w-full py-3.5 rounded-xl text-[15px] font-semibold',
                     'bg-[var(--navy-3)] text-[var(--sand-muted)]',

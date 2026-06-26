@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const team = await prisma.team.findUnique({
       where: { id },
       include: {
@@ -34,15 +30,11 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ id: str
     logger.error('Team GET error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
     const { name } = await req.json();
 
     const member = await prisma.teamMember.findUnique({
@@ -62,15 +54,11 @@ async function patchHandler(req: Request, { params }: { params: Promise<{ id: st
     logger.error('Team PATCH error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id } = await params;
+    const { id } = await ctx.params;
 
     const team = await prisma.team.findUnique({ where: { id } });
     if (!team) return NextResponse.json({ error: 'Team not found' }, { status: 404 });
@@ -83,4 +71,4 @@ async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: 
     logger.error('Team DELETE error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

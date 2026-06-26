@@ -1,9 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function CustomSectionRenderer({
-  doc, customSections, hiddenFields, updateCustomField, te,
-}: SectionProps) {
+export function CustomSectionRenderer() {
+  const { doc, customSections, hiddenFields, updateCustomField, te } = useSectionContext();
   const cs = customSections.find(c => c.id === doc.documentType);
   if (!cs) return null;
 

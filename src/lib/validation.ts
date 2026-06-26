@@ -106,11 +106,11 @@ export function validateAuthInput(body: Record<string, unknown>, type: 'login' |
 
   if (!body.password || typeof body.password !== 'string') {
     errors.password = 'Mot de passe requis. Choisissez un mot de passe sécurisé.';
-  } else if (type === 'register' && body.password.length < 6) {
-    errors.password = 'Minimum 6 caractères. Plus long = plus sécurisé.';
+  } else if (type === 'register' && body.password.length < 12) {
+    errors.password = 'Minimum 12 caractères. Plus long = plus sécurisé.';
   } else if (type === 'register') {
     let score = 0;
-    if (body.password.length >= 8) score++;
+    if (body.password.length >= 12) score++;
     if (/[A-Z]/.test(body.password as string)) score++;
     if (/[0-9]/.test(body.password as string)) score++;
     if (/[^A-Za-z0-9]/.test(body.password as string)) score++;

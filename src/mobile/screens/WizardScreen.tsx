@@ -104,8 +104,7 @@ export function WizardScreen({ onExit }: WizardScreenProps) {
       {/* ── Top bar ── */}
       <div className="flex items-center gap-3 px-5 pt-2 pb-1">
         {/* Back button */}
-        <button
-          onClick={handleBack}
+        <button type="button"           onClick={handleBack}
           className={cn(
             'w-10 h-10 rounded-full flex items-center justify-center',
             'bg-[var(--navy-3)] text-[var(--sand-muted)]',

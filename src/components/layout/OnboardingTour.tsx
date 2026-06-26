@@ -93,8 +93,8 @@ function TourTooltip({ step, onNext, onPrev, stepNum, totalSteps, finish }: {
       <h4>{step.title}</h4>
       <p>{step.content}</p>
       <div className="onboarding-actions">
-        <button onClick={onPrev} disabled={stepNum === 0}>السابق</button>
-        <button onClick={onNext}>{stepNum === totalSteps - 1 ? 'انتهى' : 'التالي'}</button>
+        <button type="button" onClick={onPrev} disabled={stepNum === 0}>السابق</button>
+        <button type="button" onClick={onNext}>{stepNum === totalSteps - 1 ? 'انتهى' : 'التالي'}</button>
       </div>
     </div>
   );

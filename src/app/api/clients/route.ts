@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function getHandler(req: Request) {
+export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
@@ -69,14 +65,10 @@ async function getHandler(req: Request) {
     logger.error('GET /api/clients error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const body = await req.json();
     const { name, address, phone, email, nif, nis, rc, ai, ice, matriculeFiscal, siret } = body;
 
@@ -128,4 +120,4 @@ async function postHandler(req: Request) {
     logger.error('POST /api/clients error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });

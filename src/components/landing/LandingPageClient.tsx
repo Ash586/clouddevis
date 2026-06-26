@@ -67,8 +67,7 @@ export function LandingFAQ({ items }: { items: { q: string; a: string }[] }) {
     <div className="faq-grid">
       {items.map((item, i) => (
         <div key={i} className="faq-item animate-on-scroll">
-          <button
-            onClick={() => setOpenFaq(openFaq === i ? null : i)}
+          <button type="button"             onClick={() => setOpenFaq(openFaq === i ? null : i)}
             className="faq-q"
             style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
           >
@@ -87,7 +86,7 @@ export function LangSwitcher() {
   return (
     <div className="footer-langs">
       {['FR', 'عر', 'EN'].map(l => (
-        <button key={l} className={`lang-btn ${activeLang === l ? 'active' : ''}`} onClick={() => setActiveLang(l)}>
+        <button type="button" key={l} className={`lang-btn ${activeLang === l ? 'active' : ''}`} onClick={() => setActiveLang(l)}>
           {l}
         </button>
       ))}

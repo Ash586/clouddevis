@@ -44,7 +44,7 @@ export default function AdminEnterpriseRequestsPage() {
 
         <div className="flex gap-2 mb-6">
           {['ALL', 'PENDING', 'CONTACTED', 'APPROVED', 'REJECTED'].map(s => (
-            <button key={s} onClick={() => setFilter(s)}
+            <button type="button" key={s} onClick={() => setFilter(s)}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${filter === s ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>
               {s === 'ALL' ? 'Tous' : s}
             </button>

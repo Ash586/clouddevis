@@ -200,8 +200,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
       </div>
 
       {/* Add item button */}
-      <button
-        onClick={openNewSheet}
+      <button type="button"         onClick={openNewSheet}
         className={cn(
           'flex items-center justify-center gap-2 h-12 rounded-xl',
           'border-2 border-dashed border-[rgba(15,39,71,0.12)]',

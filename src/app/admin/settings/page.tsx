@@ -103,7 +103,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button onClick={handleSave} disabled={saving}
+          <button type="button" onClick={handleSave} disabled={saving}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '11px 24px', borderRadius: 6,
               fontSize: 13, fontWeight: 700, border: '0.5px solid rgba(255,255,255,0.08)',

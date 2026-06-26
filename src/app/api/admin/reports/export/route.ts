@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAdminAuth(async (req, session) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
     const body = await req.json();
     const { format = 'csv', period = 'month' } = body;
 
@@ -64,7 +60,7 @@ async function postHandler(req: Request) {
     logger.error('Admin report export error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
 function escapeCsv(val: string | number | null | undefined): string {
   if (val == null) return '';

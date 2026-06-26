@@ -114,3 +114,55 @@ export async function isUserSuspended(userId: string): Promise<boolean> {
   });
   return user?.suspended ?? false;
 }
+
+// ─── Centralized auth middleware ───
+import { NextRequest, NextResponse } from 'next/server';
+import { requireCsrf } from '@/lib/csrf';
+
+type AuthenticatedHandler = (
+  req: NextRequest,
+  session: SessionUser,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ctx: any,
+) => Promise<Response> | Response;
+
+/**
+ * Wraps a route handler with centralized auth checks.
+ * Returns 401 if not authenticated.
+ *
+ * Usage:
+ *   export const GET = withAuth(async (req, session) => { ... });
+ *   export const POST = withAuth(async (req, session) => { ... });
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withAuth(handler: AuthenticatedHandler): any {
+  return async (req: NextRequest, ctx?: Record<string, unknown>) => {
+    requireCsrf(req);
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    return handler(req, session, ctx);
+  };
+}
+
+type AdminHandler = (
+  req: NextRequest,
+  admin: { adminId: string; email: string; role: string; name: string },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ctx?: any,
+) => Promise<Response> | Response;
+
+/** Same as withAuth but for admin routes (uses ADMIN_JWT_SECRET). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withAdminAuth(handler: AdminHandler): any {
+  return async (req: NextRequest, ctx?: any) => {
+    requireCsrf(req);
+    const { getAdminSession } = await import('@/lib/adminAuth');
+    const admin = await getAdminSession();
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    return handler(req, admin, ctx);
+  };
+}

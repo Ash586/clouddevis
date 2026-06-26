@@ -34,7 +34,7 @@ export function Navbar() {
       </Button>
       <div className="flex flex-col md:flex-row items-center gap-3">
         <span className="text-[11px] text-[var(--sand-muted)] font-medium">{user.name}</span>
-        <button onClick={handleLogout} className="text-[11px] text-red-400 font-semibold hover:text-red-300 bg-red-400/10 px-3 py-1.5 rounded-lg w-full md:w-auto text-center transition-all min-h-[44px]">
+        <button type="button" onClick={handleLogout} className="text-[11px] text-red-400 font-semibold hover:text-red-300 bg-red-400/10 px-3 py-1.5 rounded-lg w-full md:w-auto text-center transition-all min-h-[44px]">
           {t('logout')}
         </button>
       </div>
@@ -61,8 +61,7 @@ export function Navbar() {
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-6 sm:border-l border-[rgba(15,39,71,0.1)]">
-              <button
-                onClick={() => {
+              <button type="button"                 onClick={() => {
                   const next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
                   setLang(next);
                 }}
@@ -74,7 +73,7 @@ export function Navbar() {
 
               {user && <NotificationBell />}
 
-              <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center">
+              <button type="button" onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center">
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>

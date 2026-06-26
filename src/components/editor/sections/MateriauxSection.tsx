@@ -1,7 +1,8 @@
 'use client';
-import type { SectionProps } from './SectionProps';
+import { useSectionContext } from './SectionProps';
 
-export function MateriauxSection({ doc, setMateriauxField, hiddenFields, te }: SectionProps) {
+export function MateriauxSection() {
+  const { doc, setMateriauxField, hiddenFields, te } = useSectionContext();
   return (
     <div className="grid grid-cols-2 gap-2">
       {!hiddenFields.has('materiauxBrand') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.brand')}</label>

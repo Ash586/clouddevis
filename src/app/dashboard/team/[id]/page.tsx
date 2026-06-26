@@ -68,7 +68,7 @@ export default function TeamDetailPage() {
         <div className="flex-1 min-w-0">
           <TrialGate>
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
-              <button onClick={() => router.push('/dashboard/team')} className="text-xs text-blue-400 font-semibold hover:text-blue-300 mb-4 flex items-center gap-1">
+              <button type="button" onClick={() => router.push('/dashboard/team')} className="text-xs text-blue-400 font-semibold hover:text-blue-300 mb-4 flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 {t('backToTeams')}
               </button>

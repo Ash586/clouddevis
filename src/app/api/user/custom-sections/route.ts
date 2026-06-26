@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import type { CustomSectionDef } from '@/types';
 import type { Prisma } from '@prisma/client';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (_req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
       select: { settings: true },
@@ -24,14 +20,10 @@ async function getHandler() {
     logger.error('GET /api/user/custom-sections', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const body = (await req.json()) as { section: CustomSectionDef };
     const { section } = body;
     if (!section?.id || !section.label) {
@@ -60,14 +52,10 @@ async function postHandler(req: Request) {
     logger.error('POST /api/user/custom-sections', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const PUT = withApiErrorHandling(putHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function putHandler(req: Request) {
+export const PUT = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const body = (await req.json()) as { section: CustomSectionDef };
     const { section } = body;
     if (!section?.id) return NextResponse.json({ error: 'ID requis' }, { status: 400 });
@@ -92,14 +80,10 @@ async function putHandler(req: Request) {
     logger.error('PUT /api/user/custom-sections', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(req: Request) {
+export const DELETE = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID requis' }, { status: 400 });
@@ -124,4 +108,4 @@ async function deleteHandler(req: Request) {
     logger.error('DELETE /api/user/custom-sections', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

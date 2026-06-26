@@ -23,6 +23,8 @@ export function useEditorUndo(
   const undoStack = useRef<DocumentState[]>([]);
   const redoStack = useRef<DocumentState[]>([]);
   const lastDocRef = useRef<DocumentState | null>(null);
+  const docRef = useRef(doc);
+  docRef.current = doc;
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Track doc changes with debounce, push snapshots onto undo stack
@@ -43,20 +45,20 @@ export function useEditorUndo(
   const handleUndo = useCallback(() => {
     const prev = undoStack.current.pop();
     if (!prev) return;
-    redoStack.current.push(doc);
+    redoStack.current.push(docRef.current);
     setDoc(prev);
     setCanUndo(undoStack.current.length > 0);
     setCanRedo(true);
-  }, [doc, setDoc]);
+  }, [setDoc]);
 
   const handleRedo = useCallback(() => {
     const next = redoStack.current.pop();
     if (!next) return;
-    undoStack.current.push(doc);
+    undoStack.current.push(docRef.current);
     setDoc(next);
     setCanRedo(redoStack.current.length > 0);
     setCanUndo(true);
-  }, [doc, setDoc]);
+  }, [setDoc]);
 
   return { canUndo, canRedo, handleUndo, handleRedo };
 }

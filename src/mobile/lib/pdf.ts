@@ -3,6 +3,7 @@
 // Wraps the packages/pdf-engine for mobile use
 // ============================================================
 
+import { logger } from '@/lib/logger';
 import { generatePDFBase64 as engineGeneratePDF } from '../../../packages/pdf-engine';
 import { numberToFrenchWords, numberToArabicWords } from '../../lib/dgi';
 import type { PDFDocumentData } from '../../../packages/pdf-engine';
@@ -175,6 +176,6 @@ export function printDocument(base64OrHtml: string): void {
     window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   } catch {
-    console.error('Failed to open PDF for printing');
+    logger.error('Failed to open PDF for printing');
   }
 }

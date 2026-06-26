@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
@@ -10,12 +10,8 @@ import type { DocumentState } from '@/types';
 
 const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT', bon_commande: 'BC', bon_reception: 'BR' };
 
-export const GET = withApiErrorHandling(getHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function getHandler(req: Request) {
+export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const type = searchParams.get('type') || '';
@@ -113,14 +109,10 @@ async function getHandler(req: Request) {
     logger.error('GET /api/documents error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-export const POST = withApiErrorHandling(postHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function postHandler(req: Request) {
+export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
       select: { subscriptionStatus: true, docCountThisMonth: true, lastDocResetAt: true, trialStartAt: true },
@@ -303,16 +295,12 @@ async function postHandler(req: Request) {
     logger.error('POST /api/documents error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
 const VALID_STATUSES = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'invoice', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request) {
+export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-
     const body = await req.json();
     const { id, status } = body;
     if (!id || !status) return NextResponse.json({ error: 'id and status required' }, { status: 400 });
@@ -335,4 +323,4 @@ async function patchHandler(req: Request) {
     logger.error('PATCH /api/documents error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'invoice', severity: 'high', userImpact: 'blocking' });

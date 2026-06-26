@@ -4,6 +4,7 @@
 // Works on both iOS and Android
 // ============================================================
 
+import { logger } from '@/lib/logger';
 import { generatePDFBase64 } from '../../packages/pdf-engine';
 import type { PDFDocumentData } from '../../packages/pdf-engine';
 import type { Document } from '../mobile/types';
@@ -151,7 +152,7 @@ export async function sharePDF(options: ShareOptions): Promise<ShareResult> {
       return downloadPDF(base64, `${doc.number}.pdf`);
     }
   } catch (err) {
-    console.error('PDF share failed:', err);
+    logger.error('PDF share failed:', { error: String(err) });
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Erreur lors du partage',
@@ -259,7 +260,7 @@ export async function shareWhatsApp(options: WhatsAppOptions): Promise<ShareResu
       return downloadPDF(base64, `${doc.number}.pdf`);
     }
   } catch (err) {
-    console.error('WhatsApp share failed:', err);
+    logger.error('WhatsApp share failed:', { error: String(err) });
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Erreur lors du partage WhatsApp',

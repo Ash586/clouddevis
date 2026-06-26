@@ -101,7 +101,7 @@ export default function AdminUserDetailPage() {
   if (!user) return (
     <div className="text-center py-20">
       <p className="text-slate-400">{t('error')}</p>
-      <button onClick={() => router.push('/admin/users')} className="mt-4 text-blue-600 font-bold text-sm hover:underline">
+      <button type="button" onClick={() => router.push('/admin/users')} className="mt-4 text-blue-600 font-bold text-sm hover:underline">
         {t('nav.users')}
       </button>
     </div>
@@ -111,7 +111,7 @@ export default function AdminUserDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.push('/admin/users')} className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">
+        <button type="button" onClick={() => router.push('/admin/users')} className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">
           <ArrowLeft className="w-4 h-4 text-slate-600" />
         </button>
         <div>
@@ -119,7 +119,7 @@ export default function AdminUserDetailPage() {
           <p className="text-sm text-slate-400">{user.name} — {user.email}</p>
         </div>
         <div className="ml-auto flex gap-2">
-          <button onClick={handleSuspendToggle} disabled={actionLoading}
+          <button type="button" onClick={handleSuspendToggle} disabled={actionLoading}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-50 ${user.suspended ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}>
             {actionLoading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

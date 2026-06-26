@@ -145,10 +145,10 @@ export default function RecurringInvoicesPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => handleToggle(inv)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 rounded-lg hover:bg-blue-400/10 transition" title={inv.active ? t('pause') : t('resume')}>
+                          <button type="button" onClick={() => handleToggle(inv)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 rounded-lg hover:bg-blue-400/10 transition" title={inv.active ? t('pause') : t('resume')}>
                             {inv.active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                           </button>
-                          <button onClick={() => handleDelete(inv.id)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 rounded-lg hover:bg-red-400/10 transition" title={tc('delete')}>
+                          <button type="button" onClick={() => handleDelete(inv.id)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 rounded-lg hover:bg-red-400/10 transition" title={tc('delete')}>
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

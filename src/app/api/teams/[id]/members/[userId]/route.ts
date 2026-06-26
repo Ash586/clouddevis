@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
 const VALID_ROLES = ['MEMBER', 'ADMIN', 'OWNER'];
 
-export const PATCH = withApiErrorHandling(patchHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function patchHandler(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
+export const PATCH = withApiErrorHandling(withAuth(async (req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id, userId } = await params;
+    const { id, userId } = await ctx.params;
     const { role } = await req.json();
 
     if (!role || !VALID_ROLES.includes(role)) {
@@ -36,15 +32,11 @@ async function patchHandler(req: Request, { params }: { params: Promise<{ id: st
     logger.error('Team member PATCH error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
 
-export const DELETE = withApiErrorHandling(deleteHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
+export const DELETE = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-    const { id, userId } = await params;
+    const { id, userId } = await ctx.params;
 
     const currentMember = await prisma.teamMember.findUnique({
       where: { teamId_userId: { teamId: id, userId: session.userId } },
@@ -62,4 +54,4 @@ async function deleteHandler(_req: Request, { params }: { params: Promise<{ id: 
     logger.error('Team member DELETE error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

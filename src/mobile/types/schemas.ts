@@ -4,6 +4,7 @@
 // ============================================================
 
 import { z } from 'zod';
+import { round2 } from '@/lib/calculations';
 import type { LineItem } from './index';
 
 // ── DGI Validation Constants ─────────────────────────────────
@@ -118,7 +119,7 @@ export const LineItemSchema = z.object({
 }).refine(
   (data) => {
     // Verify totalHT = quantity * unitPrice (within rounding tolerance)
-    const expected = Math.round(data.quantity * data.unitPrice * 100) / 100;
+    const expected = round2(data.quantity * data.unitPrice);
     return Math.abs(data.totalHT - expected) < 0.02;
   },
   { message: 'Total HT ne correspond pas à quantité × prix unitaire', path: ['totalHT'] }
@@ -231,9 +232,9 @@ export function calculateDocumentTotals(items: LineItem[]): {
   const totalTTC = totalHT + totalTVA;
 
   return {
-    totalHT: Math.round(totalHT * 100) / 100,
-    totalTVA: Math.round(totalTVA * 100) / 100,
-    totalTTC: Math.round(totalTTC * 100) / 100,
+    totalHT: round2(totalHT),
+    totalTVA: round2(totalTVA),
+    totalTTC: round2(totalTTC),
   };
 }
 
@@ -260,6 +261,6 @@ export function calculateFinalTotal(
   const netAPayer = totalTTC + timbreAmount - acompte;
   return {
     timbreAmount,
-    netAPayer: Math.round(netAPayer * 100) / 100,
+    netAPayer: round2(netAPayer),
   };
 }

@@ -106,7 +106,7 @@ export default function AdminPartnersPage() {
             className="w-full pl-9 pr-8 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
           />
           {search && (
-            <button onClick={() => { setSearch(''); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            <button type="button" onClick={() => { setSearch(''); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
               <XCircle className="w-4 h-4" />
             </button>
           )}
@@ -116,8 +116,7 @@ export default function AdminPartnersPage() {
       <div className="flex gap-2 flex-wrap">
         <p className="text-xs font-semibold text-slate-500 self-center mr-1">Statut :</p>
         {['', 'PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED'].map(s => (
-          <button
-            key={s}
+          <button type="button"             key={s}
             onClick={() => { setStatusFilter(s); setPage(1); }}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${statusFilter === s ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
           >
@@ -129,8 +128,7 @@ export default function AdminPartnersPage() {
       <div className="flex gap-2 flex-wrap">
         <p className="text-xs font-semibold text-slate-500 self-center mr-1">Niveau :</p>
         {['', 'AFFILIATE', 'SUPER_AFFILIATE'].map(t => (
-          <button
-            key={t}
+          <button type="button"             key={t}
             onClick={() => { setTierFilter(t); setPage(1); }}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${tierFilter === t ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
           >
@@ -176,21 +174,21 @@ export default function AdminPartnersPage() {
                   <td className="py-2.5">
                     <div className="flex gap-1 flex-wrap">
                       {p.status === 'PENDING' && (
-                        <button onClick={() => handleApprove(p.id)} className="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded hover:bg-emerald-100">
+                        <button type="button" onClick={() => handleApprove(p.id)} className="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded hover:bg-emerald-100">
                           Approuver
                         </button>
                       )}
                       {p.status === 'PENDING' && (
-                        <button onClick={() => handleReject(p.id)} className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 flex items-center gap-1">
+                        <button type="button" onClick={() => handleReject(p.id)} className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded hover:bg-red-100 flex items-center gap-1">
                           <XCircle className="w-3 h-3" /> Rejeter
                         </button>
                       )}
                       {p.status === 'ACTIVE' && (
-                        <button onClick={() => handleSuspend(p.id)} className="text-xs bg-amber-50 text-amber-600 px-2 py-1 rounded hover:bg-amber-100 flex items-center gap-1">
+                        <button type="button" onClick={() => handleSuspend(p.id)} className="text-xs bg-amber-50 text-amber-600 px-2 py-1 rounded hover:bg-amber-100 flex items-center gap-1">
                           <Ban className="w-3 h-3" /> Suspendre
                         </button>
                       )}
-                      <button onClick={() => handleTierToggle(p.id, p.tier)} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100">
+                      <button type="button" onClick={() => handleTierToggle(p.id, p.tier)} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100">
                         {p.tier === 'SUPER_AFFILIATE' ? 'Rétrograder' : 'Promouvoir'}
                       </button>
                     </div>
@@ -204,8 +202,7 @@ export default function AdminPartnersPage() {
         {data && data.pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-4">
             {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map(p => (
-              <button
-                key={p}
+              <button type="button"                 key={p}
                 onClick={() => setPage(p)}
                 className={`w-8 h-8 rounded-lg text-xs font-semibold ${p === page ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
               >

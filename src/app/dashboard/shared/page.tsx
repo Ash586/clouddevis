@@ -56,7 +56,7 @@ export default function SharedDocumentsPage() {
 
               <div className="flex gap-2 mb-4">
                 {['all', 'view', 'edit'].map(f => (
-                  <button key={f} onClick={() => setFilter(f)}
+                  <button type="button" key={f} onClick={() => setFilter(f)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${filter === f ? 'bg-[var(--green-2)] text-white' : 'bg-[var(--navy-3)] text-[var(--sand-2)] hover:bg-[var(--navy-4)]'}`}>
                     {t(`filter.${f}`)}
                   </button>

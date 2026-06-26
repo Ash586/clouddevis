@@ -79,8 +79,7 @@ export function SettingsScreen() {
           </div>
           <div className="px-4 pb-3 flex gap-2">
             {(['FR', 'AR', 'EN'] as const).map((lang) => (
-              <button
-                key={lang}
+              <button type="button"                 key={lang}
                 onClick={() => handleSettingChange('language', lang)}
                 className={cn(
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
@@ -103,8 +102,7 @@ export function SettingsScreen() {
           </div>
           <div className="px-4 pb-3 flex gap-2">
             {[0, 9, 19].map((rate) => (
-              <button
-                key={rate}
+              <button type="button"                 key={rate}
                 onClick={() => handleSettingChange('defaultTvaRate', rate)}
                 className={cn(
                   'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
@@ -121,8 +119,7 @@ export function SettingsScreen() {
 
         {/* ── Auto Sync ────────────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]">
-          <button
-            onClick={() => handleSettingChange('autoSync', !settings.autoSync)}
+          <button type="button"             onClick={() => handleSettingChange('autoSync', !settings.autoSync)}
             className="w-full px-4 py-3 flex items-center gap-3"
           >
             <IconCloudOff size={18} className="text-[var(--sand-muted)]" />
@@ -178,14 +175,12 @@ export function SettingsScreen() {
                 Cette action est irréversible. Tous les documents, clients et paramètres seront supprimés.
               </p>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setShowClearConfirm(false)}
+                <button type="button"                   onClick={() => setShowClearConfirm(false)}
                   className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]"
                 >
                   Annuler
                 </button>
-                <button
-                  onClick={handleClearAllData}
+                <button type="button"                   onClick={handleClearAllData}
                   className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-red-500 text-white"
                 >
                   Supprimer tout
@@ -193,8 +188,7 @@ export function SettingsScreen() {
               </div>
             </div>
           ) : (
-            <button
-              onClick={() => setShowClearConfirm(true)}
+            <button type="button"               onClick={() => setShowClearConfirm(true)}
               className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
             >
               <IconTrash size={18} className="text-red-400" />

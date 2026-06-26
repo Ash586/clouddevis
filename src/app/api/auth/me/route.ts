@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getSession } from '@/lib/auth';
+import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const GET = withApiErrorHandling(getHandler, { component: 'auth', severity: 'high', userImpact: 'blocking' });
-async function getHandler() {
+export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-    }
-
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
       select: { suspended: true, suspendedAt: true },
@@ -30,4 +24,4 @@ async function getHandler() {
     logger.error('GET /api/auth/me', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'auth', severity: 'high', userImpact: 'blocking' });

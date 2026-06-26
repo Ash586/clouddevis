@@ -43,8 +43,7 @@ function NavItem({ item, pathname, router, t }: {
     : pathname.startsWith(item.href);
 
   return (
-    <button
-      onClick={() => router.push(item.href)}
+    <button type="button"       onClick={() => router.push(item.href)}
       style={{
         width: '100%',
         display: 'flex',

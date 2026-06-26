@@ -1,19 +1,16 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { getAdminSession } from '@/lib/adminAuth';
+import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
-export const POST = withApiErrorHandling(postHandler, { component: 'dashboard', severity: 'high', userImpact: 'blocking' });
-async function postHandler(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withApiErrorHandling(withAdminAuth(async (_req: Request, session, ctx: { params: Promise<{ id: string }> }) => {
   try {
-    const session = await getAdminSession();
-    if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     if (session.role !== 'ADMIN' && session.role !== 'EDITOR') {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { id } = await params;
+    const { id } = await ctx.params;
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
@@ -44,4 +41,4 @@ async function postHandler(_req: Request, { params }: { params: Promise<{ id: st
     logger.error('Admin suspend error', { error: String(error) });
     throw error;
   }
-}
+}), { component: 'dashboard', severity: 'high', userImpact: 'blocking' });

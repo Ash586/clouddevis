@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import type { HelpLang } from '@/lib/helpTranslations';
-import { hT, HELP_T } from '@/lib/helpTranslations';
+import { hT } from '@/lib/helpTranslations';
 
 const ARTICLES = [
   { titleFr: 'Créer un devis', titleAr: 'إنشاء عرض سعر', titleEn: 'Create a quote', slug: 'creer-devis', category: 'documents', keywords: 'devis créer nouveau prix' },
@@ -66,7 +66,7 @@ export function HelpSearch({ lang }: Props) {
           className="flex-1 text-[13px] outline-none bg-transparent placeholder:text-[#BBB]"
         />
         {query && (
-          <button onClick={() => { setQuery(''); setOpen(false); }} className="text-[#BBB] hover:text-[#666] text-[14px] ml-2">&times;</button>
+          <button type="button" onClick={() => { setQuery(''); setOpen(false); }} className="text-[#BBB] hover:text-[#666] text-[14px] ml-2">&times;</button>
         )}
       </div>
 

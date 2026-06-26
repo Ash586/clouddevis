@@ -61,7 +61,7 @@ export default function AdminEnterpriseRequestDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#0f1117] p-6 max-w-3xl mx-auto space-y-6">
-        <button onClick={() => router.back()} className="text-xs text-slate-400 hover:text-white transition">&larr; Retour</button>
+        <button type="button" onClick={() => router.back()} className="text-xs text-slate-400 hover:text-white transition">&larr; Retour</button>
 
         <Card className="p-6 bg-slate-900/50 border-slate-800">
           <div className="flex items-start justify-between mb-6">

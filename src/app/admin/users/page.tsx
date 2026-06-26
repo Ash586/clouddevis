@@ -122,17 +122,17 @@ export default function AdminUsersPage() {
                       <td style={{ padding: '8px 12px', color: '#a1a5ad' }}>{u.docCount}</td>
                       <td style={{ padding: '8px 12px' }}>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <button onClick={() => router.push(`/admin/users/${u.id}`)}
+                          <button type="button" onClick={() => router.push(`/admin/users/${u.id}`)}
                             style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: '#282c38', color: '#a1a5ad', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Eye size={14} />
                           </button>
                           {u.suspended ? (
-                            <button onClick={() => { setActionUser(u); setActionType('unsuspend'); }}
+                            <button type="button" onClick={() => { setActionUser(u); setActionType('unsuspend'); }}
                               style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: 'rgba(74,222,128,0.10)', color: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <CheckCircle size={14} />
                             </button>
                           ) : (
-                            <button onClick={() => { setActionUser(u); setActionType('suspend'); }}
+                            <button type="button" onClick={() => { setActionUser(u); setActionType('suspend'); }}
                               style={{ width: 32, height: 32, borderRadius: 6, border: 'none', cursor: 'pointer', background: 'rgba(248,113,113,0.10)', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <Ban size={14} />
                             </button>
@@ -151,7 +151,7 @@ export default function AdminUsersPage() {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} onClick={() => setPage(p)}
+            <button type="button" key={p} onClick={() => setPage(p)}
               style={{
                 width: 34, height: 34, borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
                 background: p === page ? '#1d202a' : 'transparent',
@@ -184,11 +184,11 @@ export default function AdminUsersPage() {
               {actionType === 'suspend' ? t('users.suspendConfirm') : t('users.unsuspendConfirm')}
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => { setActionUser(null); setActionType(null); }}
+              <button type="button" onClick={() => { setActionUser(null); setActionType(null); }}
                 style={{ flex: 1, padding: '10px 0', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '0.5px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: '#282c38', color: '#a1a5ad' }}>
                 {tc('cancel')}
               </button>
-              <button onClick={handleSuspend} disabled={actionLoading}
+              <button type="button" onClick={handleSuspend} disabled={actionLoading}
                 style={{
                   flex: 1, padding: '10px 0', borderRadius: 6, fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'default' : 'pointer',
                   background: actionType === 'suspend' ? 'rgba(248,113,113,0.10)' : 'rgba(74,222,128,0.10)',
