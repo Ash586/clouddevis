@@ -71,6 +71,7 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
     sectionOrder: [...DEFAULT_SECTION_ORDER],
     customFields: {},
     logoPosition: 'right',
+    logoSize: 'md',
     companyTagline: '',
     companyCapital: '',
     rcNumber: '',

@@ -173,7 +173,8 @@ export interface DocumentState {
   garantieNotes: string;
   sectionOrder: string[];
   customFields: Record<string, Record<string, unknown>>;
-  logoPosition?: 'left' | 'right';
+  logoPosition?: 'left' | 'center' | 'right';
+  logoSize?: 'sm' | 'md' | 'lg';
 
   // DEVIS-specific fields
   companyTagline?: string;
@@ -207,7 +208,7 @@ export interface DocumentState {
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
-  design: ['logo', 'logoPosition'],
+  design: ['logo', 'logoPosition', 'logoSize'],
   general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle', 'objet', 'docCity'],
   devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
   mode: ['businessMode'],
@@ -235,7 +236,8 @@ export const SECTION_FIELDS: Record<SectionId, string[]> = {
  */
 export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string[]>> = {
   devis: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
     devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
     mode: ['businessMode'],
@@ -249,7 +251,8 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   },
   facture: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
     mode: ['businessMode'],
     client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
@@ -259,7 +262,8 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   },
   proforma: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
     mode: ['businessMode'],
     client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone', 'clientEmail'],
@@ -269,21 +273,24 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   },
   bc: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate', 'validUntil'],
     client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone'],
     prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
     notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   },
   br: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate'],
     client: ['clientName', 'clientAddress'],
     materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
     notes: ['notes'],
   },
   intervention: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate'],
     client: ['clientName', 'clientAddress', 'clientPhone'],
     equipement: ['equipementDesignation', 'equipementType', 'equipementSerie'],
@@ -295,7 +302,8 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     notes: ['notes'],
   },
   attachement: {
-    design: ['logo', 'logoPosition'],
+    design: ['logo', 'logoPosition', 'logoSize'],
+
     general: ['docNumber', 'issueDate'],
     client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone'],
     chantier: ['chantierAddress', 'chantierType', 'chantierSurface'],
