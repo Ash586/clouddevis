@@ -62,6 +62,9 @@ export const EditorMetaSchema = z.object({
   sigDirectionNameFr: z.string().default(''),
   sigDirectionRole: z.string().default(''),
   sigDirectionNameAr: z.string().default(''),
+  validUntil: z.string().default(''),
+  bcRef: z.string().default(''),
+  brRef: z.string().default(''),
 });
 
 export type EditorMeta = z.infer<typeof EditorMetaSchema>;
