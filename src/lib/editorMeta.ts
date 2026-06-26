@@ -20,7 +20,7 @@ const PaymentDetailsSchema = z.object({
 export const EditorMetaSchema = z.object({
   tvaRate: z.number().default(19),
   logoSize: z.enum(['sm', 'md', 'lg']).default('md'),
-  clientInfo: z.record(z.unknown()).default({}),
+  clientInfo: z.record(z.string(), z.unknown()).default({}),
   artisanInfo: z.object({
     name: z.string().default(''),
     address: z.string().default(''),
