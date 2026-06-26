@@ -80,16 +80,25 @@ function EditorContent() {
   const { canUndo, canRedo, handleUndo, handleRedo } = useEditorUndo(doc, setDoc);
   const [catalogItems, setCatalogItems] = useState<LineItem[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  // Section drag & drop state
+  const dragSectionIdRef = useRef<string | null>(null);
+  const orderedSectionsRef = useRef<string[]>([]);
+  const [dragSectionId, setDragSectionId] = useState<string | null>(null);
+  const [dragOverSectionId, setDragOverSectionId] = useState<string | null>(null);
+
   // Left rail navigation config
   const relevantSections = DOC_TYPE_SECTIONS[doc.documentType] ?? DEFAULT_SECTION_ORDER;
   const ALL_SECTIONS: string[] = [...relevantSections, ...customSections.map(s => s.id).filter(id => !relevantSections.includes(id))];
-  // Editor render order: surface the primary task (line items) then the client first,
-  // regardless of the canonical DOC_TYPE_SECTIONS order (which still drives the PDF).
-  const EDITOR_PRIORITY = ['prestations', 'client'];
-  const orderedSections = [
-    ...EDITOR_PRIORITY.filter(s => relevantSections.includes(s)),
-    ...relevantSections.filter(s => !EDITOR_PRIORITY.includes(s)),
-  ];
+
+  // Ordered sections: use doc.sectionOrder as source of truth, keeping prestations first
+  const orderedSections = useMemo(() => {
+    const fromOrder = doc.sectionOrder.filter(s => relevantSections.includes(s));
+    const missing = relevantSections.filter(s => !fromOrder.includes(s));
+    const merged = [...fromOrder, ...missing];
+    return ['prestations', ...merged.filter(s => s !== 'prestations')]
+      .filter(s => relevantSections.includes(s));
+  }, [doc.sectionOrder, relevantSections]);
+  orderedSectionsRef.current = orderedSections;
   const sectionNavItems = useMemo(() => {
     const allItems = [
       { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
@@ -376,9 +385,44 @@ function EditorContent() {
     };
   }, [scrollContainerRef]);
 
+  function resetSectionDrag() {
+    dragSectionIdRef.current = null;
+    setDragSectionId(null);
+    setDragOverSectionId(null);
+  }
+
   const renderSection = (id: SectionId): React.ReactNode => {
     const s = (blockId?: BlockId) => blockId ? { blockId, visible: isBlockVisible(blockId), onToggle: toggleBlock } : { visible: true, onToggle: () => {} };
-    const dragProps = { sectionOrder: doc.sectionOrder, moveSection };
+    const isFixed = id === 'prestations';
+    const dragProps = {
+      draggable: !isFixed,
+      onDragStart: !isFixed ? (e: React.DragEvent) => {
+        dragSectionIdRef.current = id;
+        setDragSectionId(id);
+        e.dataTransfer.effectAllowed = 'move';
+      } : undefined,
+      onDragOver: !isFixed ? (e: React.DragEvent) => {
+        e.preventDefault();
+        if (dragSectionIdRef.current && dragSectionIdRef.current !== id) setDragOverSectionId(id);
+      } : undefined,
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        const from = dragSectionIdRef.current;
+        if (!from || from === id || isFixed) { resetSectionDrag(); return; }
+        const current = [...orderedSectionsRef.current];
+        const fi = current.indexOf(from);
+        const ti = current.indexOf(id);
+        if (fi !== -1 && ti !== -1) {
+          current.splice(fi, 1);
+          current.splice(ti, 0, from);
+          setDoc(prev => ({ ...prev, sectionOrder: current }));
+        }
+        resetSectionDrag();
+      },
+      onDragEnd: () => resetSectionDrag(),
+      isDragOver: dragOverSectionId === id && dragSectionId !== id,
+      isDragging: dragSectionId === id,
+    };
     const sectionProps = {
       doc, setDoc, mode, hiddenFields,
       customSections, sectionOrder: doc.sectionOrder, results,
@@ -403,7 +447,7 @@ function EditorContent() {
       const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
       if (!hasVisible) return null;
       return (
-        <CollapsibleSection title={cs.label} sectionId={cs.id} {...dragProps} {...s()} defaultOpen={true}>
+        <CollapsibleSection title={cs.label} sectionId={cs.id} {...s()} {...dragProps} defaultOpen={true}>
           <SectionProvider {...sectionProps}>
             <CustomSectionRenderer />
           </SectionProvider>
@@ -423,8 +467,8 @@ function EditorContent() {
       <CollapsibleSection
         title={te(meta.titleKey ?? `sections.${id}`)}
         sectionId={id}
-        {...dragProps}
         {...(meta.blockId ? s(meta.blockId as BlockId) : s())}
+        {...dragProps}
         defaultOpen={meta.defaultOpen ?? true}
       >
         <SectionProvider {...sectionProps}>
