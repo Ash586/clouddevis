@@ -194,6 +194,7 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
     const editorMeta: Record<string, unknown> = {
       // persist tvaRate explicitly so load doesn't reverse-compute from computed amounts
       tvaRate: Number(doc.tvaRate) || 0,
+      logoSize: typeof doc.logoSize === 'string' ? doc.logoSize : 'md',
       // client tax fields (stored on Client model, also snapshot here for loaded docs)
       clientInfo: doc.clientInfo || {},
       // artisan mode
@@ -232,6 +233,7 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
       validityDays: doc.validityDays ?? 30,
       reference: doc.reference || '',
       showWatermark: doc.showWatermark || false,
+      previewTemplate: doc.previewTemplate || 'classic',
       objet: doc.objet || '',
       docCity: doc.docCity || '',
       // signature fields

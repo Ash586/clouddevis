@@ -9,6 +9,8 @@ import { PreviewMetaSections } from './preview/PreviewMetaSections';
 import { PreviewFooter } from './preview/PreviewFooter';
 import { PreviewAttachement } from './preview/PreviewAttachement';
 import { PreviewDevis } from './preview/PreviewDevis';
+import { PreviewNordic } from './preview/PreviewNordic';
+import { PreviewVelours } from './preview/PreviewVelours';
 import { PreviewBonCommande } from './preview/PreviewBonCommande';
 import { PreviewIntervention } from './preview/PreviewIntervention';
 import { getDesign } from '@/lib/documentDesign';
@@ -58,16 +60,26 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     return <PreviewAttachement doc={doc} sf={sf} bv={bv} vb={vb} t={t} tu={tu} design={design} highlight={previewFocus} />;
   }
 
-  if (doc.documentType === 'devis') {
-    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} results={results} design={design} highlight={previewFocus} />;
-  }
-
   if (doc.documentType === 'bc') {
     return <PreviewBonCommande doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
   }
 
   if (doc.documentType === 'intervention') {
     return <PreviewIntervention doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
+  }
+
+  const sharedProps = { doc, sf, bv, vb, t, tc: tcommon, tu, results, design, highlight: previewFocus };
+
+  if (doc.previewTemplate === 'nordic') {
+    return <PreviewNordic {...sharedProps} />;
+  }
+
+  if (doc.previewTemplate === 'velours') {
+    return <PreviewVelours {...sharedProps} />;
+  }
+
+  if (doc.documentType === 'devis') {
+    return <PreviewDevis doc={doc} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} results={results} design={design} highlight={previewFocus} />;
   }
 
   return (

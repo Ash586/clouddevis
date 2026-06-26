@@ -84,6 +84,7 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
     validityDays: 30,
     reference: '',
     showWatermark: false,
+    previewTemplate: 'classic',
   };
 
   if (docType === 'attachement') {
@@ -196,6 +197,13 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
               notes: d.notes || '',
               companyInfo: companyInfo || prev.companyInfo,
               logoPosition: d.logoPosition || prev.logoPosition || 'right',
+              logoSize: ((editorMeta.logoSize as 'sm' | 'md' | 'lg' | undefined) || prev.logoSize || 'md') as 'sm' | 'md' | 'lg',
+              sectionOrder: Array.isArray(customFields.sectionOrder) && customFields.sectionOrder.length > 0
+                ? customFields.sectionOrder as string[]
+                : prev.sectionOrder,
+              hiddenBlocks: Array.isArray(customFields.hiddenBlocks)
+                ? ['signature', ...customFields.hiddenBlocks.filter((b: string) => b !== 'signature')]
+                : prev.hiddenBlocks,
               validUntil: d.validUntil ? String(d.validUntil).split('T')[0] : (editorMeta.validUntil as string) || prev.validUntil,
               bcRef: d.bcRef || (editorMeta.bcRef as string) || prev.bcRef,
               brRef: d.brRef || (editorMeta.brRef as string) || prev.brRef,
@@ -240,6 +248,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
               validityDays: (editorMeta.validityDays as number) ?? prev.validityDays,
               reference: (editorMeta.reference as string) || prev.reference,
               showWatermark: (editorMeta.showWatermark as boolean) ?? prev.showWatermark,
+              previewTemplate: (editorMeta.previewTemplate as 'classic' | 'nordic' | 'velours' | undefined) ?? prev.previewTemplate,
               objet: (editorMeta.objet as string) || prev.objet,
               docCity: (editorMeta.docCity as string) || prev.docCity,
               // Restore signature fields
