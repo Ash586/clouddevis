@@ -21,7 +21,11 @@ export const EditorMetaSchema = z.object({
   tvaRate: z.number().default(19),
   logoSize: z.enum(['sm', 'md', 'lg']).default('md'),
   clientInfo: z.record(z.unknown()).default({}),
-  artisanInfo: z.record(z.unknown()).nullable().default(null),
+  artisanInfo: z.object({
+    name: z.string().default(''),
+    address: z.string().default(''),
+    phone: z.string().default(''),
+  }).nullable().default(null),
   discount: DiscountSchema.default({}),
   stampDuty: StampDutySchema.default({}),
   paymentDetails: PaymentDetailsSchema.default({}),
