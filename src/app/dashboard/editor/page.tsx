@@ -209,6 +209,8 @@ function EditorContent() {
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
   const handleDownload = async () => {
+    // Open window synchronously during click gesture — before any await — so popup blocker doesn't fire
+    const printWindow = window.open('', '_blank');
     await saveDoc();
     track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
     const isEnt = doc.mode === 'entreprise';
@@ -266,11 +268,10 @@ function EditorContent() {
         reference: doc.reference,
       });
 
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const w = window.open(url, '_blank');
-    if (!w) { window.print(); return; }
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    if (!printWindow) { window.print(); return; }
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
   };
 
   // Show draft restoration notification
