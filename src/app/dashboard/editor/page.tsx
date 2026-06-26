@@ -14,7 +14,7 @@ import { useEditor } from '@/hooks/useEditor';
 import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
-import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML } from '@/lib/generateDocumentHTML';
+import { generateDocumentHTML, generateAttachementHTML, generateDevisHTML, generateHaussmannHTML, generateNordicHTML, generateVeloursHTML, generateIndustrielleHTML } from '@/lib/generateDocumentHTML';
 import { generateBonCommandeHTML } from '@/lib/generateBonCommandeHTML';
 import { generateInterventionHTML } from '@/lib/generateInterventionHTML';
 import { getDesign } from '@/lib/documentDesign';
@@ -234,7 +234,13 @@ function EditorContent() {
     const html = doc.documentType === 'attachement'
       ? generateAttachementHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : doc.documentType === 'devis'
-      ? generateDevisHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+      ? (doc.previewTemplate === 'nordic'
+          ? generateNordicHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+          : doc.previewTemplate === 'velours'
+          ? generateVeloursHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+          : doc.previewTemplate === 'industrielle'
+          ? generateIndustrielleHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
+          : generateHaussmannHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design }))
       : doc.documentType === 'bc'
       ? generateBonCommandeHTML({ doc, results, sf, bv, vb, tc: (k: string) => tc(k), tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>), currency: tc('currency'), design })
       : doc.documentType === 'intervention'

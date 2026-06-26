@@ -529,6 +529,273 @@ ${totalInWords ? `<div class="montant-section">
 </body></html>`;
 }
 
+export function generateHaussmannHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+}) {
+  const { doc, sf, vb, bv, results, currency } = params;
+  const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const HM = { green:'#0d4a3e', gold:'#c9a227', text:'#111827', muted:'#4b5563', faint:'#9ca3af', rule:'#e5e7eb' };
+  const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const isEnt = doc.mode === 'entreprise';
+  const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
+  const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><title>DEVIS N° ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<div class="page">
+<div style="padding:40px 44px 20px;text-align:center">
+  ${doc.companyInfo?.logo ? `<div style="margin-bottom:10px"><img src="${e(doc.companyInfo.logo)}" style="max-height:60px;max-width:180px;object-fit:contain;margin:0 auto" alt="logo"></div>` : ''}
+  ${companyName ? `<div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:46px;font-style:italic;font-weight:700;color:${HM.green};line-height:1.05;letter-spacing:-0.5px">${e(companyName)}</div>` : ''}
+  <div style="font-size:10px;color:${HM.muted};letter-spacing:4px;text-transform:uppercase;margin-top:6px">${e(doc.companyTagline || (isEnt ? 'SARL' : 'Artisan'))}</div>
+  ${companyAddr ? `<div style="font-size:10px;color:${HM.faint};margin-top:5px;line-height:1.7">${e(companyAddr)}</div>` : ''}
+  ${isEnt && doc.companyInfo ? `<div style="font-size:9px;color:${HM.faint};margin-top:3px">${doc.companyInfo.taxIds.nif?`<span>NIF ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${doc.companyInfo.taxIds.rc?`<span style="margin-left:12px">RC ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyInfo.taxIds.nis?`<span style="margin-left:12px">NIS ${e(doc.companyInfo.taxIds.nis)}</span>`:''}</div>` : ''}
+  ${doc.companyPhone ? `<div style="font-size:9px;color:${HM.faint};margin-top:2px">Tél : ${e(doc.companyPhone)}</div>` : ''}
+</div>
+<div style="padding:0 44px;margin-bottom:4px">
+  <div style="height:0.75px;background:${HM.green}"></div>
+  <div style="display:flex;align-items:center;justify-content:center;padding:10px 0;gap:10px">
+    <span style="display:inline-block;width:7px;height:7px;background:${HM.gold};transform:rotate(45deg);flex-shrink:0"></span>
+    <span style="font-size:12px;font-weight:700;color:${HM.green};letter-spacing:6px">${e(docLabel)}</span>
+    <span style="display:inline-block;width:7px;height:7px;background:${HM.gold};transform:rotate(45deg);flex-shrink:0"></span>
+  </div>
+  <div style="height:0.75px;background:${HM.green}"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;padding:18px 44px 10px">
+  <div style="border-right:0.5px solid ${HM.rule};padding-right:24px">
+    <div style="font-size:9px;font-weight:700;color:${HM.gold};letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Référence</div>
+    ${sf('docNumber') && doc.documentNumber ? `<div style="margin-bottom:6px"><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Numéro</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:${HM.green};font-weight:600">${e(doc.documentNumber)}</div></div>` : ''}
+    ${sf('issueDate') && doc.date ? `<div style="margin-bottom:6px"><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Date</div><div style="font-size:12px;color:${HM.text}">${e(doc.date)}</div></div>` : ''}
+    ${sf('validUntil') && doc.validUntil ? `<div style="margin-bottom:6px"><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Valable jusqu'au</div><div style="font-size:12px;color:${HM.text}">${e(doc.validUntil)}</div></div>` : ''}
+    ${sf('orderRef') && doc.bcRef ? `<div><div style="font-size:9px;color:${HM.faint};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px">Réf. BC</div><div style="font-size:12px;color:${HM.text}">${e(doc.bcRef)}</div></div>` : ''}
+  </div>
+  ${vb('client') && doc.clientInfo.name ? `<div style="padding-left:24px"><div style="font-size:9px;font-weight:700;color:${HM.gold};letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Adressé à</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;color:${HM.green};line-height:1.1;margin-bottom:6px">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${HM.muted};line-height:1.6">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc)?`<div style="font-size:10px;color:${HM.faint};margin-top:4px">${doc.clientInfo.nif?`<span>NIF ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC ${e(doc.clientInfo.rc)}</span>`:''}</div>`:''}</div>` : ''}
+</div>
+${doc.objet ? `<div style="margin:4px 44px 12px;padding:8px 12px;border-left:2px solid ${HM.gold};font-size:11px;color:${HM.muted};line-height:1.5"><strong style="font-size:9px;color:${HM.gold};text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
+${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 44px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-top:0.5px solid ${HM.rule};border-bottom:1px solid ${HM.green}"><th style="padding:8px 0;text-align:left;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;letter-spacing:0.1em">Désignation</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:44px">Qté</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:34px">U.</th><th style="padding:8px 6px;text-align:right;font-size:9px;font-weight:700;color:${HM.green};text-transform:uppercase;width:96px">P.U. HT</th><th style="padding:8px 0;text-align:right;font-size:9px;font-weight:700;color:${HM.gold};text-transform:uppercase;width:108px">Total HT</th></tr></thead><tbody>${doc.items.map(item=>`<tr style="border-bottom:0.5px solid ${HM.rule}"><td style="padding:9px 0;line-height:1.4;vertical-align:top"><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;font-weight:600;color:${HM.text}">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${HM.faint};margin-top:1px">${e(item.description)}</div>`:''}</td><td style="padding:9px 6px;text-align:center;color:${HM.muted}">${item.quantity}</td><td style="padding:9px 6px;text-align:center;color:${HM.faint};font-size:10px">${e(item.unit)}</td><td style="padding:9px 6px;text-align:right;color:${HM.muted}">${fmt(item.unitPrice)}</td><td style="padding:9px 0;text-align:right;font-weight:700;color:${HM.gold}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+<div style="display:flex;justify-content:flex-end;padding:14px 44px 0"><div style="width:280px">
+  <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${HM.muted};border-bottom:0.5px solid ${HM.rule}"><span>Sous-total HT</span><span>${fmt(results.subTotalHT)} ${e(currency)}</span></div>
+  ${results.discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;border-bottom:0.5px solid ${HM.rule}"><span>Remise</span><span>-${fmt(results.discountAmount)} ${e(currency)}</span></div>` : ''}
+  ${results.tvaAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${HM.muted};border-bottom:0.5px solid ${HM.rule}"><span>TVA (${results.tvaRate}%)</span><span>${fmt(results.tvaAmount)} ${e(currency)}</span></div>` : ''}
+  ${results.timbreFiscal > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${HM.muted};border-bottom:0.5px solid ${HM.rule}"><span>Timbre fiscal</span><span>${fmt(results.timbreFiscal)} ${e(currency)}</span></div>` : ''}
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:${HM.green};margin-top:6px"><span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#fff">Total TTC</span><span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:700;color:${HM.gold}">${fmt(results.totalTTC)} ${e(currency)}</span></div>
+  ${results.acompte > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;margin-top:4px"><span>Acompte versé</span><span>-${fmt(results.acompte)} ${e(currency)}</span></div>` : ''}
+  ${results.netAPayer !== results.totalTTC ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;font-weight:700;color:${HM.green}"><span>Net à payer</span><span>${fmt(results.netAPayer)} ${e(currency)}</span></div>` : ''}
+</div></div>
+${vb('tafqit') && results.totalInWords ? `<div style="margin:18px 44px 0;text-align:center;padding:11px 0;border-top:0.5px solid ${HM.rule};border-bottom:0.5px solid ${HM.rule}"><em style="font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;font-style:italic;color:${HM.green}">Arrêté à la somme de ${e(results.totalInWords)}</em></div>` : ''}
+${vb('payment') && bv('paymentConditions','paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) ? `<div style="margin:12px 44px 0;padding:10px 0;font-size:10.5px;color:${HM.muted};line-height:1.6;border-top:0.5px solid ${HM.rule}"><strong style="display:block;font-size:9px;color:${HM.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Paiement</strong>${doc.paymentDetails.terms?`<div>${e(doc.paymentDetails.terms)}</div>`:''}${doc.paymentDetails.iban?`<div style="font-size:10px">RIB : ${e(doc.paymentDetails.iban)}</div>`:''}${doc.bankName?`<div style="font-size:10px">${e(doc.bankName)}${doc.bankAgency?' — '+e(doc.bankAgency):''}</div>`:''}</div>` : ''}
+${doc.notes ? `<div style="margin:10px 44px 0;padding:10px 0;font-size:10.5px;color:${HM.muted};line-height:1.5;border-top:0.5px solid ${HM.rule}"><strong style="display:block;font-size:9px;color:${HM.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Notes</strong>${e(doc.notes)}</div>` : ''}
+${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 44px 0;border-top:0.75px solid ${HM.rule};padding-top:22px"><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${HM.green};margin-bottom:8px">Le Client</div><div style="height:64px;border-bottom:0.75px solid ${HM.rule};margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px">Signature & cachet</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:12px;color:${HM.muted}">Bon pour accord</div></div><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:${HM.green};margin-bottom:8px">Le Prestataire</div><div style="height:64px;border-bottom:0.75px solid ${HM.rule};margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px">${doc.companyInfo?.signature?`<img src="${e(doc.companyInfo.signature)}" style="max-width:100%;max-height:100%" alt="sig">`:'Signature & cachet'}</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:12px;color:${HM.muted};font-weight:600">${e(companyName)}</div></div></div>` : ''}
+<div style="padding:16px 44px 20px;text-align:center;font-size:9px;color:${HM.faint};line-height:2;margin-top:auto">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${doc.companyPhone?`<span style="margin-left:10px">· Tél : ${e(doc.companyPhone)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin-left:10px">· NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin-left:10px">· RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''}<br><span style="color:#d1d5db">Document généré par CloudDevis</span></div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+</body></html>`;
+}
+
+export function generateNordicHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+}) {
+  const { doc, sf, vb, bv, results, currency } = params;
+  const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const NK = { teal:'#0f766e', tealLight:'#f0fdf4', tealBorder:'#bbf7d0', tealDark:'#134e4a', text:'#111827', muted:'#6b7280', faint:'#9ca3af', rule:'#e5e7eb' };
+  const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const isEnt = doc.mode === 'entreprise';
+  const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
+  const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#111827;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<div class="page">
+<div style="height:3px;background:${NK.teal};flex-shrink:0"></div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:32px 40px 20px">
+  <div style="flex:1">
+    ${companyName ? `<div style="font-size:18px;font-weight:700;color:${NK.text};letter-spacing:-0.02em;margin-bottom:4px">${e(companyName)}</div>` : ''}
+    ${companyAddr ? `<div style="font-size:11px;color:${NK.muted};line-height:1.6;margin-bottom:3px">${e(companyAddr)}</div>` : ''}
+    ${doc.companyPhone ? `<div style="font-size:10px;color:${NK.faint}">Tél : ${e(doc.companyPhone)}</div>` : ''}
+    ${isEnt && doc.companyInfo ? `<div style="font-size:10px;color:${NK.faint};line-height:1.9;margin-top:2px">${doc.companyInfo.taxIds.nif?`<span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${doc.companyInfo.taxIds.rc?`<span style="margin-left:10px">RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyInfo.taxIds.nis?`<br><span>NIS : ${e(doc.companyInfo.taxIds.nis)}</span>`:''}</div>` : ''}
+    ${!isEnt && doc.artisanInfo?.phone ? `<div style="font-size:10px;color:${NK.faint};margin-top:2px">Tél : ${e(doc.artisanInfo.phone)}</div>` : ''}
+  </div>
+  <div style="text-align:right;flex-shrink:0;margin-left:24px">
+    <div style="font-size:36px;font-weight:800;color:${NK.teal};letter-spacing:-1px;line-height:1">${e(docLabel)}</div>
+    ${sf('docNumber') && doc.documentNumber ? `<div style="font-size:11px;color:${NK.muted};margin-top:6px">N° ${e(doc.documentNumber)}</div>` : ''}
+    ${sf('issueDate') && doc.date ? `<div style="font-size:11px;color:${NK.muted}">Date : ${e(doc.date)}</div>` : ''}
+    ${sf('validUntil') && doc.validUntil ? `<div style="font-size:10px;color:${NK.faint}">Valable : ${e(doc.validUntil)}</div>` : ''}
+    ${sf('orderRef') && doc.bcRef ? `<div style="font-size:10px;color:${NK.faint}">Réf BC : ${e(doc.bcRef)}</div>` : ''}
+  </div>
+</div>
+<div style="height:1px;background:${NK.tealBorder};margin:0 40px"></div>
+${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="margin:20px 40px;background:${NK.tealLight};border-left:3px solid ${NK.teal};padding:12px 16px"><div style="font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px">Client</div><div style="font-size:14px;font-weight:700;color:${NK.text}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${NK.muted};margin-top:2px">${e(doc.clientInfo.address)}</div>`:''} ${doc.clientInfo.nif?`<div style="font-size:10px;color:${NK.faint};margin-top:2px">NIF : ${e(doc.clientInfo.nif)}</div>`:''} ${doc.clientInfo.rc?`<span style="font-size:10px;color:${NK.faint};margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''}</div>` : ''}
+${doc.objet ? `<div style="margin:0 40px 16px;border-left:2px solid ${NK.tealBorder};padding:8px 12px;font-size:11px;color:${NK.muted};line-height:1.5"><strong style="font-size:9px;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
+${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 40px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="border-bottom:2px solid ${NK.teal}"><th style="padding:8px 0 8px 2px;text-align:left;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em">Désignation</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:44px">Qté</th><th style="padding:8px 6px;text-align:center;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:34px">U.</th><th style="padding:8px 6px;text-align:right;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:96px">P.U. HT</th><th style="padding:8px 0;text-align:right;font-size:9px;font-weight:700;color:${NK.teal};text-transform:uppercase;width:108px">Total HT</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="border-bottom:0.5px solid ${NK.rule};background:${idx%2===1?NK.tealLight:'#fff'}"><td style="padding:9px 0 9px 2px;color:${NK.text};line-height:1.4;vertical-align:top"><div style="font-weight:500">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${NK.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>`:''}</td><td style="padding:9px 6px;text-align:center;color:${NK.muted}">${item.quantity}</td><td style="padding:9px 6px;text-align:center;color:${NK.muted};font-size:10px">${e(item.unit)}</td><td style="padding:9px 6px;text-align:right;color:${NK.muted}">${fmt(item.unitPrice)}</td><td style="padding:9px 0;text-align:right;font-weight:700;color:${NK.tealDark}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+<div style="display:flex;justify-content:flex-end;padding:16px 40px 0"><div style="width:264px">
+  <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${NK.muted};border-bottom:0.5px solid ${NK.rule}"><span>Sous-total HT</span><span>${fmt(results.subTotalHT)} ${e(currency)}</span></div>
+  ${results.discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;border-bottom:0.5px solid ${NK.rule}"><span>Remise</span><span>-${fmt(results.discountAmount)} ${e(currency)}</span></div>` : ''}
+  ${results.tvaAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${NK.muted};border-bottom:0.5px solid ${NK.rule}"><span>TVA (${results.tvaRate}%)</span><span>${fmt(results.tvaAmount)} ${e(currency)}</span></div>` : ''}
+  ${results.timbreFiscal > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${NK.muted};border-bottom:0.5px solid ${NK.rule}"><span>Timbre fiscal</span><span>${fmt(results.timbreFiscal)} ${e(currency)}</span></div>` : ''}
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:${NK.teal};color:#fff;font-size:13px;font-weight:700;margin-top:6px"><span>Total TTC</span><span style="font-size:15px">${fmt(results.totalTTC)} ${e(currency)}</span></div>
+  ${results.acompte > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;margin-top:4px"><span>Acompte versé</span><span>-${fmt(results.acompte)} ${e(currency)}</span></div>` : ''}
+  ${results.netAPayer !== results.totalTTC ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;font-weight:700;color:${NK.tealDark}"><span>Net à payer</span><span>${fmt(results.netAPayer)} ${e(currency)}</span></div>` : ''}
+</div></div>
+${vb('tafqit') && results.totalInWords ? `<div style="margin:14px 40px 0;padding:10px 14px;border:0.5px solid ${NK.tealBorder};background:${NK.tealLight};font-size:10.5px;color:${NK.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Arrêté à la somme de</strong><em>${e(results.totalInWords)}</em></div>` : ''}
+${vb('payment') && bv('paymentConditions','paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) ? `<div style="margin:12px 40px 0;padding:10px 14px;border:0.5px solid ${NK.rule};font-size:10.5px;color:${NK.muted};line-height:1.6"><strong style="display:block;font-size:9px;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Paiement</strong>${doc.paymentDetails.terms?`<div>${e(doc.paymentDetails.terms)}</div>`:''}${doc.paymentDetails.iban?`<div style="font-size:10px">RIB : ${e(doc.paymentDetails.iban)}</div>`:''}${doc.bankName?`<div style="font-size:10px">${e(doc.bankName)}${doc.bankAgency?' — '+e(doc.bankAgency):''}</div>`:''}</div>` : ''}
+${doc.notes ? `<div style="margin:10px 40px 0;padding:10px 14px;border:0.5px solid ${NK.rule};font-size:10.5px;color:${NK.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${NK.teal};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Notes</strong>${e(doc.notes)}</div>` : ''}
+${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 40px 0;border-top:1px solid ${NK.rule};padding-top:20px"><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${NK.teal};margin-bottom:8px">Le Client</div><div style="height:60px;border:1px solid ${NK.rule};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">Signature & cachet</div><div style="font-size:10px;color:${NK.muted}">Bon pour accord</div></div><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${NK.teal};margin-bottom:8px">Prestataire</div><div style="height:60px;border:1px solid ${NK.rule};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">${doc.companyInfo?.signature?`<img src="${e(doc.companyInfo.signature)}" style="max-width:100%;max-height:100%" alt="sig">`:'Signature & cachet'}</div><div style="font-size:10px;color:${NK.muted};font-weight:600">${e(companyName)}</div></div></div>` : ''}
+<div style="border-top:1px solid ${NK.tealBorder};margin:16px 40px 0;padding-top:10px"></div>
+<div style="padding:0 40px 14px;font-size:9px;color:${NK.faint};text-align:center;line-height:1.9;margin-top:auto">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin-left:12px">· NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin-left:12px">· RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin-left:12px">· Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#d1fae5">Document généré par CloudDevis</span></div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+</body></html>`;
+}
+
+export function generateVeloursHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+}) {
+  const { doc, sf, vb, bv, results, currency } = params;
+  const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const VR = { bordeaux:'#3d0d1c', gold:'#c9a227', goldBorder:'#e8d5b7', cream:'#fdfaf5', text:'#1a0810', muted:'#7c4d5a', faint:'#b08090', rule:'#e8d5b7', roseLight:'#f9e8ee' };
+  const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const isEnt = doc.mode === 'entreprise';
+  const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
+  const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#1a0810;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{width:190mm;margin:0 auto;min-height:297mm;background:${VR.cream};display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<div class="page">
+<div style="height:3px;background:${VR.gold};flex-shrink:0"></div>
+<div style="background:${VR.bordeaux};padding:28px 40px;display:flex;justify-content:space-between;align-items:flex-start">
+  <div style="flex:1;margin-right:24px">
+    ${doc.companyInfo?.logo ? `<div style="margin-bottom:8px"><img src="${e(doc.companyInfo.logo)}" style="max-height:44px;max-width:140px;object-fit:contain" alt="logo"></div>` : ''}
+    ${companyName ? `<div style="font-family:'Playfair Display',Georgia,serif;font-size:34px;font-weight:700;color:#f0e0c8;letter-spacing:-0.5px;line-height:1.1">${e(companyName)}</div>` : ''}
+    <div style="width:36px;height:1px;background:${VR.gold};margin:10px 0 8px"></div>
+    <div style="font-size:10px;color:#c9a090;line-height:1.9">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${doc.companyPhone?`<br><span>Tél : ${e(doc.companyPhone)}</span>`:(!isEnt && doc.artisanInfo?.phone?`<br><span>Tél : ${e(doc.artisanInfo.phone)}</span>`:'')} ${isEnt && doc.companyInfo?.taxIds?.nif?`<br><span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin:0 6px">·</span><span>RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''}</div>
+  </div>
+  <div style="flex-shrink:0;text-align:right">
+    <div style="display:inline-block;border:1px solid ${VR.gold};padding:6px 16px;text-align:center;margin-bottom:8px"><div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;color:#f0e0c8;letter-spacing:2px">${e(docLabel)}</div></div>
+    <div style="font-size:10px;color:${VR.roseLight};line-height:1.8">${sf('docNumber') && doc.documentNumber?`<div>N° ${e(doc.documentNumber)}</div>`:''} ${sf('issueDate') && doc.date?`<div>${e(doc.date)}</div>`:''} ${sf('validUntil') && doc.validUntil?`<div style="font-size:9px;color:#c9a090">Valable : ${e(doc.validUntil)}</div>`:''}</div>
+  </div>
+</div>
+<div style="height:2px;background:${VR.gold}"></div>
+<div style="flex:1;padding:20px 40px">
+  ${vb('client') && bv('clientName','clientAddress') && doc.clientInfo.name ? `<div style="background:#fff;border:1px solid ${VR.goldBorder};padding:14px 18px;margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${VR.gold};font-weight:700;margin-bottom:5px">Adressé à</div><div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:${VR.bordeaux}">${e(doc.clientInfo.name)}</div>${doc.clientInfo.address?`<div style="font-size:11px;color:${VR.muted};margin-top:3px">${e(doc.clientInfo.address)}</div>`:''} ${(doc.clientInfo.nif||doc.clientInfo.rc)?`<div style="font-size:10px;color:${VR.faint};margin-top:2px">${doc.clientInfo.nif?`<span>NIF : ${e(doc.clientInfo.nif)}</span>`:''} ${doc.clientInfo.rc?`<span style="margin-left:10px">RC : ${e(doc.clientInfo.rc)}</span>`:''}</div>`:''}</div>` : ''}
+  ${doc.objet ? `<div style="padding:8px 14px;border-left:2px solid ${VR.gold};margin-bottom:16px;font-size:11px;color:${VR.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${VR.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
+  ${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:18px"><thead><tr style="border-bottom:2px solid ${VR.bordeaux}"><th style="padding:7px 0;text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700">Désignation</th><th style="padding:7px 6px;text-align:center;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:44px">Qté</th><th style="padding:7px 6px;text-align:center;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:34px">U.</th><th style="padding:7px 6px;text-align:right;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:100px">P.U.</th><th style="padding:7px 0;text-align:right;font-size:9px;text-transform:uppercase;color:${VR.bordeaux};font-weight:700;width:108px">Total</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="border-bottom:0.5px solid ${VR.goldBorder};background:${idx%2===1?VR.cream:'#fff'}"><td style="padding:10px 0;font-family:'Playfair Display',Georgia,serif;font-style:italic;color:${VR.text};line-height:1.4;vertical-align:top"><div>${e(item.designation)}</div>${item.description?`<div style="font-family:'Montserrat',Arial,sans-serif;font-style:normal;font-size:9px;color:${VR.muted};margin-top:1px">${e(item.description)}</div>`:''}</td><td style="padding:10px 6px;text-align:center;color:${VR.muted}">${item.quantity}</td><td style="padding:10px 6px;text-align:center;color:${VR.muted};font-size:10px">${e(item.unit)}</td><td style="padding:10px 6px;text-align:right;color:${VR.muted}">${fmt(item.unitPrice)}</td><td style="padding:10px 0;text-align:right;font-weight:700;color:${VR.bordeaux}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table>` : ''}
+  <div style="display:flex;justify-content:flex-end"><div style="width:272px">
+    <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${VR.muted};border-bottom:0.5px solid ${VR.rule}"><span>Sous-total HT</span><span>${fmt(results.subTotalHT)} ${e(currency)}</span></div>
+    ${results.discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;border-bottom:0.5px solid ${VR.rule}"><span>Remise</span><span>-${fmt(results.discountAmount)} ${e(currency)}</span></div>` : ''}
+    ${results.tvaAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${VR.muted};border-bottom:0.5px solid ${VR.rule}"><span>TVA (${results.tvaRate}%)</span><span>${fmt(results.tvaAmount)} ${e(currency)}</span></div>` : ''}
+    ${results.timbreFiscal > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:${VR.muted};border-bottom:0.5px solid ${VR.rule}"><span>Timbre fiscal</span><span>${fmt(results.timbreFiscal)} ${e(currency)}</span></div>` : ''}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border:2px solid ${VR.gold};background:#fff;margin-top:6px"><span style="font-family:'Playfair Display',Georgia,serif;font-size:14px;font-weight:700;font-style:italic;color:${VR.bordeaux}">Total TTC</span><span style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:${VR.gold}">${fmt(results.totalTTC)} ${e(currency)}</span></div>
+    ${results.acompte > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#ef4444;margin-top:4px"><span>Acompte versé</span><span>-${fmt(results.acompte)} ${e(currency)}</span></div>` : ''}
+    ${results.netAPayer !== results.totalTTC ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;font-weight:700;color:${VR.bordeaux}"><span>Net à payer</span><span style="font-family:'Playfair Display',Georgia,serif">${fmt(results.netAPayer)} ${e(currency)}</span></div>` : ''}
+  </div></div>
+  ${vb('tafqit') && results.totalInWords ? `<div style="margin-top:14px;padding:10px 14px;border:1px solid ${VR.goldBorder};background:#fff;line-height:1.6"><strong style="display:block;font-size:9px;color:${VR.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Arrêté à la somme de</strong><em style="font-family:'Playfair Display',Georgia,serif;font-size:11px;color:${VR.muted}">${e(results.totalInWords)}</em></div>` : ''}
+  ${vb('payment') && bv('paymentConditions','paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) ? `<div style="margin-top:12px;padding:10px 14px;border:0.5px solid ${VR.goldBorder};font-size:10.5px;color:${VR.muted};line-height:1.6"><strong style="display:block;font-size:9px;color:${VR.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Paiement</strong>${doc.paymentDetails.terms?`<div>${e(doc.paymentDetails.terms)}</div>`:''}${doc.paymentDetails.iban?`<div style="font-size:10px">RIB : ${e(doc.paymentDetails.iban)}</div>`:''}${doc.bankName?`<div style="font-size:10px">${e(doc.bankName)}${doc.bankAgency?' — '+e(doc.bankAgency):''}</div>`:''}</div>` : ''}
+  ${doc.notes ? `<div style="margin-top:10px;padding:10px 14px;border:0.5px solid ${VR.goldBorder};font-size:10.5px;color:${VR.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${VR.gold};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Notes</strong>${e(doc.notes)}</div>` : ''}
+  ${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px;border-top:1px solid ${VR.goldBorder};padding-top:18px"><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${VR.bordeaux};margin-bottom:8px">Le Client</div><div style="height:60px;border:1px solid ${VR.goldBorder};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">Signature & cachet</div><div style="font-size:10px;font-family:'Playfair Display',Georgia,serif;color:${VR.muted}">Bon pour accord</div></div><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${VR.bordeaux};margin-bottom:8px">Prestataire</div><div style="height:60px;border:1px solid ${VR.goldBorder};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">${doc.companyInfo?.signature?`<img src="${e(doc.companyInfo.signature)}" style="max-width:100%;max-height:100%" alt="sig">`:'Signature & cachet'}</div><div style="font-size:10px;font-family:'Playfair Display',Georgia,serif;color:${VR.muted};font-weight:700">${e(companyName)}</div></div></div>` : ''}
+</div>
+<div style="background:${VR.bordeaux};padding:10px 40px;margin-top:auto"><div style="font-size:9px;color:#c9a090;text-align:center;line-height:1.9">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin:0 8px">·</span><span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin:0 8px">·</span><span>RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin:0 8px">·</span><span>Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#8b4857">Document généré par CloudDevis</span></div></div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+</body></html>`;
+}
+
+export function generateIndustrielleHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+}) {
+  const { doc, sf, vb, bv, results, currency } = params;
+  const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  const IND = { slate:'#1e293b', slateMid:'#334155', slateLight:'#f1f5f9', slateBody:'#f8fafc', blue:'#2563eb', blueLight:'#93c5fd', blueDeep:'#1d4ed8', blueNav:'#1e40af', text:'#0f172a', muted:'#5a6b85', faint:'#94a3b8', rule:'#e2e8f0', white:'#ffffff' };
+  const COL = ['#2563eb','#4b7ae0','#7baef9','#93c5fd','#93c5fd'];
+  const fmt = (n: number) => n.toLocaleString('fr-DZ',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const isEnt = doc.mode === 'entreprise';
+  const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
+  const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
+  const companyPhone = doc.companyPhone || (!isEnt ? (doc.artisanInfo?.phone ?? '') : '');
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Montserrat',Arial,sans-serif;color:#0f172a;font-size:13px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff}.page{width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column}@media print{.page{box-shadow:none}}</style></head><body>
+<div class="page">
+<div style="display:flex;min-height:148px">
+  <div style="background:${IND.slate};width:45%;padding:26px;flex-shrink:0">
+    <div style="font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${IND.faint};margin-bottom:10px">Émetteur</div>
+    ${doc.companyInfo?.logo ? `<div style="margin-bottom:8px"><img src="${e(doc.companyInfo.logo)}" style="max-height:36px;max-width:110px;object-fit:contain" alt="logo"></div>` : ''}
+    ${companyName ? `<div style="font-size:16px;font-weight:700;color:${IND.white};line-height:1.2;margin-bottom:6px">${e(companyName)}</div>` : ''}
+    ${companyAddr ? `<div style="font-size:10px;color:${IND.faint};line-height:1.7;margin-bottom:4px">${e(companyAddr)}</div>` : ''}
+    ${companyPhone ? `<div style="font-size:9px;color:${IND.faint};margin-bottom:5px">Tél : ${e(companyPhone)}</div>` : ''}
+    ${isEnt && doc.companyInfo ? `<div style="display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:9px;color:${IND.faint};margin-top:2px">${doc.companyInfo.taxIds.nif?`<span style="color:${IND.blueLight};font-weight:700">NIF</span><span>${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${doc.companyInfo.taxIds.rc?`<span style="color:${IND.blueLight};font-weight:700">RC</span><span>${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyInfo.taxIds.nis?`<span style="color:${IND.blueLight};font-weight:700">NIS</span><span>${e(doc.companyInfo.taxIds.nis)}</span>`:''} ${doc.companyInfo.taxIds.ai?`<span style="color:${IND.blueLight};font-weight:700">AI</span><span>${e(doc.companyInfo.taxIds.ai)}</span>`:''}</div>` : ''}
+  </div>
+  <div style="background:${IND.slateLight};flex:1;padding:26px">
+    <div style="font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${IND.faint};margin-bottom:10px">Référence</div>
+    <div style="font-size:30px;font-weight:700;color:${IND.slate};letter-spacing:-1px;margin-bottom:12px;line-height:1">${e(docLabel)}</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px">${sf('docNumber') && doc.documentNumber?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">N°</span><span style="color:${IND.text};font-weight:600">${e(doc.documentNumber)}</span>`:''} ${sf('issueDate') && doc.date?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Date</span><span style="color:${IND.text}">${e(doc.date)}</span>`:''} ${sf('validUntil') && doc.validUntil?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Validité</span><span style="color:${IND.text}">${e(doc.validUntil)}</span>`:''} ${sf('orderRef') && doc.bcRef?`<span style="font-size:9px;color:${IND.faint};font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Réf BC</span><span style="color:${IND.text}">${e(doc.bcRef)}</span>`:''}</div>
+  </div>
+</div>
+${vb('client') && doc.clientInfo.name ? `<div style="background:${IND.slateBody};margin:14px 26px;padding:14px 18px"><div style="font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:${IND.blue};margin-bottom:9px">Destinataire</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px;font-size:11px"><div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Raison sociale</div><div style="font-weight:700;color:${IND.text}">${e(doc.clientInfo.name)}</div></div> ${doc.clientInfo.address?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Adresse</div><div style="color:${IND.muted}">${e(doc.clientInfo.address)}</div></div>`:''} ${doc.clientInfo.nif?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">NIF</div><div style="color:${IND.muted}">${e(doc.clientInfo.nif)}</div></div>`:''} ${doc.clientInfo.rc?`<div><div style="font-size:9px;color:${IND.faint};text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">RC</div><div style="color:${IND.muted}">${e(doc.clientInfo.rc)}</div></div>`:''}</div></div>` : ''}
+${doc.objet ? `<div style="margin:0 26px 10px;padding:8px 12px;border-left:3px solid ${IND.blue};background:${IND.slateBody};font-size:11px;color:${IND.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${IND.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">Objet</strong>${e(doc.objet)}</div>` : ''}
+${vb('table') && sf('itemsTable') && doc.items.length > 0 ? `<div style="padding:0 26px"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr><th style="padding:9px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};border-left:3px solid ${COL[0]}">Désignation</th><th style="padding:9px 8px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:44px;border-left:2px solid ${COL[1]}">Qté</th><th style="padding:9px 8px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:34px;border-left:2px solid ${COL[2]}">U.</th><th style="padding:9px 8px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:96px;border-left:2px solid ${COL[3]}">P.U. HT</th><th style="padding:9px 8px;text-align:right;font-size:9px;font-weight:700;text-transform:uppercase;color:${IND.white};background:${IND.slateMid};width:108px;border-left:2px solid ${COL[4]}">Montant HT</th></tr></thead><tbody>${doc.items.map((item,idx)=>`<tr style="background:${idx%2===0?IND.white:IND.slateBody};border-bottom:0.5px solid ${IND.rule}"><td style="padding:9px 8px;color:${IND.text};line-height:1.4;vertical-align:top;border-left:3px solid ${COL[0]}"><div style="font-weight:500">${e(item.designation)}</div>${item.description?`<div style="font-size:9px;color:${IND.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>`:''}</td><td style="padding:9px 8px;text-align:center;color:${IND.muted};border-left:2px solid ${COL[1]}">${item.quantity}</td><td style="padding:9px 8px;text-align:center;color:${IND.faint};font-size:10px;border-left:2px solid ${COL[2]}">${e(item.unit)}</td><td style="padding:9px 8px;text-align:right;color:${IND.muted};border-left:2px solid ${COL[3]}">${fmt(item.unitPrice)}</td><td style="padding:9px 8px;text-align:right;font-weight:700;color:${IND.blueDeep};border-left:2px solid ${COL[4]}">${fmt(item.quantity*item.unitPrice)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+<div style="display:flex;justify-content:flex-end;padding:14px 26px 0"><table style="border-collapse:collapse;width:288px;font-size:11px"><tbody>
+  <tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:${IND.muted}">Sous-total HT</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:${IND.text};font-weight:500">${fmt(results.subTotalHT)} ${e(currency)}</td></tr>
+  ${results.discountAmount > 0 ? `<tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:#ef4444">Remise</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:#ef4444">-${fmt(results.discountAmount)} ${e(currency)}</td></tr>` : ''}
+  ${results.tvaAmount > 0 ? `<tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:${IND.muted}">TVA (${results.tvaRate}%)</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:${IND.text};font-weight:500">${fmt(results.tvaAmount)} ${e(currency)}</td></tr>` : ''}
+  ${results.timbreFiscal > 0 ? `<tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:${IND.muted}">Timbre fiscal</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:${IND.text};font-weight:500">${fmt(results.timbreFiscal)} ${e(currency)}</td></tr>` : ''}
+  <tr><td style="padding:9px 12px;border:1px solid ${IND.blueNav};background:${IND.blueNav};color:${IND.white};font-weight:700;font-size:13px">Total TTC</td><td style="padding:9px 12px;border:1px solid ${IND.blueNav};background:${IND.blueNav};color:${IND.white};font-weight:700;font-size:13px;text-align:right">${fmt(results.totalTTC)} ${e(currency)}</td></tr>
+  ${results.acompte > 0 ? `<tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:#ef4444">Acompte versé</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:#ef4444">-${fmt(results.acompte)} ${e(currency)}</td></tr>` : ''}
+  ${results.netAPayer !== results.totalTTC ? `<tr><td style="padding:6px 12px;border:1px solid ${IND.rule};color:${IND.blueDeep};font-weight:700">Net à payer</td><td style="padding:6px 12px;border:1px solid ${IND.rule};text-align:right;color:${IND.blueDeep};font-weight:700">${fmt(results.netAPayer)} ${e(currency)}</td></tr>` : ''}
+</tbody></table></div>
+${vb('tafqit') && results.totalInWords ? `<div style="margin:14px 26px 0;padding:10px 14px;background:${IND.slateBody};border:1px solid ${IND.rule};font-size:10.5px;color:${IND.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${IND.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Arrêté à la somme de</strong><em>${e(results.totalInWords)}</em></div>` : ''}
+${vb('payment') && bv('paymentConditions','paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) ? `<div style="margin:10px 26px 0;padding:10px 14px;background:${IND.slateBody};border:1px solid ${IND.rule};font-size:10.5px;color:${IND.muted};line-height:1.6"><strong style="display:block;font-size:9px;color:${IND.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Paiement</strong>${doc.paymentDetails.terms?`<div>${e(doc.paymentDetails.terms)}</div>`:''}${doc.paymentDetails.iban?`<div style="font-size:10px">RIB : ${e(doc.paymentDetails.iban)}</div>`:''}${doc.bankName?`<div style="font-size:10px">${e(doc.bankName)}${doc.bankAgency?' — '+e(doc.bankAgency):''}</div>`:''}</div>` : ''}
+${doc.notes ? `<div style="margin:8px 26px 0;padding:10px 14px;background:${IND.slateBody};border:1px solid ${IND.rule};font-size:10.5px;color:${IND.muted};line-height:1.5"><strong style="display:block;font-size:9px;color:${IND.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px">Notes</strong>${e(doc.notes)}</div>` : ''}
+${vb('signature') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 26px 0;border-top:1px solid ${IND.rule};padding-top:18px"><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${IND.blue};margin-bottom:8px">Le Client</div><div style="height:60px;border:1px solid ${IND.rule};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">Signature & cachet</div><div style="font-size:10px;color:${IND.muted}">Bon pour accord</div></div><div style="text-align:center"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${IND.blue};margin-bottom:8px">Prestataire</div><div style="height:60px;border:1px solid ${IND.rule};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:4px">${doc.companyInfo?.signature?`<img src="${e(doc.companyInfo.signature)}" style="max-width:100%;max-height:100%" alt="sig">`:'Signature & cachet'}</div><div style="font-size:10px;color:${IND.muted};font-weight:600">${e(companyName)}</div></div></div>` : ''}
+<div style="flex:1"></div>
+<div style="background:${IND.slate};padding:10px 26px;margin-top:18px"><div style="font-size:9px;color:${IND.faint};text-align:center;line-height:1.9">${companyAddr?`<span>${e(companyAddr)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.nif?`<span style="margin:0 8px">·</span><span>NIF : ${e(doc.companyInfo.taxIds.nif)}</span>`:''} ${isEnt && doc.companyInfo?.taxIds?.rc?`<span style="margin:0 8px">·</span><span>RC : ${e(doc.companyInfo.taxIds.rc)}</span>`:''} ${doc.companyPhone?`<span style="margin:0 8px">·</span><span>Tél : ${e(doc.companyPhone)}</span>`:''}<br><span style="color:#475569">Document généré par CloudDevis</span></div></div>
+</div>
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
+</body></html>`;
+}
+
 export function generateAttachementHTML(params: {
   doc: DocumentState;
   results: CalculationResult;
