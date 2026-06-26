@@ -269,9 +269,10 @@ function EditorContent() {
       });
 
     if (!printWindow) { window.print(); return; }
-    printWindow.document.open();
-    printWindow.document.write(html);
-    printWindow.document.close();
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    printWindow.location.replace(url);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   };
 
   // Show draft restoration notification
