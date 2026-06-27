@@ -97,7 +97,9 @@ async function postHandler(req: Request) {
 
     return response;
   } catch (error) {
-    logger.error('Register error', { error: String(error) });
-    throw error;
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.error('Register error', { error: msg });
+    // TEMP: expose error for diagnosis — remove after auth is confirmed working
+    return NextResponse.json({ error: 'Erreur interne', _diag: msg }, { status: 500 });
   }
 }
