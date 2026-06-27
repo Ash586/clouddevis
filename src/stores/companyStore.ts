@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { validateCompanyTaxIds } from '@/lib/dgi';
+import { useSyncStore } from './syncStore';
 import type { Company } from '@/mobile/types';
 
 // ── Store Interface ───────────────────────────────────────────
@@ -84,6 +85,14 @@ export const useCompanyStore = create<CompanyStore>()(
           company,
           isSetup: true,
           lastUpdatedAt: new Date().toISOString(),
+        });
+
+        // Enqueue company profile sync
+        useSyncStore.getState().enqueue({
+          action: 'UPDATE',
+          entity: 'company',
+          entityId: company.id,
+          payload: company,
         });
 
         return null; // null = success

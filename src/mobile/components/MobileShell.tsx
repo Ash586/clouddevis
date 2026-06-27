@@ -12,6 +12,7 @@ import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useSyncStore } from '@/stores/syncStore';
+import { useApiSync } from '@/mobile/lib/useApiSync';
 import { BottomTabs, type TabId } from './BottomTabs';
 import { OfflineBanner } from './OfflineBanner';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -43,19 +44,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [showWizard, setShowWizard] = useState(false);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
-  const processQueue = useSyncStore((s) => s.processQueue);
 
-  // ── Network detection with auto-sync on reconnect ─────────
-  const { isOnline, setSyncing } = useNetwork({
-    onReconnect: async () => {
-      setSyncing(true);
-      await processQueue(async (item) => {
-        // TODO: implement actual API sync per entity type
-        return true;
-      });
-      setSyncing(false);
-    },
-  });
+  // Bootstrap API: pull initial data + wire reconnect → flush queue
+  useApiSync();
+
+  // ── Network detection ─────────────────────────────────────
+  const { isOnline } = useNetwork();
 
   // ── Tab navigation ────────────────────────────────────────
   const handleTabChange = useCallback(
@@ -85,12 +79,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const handleGoToClients = useCallback(() => setCompanyView('clients'), []);
   const handleBackToProfile = useCallback(() => setCompanyView('profile'), []);
 
-  // ── Network retry ─────────────────────────────────────────
+  // ── Network retry: flush pending queue ───────────────────
+  const processQueue = useSyncStore((s) => s.processQueue);
   const handleRetry = useCallback(() => {
     if (isOnline) {
-      processQueue(async (item) => {
-        return true;
-      });
+      void processQueue(async () => true);
     }
   }, [isOnline, processQueue]);
 

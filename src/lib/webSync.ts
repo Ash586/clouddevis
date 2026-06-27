@@ -9,7 +9,7 @@ import type { SyncQueueItem } from '@/stores/syncStore';
 const ENTITY_PATHS: Record<string, string> = {
   document: '/api/documents',
   client:   '/api/clients',
-  company:  '/api/companies',
+  // company uses a profile-based endpoint (always PUT, no per-id path)
 };
 
 /**
@@ -18,6 +18,18 @@ const ENTITY_PATHS: Record<string, string> = {
  * Throws on network failure so syncStore can retry.
  */
 export async function processWebSyncItem(item: SyncQueueItem): Promise<boolean> {
+  // Company profile uses a dedicated endpoint — always PUT to /api/user/profile
+  if (item.entity === 'company') {
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ companyInfo: item.payload }),
+    });
+    if (res.status === 409) return true;
+    return res.ok;
+  }
+
   const basePath = ENTITY_PATHS[item.entity];
   if (!basePath) return true; // unknown entity — drop silently
 
@@ -28,12 +40,13 @@ export async function processWebSyncItem(item: SyncQueueItem): Promise<boolean> 
 
   const res = await fetch(url, {
     method,
+    credentials: 'include',
     headers: isDelete ? undefined : { 'Content-Type': 'application/json' },
     body: isDelete ? undefined : JSON.stringify(item.payload),
   });
 
   if (res.status === 409) {
-    // Conflict — the server already has a newer version, drop this item
+    // Conflict — server has a newer version, drop this item
     return true;
   }
 

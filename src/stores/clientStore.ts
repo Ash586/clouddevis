@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { generateId } from '@/lib/calculations';
+import { useSyncStore } from './syncStore';
 import type { Client } from '@/mobile/types';
 
 // ── Store Interface ───────────────────────────────────────────
@@ -77,6 +78,14 @@ export const useClientStore = create<ClientStore>()(
         set((state) => ({
           clients: [...state.clients, newClient],
         }));
+
+        // Enqueue for API sync
+        useSyncStore.getState().enqueue({
+          action: 'CREATE',
+          entity: 'client',
+          entityId: newClient.id,
+          payload: newClient,
+        });
 
         return newClient;
       },

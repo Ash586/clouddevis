@@ -11,6 +11,7 @@ import {
   type DocumentCalculationResult,
 } from '@/lib/dgi';
 import { generateId, round2 } from '@/lib/calculations';
+import { useSyncStore } from './syncStore';
 import type {
   Document,
   DocumentType,
@@ -262,6 +263,14 @@ export const useDocumentStore = create<DocumentStore>()(
           savedDocuments: [...prevState.savedDocuments, doc],
           syncStatus: 'pending',
         }));
+
+        // Enqueue for API sync (processQueue will push when online)
+        useSyncStore.getState().enqueue({
+          action: 'CREATE',
+          entity: 'document',
+          entityId: doc.id,
+          payload: doc,
+        });
 
         return doc;
       },
