@@ -1135,6 +1135,17 @@
       "exporting": "جاري التصدير...",
       "success": "تم التصدير بنجاح",
       "selectPeriod": "اختر الفترة"
+    },
+    "partners": {
+      "approve": "موافقة",
+      "reject": "رفض",
+      "suspend": "تعليق",
+      "promote": "ترقية",
+      "retrograde": "تخفيض",
+      "searchPlaceholder": "بحث بالرمز، البريد، الاسم...",
+      "filterStatus": "الحالة",
+      "filterTier": "المستوى",
+      "all": "الكل"
     }
   },
   "notifications": {
@@ -1349,19 +1360,6 @@
       "ctaFinal": "مستعد لكسب العمولات؟",
       "ctaFinalDesc": "انضم إلى مئات الشركاء الذين يحققونAlready إيرادات مع CloudDevis.",
       "ctaStart": "ابدأ الآن"
-    }
-  },
-  "admin": {
-    "partners": {
-      "approve": "موافقة",
-      "reject": "رفض",
-      "suspend": "تعليق",
-      "promote": "ترقية",
-      "retrograde": "تخفيض",
-      "searchPlaceholder": "بحث بالرمز، البريد، الاسم...",
-      "filterStatus": "الحالة",
-      "filterTier": "المستوى",
-      "all": "الكل"
     }
   }
 }

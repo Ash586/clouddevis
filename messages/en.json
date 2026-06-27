@@ -1135,6 +1135,17 @@
       "exporting": "Exporting...",
       "success": "Export successful",
       "selectPeriod": "Select Period"
+    },
+    "partners": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "suspend": "Suspend",
+      "promote": "Promote",
+      "retrograde": "Demote",
+      "searchPlaceholder": "Search by code, email, name...",
+      "filterStatus": "Status",
+      "filterTier": "Tier",
+      "all": "All"
     }
   },
   "notifications": {
@@ -1349,19 +1360,6 @@
       "ctaFinal": "Ready to earn commissions?",
       "ctaFinalDesc": "Join hundreds of partners already earning revenue with CloudDevis.",
       "ctaStart": "Start now"
-    }
-  },
-  "admin": {
-    "partners": {
-      "approve": "Approve",
-      "reject": "Reject",
-      "suspend": "Suspend",
-      "promote": "Promote",
-      "retrograde": "Demote",
-      "searchPlaceholder": "Search by code, email, name...",
-      "filterStatus": "Status",
-      "filterTier": "Tier",
-      "all": "All"
     }
   }
 }

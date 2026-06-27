@@ -1,14 +1,19 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DATABASE_URL must be set');
+
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
 
   if (!email || !password) {
-    throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env to seed the admin user.');
+    throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set to seed the admin user.');
   }
 
   const existing = await prisma.admin.findUnique({ where: { email } });
