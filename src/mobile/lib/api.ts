@@ -161,6 +161,31 @@ export async function deleteApiDocument(id: string): Promise<void> {
   await request(`/api/documents/${id}`, { method: 'DELETE' });
 }
 
+// ── Auth ──────────────────────────────────────────────────────
+
+export async function loginApi(
+  email: string,
+  password: string,
+  rememberMe = false
+): Promise<{ id: string; name: string; email: string }> {
+  const res = await request<{ success: boolean; user: { id: string; name: string; email: string } }>(
+    '/api/auth/login',
+    { method: 'POST', body: JSON.stringify({ email, password, rememberMe }) }
+  );
+  return res.user;
+}
+
+export async function logoutApi(): Promise<void> {
+  await request('/api/auth/logout', { method: 'POST' });
+}
+
+export async function fetchCurrentUser(): Promise<{ id: string; name: string; email: string }> {
+  const res = await request<{ user: { id: string; name: string; email: string } }>(
+    '/api/user/profile'
+  );
+  return res.user;
+}
+
 // ── Profile / Company ─────────────────────────────────────────
 
 export async function updateCompanyProfile(company: Company): Promise<void> {

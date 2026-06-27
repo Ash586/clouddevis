@@ -5,9 +5,9 @@
 // App settings: language, TVA rate, theme, data management
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Languages, Receipt, Moon, CloudOff, Trash2, ChevronRight, RefreshCw, Info } from 'lucide-react';
+import { Languages, Receipt, Moon, CloudOff, Trash2, ChevronRight, RefreshCw, Info, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -19,7 +19,11 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useCompanyStore } from '@/stores/companyStore';
 
-export function SettingsScreen() {
+interface SettingsScreenProps {
+  onLogout?: () => Promise<void>;
+}
+
+export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   const [settings, setLocalSettings] = useState<AppSettings>({
     language: 'FR',
     defaultTvaRate: 19,
@@ -28,6 +32,17 @@ export function SettingsScreen() {
     theme: 'light',
   });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = useCallback(async () => {
+    if (!onLogout) return;
+    setLoggingOut(true);
+    try {
+      await onLogout();
+    } finally {
+      setLoggingOut(false);
+    }
+  }, [onLogout]);
 
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
   const clients = useClientStore((s) => s.clients);
@@ -190,6 +205,23 @@ export function SettingsScreen() {
             </button>
           )}
         </div>
+
+        {/* ── Logout ───────────────────────────────────────── */}
+        {onLogout && (
+          <div className="rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] overflow-hidden">
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors disabled:opacity-50"
+            >
+              <LogOut size={18} className="text-[var(--sand-muted)]" />
+              <span className="text-sm font-semibold text-[var(--sand)] flex-1 text-left">
+                {loggingOut ? 'Déconnexion…' : 'Se déconnecter'}
+              </span>
+            </button>
+          </div>
+        )}
 
         {/* ── App Version ──────────────────────────────────── */}
         <div className="text-center py-4">

@@ -8,13 +8,15 @@
 
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useSyncStore } from '@/stores/syncStore';
 import { useApiSync } from '@/mobile/lib/useApiSync';
+import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { BottomTabs, type TabId } from './BottomTabs';
 import { OfflineBanner } from './OfflineBanner';
+import { LoginScreen } from '../screens/LoginScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DocumentsListScreen } from '../screens/DocumentsListScreen';
 import { CompanyProfileScreen } from '../screens/CompanyProfileScreen';
@@ -45,8 +47,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [showWizard, setShowWizard] = useState(false);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
 
-  // Bootstrap API: pull initial data + wire reconnect → flush queue
-  useApiSync();
+  // ── Auth: check session on mount, expose login/logout ─────
+  const { authState, userName, onUnauthorized, login, logout } = useAuthGuard();
+
+  // ── Bootstrap API only when authenticated ─────────────────
+  useApiSync({ enabled: authState === 'authenticated', onUnauthorized });
 
   // ── Network detection ─────────────────────────────────────
   const { isOnline } = useNetwork();
@@ -93,7 +98,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       case 'home':
         return (
           <HomeScreen
-            userName="Utilisateur"
+            userName={userName || 'Utilisateur'}
             onNewDevis={handleNewDevis}
             onNewFacture={handleNewFacture}
             onDuplicate={handleDuplicate}
@@ -117,12 +122,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         return <CompanyProfileScreen onGoToClients={handleGoToClients} />;
 
       case 'settings':
-        return <SettingsScreen />;
+        return <SettingsScreen onLogout={logout} />;
 
       default:
         return (
           <HomeScreen
-            userName="Utilisateur"
+            userName={userName || 'Utilisateur'}
             onNewDevis={handleNewDevis}
             onNewFacture={handleNewFacture}
             onDuplicate={handleDuplicate}
@@ -132,6 +137,25 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         );
     }
   };
+
+  // ── Loading splash (checking session) ────────────────────
+  if (authState === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--navy)]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--green-2)] flex items-center justify-center">
+            <Loader2 size={26} className="text-white animate-spin" />
+          </div>
+          <p className="text-sm text-[var(--sand-muted)]">Chargement…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Login screen ──────────────────────────────────────────
+  if (authState === 'unauthenticated') {
+    return <LoginScreen onLogin={login} />;
+  }
 
   return (
     <div

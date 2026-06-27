@@ -38,42 +38,51 @@ function mapApiClientToStore(c: {
   };
 }
 
-export function useApiSync(): void {
+interface UseApiSyncOptions {
+  /** Only run when authenticated */
+  enabled: boolean;
+  /** Called when any API request returns 401 */
+  onUnauthorized: () => void;
+}
+
+export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void {
   const replaceAll = useClientStore((s) => s.replaceAll);
   const processQueue = useSyncStore((s) => s.processQueue);
   const initialized = useRef(false);
 
   useEffect(() => {
+    if (!enabled) return;
     if (initialized.current) return;
     initialized.current = true;
 
-    // Wire future reconnects → flush pending mutations
+    const handleApiError = (err: unknown) => {
+      if (err instanceof ApiError && err.status === 401) {
+        onUnauthorized();
+        return;
+      }
+      console.error('[useApiSync] error', err);
+    };
+
+    // Wire future reconnects → flush pending mutations then refresh clients
     onReconnect(async () => {
-      await processQueue(processWebSyncItem);
-      // After flushing, refresh client list
       try {
+        await processQueue(processWebSyncItem);
         const apiClients = await fetchAllClients();
         replaceAll(apiClients.map(mapApiClientToStore));
-      } catch {
-        // Keep local cache on error
+      } catch (err) {
+        handleApiError(err);
       }
     });
 
-    // Bootstrap: check online now, flush + pull
+    // Bootstrap: flush queue + pull fresh client list
     checkNetworkStatus()
       .then(async (online) => {
         if (!online) return;
-        // Flush queued mutations first (handles offline-created items)
         await processQueue(processWebSyncItem);
-        // Pull fresh client list
         const apiClients = await fetchAllClients();
         replaceAll(apiClients.map(mapApiClientToStore));
       })
-      .catch((err: unknown) => {
-        // 401 means not logged in — don't log as error
-        if (err instanceof ApiError && err.status === 401) return;
-        console.error('[useApiSync] bootstrap failed', err);
-      });
+      .catch(handleApiError);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [enabled]);
 }
