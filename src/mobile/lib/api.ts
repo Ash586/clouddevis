@@ -161,6 +161,34 @@ export async function deleteApiDocument(id: string): Promise<void> {
   await request(`/api/documents/${id}`, { method: 'DELETE' });
 }
 
+// ── Documents (list) ─────────────────────────────────────────
+
+export interface ApiDocumentListItem {
+  id: string;
+  number: string;
+  type: string;
+  status: string;
+  client: string;       // client name
+  clientNif: string | null;
+  total: number;        // totalTTC
+  timbreAmount: number;
+  acompte: number;
+  date: string;         // localized "fr-DZ"
+  dateISO: string;      // raw ISO string for date arithmetic
+}
+
+interface DocumentsListResponse {
+  documents: ApiDocumentListItem[];
+  pagination: { total: number; totalPages: number; page: number; limit: number };
+}
+
+export async function fetchDocuments(page = 1, limit = 100): Promise<ApiDocumentListItem[]> {
+  const data = await request<DocumentsListResponse>(
+    `/api/documents?page=${page}&limit=${limit}&sortBy=date&sortOrder=desc`
+  );
+  return data.documents;
+}
+
 // ── Auth ──────────────────────────────────────────────────────
 
 export async function loginApi(

@@ -97,6 +97,11 @@ export interface DocumentStore {
   // ── Sync ──
   setSyncStatus: (status: 'synced' | 'pending' | 'offline') => void;
   markDocumentSynced: (id: string) => void;
+  /**
+   * Replace savedDocuments with server data.
+   * Locally-created docs whose ID isn't on the server are preserved (offline-created).
+   */
+  replaceAll: (serverDocs: Document[]) => void;
 
   // ── Reset ──
   resetDocument: () => void;
@@ -349,6 +354,17 @@ export const useDocumentStore = create<DocumentStore>()(
           ),
           syncStatus: state.savedDocuments.length > 0 ? 'synced' : 'offline',
         })),
+
+      replaceAll: (serverDocs) =>
+        set((state) => {
+          const serverIds = new Set(serverDocs.map((d) => d.id));
+          // Keep locally-created docs not yet on the server
+          const localOnly = state.savedDocuments.filter((d) => !serverIds.has(d.id));
+          return {
+            savedDocuments: [...serverDocs, ...localOnly],
+            syncStatus: 'synced',
+          };
+        }),
 
       // ── Reset ──
 

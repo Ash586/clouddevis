@@ -9,11 +9,14 @@
 
 import { useEffect, useRef } from 'react';
 import { useClientStore } from '@/stores/clientStore';
+import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
 import { processWebSyncItem } from '@/lib/webSync';
 import { onReconnect, checkNetworkStatus } from './network';
-import { fetchAllClients, ApiError } from './api';
-import type { Client } from '@/mobile/types';
+import { fetchAllClients, fetchDocuments, ApiError, type ApiDocumentListItem } from './api';
+import type { Client, Document, DocumentType, DocumentStatus, PaymentMode, Language } from '@/mobile/types';
+
+// ── Mappers ───────────────────────────────────────────────────
 
 function mapApiClientToStore(c: {
   id: string;
@@ -38,6 +41,62 @@ function mapApiClientToStore(c: {
   };
 }
 
+// Valid DocumentType values from the mobile types
+const VALID_DOC_TYPES = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR']);
+
+function mapApiDocumentToStore(d: ApiDocumentListItem): Document {
+  // The API returns INTERVENTION and ATTACHEMENT which aren't in the mobile DocumentType.
+  // Map unknown types to DEVIS as a safe fallback.
+  const type: DocumentType = VALID_DOC_TYPES.has(d.type)
+    ? (d.type as DocumentType)
+    : 'DEVIS';
+
+  // status: API uses DRAFT/SENT/PAID/CANCELLED — map ACCEPTED/PROGRESS/DELIVERED → SENT
+  const statusMap: Record<string, DocumentStatus> = {
+    DRAFT: 'DRAFT', SENT: 'SENT', PAID: 'PAID', CANCELLED: 'CANCELLED',
+    ACCEPTED: 'SENT', PROGRESS: 'SENT', DELIVERED: 'SENT',
+  };
+  const status: DocumentStatus = statusMap[d.status] ?? 'DRAFT';
+
+  return {
+    id: d.id,
+    type,
+    number: d.number,
+    // dateISO is the raw ISO string; fall back to dateString parsing
+    date: d.dateISO ? d.dateISO.split('T')[0] : d.date,
+    company: {
+      // Placeholder — only populated when document is opened for editing
+      id: '',
+      name: '',
+      nif: '',
+      rc: '',
+      nis: '',
+      ai: '',
+      phone: '',
+      address: '',
+      tvaRate: 19,
+    },
+    client: {
+      id: '',
+      name: d.client,
+      phone: '',
+      nif: d.clientNif ?? undefined,
+    },
+    items: [],
+    totalHT: 0,
+    totalTVA: 0,
+    timbreFiscal: d.timbreAmount > 0,
+    timbreAmount: d.timbreAmount,
+    totalTTC: d.total,
+    status,
+    language: 'FR' as Language,
+    paymentMode: 'cheque' as PaymentMode,
+    acompte: d.acompte || undefined,
+  };
+}
+
+// ── Hook ──────────────────────────────────────────────────────
+
 interface UseApiSyncOptions {
   /** Only run when authenticated */
   enabled: boolean;
@@ -46,7 +105,8 @@ interface UseApiSyncOptions {
 }
 
 export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void {
-  const replaceAll = useClientStore((s) => s.replaceAll);
+  const replaceClients = useClientStore((s) => s.replaceAll);
+  const replaceDocuments = useDocumentStore((s) => s.replaceAll);
   const processQueue = useSyncStore((s) => s.processQueue);
   const initialized = useRef(false);
 
@@ -63,26 +123,35 @@ export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void
       console.error('[useApiSync] error', err);
     };
 
-    // Wire future reconnects → flush pending mutations then refresh clients
+    async function bootstrap() {
+      const online = await checkNetworkStatus();
+      if (!online) return;
+
+      // 1. Flush any queued offline mutations first
+      await processQueue(processWebSyncItem);
+
+      // 2. Pull fresh data in parallel
+      const [apiClients, apiDocuments] = await Promise.all([
+        fetchAllClients(),
+        fetchDocuments(1, 100),
+      ]);
+
+      replaceClients(apiClients.map(mapApiClientToStore));
+      replaceDocuments(apiDocuments.map(mapApiDocumentToStore));
+    }
+
+    // Wire future reconnects → flush + refresh
     onReconnect(async () => {
       try {
-        await processQueue(processWebSyncItem);
-        const apiClients = await fetchAllClients();
-        replaceAll(apiClients.map(mapApiClientToStore));
+        await bootstrap();
       } catch (err) {
         handleApiError(err);
       }
     });
 
-    // Bootstrap: flush queue + pull fresh client list
-    checkNetworkStatus()
-      .then(async (online) => {
-        if (!online) return;
-        await processQueue(processWebSyncItem);
-        const apiClients = await fetchAllClients();
-        replaceAll(apiClients.map(mapApiClientToStore));
-      })
-      .catch(handleApiError);
+    // Bootstrap immediately
+    bootstrap().catch(handleApiError);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 }
