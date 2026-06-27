@@ -132,7 +132,12 @@ function RegisterForm() {
   }
 
   function nextStep() {
-    if (step === 1 && !canNext()) { setError('Remplissez tous les champs correctement'); return; }
+    if (step === 1) {
+      if (!name.trim()) { setError('Veuillez saisir votre nom complet'); return; }
+      if (!email.trim() || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { setError('Adresse email invalide'); return; }
+      if (password.length < 12) { setError('Mot de passe trop court — minimum 12 caractères'); return; }
+      if (password !== confirmPassword) { setError('Les mots de passe ne correspondent pas'); return; }
+    }
     setError('');
     if (step < totalSteps) setStep(step + 1);
   }
