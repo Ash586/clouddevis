@@ -33,11 +33,11 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{
-        background: 'rgba(17, 24, 39, 0.95)',
-        borderTop: '1px solid rgba(245, 237, 214, 0.08)',
+        background: 'rgba(11, 17, 32, 0.96)',
+        borderTop: '1px solid rgba(255,255,255,0.07)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
       }}
     >
       <div className="flex items-stretch justify-around h-16 px-2 max-w-lg mx-auto">
@@ -46,7 +46,9 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
           const Icon = tab.icon;
 
           return (
-            <button type="button"               key={tab.id}
+            <button
+              type="button"
+              key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 'relative flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px]',
@@ -58,12 +60,12 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
             >
               {/* Active indicator bar (top) */}
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-[var(--green-3)]" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-[#60A5FA]" />
               )}
               <span
                 className={cn(
                   'flex items-center justify-center w-9 h-7 rounded-lg transition-all duration-200',
-                  isActive && 'bg-[rgba(37,99,235,0.12)]',
+                  isActive && 'bg-white/10',
                 )}
               >
                 <Icon
@@ -71,7 +73,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
                   strokeWidth={isActive ? 2.2 : 1.8}
                   className={cn(
                     'transition-colors duration-200',
-                    isActive ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]',
+                    isActive ? 'text-white' : 'text-white/45',
                   )}
                 />
               </span>
@@ -79,7 +81,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
                 className={cn(
                   'text-[10px] font-semibold leading-tight truncate',
                   'transition-colors duration-200',
-                  isActive ? 'text-[var(--green-3)]' : 'text-[var(--sand-muted)]',
+                  isActive ? 'text-white' : 'text-white/45',
                 )}
               >
                 {tab.label}

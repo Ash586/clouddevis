@@ -50,6 +50,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
   const [pushToast, setPushToast] = useState<PushToastData | null>(null);
+  const [hasUnread, setHasUnread] = useState(false);
   const toastIdRef = useRef(0);
 
   // ── Auth: check session on mount, expose login/logout ─────
@@ -70,6 +71,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
           body,
           documentId: payload.documentId,
         });
+        setHasUnread(true);
       },
       onTap: (payload) => {
         if (payload.documentId) {
@@ -145,6 +147,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             onDuplicate={handleDuplicate}
             onDocumentTap={handleEditDocument}
             onSeeAll={() => setActiveTab('documents')}
+            hasNotifications={hasUnread}
+            onNotificationTap={() => {
+              setHasUnread(false);
+              setActiveTab('documents');
+            }}
           />
         );
 

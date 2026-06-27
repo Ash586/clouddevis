@@ -13,9 +13,10 @@ interface QuickActionsProps {
   onNewDevis: () => void;
   onNewFacture: () => void;
   onDuplicate: () => void;
+  canDuplicate?: boolean;
 }
 
-export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickActionsProps) {
+export function QuickActions({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = false }: QuickActionsProps) {
   return (
     <div className="flex gap-3 px-5">
       {/* Nouveau devis — primary green */}
@@ -53,17 +54,22 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate }: QuickAct
         <span>Facture</span>
       </motion.button>
 
-      {/* Dupliquer — secondary */}
+      {/* Dupliquer — disabled when no documents exist */}
       <motion.button
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.25, delay: 0.30 }}
-        onClick={onDuplicate}
+        onClick={canDuplicate ? onDuplicate : undefined}
+        disabled={!canDuplicate}
+        title={canDuplicate ? 'Dupliquer le dernier document' : 'Aucun document à dupliquer'}
         className={cn(
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
-          'min-h-[44px] active:scale-[0.97] transition-transform',
-          'bg-[var(--navy-3)] text-[var(--sand)] font-semibold text-sm',
+          'min-h-[44px] transition-all duration-200',
+          'bg-[var(--navy-3)] font-semibold text-sm',
           'border border-[rgba(15,39,71,0.08)]',
+          canDuplicate
+            ? 'text-[var(--sand)] active:scale-[0.97]'
+            : 'text-[var(--sand-muted)] opacity-40 cursor-not-allowed',
         )}
       >
         <Copy size={22} strokeWidth={1.8} />

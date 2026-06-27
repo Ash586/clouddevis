@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { formatAmount, formatDate } from '@/mobile/lib/format';
 import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
 
 // ── Constants ────────────────────────────────────────────────
@@ -52,25 +53,6 @@ const STATUS_MAP: Record<DocumentStatus, { label: string; variant: BadgeVariant 
   DRAFT: { label: 'Brouillon', variant: 'default' },
   CANCELLED: { label: 'Annulé', variant: 'danger' },
 };
-
-// ── Helpers ──────────────────────────────────────────────────
-
-function formatAmount(amount: number): string {
-  return (
-    amount.toLocaleString('fr-DZ', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }) + ' DA'
-  );
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'short',
-  });
-}
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -172,36 +154,33 @@ export function DocumentRow({
   return (
     <div className="relative overflow-hidden rounded-2xl mb-3">
       {/* ── Action buttons (behind the row) ─────────────────── */}
-      <div
-        className="absolute inset-0 flex items-center"
-        style={{ justifyContent: 'flex-end' }}
-      >
+      <div className="absolute inset-0 flex items-stretch justify-end">
         <motion.button
           onClick={handleEdit}
-          style={{ opacity: editOpacity }}
-          className="h-full flex flex-col items-center justify-center bg-blue-500 text-white"
+          style={{ opacity: editOpacity, width: ACTION_WIDTH }}
+          className="flex-shrink-0 flex flex-col items-center justify-center gap-1 bg-blue-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <Pencil size={20} strokeWidth={2} />
-          <span className="text-[10px] font-semibold mt-1">Modifier</span>
+          <Pencil size={18} strokeWidth={2} />
+          <span className="text-[10px] font-semibold">Modifier</span>
         </motion.button>
         <motion.button
           onClick={handleDuplicate}
-          style={{ opacity: dupOpacity }}
-          className="h-full flex flex-col items-center justify-center bg-emerald-500 text-white"
+          style={{ opacity: dupOpacity, width: ACTION_WIDTH }}
+          className="flex-shrink-0 flex flex-col items-center justify-center gap-1 bg-emerald-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <Copy size={20} strokeWidth={2} />
-          <span className="text-[10px] font-semibold mt-1">Dupliquer</span>
+          <Copy size={18} strokeWidth={2} />
+          <span className="text-[10px] font-semibold">Dupliquer</span>
         </motion.button>
         <motion.button
           onClick={handleDelete}
-          style={{ opacity: delOpacity }}
-          className="h-full flex flex-col items-center justify-center bg-red-500 text-white"
+          style={{ opacity: delOpacity, width: ACTION_WIDTH }}
+          className="flex-shrink-0 flex flex-col items-center justify-center gap-1 bg-red-500 text-white"
           whileTap={{ scale: 0.95 }}
         >
-          <Trash2 size={20} strokeWidth={2} />
-          <span className="text-[10px] font-semibold mt-1">Supprimer</span>
+          <Trash2 size={18} strokeWidth={2} />
+          <span className="text-[10px] font-semibold">Supprimer</span>
         </motion.button>
       </div>
 

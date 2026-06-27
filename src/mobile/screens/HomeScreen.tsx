@@ -59,11 +59,10 @@ export function HomeScreen({
   }, [resetDocument, setType, onNewFacture]);
 
   const handleDuplicate = useCallback(() => {
-    if (savedDocuments.length > 0) {
-      useDocumentStore.getState().loadDocumentIntoWizard(
-        savedDocuments[savedDocuments.length - 1].id,
-      );
-    }
+    if (savedDocuments.length === 0) return;
+    useDocumentStore.getState().loadDocumentIntoWizard(
+      savedDocuments[savedDocuments.length - 1].id,
+    );
     onDuplicate?.();
   }, [savedDocuments, onDuplicate]);
 
@@ -90,6 +89,7 @@ export function HomeScreen({
         onNewDevis={handleNewDevis}
         onNewFacture={handleNewFacture}
         onDuplicate={handleDuplicate}
+        canDuplicate={savedDocuments.length > 0}
       />
 
       {/* 4. Recent documents */}

@@ -7,7 +7,7 @@
 // document from the API and switches to update (PUT) mode.
 // ============================================================
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -119,6 +119,11 @@ export function WizardScreen({ editingDocId, onExit }: WizardScreenProps) {
   const [loadingDoc, setLoadingDoc] = useState(false);
   const [loadError, setLoadError] = useState('');
 
+  // ── Track slide direction (1 = forward, -1 = back) ────────
+  const prevStepRef = useRef(step);
+  const direction = step >= prevStepRef.current ? 1 : -1;
+  useEffect(() => { prevStepRef.current = step; }, [step]);
+
   // ── Load full document when in edit mode ──────────────────
   useEffect(() => {
     if (!editingDocId) {
@@ -147,8 +152,6 @@ export function WizardScreen({ editingDocId, onExit }: WizardScreenProps) {
       .finally(() => setLoadingDoc(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingDocId]);
-
-  const direction = useMemo(() => 1, [step]);
 
   // ── Navigation ───────────────────────────────────────────
   const handleTypeSelect = useCallback(

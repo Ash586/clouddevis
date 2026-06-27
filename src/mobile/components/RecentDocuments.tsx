@@ -16,6 +16,7 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { formatAmount } from '@/mobile/lib/format';
 import type { Document, DocumentType } from '@/mobile/types';
 
 // ── Document type → icon mapping ──────────────────────────────
@@ -38,15 +39,6 @@ const STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
   DRAFT: { label: 'Brouillon', variant: 'default' },
   CANCELLED: { label: 'Annulé', variant: 'danger' },
 };
-
-// ── Format currency ───────────────────────────────────────────
-
-function formatAmount(amount: number): string {
-  return amount.toLocaleString('fr-DZ', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }) + ' DA';
-}
 
 // ── Component ─────────────────────────────────────────────────
 
@@ -71,7 +63,9 @@ const itemVariants = {
 };
 
 export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDocumentsProps) {
-  const recentDocs = documents.slice(-5).reverse(); // Last 5, newest first
+  const recentDocs = [...documents]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
 
   if (recentDocs.length === 0) {
     return (
