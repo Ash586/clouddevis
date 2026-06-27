@@ -102,6 +102,8 @@ export interface DocumentStore {
    * Locally-created docs whose ID isn't on the server are preserved (offline-created).
    */
   replaceAll: (serverDocs: Document[]) => void;
+  /** Patch a specific saved document (used after a successful PUT to /api/documents/[id]) */
+  updateSavedDocument: (id: string, updates: Partial<Document>) => void;
 
   // ── Reset ──
   resetDocument: () => void;
@@ -353,6 +355,13 @@ export const useDocumentStore = create<DocumentStore>()(
             doc.id === id ? doc : doc
           ),
           syncStatus: state.savedDocuments.length > 0 ? 'synced' : 'offline',
+        })),
+
+      updateSavedDocument: (id, updates) =>
+        set((state) => ({
+          savedDocuments: state.savedDocuments.map((doc) =>
+            doc.id === id ? { ...doc, ...updates } : doc
+          ),
         })),
 
       replaceAll: (serverDocs) =>

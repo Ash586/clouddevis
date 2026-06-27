@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useCallback } from 'react';
-import { FileText, Receipt, MessageCircle, Mail, Download, Printer, Share2, Check } from 'lucide-react';
+import { FileText, MessageCircle, Mail, Download, Printer, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
@@ -15,8 +15,9 @@ import { useCompanyStore } from '@/stores/companyStore';
 import { Badge } from '@/components/ui/badge';
 import { generatePDFBase64, printDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
+import { updateApiDocument, createApiDocument } from '@/mobile/lib/api';
 import { numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
-import type { DocumentType, DocumentStatus } from '@/mobile/types';
+import type { DocumentType } from '@/mobile/types';
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -36,18 +37,25 @@ const DOC_TYPE_LABELS: Record<DocumentType, string> = {
 
 interface StepReviewExportProps {
   onBack: () => void;
+  /** When set: edit mode — saves via PUT instead of POST */
+  editingDocId?: string;
+  /** Called after a successful save (closes wizard) */
+  onSaved?: () => void;
 }
 
-export function StepReviewExport({ onBack }: StepReviewExportProps) {
+export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewExportProps) {
   const currentDoc = useDocumentStore((s) => s.currentDoc);
   const totals = useDocumentStore((s) => s.totals);
   const saveDocument = useDocumentStore((s) => s.saveDocument);
+  const updateSavedDocument = useDocumentStore((s) => s.updateSavedDocument);
   const company = useCompanyStore((s) => s.company);
 
   const [pdfGenerated, setPdfGenerated] = useState(false);
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   // ── Generate PDF ──
   const handleGeneratePDF = useCallback(async () => {
@@ -90,11 +98,45 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
   }, [currentDoc, totals, company]);
 
   // ── Save document ──
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!company) return;
-    const doc = saveDocument(company);
-    if (doc) setSaved(true);
-  }, [company, saveDocument]);
+    setSaving(true);
+    setSaveError('');
+    try {
+      if (editingDocId) {
+        // Build a temporary full document from wizard state to send to PUT
+        const tempDoc = saveDocument(company);
+        if (!tempDoc) { setSaveError('Aucun article à enregistrer.'); return; }
+        // Override the ID so we PUT the right document
+        const docToSend = { ...tempDoc, id: editingDocId };
+        await updateApiDocument(editingDocId, docToSend);
+        // Patch local store so the list reflects changes immediately
+        updateSavedDocument(editingDocId, {
+          type: currentDoc.type,
+          client: currentDoc.client as never,
+          items: currentDoc.items,
+          notes: currentDoc.notes || undefined,
+          paymentMode: currentDoc.paymentMode,
+          acompte: currentDoc.acompte || undefined,
+          totalHT: totals.subTotalHT,
+          totalTVA: totals.totalTVA,
+          totalTTC: totals.totalTTC,
+          timbreFiscal: totals.timbreFiscal,
+          timbreAmount: totals.timbreAmount,
+        });
+      } else {
+        const doc = saveDocument(company);
+        if (!doc) { setSaveError('Aucun article à enregistrer.'); return; }
+        await createApiDocument(doc);
+      }
+      setSaved(true);
+      setTimeout(() => onSaved?.(), 800);
+    } catch {
+      setSaveError('Erreur lors de l\'enregistrement. Réessayez.');
+    } finally {
+      setSaving(false);
+    }
+  }, [company, editingDocId, saveDocument, updateSavedDocument, currentDoc, totals, onSaved]);
 
   // ── Share handlers ──
   const handleWhatsApp = useCallback(() => {
@@ -227,6 +269,33 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
         </div>
       </motion.div>
 
+      {/* Quick save button in edit mode (before PDF) */}
+      {editingDocId && !saved && (
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className={cn(
+            'h-12 rounded-xl text-sm font-semibold text-white',
+            'active:scale-[0.97] transition-all flex items-center justify-center gap-2',
+            'disabled:opacity-60',
+          )}
+          style={{ background: 'var(--green-2)', boxShadow: '0 4px 20px rgba(37,99,235, 0.35)' }}
+        >
+          {saving && <Loader2 size={15} className="animate-spin" />}
+          Enregistrer les modifications
+        </button>
+      )}
+      {editingDocId && saved && (
+        <div className="flex items-center justify-center gap-2 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+          <Check size={16} className="text-emerald-400" />
+          <span className="text-sm font-semibold text-emerald-400">Modifications enregistrées</span>
+        </div>
+      )}
+      {saveError && !pdfGenerated && (
+        <p className="text-xs text-red-400 text-center">{saveError}</p>
+      )}
+
       {/* Generate PDF button */}
       {!pdfGenerated && (
         <motion.button
@@ -324,23 +393,33 @@ export function StepReviewExport({ onBack }: StepReviewExportProps) {
             </div>
 
             {/* Save button */}
+            {saveError && (
+              <p className="text-xs text-red-400 text-center">{saveError}</p>
+            )}
             {!saved ? (
-              <button type="button"                 onClick={handleSave}
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saving}
                 className={cn(
                   'h-12 rounded-xl text-sm font-semibold text-white mt-1',
-                  'active:scale-[0.97] transition-all',
+                  'active:scale-[0.97] transition-all flex items-center justify-center gap-2',
+                  'disabled:opacity-60',
                 )}
                 style={{
                   background: 'var(--green-2)',
                   boxShadow: '0 2px 12px rgba(37,99,235, 0.3)',
                 }}
               >
-                Enregistrer le document
+                {saving && <Loader2 size={15} className="animate-spin" />}
+                {editingDocId ? 'Enregistrer les modifications' : 'Enregistrer le document'}
               </button>
             ) : (
               <div className="flex items-center justify-center gap-2 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <Check size={16} className="text-emerald-400" />
-                <span className="text-sm font-semibold text-emerald-400">Enregistré</span>
+                <span className="text-sm font-semibold text-emerald-400">
+                  {editingDocId ? 'Modifications enregistrées' : 'Enregistré'}
+                </span>
               </div>
             )}
           </motion.div>

@@ -59,6 +59,7 @@ model User {
   suspendedAt       DateTime?
   companyInfo       Json?              // ⛔ DEPRECATED — use Company model. Migrate via migrateUserCompany()
   settings          Json?              // { fieldVisibility, defaultTaxRegime, defaultDocType, template }
+  fcmToken          String?            // FCM device token for push notifications (mobile app)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 

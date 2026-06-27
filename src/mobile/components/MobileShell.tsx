@@ -6,16 +6,18 @@
 // offline banner, and safe area management
 // ============================================================
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useSyncStore } from '@/stores/syncStore';
 import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
+import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
 import { BottomTabs, type TabId } from './BottomTabs';
 import { OfflineBanner } from './OfflineBanner';
+import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DocumentsListScreen } from '../screens/DocumentsListScreen';
@@ -45,13 +47,41 @@ interface MobileShellProps {
 export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [showWizard, setShowWizard] = useState(false);
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
+  const [pushToast, setPushToast] = useState<PushToastData | null>(null);
+  const toastIdRef = useRef(0);
 
   // ── Auth: check session on mount, expose login/logout ─────
   const { authState, userName, onUnauthorized, login, logout } = useAuthGuard();
 
   // ── Bootstrap API only when authenticated ─────────────────
   useApiSync({ enabled: authState === 'authenticated', onUnauthorized });
+
+  // ── Push notifications (init after auth, teardown on logout) ──
+  useEffect(() => {
+    if (authState !== 'authenticated') return;
+    void initPushNotifications({
+      onForeground: (title, body, payload) => {
+        toastIdRef.current += 1;
+        setPushToast({
+          id: String(toastIdRef.current),
+          title,
+          body,
+          documentId: payload.documentId,
+        });
+      },
+      onTap: (payload) => {
+        if (payload.documentId) {
+          // Navigate to documents tab and open the document
+          setActiveTab('documents');
+          setEditingDocId(payload.documentId);
+          setShowWizard(true);
+        }
+      },
+    });
+    return () => { void teardownPushNotifications(); };
+  }, [authState]);
 
   // ── Network detection ─────────────────────────────────────
   const { isOnline } = useNetwork();
@@ -73,11 +103,22 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const handleNewDevis = useCallback(() => setShowWizard(true), []);
   const handleNewFacture = useCallback(() => setShowWizard(true), []);
   const handleDuplicate = useCallback(() => setShowWizard(true), []);
-  const handleWizardClose = useCallback(() => setShowWizard(false), []);
+  const handleWizardClose = useCallback(() => {
+    setShowWizard(false);
+    setEditingDocId(null);
+  }, []);
+
+  // ── Logout: clear FCM token then call auth logout ─────────
+  const handleLogout = useCallback(async () => {
+    // Best-effort: clear token server-side before logging out
+    await fetch('/api/user/push-token', { method: 'DELETE', credentials: 'include' }).catch(() => {});
+    await logout();
+  }, [logout]);
 
   // ── Document tap handler ──────────────────────────────────
   const handleEditDocument = useCallback((doc: Document) => {
-    // TODO: open document detail view or edit wizard
+    setEditingDocId(doc.id);
+    setShowWizard(true);
   }, []);
 
   // ── Company navigation ────────────────────────────────────
@@ -122,7 +163,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         return <CompanyProfileScreen onGoToClients={handleGoToClients} />;
 
       case 'settings':
-        return <SettingsScreen onLogout={logout} />;
+        return <SettingsScreen onLogout={handleLogout} />;
 
       default:
         return (
@@ -169,6 +210,17 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
       }}
     >
+      {/* Foreground push notification toast */}
+      <PushToast
+        toast={pushToast}
+        onDismiss={() => setPushToast(null)}
+        onTap={(docId) => {
+          setActiveTab('documents');
+          setEditingDocId(docId);
+          setShowWizard(true);
+        }}
+      />
+
       {/* Offline/Online banner */}
       <OfflineBanner isOnline={isOnline} onRetry={handleRetry} />
 
@@ -192,23 +244,10 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-[60] bg-[var(--navy)]"
           >
-            {/* Back button */}
-            <button type="button"               onClick={handleWizardClose}
-              className={cn(
-                'absolute top-4 left-4 z-10',
-                'flex items-center gap-1 px-3 py-2 rounded-lg',
-                'bg-[rgba(15,39,71,0.08)] text-[var(--sand)]',
-                'active:scale-95 transition-transform',
-              )}
-              aria-label="Retour"
-            >
-              <ArrowLeft size={18} />
-              <span className="text-sm font-medium">Retour</span>
-            </button>
-
-            {/* Wizard content */}
+            {/* Wizard handles its own back/exit button */}
             <WizardScreen
               onExit={handleWizardClose}
+              editingDocId={editingDocId ?? undefined}
             />
           </motion.div>
         )}

@@ -137,6 +137,37 @@ function toApiDocumentBody(doc: Document) {
   };
 }
 
+export interface ApiDocumentDetail {
+  id: string;
+  type: string;
+  number: string;
+  status: string;
+  date: string;          // ISO DateTime
+  acompte: number;
+  totalTTC: number;
+  timbreFiscal: number;
+  notes: string | null;
+  paymentMode: string;
+  items: string;         // JSON string of line items
+  companyInfo: Record<string, unknown> | null;
+  client: {
+    id: string;
+    name: string;
+    phone: string | null;
+    email: string | null;
+    address: string | null;
+    nif: string | null;
+    rc: string | null;
+    nis: string | null;
+    ai: string | null;
+  } | null;
+}
+
+export async function fetchDocumentDetail(id: string): Promise<ApiDocumentDetail> {
+  const res = await request<{ document: ApiDocumentDetail }>(`/api/documents/${id}`);
+  return res.document;
+}
+
 export async function createApiDocument(
   doc: Document
 ): Promise<{ id: string; number: string }> {

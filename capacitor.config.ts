@@ -31,6 +31,10 @@ const config: CapacitorConfig = {
     Preferences: {
       group: 'clouddevis',
     },
+    PushNotifications: {
+      // Notification options when app is in foreground
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
   },
 };
 

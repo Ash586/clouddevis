@@ -14,7 +14,14 @@ const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE
 export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {
     const { id } = await ctx!.params as { id: string };
-    const doc = await prisma.document.findFirst({ where: { id, userId: session.userId } });
+    const doc = await prisma.document.findFirst({
+      where: { id, userId: session.userId },
+      include: {
+        client: {
+          select: { id: true, name: true, phone: true, email: true, address: true, nif: true, rc: true, nis: true, ai: true },
+        },
+      },
+    });
     if (!doc) return NextResponse.json({ error: 'Document introuvable' }, { status: 404 });
 
     return NextResponse.json({ document: doc });

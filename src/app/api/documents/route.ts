@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendPush, invoiceApprovedPush, devisAcceptedPush, paymentReceivedPush } from '@/lib/fcm';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
 import { generateDocNumber } from '@/lib/dgi';
@@ -290,13 +291,41 @@ export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
       return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
     }
 
-    const doc = await prisma.document.findFirst({ where: { id, userId: session.userId }, select: { id: true } });
+    const doc = await prisma.document.findFirst({
+      where: { id, userId: session.userId },
+      select: { id: true, number: true, type: true, totalTTC: true, userId: true },
+    });
     if (!doc) return NextResponse.json({ error: 'Document non trouvé' }, { status: 404 });
 
     const updated = await prisma.document.update({
       where: { id },
       data: { status: upperStatus as 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' },
     });
+
+    // Fire push notification when status reaches a notable milestone
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: { fcmToken: true },
+    });
+    const fcmToken = user?.fcmToken ?? null;
+    if (fcmToken) {
+      const docNumber = doc.number ?? '';
+      const docId = doc.id;
+      let pushPayload = null;
+      if (upperStatus === 'ACCEPTED') {
+        pushPayload = doc.type === 'DEVIS'
+          ? devisAcceptedPush(fcmToken, docNumber, docId)
+          : invoiceApprovedPush(fcmToken, docNumber, docId);
+      } else if (upperStatus === 'DELIVERED') {
+        pushPayload = paymentReceivedPush(
+          fcmToken,
+          docNumber,
+          Number(doc.totalTTC ?? 0).toFixed(2),
+          docId,
+        );
+      }
+      if (pushPayload) void sendPush(pushPayload);
+    }
 
     return NextResponse.json({ id: updated.id, status: updated.status });
   } catch (error) {
