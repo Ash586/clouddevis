@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
 import { prisma } from '@/lib/prisma';
-import { createSession } from '@/lib/auth';
+import { createSession, applySessionCookie } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
+
+export const runtime = 'nodejs';
 
 const VALID_PROVIDERS = ['google', 'github'] as const;
 type ValidProvider = (typeof VALID_PROVIDERS)[number];
@@ -46,22 +48,20 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
     return NextResponse.redirect(new URL('/auth/login?error=oauth_canceled', _req.url));
   }
 
-  // CSRF state validation: compare against stored cookie
   const cookieHeader = _req.headers.get('cookie') || '';
-  const cookies = Object.fromEntries(
+  const parsedCookies = Object.fromEntries(
     cookieHeader.split(';').filter(Boolean).map(c => {
       const [k, ...v] = c.trim().split('=');
       return [k, v.join('=')];
     })
   );
-  const storedState = cookies['oauth_state'];
+  const storedState = parsedCookies['oauth_state'];
 
   if (!callbackState || !storedState || callbackState !== storedState) {
     return NextResponse.redirect(new URL('/auth/login?error=oauth_invalid_state', _req.url));
   }
 
   try {
-    // Exchange code for access token
     const tokenBody = provider === 'github'
       ? new URLSearchParams({
           code,
@@ -93,7 +93,6 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
       return NextResponse.redirect(new URL('/auth/login?error=oauth_failed', _req.url));
     }
 
-    // Fetch user info
     const cfg = USER_URLS[provider];
     const userRes = await fetch(cfg.url, { headers: { Authorization: `Bearer ${accessToken}` } });
     const userData = await userRes.json();
@@ -106,7 +105,6 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
 
     const { id: providerId, email, name } = cfg.parser(userData, emails);
 
-    // Find or create user
     const existingAccount = await prisma.account.findUnique({
       where: { provider_providerAccountId: { provider, providerAccountId: providerId } },
       include: { user: true },
@@ -115,16 +113,13 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
     let user = existingAccount?.user;
 
     if (!user) {
-      // Check if email already exists
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
-        // Link account to existing user
         await prisma.account.create({
           data: { userId: existingUser.id, provider, providerAccountId: providerId, accessToken },
         });
         user = existingUser;
       } else {
-        // Create new user with secure random password
         const oauthPassword = crypto.randomBytes(32).toString('hex');
         const { hashPassword } = await import('@/lib/auth');
         const hashedPassword = await hashPassword(oauthPassword);
@@ -145,7 +140,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
       }
     }
 
-    await createSession({
+    const { token, maxAge } = await createSession({
       id: user.id,
       email: user.email,
       name: user.name,
@@ -156,35 +151,29 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
       subscriptionStatus: user.subscriptionStatus,
     });
 
-    const referralCode = cookies['oauth_referral'] || '';
-    const savedRedirect = cookies['oauth_redirect'] || '/dashboard';
+    const referralCode = parsedCookies['oauth_referral'] || '';
+    const savedRedirect = parsedCookies['oauth_redirect'] || '/dashboard';
     const safeRedirect = savedRedirect.startsWith('/dashboard') || savedRedirect.startsWith('/auth') ? savedRedirect : '/dashboard';
 
     const redirect = NextResponse.redirect(new URL(safeRedirect, _req.url));
+    applySessionCookie(redirect, token, maxAge);
     redirect.cookies.delete('oauth_state');
     redirect.cookies.delete('oauth_referral');
     redirect.cookies.delete('oauth_redirect');
 
-    // Create referral record if referral code exists (same logic as register API)
     if (referralCode && !existingAccount) {
       try {
         const partner = await prisma.partner.findUnique({ where: { code: referralCode.toUpperCase() } });
         if (partner && partner.status === 'ACTIVE' && partner.userId !== user.id) {
-          const existingReferral = await prisma.referral.findFirst({
-            where: { referredUserId: user.id },
-          });
+          const existingReferral = await prisma.referral.findFirst({ where: { referredUserId: user.id } });
           if (!existingReferral) {
             await prisma.referral.create({
-              data: {
-                partnerId: partner.id,
-                referredUserId: user.id,
-                status: 'PENDING',
-              },
+              data: { partnerId: partner.id, referredUserId: user.id, status: 'PENDING' },
             });
           }
         }
       } catch {
-        // Non-critical: don't block login if referral creation fails
+        // Non-critical
       }
     }
 

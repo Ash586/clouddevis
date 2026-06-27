@@ -1,10 +1,11 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-const COOKIE_NAME = 'session';
+export const SESSION_COOKIE = 'session';
+const BCRYPT_ROUNDS = 10;
 
-/** Lazy getter for JWT secret – only throws when actually used (safe at build time). */
 function getSecret(): Uint8Array {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET environment variable is required');
@@ -24,21 +25,39 @@ export interface SessionUser {
 }
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
+  return bcrypt.hash(password, BCRYPT_ROUNDS);
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
-export async function createSession(user: { id: string; email: string; name: string; mode: string; sector: string | null; country: string; language: string; subscriptionStatus: string }, rememberMe = false) {
+/**
+ * Signs a JWT, persists the session to DB, and returns the token + maxAge.
+ * The CALLER is responsible for setting the cookie on the NextResponse — do NOT
+ * use next/headers here; it is unreliable when called from nested async functions
+ * in Next.js 16 Route Handlers.
+ */
+export async function createSession(
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    mode: string;
+    sector: string | null;
+    country: string;
+    language: string;
+    subscriptionStatus: string;
+  },
+  rememberMe = false,
+): Promise<{ token: string; maxAge: number }> {
+  const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
   const expiry = rememberMe ? '30d' : '7d';
-  const maxAgeSec = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
 
-  // Use crypto.randomUUID as a unique JWT ID for revocation
-  const jti = typeof crypto !== 'undefined' && crypto.randomUUID
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
+  const jti =
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
 
   const token = await new SignJWT({
     userId: user.id,
@@ -56,31 +75,40 @@ export async function createSession(user: { id: string; email: string; name: str
     .setJti(jti)
     .sign(getSecret());
 
-  // Persist session to DB for revocation support
   const { prisma } = await import('@/lib/prisma');
   await prisma.session.create({
     data: {
       userId: user.id,
       jti,
-      expiresAt: new Date(Date.now() + maxAgeSec * 1000),
+      expiresAt: new Date(Date.now() + maxAge * 1000),
     },
   });
 
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
+  return { token, maxAge };
+}
+
+/**
+ * Apply the session cookie to any NextResponse (json or redirect).
+ * Call this immediately after createSession().
+ */
+export function applySessionCookie(
+  response: NextResponse,
+  token: string,
+  maxAge: number,
+): NextResponse {
+  response.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: maxAgeSec,
+    maxAge,
     path: '/',
   });
-
-  return token;
+  return response;
 }
 
 export async function getSession(): Promise<(SessionUser & { jti?: string }) | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
   try {
@@ -101,35 +129,29 @@ export async function getSession(): Promise<(SessionUser & { jti?: string }) | n
   }
 }
 
-export async function clearSession() {
-  const cookieStore = await cookies();
+/** Revoke session in DB. Returns the cookie name so the caller can delete it on the response. */
+export async function clearSession(): Promise<string> {
   const session = await getSession();
-
-  // Revoke session in DB if jti is present
   if (session?.jti) {
     try {
       const { prisma } = await import('@/lib/prisma');
       await prisma.session.deleteMany({ where: { jti: session.jti } });
     } catch { /* non-fatal — cookie is still cleared */ }
   }
-
-  cookieStore.delete(COOKIE_NAME);
+  return SESSION_COOKIE;
 }
 
-/** Revoke all active sessions for a user (e.g. after password change). */
 export async function revokeAllSessions(userId: string): Promise<void> {
   const { prisma } = await import('@/lib/prisma');
   await prisma.session.deleteMany({ where: { userId } });
 }
 
-/** Get session, verify it is not revoked, and verify user is not suspended. */
 export async function getActiveSession(): Promise<SessionUser | null> {
   const session = await getSession();
   if (!session) return null;
 
   const { prisma } = await import('@/lib/prisma');
 
-  // Check DB session exists (revocation check) — only for sessions with jti
   if (session.jti) {
     const dbSession = await prisma.session.findUnique({
       where: { jti: session.jti },
@@ -145,12 +167,10 @@ export async function getActiveSession(): Promise<SessionUser | null> {
 
   if (user?.suspended) return null;
 
-  // Strip internal jti before returning to callers
   const { jti: _jti, ...sessionUser } = session;
   return sessionUser;
 }
 
-/** Check if a user is suspended by ID */
 export async function isUserSuspended(userId: string): Promise<boolean> {
   const { prisma } = await import('@/lib/prisma');
   const user = await prisma.user.findUnique({
@@ -161,7 +181,7 @@ export async function isUserSuspended(userId: string): Promise<boolean> {
 }
 
 // ─── Centralized auth middleware ───
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireCsrf } from '@/lib/csrf';
 
 type AuthenticatedHandler = (
@@ -171,14 +191,6 @@ type AuthenticatedHandler = (
   ctx: any,
 ) => Promise<Response> | Response;
 
-/**
- * Wraps a route handler with centralized auth checks.
- * Returns 401 if not authenticated.
- *
- * Usage:
- *   export const GET = withAuth(async (req, session) => { ... });
- *   export const POST = withAuth(async (req, session) => { ... });
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuth(handler: AuthenticatedHandler): any {
   return async (req: NextRequest, ctx?: Record<string, unknown>) => {
@@ -198,7 +210,6 @@ type AdminHandler = (
   ctx?: any,
 ) => Promise<Response> | Response;
 
-/** Same as withAuth but for admin routes (uses ADMIN_JWT_SECRET). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAdminAuth(handler: AdminHandler): any {
   return async (req: NextRequest, ctx?: any) => {
