@@ -6,9 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    // Remote Server Mode — يفتح الموقع المنشور
-    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000'
-    url: 'https://clouddevis.vercel.app',
+    // Remote Server Mode — يفتح واجهة الهاتف /mobile مباشرةً (وليس صفحة التسويق)
+    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000/mobile'
+    url: 'https://clouddevis.vercel.app/mobile',
     cleartext: false,
   },
   plugins: {
@@ -18,15 +18,16 @@ const config: CapacitorConfig = {
       androidScaleType: 'CENTER_CROP',
       splashFullScreen: true,
       splashImmersive: true,
-      backgroundColor: '#0B3D2E',
+      backgroundColor: '#F3F6FC',
     },
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: true,
     },
     StatusBar: {
-      style: 'DARK',
-      backgroundColor: '#0B3D2E',
+      // Light app background → light bar with dark icons/text
+      style: 'LIGHT',
+      backgroundColor: '#F3F6FC',
     },
     Preferences: {
       group: 'clouddevis',
