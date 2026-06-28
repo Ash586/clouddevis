@@ -253,7 +253,7 @@ export function DocumentsListScreen({
                   className={cn(
                     'w-full pl-10 pr-4 py-2.5 rounded-xl text-sm',
                     'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-                    'border border-[rgba(15,39,71,0.06)]',
+                    'border border-[var(--border)]',
                     'focus:outline-none focus:border-[rgba(37,99,235,0.3)]',
                   )}
                   autoFocus
@@ -276,7 +276,7 @@ export function DocumentsListScreen({
                   'transition-all duration-200 border',
                   isActive
                     ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(15,39,71,0.06)] active:bg-[var(--navy-2)]',
+                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)] active:bg-[var(--navy-2)]',
                 )}
               >
                 {filter.label}
@@ -286,7 +286,7 @@ export function DocumentsListScreen({
                       'min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center px-1',
                       isActive
                         ? 'bg-white/20 text-white'
-                        : 'bg-[rgba(15,39,71,0.08)] text-[var(--sand-muted)]',
+                        : 'bg-[var(--border)] text-[var(--sand-muted)]',
                     )}
                   >
                     {count}

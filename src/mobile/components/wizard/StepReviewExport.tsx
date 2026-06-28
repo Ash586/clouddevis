@@ -161,8 +161,8 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
       {/* Header */}
       <div>
         <h2
-          className="text-lg font-bold text-[var(--sand)]"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-lg text-[var(--sand)]"
+         
         >
           Aperçu
         </h2>
@@ -177,7 +177,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           'rounded-2xl overflow-hidden',
-          'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]',
+          'bg-[var(--navy-2)] border border-[var(--border)]',
         )}
       >
         {/* Header bar */}
@@ -200,7 +200,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
         </div>
 
         {/* Client info */}
-        <div className="p-4 border-b border-[rgba(15,39,71,0.06)]">
+        <div className="p-4 border-b border-[var(--border)]">
           <p className="text-[10px] text-[var(--sand-muted)] uppercase tracking-wide mb-1">
             Client
           </p>
@@ -255,7 +255,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
                 <span>{formatDA(totals.timbreAmount)}</span>
               </div>
             )}
-            <div className="h-px bg-[rgba(15,39,71,0.08)]" />
+            <div className="h-px bg-[var(--border)]" />
             <div className="flex justify-between text-sm font-bold text-[var(--sand)]">
               <span>TTC</span>
               <span>{formatDA(totals.totalTTC)}</span>
@@ -341,7 +341,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
               <button type="button"                 onClick={handleWhatsApp}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                  'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -354,7 +354,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
               {/* Email */}
               <button type="button"                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                  'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -367,7 +367,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
               {/* Download */}
               <button type="button"                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                  'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
@@ -381,7 +381,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
               <button type="button"                 onClick={handlePrint}
                 className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
-                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                  'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >

@@ -47,7 +47,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate, canDuplica
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
           'min-h-[44px] active:scale-[0.97] transition-transform',
           'bg-[var(--navy-3)] text-[var(--sand)] font-semibold text-sm',
-          'border border-[rgba(15,39,71,0.08)]',
+          'border border-[var(--border)]',
         )}
       >
         <Receipt size={22} strokeWidth={1.8} />
@@ -66,7 +66,7 @@ export function QuickActions({ onNewDevis, onNewFacture, onDuplicate, canDuplica
           'flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl',
           'min-h-[44px] transition-all duration-200',
           'bg-[var(--navy-3)] font-semibold text-sm',
-          'border border-[rgba(15,39,71,0.08)]',
+          'border border-[var(--border)]',
           canDuplicate
             ? 'text-[var(--sand)] active:scale-[0.97]'
             : 'text-[var(--sand-muted)] opacity-40 cursor-not-allowed',

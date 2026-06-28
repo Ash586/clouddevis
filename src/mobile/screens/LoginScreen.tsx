@@ -79,7 +79,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="w-full max-w-sm bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)] rounded-2xl p-6 space-y-4"
+        className="w-full max-w-sm bg-[var(--navy-2)] border border-[var(--border)] rounded-2xl p-6 space-y-4"
         noValidate
       >
         {/* Error banner */}
@@ -114,7 +114,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               'w-full px-4 py-3 rounded-xl text-sm',
               'bg-[var(--navy-3)] text-[var(--sand)]',
               'placeholder:text-[var(--sand-muted)]',
-              'border border-[rgba(15,39,71,0.06)]',
+              'border border-[var(--border)]',
               'focus:outline-none focus:border-[rgba(37,99,235,0.4)]',
               'disabled:opacity-50',
             )}
@@ -142,7 +142,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 'w-full px-4 py-3 pr-12 rounded-xl text-sm',
                 'bg-[var(--navy-3)] text-[var(--sand)]',
                 'placeholder:text-[var(--sand-muted)]',
-                'border border-[rgba(15,39,71,0.06)]',
+                'border border-[var(--border)]',
                 'focus:outline-none focus:border-[rgba(37,99,235,0.4)]',
                 'disabled:opacity-50',
               )}

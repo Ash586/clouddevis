@@ -141,8 +141,8 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
       {/* Header */}
       <div>
         <h2
-          className="text-lg font-bold text-[var(--sand)]"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-lg text-[var(--sand)]"
+         
         >
           Articles
         </h2>
@@ -164,7 +164,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               onClick={() => openEditSheet(item)}
               className={cn(
                 'flex items-center gap-3 p-3.5 rounded-2xl text-left w-full',
-                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                'bg-[var(--navy-2)] border border-[var(--border)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
               )}
             >
@@ -226,7 +226,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
       <div
         className={cn(
           'sticky bottom-0 -mx-5 px-5 pt-3 pb-4',
-          'bg-[var(--navy)] border-t border-[rgba(15,39,71,0.08)]',
+          'bg-[var(--navy)] border-t border-[var(--border)]',
         )}
       >
         <div className="flex flex-col gap-1.5">
@@ -244,7 +244,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               <span>{formatDA(totals.timbreAmount)}</span>
             </div>
           )}
-          <div className="h-px bg-[rgba(15,39,71,0.08)] my-1" />
+          <div className="h-px bg-[var(--border)] my-1" />
           <div className="flex justify-between text-sm font-bold text-[var(--sand)]">
             <span>Total TTC</span>
             <span>{formatDA(totals.totalTTC)}</span>
@@ -271,7 +271,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.label ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+                errors.label ? 'border-red-400/50' : 'border-[var(--border)]',
               )}
             />
             {errors.label && (
@@ -291,7 +291,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                   'w-full h-11 px-3.5 rounded-xl text-sm',
                   'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                   'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                  errors.quantity ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+                  errors.quantity ? 'border-red-400/50' : 'border-[var(--border)]',
                 )}
               />
             </div>
@@ -299,7 +299,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               {...register('unit')}
               className={cn(
                 'h-11 px-3 rounded-xl text-sm',
-                'bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)]',
+                'bg-[var(--navy-3)] border border-[var(--border)]',
                 'text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
               )}
             >
@@ -322,7 +322,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.unitPrice ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+                errors.unitPrice ? 'border-red-400/50' : 'border-[var(--border)]',
               )}
             />
             {errors.unitPrice && (
@@ -342,7 +342,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
                     'border transition-all duration-200 cursor-pointer',
                     watchedTva === opt.value
                       ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
-                      : 'bg-[var(--navy-3)] border-[rgba(15,39,71,0.08)] text-[var(--sand-muted)]',
+                      : 'bg-[var(--navy-3)] border-[var(--border)] text-[var(--sand-muted)]',
                   )}
                 >
                   <input

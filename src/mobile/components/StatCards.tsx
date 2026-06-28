@@ -33,7 +33,7 @@ function StatCard({ icon, iconBg, label, value, sub, delay, loading }: CardProps
       transition={{ duration: 0.28, delay }}
       className={cn(
         'rounded-2xl p-4',
-        'bg-[var(--navy-2)] border border-[rgba(255,255,255,0.05)]',
+        'bg-[var(--navy-2)] border border-[var(--border)]',
       )}
     >
       <div className="flex items-center gap-2.5 mb-2.5">
@@ -49,8 +49,7 @@ function StatCard({ icon, iconBg, label, value, sub, delay, loading }: CardProps
         <div className="h-7 w-14 rounded-lg bg-[rgba(255,255,255,0.06)] animate-pulse" />
       ) : (
         <p
-          className="text-[22px] font-bold text-[var(--sand)] leading-none"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-[22px] text-[var(--sand)] leading-none"
         >
           {value}
         </p>

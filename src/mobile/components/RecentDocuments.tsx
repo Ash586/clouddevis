@@ -10,7 +10,7 @@ import {
   Receipt,
   ClipboardList,
   ReceiptText,
-  PartyPopper,
+  PackageCheck,
   type LucideIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -26,7 +26,7 @@ const DOC_ICONS: Record<DocumentType, LucideIcon> = {
   FACTURE: Receipt,
   PROFORMA: ReceiptText,
   BC: ClipboardList,
-  BR: PartyPopper,
+  BR: PackageCheck,
 };
 
 // ── Status → badge variant mapping ────────────────────────────
@@ -72,14 +72,14 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
       <div className="px-5">
         <h3
           className="text-base font-bold text-[var(--sand)] mb-3"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+         
         >
           Récents
         </h3>
         <div
           className={cn(
             'rounded-2xl p-8 text-center',
-            'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+            'bg-[var(--navy-2)] border border-[var(--border)]',
           )}
         >
           <FileText size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
@@ -99,8 +99,8 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
       {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <h3
-          className="text-base font-bold text-[var(--sand)]"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-base text-[var(--sand)]"
+         
         >
           Récents
         </h3>
@@ -131,7 +131,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               onClick={() => onDocumentTap?.(doc)}
               className={cn(
                 'flex items-center gap-3 w-full p-3.5 rounded-2xl',
-                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                'bg-[var(--navy-2)] border border-[var(--border)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
                 'min-h-[56px] text-left',
               )}

@@ -13,7 +13,7 @@ import {
   Receipt,
   ReceiptText,
   ClipboardList,
-  PartyPopper,
+  PackageCheck,
   Pencil,
   Copy,
   Trash2,
@@ -34,7 +34,7 @@ const DOC_ICONS: Record<DocumentType, LucideIcon> = {
   FACTURE: Receipt,
   PROFORMA: ReceiptText,
   BC: ClipboardList,
-  BR: PartyPopper,
+  BR: PackageCheck,
 };
 
 const DOC_COLORS: Record<DocumentType, string> = {
@@ -199,7 +199,7 @@ export function DocumentRow({
         onMouseLeave={handleTouchEnd}
         className={cn(
           'relative flex items-center gap-3 p-3 rounded-2xl',
-          'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+          'bg-[var(--navy-2)] border border-[var(--border)]',
           'active:cursor-grabbing select-none touch-pan-y',
         )}
         initial={{ opacity: 0, y: 12 }}

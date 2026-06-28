@@ -114,8 +114,8 @@ export function StepClientSelection({
       {/* Header */}
       <div>
         <h2
-          className="text-lg font-bold text-[var(--sand)]"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-lg text-[var(--sand)]"
+         
         >
           Client
         </h2>
@@ -167,7 +167,7 @@ export function StepClientSelection({
           placeholder="Rechercher un client..."
           className={cn(
             'w-full h-12 pl-10 pr-4 rounded-xl',
-            'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]',
+            'bg-[var(--navy-2)] border border-[var(--border)]',
             'text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
             'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
             'transition-all duration-200',
@@ -183,7 +183,7 @@ export function StepClientSelection({
               onClick={() => handleSelectClient(client)}
               className={cn(
                 'flex items-center gap-3 p-3.5 rounded-xl text-left',
-                'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                'bg-[var(--navy-2)] border border-[var(--border)]',
                 'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
                 'min-h-[56px]',
               )}
@@ -222,7 +222,7 @@ export function StepClientSelection({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmit(onSubmitNewClient)}
-          className="flex flex-col gap-3 p-4 rounded-2xl bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)]"
+          className="flex flex-col gap-3 p-4 rounded-2xl bg-[var(--navy-2)] border border-[var(--border)]"
         >
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-semibold text-[var(--sand)]">Nouveau client</p>
@@ -244,7 +244,7 @@ export function StepClientSelection({
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.name ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+                errors.name ? 'border-red-400/50' : 'border-[var(--border)]',
               )}
             />
             {errors.name && (
@@ -270,7 +270,7 @@ export function StepClientSelection({
                     ? 'border-emerald-400/50'
                     : nifValid === false
                       ? 'border-red-400/50'
-                      : 'border-[rgba(15,39,71,0.08)]',
+                      : 'border-[var(--border)]',
                 )}
               />
               {nifValid === true && (
@@ -287,7 +287,7 @@ export function StepClientSelection({
             placeholder="RC (optionnel)"
             className={cn(
               'w-full h-11 px-3.5 rounded-xl text-sm',
-              'bg-[var(--navy-3)] border border-[rgba(15,39,71,0.08)]',
+              'bg-[var(--navy-3)] border border-[var(--border)]',
               'text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
               'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
             )}
@@ -302,7 +302,7 @@ export function StepClientSelection({
                 'w-full h-11 px-3.5 rounded-xl text-sm',
                 'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                 'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-                errors.phone ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+                errors.phone ? 'border-red-400/50' : 'border-[var(--border)]',
               )}
             />
             {errors.phone && (
@@ -318,7 +318,7 @@ export function StepClientSelection({
               'w-full h-11 px-3.5 rounded-xl text-sm',
               'bg-[var(--navy-3)] border text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
               'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',
-              errors.email ? 'border-red-400/50' : 'border-[rgba(15,39,71,0.08)]',
+              errors.email ? 'border-red-400/50' : 'border-[var(--border)]',
             )}
           />
 

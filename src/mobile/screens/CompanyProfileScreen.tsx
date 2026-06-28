@@ -115,7 +115,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
               Ajoutez les informations de votre entreprise pour générer des documents conformes
             </p>
             <button type="button"               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-95 transition-transform"
+              className="px-4 py-2 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-[0.97] transition-transform"
             >
               Configurer ma société
             </button>
@@ -137,7 +137,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 )}
               </div>
               {isEditing && (
-                <button type="button" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-95 transition-transform">
+                <button type="button" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform">
                   <Image size={14} />
                   Ajouter un logo
                 </button>
@@ -171,7 +171,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                       'border transition-colors',
                       errors[field]
                         ? 'border-red-400/50 focus:border-red-400'
-                        : 'border-[rgba(15,39,71,0.06)] focus:border-[rgba(37,99,235,0.3)]',
+                        : 'border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]',
                     )}
                   />
                 ) : (
@@ -202,7 +202,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
               <button type="button"                 onClick={onGoToClients}
                 className={cn(
                   'w-full flex items-center justify-between px-4 py-3.5 rounded-xl',
-                  'bg-[var(--navy-2)] border border-[rgba(15,39,71,0.06)]',
+                  'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.98] transition-transform',
                 )}
               >

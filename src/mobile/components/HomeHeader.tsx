@@ -31,7 +31,7 @@ export function HomeHeader({
         <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white bg-gradient-to-br from-[var(--green)] to-[var(--teal)]">
           CD
         </div>
-        <span className="text-lg font-bold text-[var(--sand)]" style={{ fontFamily: 'Sora, sans-serif' }}>
+        <span className="heading text-lg text-[var(--sand)]">
           CloudDevis
         </span>
       </div>

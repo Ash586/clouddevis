@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  CloudDevis — Adaptive Icon Foreground (API 24+)
-  Canvas: 108dp × 108dp
-  Safe zone: central 72dp × 72dp (inset 18dp each side)
-  Design: white invoice document + amber total row + green badge
--->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- ── Document shadow ── -->
+    <!-- Document shadow -->
     <path
         android:pathData="M32.5,22.5 h45 a4,4 0 0 1 4,4 v60 a4,4 0 0 1 -4,4 h-45 a4,4 0 0 1 -4,-4 v-60 a4,4 0 0 1 4,-4 Z"
         android:fillColor="#000000"
@@ -19,12 +13,12 @@
         android:translateX="1"
         android:translateY="1.5"/>
 
-    <!-- ── Document body ── -->
+    <!-- Document body -->
     <path
         android:pathData="M32,21 h35 l14,13 v58 a4,4 0 0 1 -4,4 h-45 a4,4 0 0 1 -4,-4 v-67 a4,4 0 0 1 4,-4 Z"
         android:fillColor="#F7FAFC"/>
 
-    <!-- ── Corner fold (light) ── -->
+    <!-- Corner fold -->
     <path
         android:pathData="M67,21 l14,13 h-14 Z"
         android:fillColor="#CBD5E0"/>
@@ -32,25 +26,16 @@
         android:pathData="M67,21 l14,13 l-14,0 Z"
         android:fillColor="#E2E8F0"/>
 
-    <!-- ── Gold accent stripe (top edge of document) ── -->
+    <!-- Gold accent stripe -->
     <path
-        android:pathData="M32,21 h35 a0,0 0 0 1 0,0 v2.5 h-35 a4,4 0 0 1 -4,-4 v1.5 a4,4 0 0 0 4,0 Z"
-        android:fillColor="#C8963A"
-        android:fillAlpha="0.0"/>
-    <rect
-        android:x="28"
-        android:y="21"
-        android:width="39"
-        android:height="2.5"
+        android:pathData="M28,21 h39 v2.5 h-39 z"
         android:fillColor="#C8963A"
         android:fillAlpha="0.6"/>
 
-    <!-- ── Content placeholder lines ── -->
-    <!-- Title -->
+    <!-- Content placeholder lines -->
     <path
         android:pathData="M36,40 h20 a1.5,1.5 0 0 1 0,3 h-20 a1.5,1.5 0 0 1 0,-3 Z"
         android:fillColor="#CBD5E0"/>
-    <!-- Lines -->
     <path
         android:pathData="M36,48 h28 a1,1 0 0 1 0,2 h-28 a1,1 0 0 1 0,-2 Z"
         android:fillColor="#DDE3EC"
@@ -60,12 +45,10 @@
         android:fillColor="#DDE3EC"
         android:fillAlpha="0.6"/>
 
-    <!-- Divider -->
     <path
         android:pathData="M36,60 h36 v1 h-36 Z"
         android:fillColor="#CBD5E0"/>
 
-    <!-- Item rows (label + amount) -->
     <path
         android:pathData="M36,64 h19 a1,1 0 0 1 0,2 h-19 a1,1 0 0 1 0,-2 Z"
         android:fillColor="#DDE3EC"
@@ -83,12 +66,10 @@
         android:fillColor="#DDE3EC"
         android:fillAlpha="0.7"/>
 
-    <!-- Total divider -->
     <path
         android:pathData="M36,74 h36 v1 h-36 Z"
         android:fillColor="#B0BCCC"/>
 
-    <!-- Total row (amber highlight) -->
     <path
         android:pathData="M36,76.5 h36 a1.5,1.5 0 0 1 1.5,1.5 v3 a1.5,1.5 0 0 1 -1.5,1.5 h-36 a1.5,1.5 0 0 1 -1.5,-1.5 v-3 a1.5,1.5 0 0 1 1.5,-1.5 Z"
         android:fillColor="#C8963A"
@@ -102,12 +83,10 @@
         android:fillColor="#C8963A"
         android:fillAlpha="0.5"/>
 
-    <!-- ── Badge circle ── -->
     <path
         android:pathData="M72,78 m-8,0 a8,8 0 1 1 16,0 a8,8 0 1 1 -16,0"
         android:fillColor="#1D6B4A"/>
 
-    <!-- Checkmark in badge -->
     <path
         android:pathData="M67.5,78 L71,81.5 L76.5,74.5"
         android:fillColor="#00000000"
@@ -115,5 +94,4 @@
         android:strokeWidth="1.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"/>
-
 </vector>

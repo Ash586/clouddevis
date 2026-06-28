@@ -67,8 +67,8 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
       {/* Header */}
       <div>
         <h2
-          className="text-lg font-bold text-[var(--sand)]"
-          style={{ fontFamily: 'Sora, sans-serif' }}
+          className="heading text-lg text-[var(--sand)]"
+         
         >
           Type de document
         </h2>
@@ -99,7 +99,7 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 'border-2',
                 isSelected
                   ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.1)]'
-                  : 'border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)]',
+                  : 'border-[var(--border)] bg-[var(--navy-2)]',
               )}
             >
               <div
