@@ -152,6 +152,32 @@ export async function generatePDFBase64(options: {
 }
 
 /**
+ * Trigger a download of a base64-encoded PDF.
+ * Works in the browser and in the Android WebView (hands off to the
+ * system download manager via an anchor with the `download` attribute).
+ */
+export function downloadDocument(base64: string, fileName: string): void {
+  try {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch {
+    logger.error('Failed to download PDF');
+  }
+}
+
+/**
  * Open PDF in a new window for printing (browser fallback).
  */
 export function printDocument(base64OrHtml: string): void {

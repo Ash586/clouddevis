@@ -5,13 +5,15 @@
 // Displays and edits company info: name, NIF, RC, NIS, AI, logo
 // ============================================================
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Building, ChevronRight, Pencil, Image, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
 import { Badge } from '@/components/ui/badge';
+
+const MAX_LOGO_BYTES = 500 * 1024; // 500 KB
 
 interface CompanyProfileScreenProps {
   /** Navigate to clients list */
@@ -29,6 +31,9 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
   const [isEditing, setIsEditing] = useState(!isSetup);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [logoData, setLogoData] = useState<string | undefined>(company?.logo);
+  const [logoError, setLogoError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form state ──
   const [form, setForm] = useState({
@@ -46,6 +51,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
     const result = setCompany({
       id: company?.id || crypto.randomUUID().slice(0, 9),
       ...form,
+      logo: logoData,
       tvaRate: company?.tvaRate || 19,
     });
 
@@ -56,7 +62,40 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
     setErrors({});
     setIsEditing(false);
-  }, [form, company, setCompany]);
+  }, [form, company, logoData, setCompany]);
+
+  // ── Logo upload (base64, max 500 KB) ──
+  const handleLogoPick = useCallback(() => {
+    setLogoError('');
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleLogoChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = ''; // allow re-picking the same file
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        setLogoError('Veuillez choisir une image.');
+        return;
+      }
+      if (file.size > MAX_LOGO_BYTES) {
+        setLogoError('Image trop lourde (max 500 KB).');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        setLogoData(dataUrl);
+        // Persist immediately if the company already exists; otherwise it is
+        // saved together with the form on "Enregistrer".
+        if (isSetup) setLogo(dataUrl);
+      };
+      reader.onerror = () => setLogoError('Lecture du fichier impossible.');
+      reader.readAsDataURL(file);
+    },
+    [isSetup, setLogo],
+  );
 
   const handleFieldChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -130,17 +169,31 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             {/* Logo */}
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center overflow-hidden">
-                {company?.logo ? (
-                  <img src={company.logo} alt="Logo" className="w-full h-full object-cover" />
+                {(logoData || company?.logo) ? (
+                  <img src={logoData || company?.logo} alt="Logo de la société" className="w-full h-full object-cover" />
                 ) : (
                   <Building size={28} className="text-[var(--sand-muted)]" />
                 )}
               </div>
               {isEditing && (
-                <button type="button" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform">
-                  <Image size={14} />
-                  Ajouter un logo
-                </button>
+                <div className="flex flex-col gap-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleLogoPick}
+                    className="flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform"
+                  >
+                    <Image size={14} />
+                    {(logoData || company?.logo) ? 'Changer le logo' : 'Ajouter un logo'}
+                  </button>
+                  {logoError && <p className="text-[11px] text-red-400">{logoError}</p>}
+                </div>
               )}
             </div>
 

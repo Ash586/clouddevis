@@ -5,7 +5,7 @@
 // 2×2 grid of document type cards with large touch targets
 // ============================================================
 
-import { FileText, Receipt, ReceiptText, ClipboardList, type LucideIcon } from 'lucide-react';
+import { FileText, Receipt, ReceiptText, ClipboardList, PackageCheck, type LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { DocumentType } from '@/mobile/types';
@@ -20,6 +20,8 @@ interface TypeCard {
   label: string;
   subtitle: string;
   icon: LucideIcon;
+  /** Span both grid columns (used for the odd 5th card) */
+  wide?: boolean;
 }
 
 const TYPE_CARDS: TypeCard[] = [
@@ -46,6 +48,13 @@ const TYPE_CARDS: TypeCard[] = [
     label: 'Bon de Commande',
     subtitle: 'Commande',
     icon: ClipboardList,
+  },
+  {
+    type: 'BR',
+    label: 'Bon de Réception',
+    subtitle: 'Réception de marchandises',
+    icon: PackageCheck,
+    wide: true,
   },
 ];
 
@@ -97,8 +106,9 @@ export function StepTypeSelection({ selectedType, onSelect }: StepTypeSelectionP
                 'flex flex-col items-center justify-center gap-3 p-5 rounded-2xl',
                 'min-h-[120px] active:scale-[0.97] transition-all duration-200',
                 'border-2',
+                card.wide && 'col-span-2',
                 isSelected
-                  ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.1)]'
+                  ? 'border-[var(--green-2)] bg-[var(--blue-bg)]'
                   : 'border-[var(--border)] bg-[var(--navy-2)]',
               )}
             >

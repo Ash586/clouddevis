@@ -5,7 +5,7 @@
 // Document preview + PDF generation + share options
 // ============================================================
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { FileText, MessageCircle, Mail, Download, Printer, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logger } from '@/lib/logger';
@@ -13,10 +13,10 @@ import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
 import { Badge } from '@/components/ui/badge';
-import { generatePDFBase64, printDocument } from '@/mobile/lib/pdf';
+import { generatePDFBase64, printDocument, downloadDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
 import { updateApiDocument, createApiDocument } from '@/mobile/lib/api';
-import { numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
+import { numberToFrenchWords, formatDateAlgerian, generateDocNumber } from '@/lib/dgi';
 import type { DocumentType } from '@/mobile/types';
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -48,6 +48,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
   const totals = useDocumentStore((s) => s.totals);
   const saveDocument = useDocumentStore((s) => s.saveDocument);
   const updateSavedDocument = useDocumentStore((s) => s.updateSavedDocument);
+  const savedDocuments = useDocumentStore((s) => s.savedDocuments);
   const company = useCompanyStore((s) => s.company);
 
   const [pdfGenerated, setPdfGenerated] = useState(false);
@@ -57,12 +58,23 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
 
+  // ── Real document number ──
+  // Edit mode: reuse the existing number. New doc: preview the number the
+  // store will assign on save (savedDocuments.length + 1), matching buildDocument().
+  const docNumber = useMemo(() => {
+    if (editingDocId) {
+      const existing = savedDocuments.find((d) => d.id === editingDocId);
+      if (existing?.number) return existing.number;
+    }
+    return generateDocNumber(currentDoc.type, savedDocuments.length + 1);
+  }, [editingDocId, savedDocuments, currentDoc.type]);
+
   // ── Generate PDF ──
   const handleGeneratePDF = useCallback(async () => {
     setGenerating(true);
     try {
       const base64 = await generatePDFBase64({
-        docNumber: 'DEV-2026-00001',
+        docNumber,
         docType: currentDoc.type,
         clientName: currentDoc.client?.name || 'Client',
         clientAddress: currentDoc.client?.address,
@@ -95,7 +107,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
     } finally {
       setGenerating(false);
     }
-  }, [currentDoc, totals, company]);
+  }, [currentDoc, totals, company, docNumber]);
 
   // ── Save document ──
   const handleSave = useCallback(async () => {
@@ -143,12 +155,33 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
     if (pdfBase64) {
       shareDocument({
         pdfBase64,
-        docNumber: 'DEV-2026-00001',
+        docNumber,
         clientName: currentDoc.client?.name || 'Client',
         total: totals.netAPayer,
       });
     }
-  }, [pdfBase64, currentDoc, totals]);
+  }, [pdfBase64, currentDoc, totals, docNumber]);
+
+  const handleEmail = useCallback(() => {
+    const label = DOC_TYPE_LABELS[currentDoc.type] || 'Document';
+    const subject = `${label} ${docNumber}`;
+    const body =
+      `Bonjour ${currentDoc.client?.name || ''},\n\n` +
+      `Veuillez trouver votre ${label.toLowerCase()} ${docNumber} ` +
+      `d'un montant de ${formatDA(totals.netAPayer)}.\n\n` +
+      `Cordialement,\n${company?.name || 'CloudDevis'}`;
+    const to = currentDoc.client?.email || '';
+    window.open(
+      `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_system',
+    );
+  }, [currentDoc, docNumber, totals, company]);
+
+  const handleDownload = useCallback(() => {
+    if (pdfBase64) {
+      downloadDocument(pdfBase64, `${docNumber}.pdf`);
+    }
+  }, [pdfBase64, docNumber]);
 
   const handlePrint = useCallback(() => {
     if (pdfBase64) {
@@ -352,20 +385,26 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
               </button>
 
               {/* Email */}
-              <button type="button"                 className={cn(
+              <button
+                type="button"
+                onClick={handleEmail}
+                className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
                 )}
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-400/15 flex items-center justify-center">
-                  <Mail size={20} className="text-blue-400" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--blue-bg)] flex items-center justify-center">
+                  <Mail size={20} className="text-[var(--green-2)]" />
                 </div>
                 <span className="text-xs font-semibold text-[var(--sand)]">Email</span>
               </button>
 
               {/* Download */}
-              <button type="button"                 className={cn(
+              <button
+                type="button"
+                onClick={handleDownload}
+                className={cn(
                   'flex flex-col items-center gap-2 py-4 rounded-2xl',
                   'bg-[var(--navy-2)] border border-[var(--border)]',
                   'active:scale-[0.97] transition-transform',
