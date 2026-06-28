@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useCallback, useMemo } from 'react';
-import { FileText, MessageCircle, Mail, Download, Printer, Check, Loader2 } from 'lucide-react';
+import { FileText, MessageCircle, Mail, Download, Printer, Check, Loader2, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
@@ -192,16 +192,21 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
   return (
     <div className="flex flex-col gap-5 px-5">
       {/* Header */}
-      <div>
-        <h2
-          className="heading text-lg text-[var(--sand)]"
-         
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="w-11 h-11 -ml-2 rounded-xl flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
+          aria-label="Modifier les articles"
         >
-          Aperçu
-        </h2>
-        <p className="text-sm text-[var(--sand-muted)] mt-1">
-          Vérifiez et générez votre document
-        </p>
+          <ChevronLeft size={22} />
+        </button>
+        <div>
+          <h2 className="heading text-lg text-[var(--sand)]">Aperçu</h2>
+          <p className="text-sm text-[var(--sand-muted)] mt-0.5">
+            Vérifiez et générez votre document
+          </p>
+        </div>
       </div>
 
       {/* Document preview card */}

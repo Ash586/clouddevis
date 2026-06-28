@@ -8,11 +8,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Check, User, X } from 'lucide-react';
+import { Search, Plus, Check, User, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
 import { useClientStore } from '@/stores/clientStore';
+import { useDocumentStore } from '@/stores/documentStore';
 import type { Client } from '@/mobile/types';
 import { z } from 'zod';
 
@@ -49,6 +50,7 @@ export function StepClientSelection({
   const clients = useClientStore((s) => s.clients);
   const searchClients = useClientStore((s) => s.searchClients);
   const addClient = useClientStore((s) => s.addClient);
+  const nextStep = useDocumentStore((s) => s.nextStep);
 
   const {
     register,
@@ -145,7 +147,7 @@ export function StepClientSelection({
               )}
             </div>
             <button type="button"               onClick={onClear}
-              className="w-7 h-7 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
+              className="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
               aria-label="Retirer le client"
             >
               <X size={14} />
@@ -153,6 +155,19 @@ export function StepClientSelection({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Continue (shown when a client is already selected, e.g. navigating back) */}
+      {selectedClient?.name && (
+        <button
+          type="button"
+          onClick={() => nextStep()}
+          className="w-full h-12 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          style={{ background: 'var(--green-2)' }}
+        >
+          Continuer
+          <ArrowRight size={16} />
+        </button>
+      )}
 
       {/* Search bar */}
       <div className="relative">

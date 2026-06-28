@@ -7,11 +7,12 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, UserPlus, Users, Phone, Mail, X, Check } from 'lucide-react';
+import { ArrowLeft, Search, UserPlus, Users, Phone, Mail, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import type { Client } from '@/mobile/types';
 
 interface ClientsScreenProps {
@@ -139,6 +140,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
 
   // ── Filtered clients ──
   const filteredClients = useMemo(() => {
@@ -310,8 +312,11 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                       >
                         Modifier
                       </button>
-                      <button type="button"                         onClick={() => deleteClient(client.id)}
-                        className="py-2 px-3 rounded-xl text-xs font-semibold bg-red-400/10 text-red-400 active:scale-[0.98] transition-transform"
+                      <button
+                        type="button"
+                        onClick={() => setClientToDelete(client)}
+                        className="py-2 px-3 min-h-[44px] rounded-xl text-xs font-semibold bg-red-400/10 text-red-400 active:scale-[0.98] transition-transform"
+                        aria-label={`Supprimer ${client.name}`}
                       >
                         <X size={14} />
                       </button>
@@ -323,6 +328,21 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Delete confirmation */}
+      <ConfirmSheet
+        open={clientToDelete !== null}
+        title={`Supprimer ${clientToDelete?.name ?? 'ce client'} ?`}
+        message={
+          clientToDelete && getClientDocCount(clientToDelete.id) > 0
+            ? `Ce client est lié à ${getClientDocCount(clientToDelete.id)} document(s). Cette action est irréversible.`
+            : 'Cette action est irréversible.'
+        }
+        onConfirm={() => {
+          if (clientToDelete) deleteClient(clientToDelete.id);
+        }}
+        onClose={() => setClientToDelete(null)}
+      />
     </div>
   );
 }

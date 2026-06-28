@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
+import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64FromDoc, printDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
 import type { Document } from '@/mobile/types';
@@ -92,6 +93,7 @@ export function DocumentsListScreen({
   const [showSearch, setShowSearch] = useState(false);
   const [actionSheetDoc, setActionSheetDoc] = useState<Document | null>(null);
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
+  const [docToDelete, setDocToDelete] = useState<Document | null>(null);
 
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
   const deleteDocument = useDocumentStore((s) => s.deleteDocument);
@@ -171,7 +173,7 @@ export function DocumentsListScreen({
           if (duplicateDocument(doc.id)) void notify('Document dupliqué');
           break;
         case 'delete':
-          deleteDocument(doc.id);
+          setDocToDelete(doc);
           break;
         case 'share':
           try {
@@ -197,7 +199,7 @@ export function DocumentsListScreen({
           break;
       }
     },
-    [onEditDocument, duplicateDocument, deleteDocument]
+    [onEditDocument, duplicateDocument]
   );
 
   return (
@@ -352,6 +354,24 @@ export function DocumentsListScreen({
           setActionSheetDoc(null);
         }}
         onAction={handleActionSheet}
+      />
+
+      {/* ── Delete confirmation ──────────────────────────────── */}
+      <ConfirmSheet
+        open={docToDelete !== null}
+        title="Supprimer ce document ?"
+        message={
+          docToDelete
+            ? `${docToDelete.number} — ${docToDelete.client?.name ?? ''}. Cette action est irréversible.`
+            : 'Cette action est irréversible.'
+        }
+        onConfirm={() => {
+          if (docToDelete) {
+            deleteDocument(docToDelete.id);
+            void notify('Document supprimé');
+          }
+        }}
+        onClose={() => setDocToDelete(null)}
       />
     </div>
   );

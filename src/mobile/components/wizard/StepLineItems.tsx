@@ -8,7 +8,7 @@
 import { useState, useCallback } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
@@ -63,6 +63,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
   const addItem = useDocumentStore((s) => s.addItem);
   const updateItem = useDocumentStore((s) => s.updateItem);
   const removeItem = useDocumentStore((s) => s.removeItem);
+  const nextStep = useDocumentStore((s) => s.nextStep);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LineItem | null>(null);
@@ -250,6 +251,28 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
             <span>{formatDA(totals.totalTTC)}</span>
           </div>
         </div>
+
+        {/* Continue to review — gated on at least one item */}
+        <button
+          type="button"
+          onClick={() => { if (items.length > 0) nextStep(); }}
+          disabled={items.length === 0}
+          className={cn(
+            'w-full h-12 mt-3 rounded-xl text-sm font-semibold text-white',
+            'flex items-center justify-center gap-2',
+            'active:scale-[0.98] transition-all',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+          )}
+          style={{ background: 'var(--green-2)' }}
+        >
+          Continuer vers l&apos;aperçu
+          <ArrowRight size={16} />
+        </button>
+        {items.length === 0 && (
+          <p className="text-[11px] text-[var(--sand-muted)] text-center mt-1.5">
+            Ajoutez au moins un article pour continuer
+          </p>
+        )}
       </div>
 
       {/* Bottom sheet for item editing */}

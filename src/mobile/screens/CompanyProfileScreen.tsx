@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building, ChevronRight, Pencil, Image, Users, X } from 'lucide-react';
+import { Building, ChevronRight, Pencil, Image as ImageIcon, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
@@ -25,7 +25,6 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   const company = useCompanyStore((s) => s.company);
   const isSetup = useCompanyStore((s) => s.isSetup);
   const setCompany = useCompanyStore((s) => s.setCompany);
-  const updateCompany = useCompanyStore((s) => s.updateCompany);
   const setLogo = useCompanyStore((s) => s.setLogo);
   const validate = useCompanyStore((s) => s.validate);
 
@@ -189,7 +188,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                     onClick={handleLogoPick}
                     className="flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform"
                   >
-                    <Image size={14} />
+                    <ImageIcon size={14} />
                     {(logoData || company?.logo) ? 'Changer le logo' : 'Ajouter un logo'}
                   </button>
                   {logoError && <p className="text-[11px] text-red-400">{logoError}</p>}
