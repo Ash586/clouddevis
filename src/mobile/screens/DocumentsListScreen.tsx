@@ -10,7 +10,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FilePlus, Files, X } from 'lucide-react';
-import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
@@ -18,17 +17,8 @@ import { ActionSheet } from '@/mobile/components/ActionSheet';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64FromDoc, printDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
+import { notify } from '@/mobile/lib/toast';
 import type { Document } from '@/mobile/types';
-
-/** Show a lightweight native toast when available, falling back to console. */
-async function notify(message: string) {
-  try {
-    const { Toast } = await import('@capacitor/toast');
-    await Toast.show({ text: message, duration: 'short' });
-  } catch {
-    if (typeof window !== 'undefined') logger.info(message);
-  }
-}
 
 // ── Filter definitions ───────────────────────────────────────
 

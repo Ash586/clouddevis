@@ -6,8 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Languages, Receipt, Moon, CloudOff, Trash2, ChevronRight, RefreshCw, Info, LogOut } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -18,6 +17,8 @@ import {
 import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useCompanyStore } from '@/stores/companyStore';
+import { notify } from '@/mobile/lib/toast';
+import { APP_VERSION } from '@/mobile/constants';
 
 interface SettingsScreenProps {
   onLogout?: () => Promise<void>;
@@ -57,6 +58,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     const updated = { ...settings, [key]: value };
     setLocalSettings(updated);
     await setSettings({ [key]: value });
+    void notify('Paramètre enregistré ✓');
   };
 
   const handleClearAllData = async () => {
@@ -65,6 +67,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     useClientStore.getState().clearAll();
     useCompanyStore.getState().clearCompany();
     setShowClearConfirm(false);
+    void notify('Toutes les données ont été effacées');
   };
 
   return (
@@ -226,7 +229,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         {/* ── App Version ──────────────────────────────────── */}
         <div className="text-center py-4">
           <p className="text-[11px] text-[var(--sand-muted)]">
-            CloudDevis v1.0.0
+            CloudDevis v{APP_VERSION}
           </p>
           <p className="text-[10px] text-[var(--sand-muted)]/50 mt-1">
             Conformes DGI Algérie

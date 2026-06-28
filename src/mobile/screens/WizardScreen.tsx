@@ -118,6 +118,7 @@ export function WizardScreen({ editingDocId, onExit }: WizardScreenProps) {
 
   const [loadingDoc, setLoadingDoc] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [retryToken, setRetryToken] = useState(0);
 
   // ── Track slide direction (1 = forward, -1 = back) ────────
   const prevStepRef = useRef(step);
@@ -151,7 +152,7 @@ export function WizardScreen({ editingDocId, onExit }: WizardScreenProps) {
       .catch(() => setLoadError('Impossible de charger le document.'))
       .finally(() => setLoadingDoc(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editingDocId]);
+  }, [editingDocId, retryToken]);
 
   // ── Navigation ───────────────────────────────────────────
   const handleTypeSelect = useCallback(
@@ -199,13 +200,22 @@ export function WizardScreen({ editingDocId, onExit }: WizardScreenProps) {
       <div className="min-h-screen flex items-center justify-center bg-[var(--navy)] px-6">
         <div className="text-center">
           <p className="text-sm text-red-400 mb-4">{loadError}</p>
-          <button
-            type="button"
-            onClick={() => onExit?.()}
-            className="px-5 py-2.5 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]"
-          >
-            Retour
-          </button>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => onExit?.()}
+              className="px-5 py-2.5 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]"
+            >
+              Retour
+            </button>
+            <button
+              type="button"
+              onClick={() => setRetryToken((t) => t + 1)}
+              className="px-5 py-2.5 rounded-xl bg-[var(--green-2)] text-sm font-semibold text-white"
+            >
+              Réessayer
+            </button>
+          </div>
         </div>
       </div>
     );

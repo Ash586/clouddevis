@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
 import { Badge } from '@/components/ui/badge';
+import { notify } from '@/mobile/lib/toast';
 
 const MAX_LOGO_BYTES = 500 * 1024; // 500 KB
 
@@ -56,11 +57,13 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
     if (result && !result.valid) {
       setErrors(result.errors);
+      void notify('Vérifiez les champs en rouge');
       return;
     }
 
     setErrors({});
     setIsEditing(false);
+    void notify('Société enregistrée ✓');
   }, [form, company, logoData, setCompany]);
 
   // ── Logo upload (base64, max 500 KB) ──

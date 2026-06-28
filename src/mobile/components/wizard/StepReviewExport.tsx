@@ -54,6 +54,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
   const [pdfGenerated, setPdfGenerated] = useState(false);
   const [pdfBase64, setPdfBase64] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [pdfError, setPdfError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -72,6 +73,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
   // ── Generate PDF ──
   const handleGeneratePDF = useCallback(async () => {
     setGenerating(true);
+    setPdfError('');
     try {
       const base64 = await generatePDFBase64({
         docNumber,
@@ -104,6 +106,7 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
       setPdfGenerated(true);
     } catch (err) {
       logger.error('PDF generation failed:', { error: String(err) });
+      setPdfError('Échec de la génération du PDF. Réessayez.');
     } finally {
       setGenerating(false);
     }
@@ -351,8 +354,11 @@ export function StepReviewExport({ onBack, editingDocId, onSaved }: StepReviewEx
             boxShadow: '0 4px 20px rgba(37,99,235, 0.35)',
           }}
         >
-          {generating ? 'Génération...' : 'Générer PDF'}
+          {generating ? 'Génération...' : pdfError ? 'Réessayer' : 'Générer PDF'}
         </motion.button>
+      )}
+      {pdfError && !pdfGenerated && (
+        <p className="text-xs text-red-400 text-center -mt-2">{pdfError}</p>
       )}
 
       {/* Share options (shown after PDF generation) */}
