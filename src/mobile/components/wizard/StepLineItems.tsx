@@ -172,7 +172,7 @@ export function StepLineItems({ documentType }: StepLineItemsProps) {
               {/* Index */}
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                style={{ background: 'rgba(37,99,235, 0.15)', color: 'var(--green-2)' }}
+                style={{ background: 'var(--blue-bg)', color: 'var(--green-2)' }}
               >
                 {index + 1}
               </div>

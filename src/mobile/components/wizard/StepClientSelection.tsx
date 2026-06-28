@@ -133,7 +133,7 @@ export function StepClientSelection({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-2 p-3 rounded-xl bg-[rgba(37,99,235,0.12)] border border-[rgba(37,99,235,0.25)]"
+            className="flex items-center gap-2 p-3 rounded-xl bg-[var(--blue-bg)] border border-[var(--accent-ring)]"
           >
             <User size={16} className="text-[var(--green-3)] flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -173,7 +173,7 @@ export function StepClientSelection({
       <div className="relative">
         <Search
           size={18}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
+          className="absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
         />
         <input
           type="text"
@@ -181,7 +181,7 @@ export function StepClientSelection({
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un client..."
           className={cn(
-            'w-full h-12 pl-10 pr-4 rounded-xl',
+            'w-full h-12 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 rounded-xl',
             'bg-[var(--navy-2)] border border-[var(--border)]',
             'text-sm text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
             'focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]',

@@ -137,7 +137,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               )}
             >
               {/* Document type icon */}
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[rgba(37,99,235,0.12)]">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[var(--blue-bg)]">
                 <Icon size={18} strokeWidth={1.8} className="text-[var(--green-3)]" />
               </div>
 

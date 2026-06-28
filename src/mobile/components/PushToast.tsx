@@ -85,7 +85,7 @@ export function PushToast({ toast, onDismiss, onTap }: PushToastProps) {
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onDismiss(); }}
-              className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 flex-shrink-0 mt-0.5"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 flex-shrink-0"
               aria-label="Fermer"
             >
               <X size={12} className="text-white/60" />

@@ -119,7 +119,8 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
           <h1 className="text-xl font-bold text-[var(--sand)]">Société</h1>
           {isSetup && (
             <button type="button"               onClick={() => setIsEditing(!isEditing)}
-              className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
+              aria-label={isEditing ? 'Annuler la modification' : 'Modifier la société'}
             >
               {isEditing ? <X size={18} /> : <Pencil size={18} />}
             </button>
@@ -223,7 +224,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                       'border transition-colors',
                       errors[field]
                         ? 'border-red-400/50 focus:border-red-400'
-                        : 'border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]',
+                        : 'border-[var(--border)] focus:border-[var(--green-2)]',
                     )}
                   />
                 ) : (
@@ -259,8 +260,8 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[rgba(37,99,235,0.1)] flex items-center justify-center">
-                    <Users size={18} className="text-[#1D4ED8]" />
+                  <div className="w-10 h-10 rounded-xl bg-[var(--blue-bg)] flex items-center justify-center">
+                    <Users size={18} className="text-[var(--green-3)]" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-semibold text-[var(--sand)]">Gérer les clients</p>
@@ -269,7 +270,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                     </p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-[var(--sand-muted)]" />
+                <ChevronRight size={16} className="text-[var(--sand-muted)] rtl:rotate-180" />
               </button>
             )}
 

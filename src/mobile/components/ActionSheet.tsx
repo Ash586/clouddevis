@@ -98,15 +98,10 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
             exit={{ y: '100%' }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
           >
-            <div
-              className="bg-[var(--navy-1)] rounded-t-3xl overflow-hidden"
-              style={{
-                borderTop: '1px solid rgba(245, 237, 214, 0.08)',
-              }}
-            >
+            <div className="bg-[var(--navy-2)] rounded-t-3xl overflow-hidden border-t border-[var(--border)]">
               {/* ── Handle bar ─────────────────────────────────── */}
               <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 rounded-full bg-[rgba(15,39,71,0.2)]" />
+                <div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" />
               </div>
 
               {/* ── Document info header ───────────────────────── */}
@@ -120,7 +115,8 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
                   </p>
                 </div>
                 <button type="button"                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-[var(--navy-3)] flex items-center justify-center active:scale-95 transition-transform"
+                  className="w-10 h-10 rounded-full bg-[var(--navy-3)] flex items-center justify-center active:scale-95 transition-transform"
+                  aria-label="Fermer"
                 >
                   <X size={16} className="text-[var(--sand-muted)]" />
                 </button>

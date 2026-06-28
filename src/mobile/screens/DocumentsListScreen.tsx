@@ -216,16 +216,18 @@ export function DocumentsListScreen({
           <div className="flex items-center gap-2">
             <button type="button"               onClick={() => setShowSearch(!showSearch)}
               className={cn(
-                'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
+                'w-11 h-11 rounded-xl flex items-center justify-center transition-colors',
                 showSearch
                   ? 'bg-[var(--green-2)] text-white'
                   : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
               )}
+              aria-label={showSearch ? 'Fermer la recherche' : 'Rechercher'}
             >
               {showSearch ? <X size={18} /> : <Search size={18} />}
             </button>
             <button type="button"               onClick={onNewDocument}
-              className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
+              aria-label="Nouveau document"
             >
               <FilePlus size={18} />
             </button>
@@ -245,7 +247,7 @@ export function DocumentsListScreen({
               <div className="relative mb-3">
                 <Search
                   size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
+                  className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
                 />
                 <input
                   type="text"
@@ -253,10 +255,10 @@ export function DocumentsListScreen({
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Rechercher un client, NIF, numéro..."
                   className={cn(
-                    'w-full pl-10 pr-4 py-2.5 rounded-xl text-sm',
+                    'w-full ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 py-2.5 rounded-xl text-sm',
                     'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
                     'border border-[var(--border)]',
-                    'focus:outline-none focus:border-[rgba(37,99,235,0.3)]',
+                    'focus:outline-none focus:border-[var(--green-2)]',
                   )}
                   autoFocus
                 />

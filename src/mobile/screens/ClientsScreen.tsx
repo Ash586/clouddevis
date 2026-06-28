@@ -61,7 +61,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.name}
           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
           placeholder="Nom du client"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>
       <div>
@@ -71,7 +71,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.nif}
           onChange={(e) => setForm((p) => ({ ...p, nif: e.target.value }))}
           placeholder="123456789012345"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>
       <div>
@@ -81,7 +81,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.phone}
           onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
           placeholder="0555 12 34 56"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>
       <div>
@@ -91,7 +91,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
           placeholder="client@example.com"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>
       <div>
@@ -101,7 +101,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.address}
           onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
           placeholder="123 Rue Principale, Alger"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[rgba(37,99,235,0.3)]"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>
       <div className="flex gap-2 pt-2">
@@ -183,10 +183,10 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
           <div className="flex items-center gap-3">
             {onBack && (
               <button type="button"                 onClick={onBack}
-                className="w-10 h-10 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
+                className="w-11 h-11 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
                 aria-label="Retour"
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={18} className="rtl:rotate-180" />
               </button>
             )}
             <div>
@@ -200,7 +200,8 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               setEditingClient(null);
               setShowForm(true);
             }}
-            className="w-10 h-10 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
+            className="w-11 h-11 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
+            aria-label="Ajouter un client"
           >
             <UserPlus size={18} />
           </button>
@@ -210,7 +211,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
+            className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
           />
           <input
             type="text"
@@ -218,10 +219,10 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher un client..."
             className={cn(
-              'w-full pl-10 pr-4 py-2.5 rounded-xl text-sm',
+              'w-full ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 py-2.5 rounded-xl text-sm',
               'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
               'border border-[var(--border)]',
-              'focus:outline-none focus:border-[rgba(37,99,235,0.3)]',
+              'focus:outline-none focus:border-[var(--green-2)]',
             )}
           />
         </div>

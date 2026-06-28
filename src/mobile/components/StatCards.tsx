@@ -46,7 +46,7 @@ function StatCard({ icon, iconBg, label, value, sub, delay, loading }: CardProps
       </div>
 
       {loading ? (
-        <div className="h-7 w-14 rounded-lg bg-[rgba(255,255,255,0.06)] animate-pulse" />
+        <div className="h-7 w-14 rounded-lg bg-[var(--navy-3)] animate-pulse" />
       ) : (
         <p
           className="heading text-[22px] text-[var(--sand)] leading-none"
@@ -71,7 +71,7 @@ export function StatCards({ stats, loading }: StatCardsProps) {
   const cards: Omit<CardProps, 'loading'>[] = [
     {
       icon: <FileText size={16} strokeWidth={2} className="text-[var(--green-3)]" />,
-      iconBg: 'bg-[rgba(37,99,235,0.12)]',
+      iconBg: 'bg-[var(--blue-bg)]',
       label: 'Ce mois',
       value: String(stats.monthDocs),
       sub: 'documents créés',

@@ -41,7 +41,7 @@ export function HomeHeader({
         {/* Notification bell */}
         <button type="button"           onClick={onNotificationTap}
           className={cn(
-            'relative w-10 h-10 rounded-full flex items-center justify-center',
+            'relative w-11 h-11 rounded-full flex items-center justify-center',
             'bg-[var(--navy-3)] text-[var(--sand-muted)]',
             'active:scale-95 transition-transform',
           )}
@@ -64,7 +64,7 @@ export function HomeHeader({
           className={cn(
             'w-10 h-10 rounded-full flex items-center justify-center',
             'text-sm font-bold text-white',
-            'bg-gradient-to-br from-[var(--green-2)] to-[#0EA5E9]',
+            'bg-gradient-to-br from-[var(--green-2)] to-[var(--teal)]',
           )}
         >
           {userInitials}
