@@ -33,18 +33,16 @@ export { OfflineBanner } from './components/OfflineBanner';
 
 // ── Screens ───────────────────────────────────────────────────
 export { HomeScreen } from './screens/HomeScreen';
-export { WizardScreen } from './screens/WizardScreen';
+export { CreateScreen } from './screens/CreateScreen';
 export { DocumentsListScreen } from './screens/DocumentsListScreen';
 export { CompanyProfileScreen } from './screens/CompanyProfileScreen';
 export { ClientsScreen } from './screens/ClientsScreen';
 export { SettingsScreen } from './screens/SettingsScreen';
 
-// ── Wizard Steps ──────────────────────────────────────────────
-export { WizardProgress } from './components/wizard/WizardProgress';
-export { StepTypeSelection } from './components/wizard/StepTypeSelection';
-export { StepClientSelection } from './components/wizard/StepClientSelection';
-export { StepLineItems } from './components/wizard/StepLineItems';
-export { StepReviewExport } from './components/wizard/StepReviewExport';
+// ── Document creation (FlashFacture single-canvas) ────────────
+export { LivePaper } from './components/create/LivePaper';
+export { CreateDock } from './components/create/CreateDock';
+export type { DockMode, CatalogItem } from './components/create/CreateDock';
 
 // ── Lib ──────────────────────────────────────────────────────
 export { initDatabase, getDB, saveClient, searchClients, saveDocument, getDocuments, getUnsyncedDocuments, markSynced } from './lib/sqlite';

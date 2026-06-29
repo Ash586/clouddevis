@@ -24,7 +24,7 @@ import { DocumentsListScreen } from '../screens/DocumentsListScreen';
 import { CompanyProfileScreen } from '../screens/CompanyProfileScreen';
 import { ClientsScreen } from '../screens/ClientsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
-import { WizardScreen } from '../screens/WizardScreen';
+import { CreateScreen } from '../screens/CreateScreen';
 import type { Document } from '@/mobile/types';
 
 // ── Company sub-views ────────────────────────────────────────
@@ -239,11 +239,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       {/* Bottom tab bar */}
       <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
-      {/* ── Wizard overlay ─────────────────────────────────── */}
+      {/* ── Create overlay (FlashFacture single-canvas) ──────── */}
       <AnimatePresence>
         {showWizard && (
           <motion.div
-            key="wizard-overlay"
+            key="create-overlay"
             variants={overlayVariants}
             initial="enter"
             animate="center"
@@ -251,8 +251,8 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-[60] bg-[var(--navy)]"
           >
-            {/* Wizard handles its own back/exit button */}
-            <WizardScreen
+            {/* CreateScreen handles its own back/exit button */}
+            <CreateScreen
               onExit={handleWizardClose}
               editingDocId={editingDocId ?? undefined}
             />
