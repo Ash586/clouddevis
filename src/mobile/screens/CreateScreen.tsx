@@ -29,6 +29,10 @@ import { DocumentPreview } from '@/mobile/components/create/DocumentPreview';
 import { DOCUMENT_TYPE_LABELS } from '@/mobile/types';
 import type { DocumentType, Client, LineItem, PaymentMode } from '@/mobile/types';
 
+const PAYMENT_LABEL: Record<string, string> = {
+  especes: 'Espèces', cheque: 'Chèque', virement: 'Virement', cb: 'Carte bancaire',
+};
+
 interface CreateScreenProps {
   editingDocId?: string;
   onExit?: () => void;
@@ -154,14 +158,17 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
         clientNif: currentDoc.client?.nif,
         clientRc: currentDoc.client?.rc,
         clientNis: currentDoc.client?.nis,
+        clientAi: currentDoc.client?.ai,
         items: currentDoc.items.map((it) => ({
           designation: it.label, code: it.code, quantity: it.quantity, unit: it.unit,
-          unitPrice: it.unitPrice, tvaRate: it.tvaRate, total: it.totalHT,
+          unitPrice: it.unitPrice, tvaRate: it.tvaRate, remise: it.remise, total: it.totalHT,
         })),
         subTotalHT: totals.subTotalHT,
         tvaAmount: totals.totalTVA,
         timbreFiscal: totals.timbreAmount,
         totalTTC: totals.totalTTC,
+        netAPayer: totals.netAPayer,
+        acompte: currentDoc.acompte || undefined,
         totalInWords: numberToFrenchWords(totals.netAPayer),
         companyName: company?.name,
         companyAddress: company?.address,
@@ -171,11 +178,17 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
         companyAi: company?.ai,
         companyActivity: company?.activity,
         companyCapital: company?.capital,
+        companyPhone: company?.phone,
+        companyFax: company?.fax,
+        companyEmail: company?.email,
         companyRib: company?.rib,
         companyCcp: company?.ccp,
         companyBank: company?.bankName,
+        companyLogo: company?.logo,
+        companySignature: company?.signature,
         reference: currentDoc.reference || undefined,
         objet: currentDoc.objet || undefined,
+        paymentMode: PAYMENT_LABEL[currentDoc.paymentMode] ?? currentDoc.paymentMode,
         date: new Date().toISOString().split('T')[0],
         notes: currentDoc.notes,
       });

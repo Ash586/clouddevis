@@ -11,9 +11,15 @@ export interface PDFCompany {
   nis: string;
   ai?: string;
   phone?: string;
+  fax?: string;
+  email?: string;
   address: string;
   logo?: string;        // Base64 data URL
   capital?: string;
+  activity?: string;    // Activité / tagline
+  rib?: string;
+  ccp?: string;
+  bankName?: string;
   signature?: string;   // Base64 data URL
 }
 
@@ -23,6 +29,7 @@ export interface PDFClient {
   nif?: string;
   rc?: string;
   nis?: string;
+  ai?: string;
   phone?: string;
   email?: string;
   address?: string;
@@ -31,10 +38,12 @@ export interface PDFClient {
 /** Line item for PDF table */
 export interface PDFLineItem {
   label: string;
+  code?: string;
   quantity: number;
   unit: string;
   unitPrice: number;
   tvaRate: number;
+  remise?: number;      // per-line discount %
   totalHT: number;
 }
 
@@ -65,6 +74,12 @@ export interface PDFDocumentData {
 
   // Formatting
   totalInWords: string;
+
+  // Optional document fields
+  objet?: string;
+  paymentMode?: string;   // already-localized label, e.g. "Virement"
+  acompte?: number;
+  netAPayer?: number;
 
   // Settings
   language: 'FR' | 'AR' | 'EN';

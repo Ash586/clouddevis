@@ -1,330 +1,125 @@
 import React from 'react';
-import { Document, Page, View, Text, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, View, Text, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import type { PDFDocumentData } from '../types';
 
+// Keep words whole — no mid-word hyphenation (e.g. "gas-troscope").
+Font.registerHyphenationCallback((word) => [word]);
+
 const COLORS = {
-  primary: '#0B3D2E',
-  primaryLight: '#1A5C47',
+  primary: '#2563EB',      // brand blue
+  primaryDark: '#1E40AF',
   white: '#FFFFFF',
-  text: '#1F2937',
-  textLight: '#6B7280',
-  border: '#E5E7EB',
-  bgLight: '#F9FAFB',
-  stampRed: '#DC2626',
-  timbreAmber: '#D97706',
-  gold: '#D4A843',
+  text: '#0F2747',
+  textLight: '#5A6B85',
+  border: '#E5E9F0',
+  bgLight: '#F3F6FC',
+  timbreAmber: '#C77D11',
+  gold: '#B4924C',
 };
 
-function formatDA(n: number): string {
-  return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' DA';
-}
+const NBSP = ' ';
 
+/** Locale-independent money format: "43 500,00" (space group, comma decimals). */
+function formatNum(n: number): string {
+  const neg = n < 0;
+  const [int, dec] = Math.abs(n).toFixed(2).split('.');
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, NBSP);
+  return (neg ? '-' : '') + grouped + ',' + dec;
+}
+function formatDA(n: number): string {
+  return formatNum(n) + NBSP + 'DA';
+}
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
+function joinDot(parts: Array<string | undefined | false>): string {
+  return parts.filter(Boolean).join('     ');
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  DEVIS: 'Devis', FACTURE: 'Facture', PROFORMA: 'Facture Proforma',
+  BC: 'Bon de Commande', BR: 'Bon de Réception',
+};
+
+/** "Arrêté(e) … à la somme de" framing per document type. */
+function wordsPrefix(type: string): string {
+  if (type === 'FACTURE') return 'Arrêtée la présente facture à la somme de';
+  if (type === 'DEVIS') return 'Arrêté le présent devis à la somme de';
+  return `Arrêté le présent ${(TYPE_LABELS[type] || 'document').toLowerCase()} à la somme de`;
+}
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontSize: 9,
-    fontFamily: 'Helvetica',
-    color: COLORS.text,
-    lineHeight: 1.4,
-    position: 'relative',
-  },
+  page: { paddingTop: 32, paddingHorizontal: 36, paddingBottom: 40, fontSize: 9, fontFamily: 'Helvetica', color: COLORS.text, lineHeight: 1.4 },
+  stripe: { height: 3, backgroundColor: COLORS.primary, marginHorizontal: -36, marginTop: -32, marginBottom: 14 },
 
-  // Watermark
-  watermarkContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: -1,
-  },
-  watermarkText: {
-    fontSize: 80,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.border,
-    opacity: 0.15,
-    transform: 'rotate(-45deg)',
-    textTransform: 'uppercase',
-  },
+  watermarkContainer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', zIndex: -1 },
+  watermarkText: { fontSize: 90, fontFamily: 'Helvetica-Bold', color: COLORS.border, opacity: 0.18, transform: 'rotate(-45deg)', textTransform: 'uppercase' },
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingBottom: 15,
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  companyName: {
-    fontSize: 16,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.primary,
-    marginBottom: 2,
-  },
-  companyTagline: {
-    fontSize: 8,
-    color: COLORS.textLight,
-    marginBottom: 2,
-    fontStyle: 'italic',
-  },
-  companyAddress: {
-    fontSize: 8,
-    color: COLORS.textLight,
-    marginBottom: 2,
-  },
-  companyCapital: {
-    fontSize: 7,
-    color: COLORS.textLight,
-    marginTop: 2,
-  },
-  companyTaxIds: {
-    fontSize: 7,
-    color: COLORS.textLight,
-    marginTop: 4,
-  },
-  logo: {
-    width: 70,
-    height: 70,
-    objectFit: 'contain',
-  },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  companyName: { fontSize: 15, fontFamily: 'Helvetica-Bold', color: COLORS.text },
+  companyActivity: { fontSize: 8, color: COLORS.textLight, fontStyle: 'italic', marginTop: 1 },
+  companyLine: { fontSize: 8, color: COLORS.text, marginTop: 2 },
+  companyMuted: { fontSize: 7.5, color: COLORS.textLight, marginTop: 1 },
+  logo: { width: 64, height: 64, objectFit: 'contain' },
 
-  // Document Title
-  titleSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  docTitle: {
-    fontSize: 20,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.primary,
-    textTransform: 'uppercase',
-  },
-  docMeta: {
-    alignItems: 'flex-end',
-  },
-  docNumber: {
-    fontSize: 10,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.text,
-  },
-  docDate: {
-    fontSize: 8,
-    color: COLORS.textLight,
-    marginTop: 2,
-  },
+  fiscalBand: { marginTop: 8, paddingTop: 6, borderTopWidth: 0.5, borderTopColor: COLORS.border },
+  fiscalText: { fontSize: 7.5, color: COLORS.textLight },
 
-  // Client Block
-  clientSection: {
-    backgroundColor: COLORS.bgLight,
-    borderRadius: 4,
-    padding: 12,
-    marginBottom: 20,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
-  },
-  clientLabel: {
-    fontSize: 7,
-    color: COLORS.textLight,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  clientName: {
-    fontSize: 11,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.text,
-    marginBottom: 2,
-  },
-  clientDetail: {
-    fontSize: 8,
-    color: COLORS.textLight,
-  },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16 },
+  docKicker: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.primary, textTransform: 'uppercase', letterSpacing: 0.5 },
+  docNumber: { fontSize: 17, fontFamily: 'Helvetica-Bold', color: COLORS.text },
+  docMeta: { fontSize: 8, color: COLORS.textLight, textAlign: 'right' },
 
-  // Items Table
-  table: {
-    marginBottom: 20,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.primary,
-    padding: 8,
-    borderRadius: 4,
-  },
-  tableHeaderText: {
-    fontSize: 7,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.white,
-    textTransform: 'uppercase',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.border,
-  },
-  tableRowAlt: {
-    backgroundColor: COLORS.bgLight,
-  },
-  colNum: { width: '6%', fontSize: 8, textAlign: 'center', color: COLORS.textLight },
-  colLabel: { width: '36%', fontSize: 8 },
-  colQty: { width: '9%', fontSize: 8, textAlign: 'center' },
-  colUnit: { width: '9%', fontSize: 8, textAlign: 'center' },
-  colPrice: { width: '16%', fontSize: 8, textAlign: 'right' },
-  colTotal: { width: '24%', fontSize: 8, textAlign: 'right', fontFamily: 'Helvetica-Bold' },
+  clientSection: { backgroundColor: COLORS.bgLight, borderRadius: 4, padding: 10, marginTop: 12, borderLeftWidth: 3, borderLeftColor: COLORS.primary },
+  clientLabel: { fontSize: 7, color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 },
+  clientName: { fontSize: 11, fontFamily: 'Helvetica-Bold', color: COLORS.text },
+  clientDetail: { fontSize: 8, color: COLORS.textLight, marginTop: 1 },
 
-  // RIB Block
-  ribBlock: {
-    marginBottom: 15,
-    padding: 12,
-    backgroundColor: COLORS.bgLight,
-    borderRadius: 4,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.gold,
-  },
-  ribTitle: {
-    fontSize: 8,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.primary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 6,
-  },
-  ribRow: {
-    flexDirection: 'row',
-    marginBottom: 2,
-  },
-  ribLabel: {
-    fontSize: 8,
-    color: COLORS.textLight,
-    width: 80,
-  },
-  ribValue: {
-    fontSize: 8,
-    color: COLORS.text,
-    fontFamily: 'Helvetica-Bold',
-  },
+  objetBlock: { marginTop: 10 },
+  objetText: { fontSize: 9, color: COLORS.text },
+  objetLabel: { fontFamily: 'Helvetica-Bold' },
 
-  // Validity Banner
-  validityBanner: {
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 4,
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.timbreAmber,
-  },
-  validityText: {
-    fontSize: 9,
-    color: COLORS.text,
-    fontFamily: 'Helvetica-Bold',
-  },
+  table: { marginTop: 12 },
+  tableHeader: { flexDirection: 'row', backgroundColor: COLORS.primary, paddingVertical: 6, paddingHorizontal: 6, borderRadius: 3 },
+  th: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: COLORS.white, textTransform: 'uppercase' },
+  tableRow: { flexDirection: 'row', paddingVertical: 6, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: COLORS.border },
+  tableRowAlt: { backgroundColor: COLORS.bgLight },
+  cNum: { width: '5%', fontSize: 8, textAlign: 'center', color: COLORS.textLight },
+  cLabel: { width: '29%', fontSize: 8 },
+  cQty: { width: '7%', fontSize: 8, textAlign: 'center' },
+  cUnit: { width: '8%', fontSize: 8, textAlign: 'center' },
+  cPrice: { width: '15%', fontSize: 8, textAlign: 'right' },
+  cRem: { width: '8%', fontSize: 8, textAlign: 'right' },
+  cTotal: { width: '18%', fontSize: 8, textAlign: 'right', fontFamily: 'Helvetica-Bold' },
+  cTva: { width: '10%', fontSize: 8, textAlign: 'right' },
+  codePrefix: { fontFamily: 'Helvetica-Bold', color: COLORS.textLight },
 
-  // Totals
-  totalsSection: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: 20,
-  },
-  totalsBox: {
-    width: '45%',
-  },
-  totalsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  totalsRowTimbre: {
-    backgroundColor: '#FEF3C7',
-    borderRadius: 2,
-  },
-  totalsLabel: {
-    fontSize: 8,
-    color: COLORS.textLight,
-  },
-  totalsValue: {
-    fontSize: 8,
-    fontFamily: 'Helvetica-Bold',
-  },
-  totalsRowTotal: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 4,
-  },
-  totalsRowTotalLabel: {
-    fontSize: 9,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.white,
-  },
-  totalsRowTotalValue: {
-    fontSize: 10,
-    fontFamily: 'Helvetica-Bold',
-    color: COLORS.white,
-  },
+  bottomRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 },
+  bankBox: { width: '52%' },
+  bankTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: COLORS.textLight, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 3 },
+  bankLine: { fontSize: 8, color: COLORS.text },
 
-  // Total in Words
-  wordsSection: {
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: COLORS.bgLight,
-    borderRadius: 4,
-  },
-  wordsLabel: {
-    fontSize: 7,
-    color: COLORS.textLight,
-    textTransform: 'uppercase',
-    marginBottom: 3,
-  },
-  wordsText: {
-    fontSize: 8,
-    fontStyle: 'italic',
-    color: COLORS.text,
-  },
+  totalsBox: { width: '44%' },
+  totalsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3, paddingHorizontal: 8 },
+  totalsRowTimbre: { backgroundColor: '#FBF1DE', borderRadius: 2 },
+  totalsLabel: { fontSize: 8, color: COLORS.textLight },
+  totalsValue: { fontSize: 8, fontFamily: 'Helvetica-Bold' },
+  totalsNet: { backgroundColor: COLORS.primary, borderRadius: 4, marginTop: 2 },
+  totalsNetLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.white },
+  totalsNetValue: { fontSize: 11, fontFamily: 'Helvetica-Bold', color: COLORS.white },
 
-  // Notes
-  notesSection: {
-    marginBottom: 20,
-  },
-  notesLabel: {
-    fontSize: 7,
-    color: COLORS.textLight,
-    textTransform: 'uppercase',
-    marginBottom: 3,
-  },
-  notesText: {
-    fontSize: 8,
-    color: COLORS.text,
-  },
+  words: { marginTop: 12, fontSize: 8.5, fontStyle: 'italic', color: COLORS.text },
 
-  // Footer
-  footer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 40,
-    right: 40,
-    borderTopWidth: 0.5,
-    borderTopColor: COLORS.border,
-    paddingTop: 10,
-  },
-  footerText: {
-    fontSize: 6,
-    color: COLORS.textLight,
-    textAlign: 'center',
-    lineHeight: 1.6,
-  },
+  notes: { marginTop: 10 },
+  notesLabel: { fontSize: 7, color: COLORS.textLight, textTransform: 'uppercase', marginBottom: 2 },
+  notesText: { fontSize: 8, color: COLORS.text },
+
+  signature: { marginTop: 22, flexDirection: 'row', justifyContent: 'flex-end' },
+  signatureBox: { width: 150, alignItems: 'center' },
+  signatureLabel: { fontSize: 8, color: COLORS.textLight, marginBottom: 28 },
+  signatureImg: { height: 44, objectFit: 'contain' },
+  signatureLine: { width: 130, borderTopWidth: 0.5, borderTopColor: COLORS.border },
 });
 
 interface DevisFRTemplateProps {
@@ -332,164 +127,174 @@ interface DevisFRTemplateProps {
 }
 
 export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
+  const c = data.company;
+  const cl = data.client;
+  const rc = c.rc || data.rcNumber;
+  const nis = c.nis || data.nisNumber;
+  const ai = c.ai || data.aiNumber;
+  const activity = c.activity || data.companyTagline;
+  const capital = c.capital || data.companyCapital;
+  const rib = c.rib || data.rib;
+  const ccp = c.ccp || data.ccpNumber;
+  const bank = c.bankName || data.bankName;
+
+  const fiscal = joinDot([
+    rc && `RC : ${rc}`,
+    c.nif && `NIF : ${c.nif}`,
+    nis && `NIS : ${nis}`,
+    ai && `AI : ${ai}`,
+  ]);
+  const contact = joinDot([
+    c.phone && `Tél : ${c.phone}`,
+    c.fax && `Fax : ${c.fax}`,
+    c.email,
+  ]);
+  const net = data.netAPayer ?? (data.totalTTC + (data.timbreFiscal ? data.timbreAmount : 0) - (data.acompte || 0));
+  const typeLabel = TYPE_LABELS[data.type] || 'Document';
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <View style={styles.stripe} />
+
         {data.showWatermark && (
           <View style={styles.watermarkContainer}>
-            <Text style={styles.watermarkText}>DEVIS</Text>
+            <Text style={styles.watermarkText}>{typeLabel}</Text>
           </View>
         )}
 
-        {/* Header */}
+        {/* Letterhead */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.companyName}>{data.company.name}</Text>
-            {data.companyTagline && <Text style={styles.companyTagline}>{data.companyTagline}</Text>}
-            <Text style={styles.companyAddress}>{data.company.address}</Text>
-            {data.companyCapital && <Text style={styles.companyCapital}>Au Capital Social de {data.companyCapital}</Text>}
-            <Text style={styles.companyTaxIds}>
-              NIF: {data.company.nif}
-              {data.rcNumber ? ` | R.C.: ${data.rcNumber}` : ''}
-              {data.nisNumber ? ` | NIS: ${data.nisNumber}` : ''}
-            </Text>
-            {data.aiNumber && <Text style={styles.companyTaxIds}>N°AI: {data.aiNumber}</Text>}
+          <View style={{ flex: 1, paddingRight: 12 }}>
+            <Text style={styles.companyName}>{c.name || ' '}</Text>
+            {activity ? <Text style={styles.companyActivity}>{activity}</Text> : null}
+            {c.address ? <Text style={styles.companyLine}>{c.address}</Text> : null}
+            {capital ? <Text style={styles.companyMuted}>Au capital de {capital}</Text> : null}
+            {contact ? <Text style={styles.companyMuted}>{contact}</Text> : null}
           </View>
-          {data.company.logo && <Image src={data.company.logo} style={styles.logo} />}
+          {c.logo ? <Image src={c.logo} style={styles.logo} /> : null}
         </View>
 
-        {/* Document Title */}
-        <View style={styles.titleSection}>
-          <Text style={styles.docTitle}>DEVIS</Text>
-          <View style={styles.docMeta}>
+        {(fiscal || rib || ccp || bank) ? (
+          <View style={styles.fiscalBand}>
+            {fiscal ? <Text style={styles.fiscalText}>{fiscal}</Text> : null}
+            {(bank || rib || ccp) ? (
+              <Text style={[styles.fiscalText, { marginTop: 1 }]}>
+                {joinDot([bank && `Banque : ${bank}`, rib && `RIB : ${rib}`, ccp && `CCP : ${ccp}`])}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+
+        {/* Title */}
+        <View style={styles.titleRow}>
+          <View>
+            <Text style={styles.docKicker}>{typeLabel}</Text>
             <Text style={styles.docNumber}>{data.number}</Text>
-            {data.reference && <Text style={styles.docDate}>Réf: {data.reference}</Text>}
-            <Text style={styles.docDate}>Date: {formatDate(data.date)}</Text>
-            {data.validUntil && <Text style={styles.docDate}>{`Valide jusqu\u2019au: ${formatDate(data.validUntil)}`}</Text>}
+          </View>
+          <View>
+            <Text style={styles.docMeta}>Date : {formatDate(data.date)}</Text>
+            {data.paymentMode ? <Text style={styles.docMeta}>Mode de paiement : {data.paymentMode}</Text> : null}
+            {data.validUntil ? <Text style={styles.docMeta}>{`Valide jusqu${'’'}au : ${formatDate(data.validUntil)}`}</Text> : null}
           </View>
         </View>
 
-        {/* Client Block */}
+        {/* Client */}
         <View style={styles.clientSection}>
-          <Text style={styles.clientLabel}>Adressé à</Text>
-          <Text style={styles.clientName}>{data.client.name}</Text>
-          {data.client.address && <Text style={styles.clientDetail}>{data.client.address}</Text>}
-          {data.client.nif && <Text style={styles.clientDetail}>NIF: {data.client.nif}</Text>}
-          {data.client.rc && <Text style={styles.clientDetail}>RC: {data.client.rc}</Text>}
-          {data.client.nis && <Text style={styles.clientDetail}>NIS: {data.client.nis}</Text>}
-          {data.client.phone && <Text style={styles.clientDetail}>Tél: {data.client.phone}</Text>}
+          <Text style={styles.clientLabel}>Doit</Text>
+          <Text style={styles.clientName}>{cl.name}</Text>
+          {cl.address ? <Text style={styles.clientDetail}>{cl.address}</Text> : null}
+          <Text style={styles.clientDetail}>
+            {joinDot([cl.nif && `NIF : ${cl.nif}`, cl.ai && `AI : ${cl.ai}`, cl.rc && `RC : ${cl.rc}`, cl.nis && `NIS : ${cl.nis}`])}
+          </Text>
         </View>
 
-        {/* Items Table */}
+        {/* Objet / Reference */}
+        {(data.reference || data.objet) ? (
+          <View style={styles.objetBlock}>
+            {data.reference ? <Text style={styles.objetText}><Text style={styles.objetLabel}>Référence : </Text>{data.reference}</Text> : null}
+            {data.objet ? <Text style={[styles.objetText, { marginTop: 1 }]}><Text style={styles.objetLabel}>Objet : </Text>{data.objet}</Text> : null}
+          </View>
+        ) : null}
+
+        {/* Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderText, styles.colNum]}>N°</Text>
-            <Text style={[styles.tableHeaderText, styles.colLabel]}>Désignation</Text>
-            <Text style={[styles.tableHeaderText, styles.colQty]}>Qté</Text>
-            <Text style={[styles.tableHeaderText, styles.colUnit]}>Unité</Text>
-            <Text style={[styles.tableHeaderText, styles.colPrice]}>Prix Unit. HT</Text>
-            <Text style={[styles.tableHeaderText, styles.colTotal]}>Montant HT</Text>
+            <Text style={[styles.th, styles.cNum]}>N°</Text>
+            <Text style={[styles.th, styles.cLabel]}>Désignation</Text>
+            <Text style={[styles.th, styles.cQty]}>Qté</Text>
+            <Text style={[styles.th, styles.cUnit]}>Unité</Text>
+            <Text style={[styles.th, styles.cPrice]}>P.U HT</Text>
+            <Text style={[styles.th, styles.cRem]}>Rem.</Text>
+            <Text style={[styles.th, styles.cTotal]}>Montant HT</Text>
+            <Text style={[styles.th, styles.cTva]}>TVA</Text>
           </View>
           {data.items.map((item, index) => (
-            <View
-              key={index}
-              style={index % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}
-            >
-              <Text style={styles.colNum}>{index + 1}</Text>
-              <Text style={styles.colLabel}>{item.label}</Text>
-              <Text style={styles.colQty}>{item.quantity}</Text>
-              <Text style={styles.colUnit}>{item.unit}</Text>
-              <Text style={styles.colPrice}>{formatDA(item.unitPrice)}</Text>
-              <Text style={styles.colTotal}>{formatDA(item.totalHT)}</Text>
+            <View key={index} style={index % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
+              <Text style={styles.cNum}>{index + 1}</Text>
+              <Text style={styles.cLabel}>
+                {item.code ? <Text style={styles.codePrefix}>{item.code} · </Text> : null}
+                {item.label}
+              </Text>
+              <Text style={styles.cQty}>{item.quantity}</Text>
+              <Text style={styles.cUnit}>{item.unit}</Text>
+              <Text style={styles.cPrice}>{formatNum(item.unitPrice)}</Text>
+              <Text style={styles.cRem}>{item.remise ? `${item.remise}%` : '—'}</Text>
+              <Text style={styles.cTotal}>{formatNum(item.totalHT)}</Text>
+              <Text style={styles.cTva}>{item.tvaRate}%</Text>
             </View>
           ))}
         </View>
 
-        {/* RIB Block */}
-        {data.rib && (
-          <View style={styles.ribBlock}>
-            <Text style={styles.ribTitle}>RIB</Text>
-            <View style={styles.ribRow}>
-              <Text style={styles.ribLabel}>RIB:</Text>
-              <Text style={styles.ribValue}>{data.rib}</Text>
-            </View>
-            {data.bankName && (
-              <View style={styles.ribRow}>
-                <Text style={styles.ribLabel}>Banque:</Text>
-                <Text style={styles.ribValue}>{data.bankName}</Text>
-              </View>
-            )}
-            {data.bankAgency && (
-              <View style={styles.ribRow}>
-                <Text style={styles.ribLabel}>Agence:</Text>
-                <Text style={styles.ribValue}>{data.bankAgency}</Text>
-              </View>
-            )}
-            {data.ccpNumber && (
-              <View style={styles.ribRow}>
-                <Text style={styles.ribLabel}>CCP:</Text>
-                <Text style={styles.ribValue}>{data.ccpNumber}</Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* Validity Banner */}
-        {data.validityDays && (
-          <View style={styles.validityBanner}>
-            <Text style={styles.validityText}>
-              {`Ce devis est valable ${data.validityDays} jours à compter de la date d'émission.`}
-            </Text>
-          </View>
-        )}
-
         {/* Totals */}
-        <View style={styles.totalsSection}>
+        <View style={styles.bottomRow}>
           <View style={styles.totalsBox}>
             <View style={styles.totalsRow}>
-              <Text style={styles.totalsLabel}>Sous-total HT</Text>
+              <Text style={styles.totalsLabel}>Total HT</Text>
               <Text style={styles.totalsValue}>{formatDA(data.totalHT)}</Text>
             </View>
             <View style={styles.totalsRow}>
               <Text style={styles.totalsLabel}>TVA</Text>
               <Text style={styles.totalsValue}>{formatDA(data.totalTVA)}</Text>
             </View>
-            {data.timbreFiscal && (
+            {data.timbreFiscal ? (
               <View style={[styles.totalsRow, styles.totalsRowTimbre]}>
-                <Text style={styles.totalsLabel}>Timbre fiscal (Art. 220)</Text>
-                <Text style={[styles.totalsValue, { color: COLORS.timbreAmber }]}>
-                  {formatDA(data.timbreAmount)}
-                </Text>
+                <Text style={styles.totalsLabel}>Timbre fiscal</Text>
+                <Text style={[styles.totalsValue, { color: COLORS.timbreAmber }]}>{formatDA(data.timbreAmount)}</Text>
               </View>
-            )}
-            <View style={[styles.totalsRow, styles.totalsRowTotal]}>
-              <Text style={styles.totalsRowTotalLabel}>Total TTC</Text>
-              <Text style={styles.totalsRowTotalValue}>{formatDA(data.totalTTC)}</Text>
+            ) : null}
+            {data.acompte ? (
+              <View style={styles.totalsRow}>
+                <Text style={styles.totalsLabel}>Acompte</Text>
+                <Text style={styles.totalsValue}>- {formatDA(data.acompte)}</Text>
+              </View>
+            ) : null}
+            <View style={[styles.totalsRow, styles.totalsNet]}>
+              <Text style={styles.totalsNetLabel}>Net à payer</Text>
+              <Text style={styles.totalsNetValue}>{formatDA(net)}</Text>
             </View>
           </View>
         </View>
 
-        {/* Total in Words */}
-        <View style={styles.wordsSection}>
-          <Text style={styles.wordsLabel}>Montant en lettres</Text>
-          <Text style={styles.wordsText}>{data.totalInWords}</Text>
-        </View>
+        {/* Amount in words */}
+        <Text style={styles.words}>
+          {`${wordsPrefix(data.type)} : ${data.totalInWords}.`}
+        </Text>
 
         {/* Notes */}
-        {data.notes && (
-          <View style={styles.notesSection}>
+        {data.notes ? (
+          <View style={styles.notes}>
             <Text style={styles.notesLabel}>Notes</Text>
             <Text style={styles.notesText}>{data.notes}</Text>
           </View>
-        )}
+        ) : null}
 
-        {/* Footer */}
-        <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>
-            CloudDevis — Générez vos devis et factures en quelques clics{'\n'}
-            www.clouddevis.vercel.app{'\n'}
-            Mentions légales : Ce document est établi conformément à la réglementation algérienne en vigueur.
-          </Text>
+        {/* Signature */}
+        <View style={styles.signature}>
+          <View style={styles.signatureBox}>
+            <Text style={styles.signatureLabel}>Cachet et signature</Text>
+            {c.signature ? <Image src={c.signature} style={styles.signatureImg} /> : <View style={styles.signatureLine} />}
+          </View>
         </View>
       </Page>
     </Document>

@@ -24,6 +24,8 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
     dueDate: doc.dueDate,
     validUntil: doc.validUntil,
     notes: doc.notes,
+    objet: doc.objet,
+    acompte: doc.acompte,
     company: {
       name: doc.company.name,
       nif: doc.company.nif,
@@ -31,9 +33,15 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
       nis: doc.company.nis,
       ai: doc.company.ai,
       phone: doc.company.phone,
+      fax: doc.company.fax,
+      email: doc.company.email,
       address: doc.company.address,
       logo: doc.company.logo,
       capital: doc.company.capital,
+      activity: doc.company.activity,
+      rib: doc.company.rib,
+      ccp: doc.company.ccp,
+      bankName: doc.company.bankName,
       signature: doc.company.signature,
     },
     client: {
@@ -41,16 +49,19 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
       nif: doc.client.nif,
       rc: doc.client.rc,
       nis: doc.client.nis,
+      ai: doc.client.ai,
       phone: doc.client.phone,
       email: doc.client.email,
       address: doc.client.address,
     },
     items: doc.items.map((item) => ({
       label: item.label,
+      code: item.code,
       quantity: item.quantity,
       unit: item.unit,
       unitPrice: item.unitPrice,
       tvaRate: item.tvaRate,
+      remise: item.remise,
       totalHT: item.totalHT,
     })),
     totalHT: doc.totalHT,
@@ -94,6 +105,7 @@ export async function generatePDFBase64(options: {
   clientNif?: string;
   clientRc?: string;
   clientNis?: string;
+  clientAi?: string;
   items: Array<{
     designation: string;
     code?: string;
@@ -101,12 +113,15 @@ export async function generatePDFBase64(options: {
     unit: string;
     unitPrice: number;
     tvaRate?: 0 | 9 | 19;
+    remise?: number;
     total: number;
   }>;
   subTotalHT: number;
   tvaAmount: number;
   timbreFiscal: number;
   totalTTC: number;
+  netAPayer?: number;
+  acompte?: number;
   totalInWords: string;
   companyName?: string;
   companyAddress?: string;
@@ -116,50 +131,62 @@ export async function generatePDFBase64(options: {
   companyAi?: string;
   companyActivity?: string;
   companyCapital?: string;
+  companyPhone?: string;
+  companyFax?: string;
+  companyEmail?: string;
   companyRib?: string;
   companyCcp?: string;
   companyBank?: string;
+  companyLogo?: string;
+  companySignature?: string;
   reference?: string;
   objet?: string;
+  paymentMode?: string;
   date?: string;
   notes?: string;
 }): Promise<string> {
-  const notes = options.objet
-    ? `Objet : ${options.objet}${options.notes ? `\n${options.notes}` : ''}`
-    : options.notes;
-
   const pdfData: PDFDocumentData = {
     type: (options.docType.toUpperCase() as PDFDocumentData['type']) || 'FACTURE',
     number: options.docNumber,
     date: options.date || new Date().toISOString().split('T')[0],
-    notes,
+    notes: options.notes,
+    objet: options.objet,
     reference: options.reference,
+    paymentMode: options.paymentMode,
     company: {
       name: options.companyName || '',
       nif: options.companyNif || '',
       rc: options.companyRc || '',
       nis: options.companyNis || '',
       ai: options.companyAi,
+      phone: options.companyPhone,
+      fax: options.companyFax,
+      email: options.companyEmail,
       address: options.companyAddress || '',
+      capital: options.companyCapital,
+      activity: options.companyActivity,
+      rib: options.companyRib,
+      ccp: options.companyCcp,
+      bankName: options.companyBank,
+      logo: options.companyLogo,
+      signature: options.companySignature,
     },
-    companyTagline: options.companyActivity,
-    companyCapital: options.companyCapital,
-    rib: options.companyRib,
-    bankName: options.companyBank,
-    ccpNumber: options.companyCcp,
     client: {
       name: options.clientName,
       address: options.clientAddress,
       nif: options.clientNif,
       rc: options.clientRc,
       nis: options.clientNis,
+      ai: options.clientAi,
     },
     items: options.items.map((item) => ({
-      label: item.code ? `${item.code} — ${item.designation}` : item.designation,
+      label: item.designation,
+      code: item.code,
       quantity: item.quantity,
       unit: item.unit,
       unitPrice: item.unitPrice,
       tvaRate: item.tvaRate ?? 19,
+      remise: item.remise,
       totalHT: item.total,
     })),
     totalHT: options.subTotalHT,
@@ -167,6 +194,8 @@ export async function generatePDFBase64(options: {
     timbreFiscal: options.timbreFiscal > 0,
     timbreAmount: options.timbreFiscal,
     totalTTC: options.totalTTC,
+    netAPayer: options.netAPayer,
+    acompte: options.acompte,
     totalInWords: options.totalInWords,
     language: 'FR',
   };
