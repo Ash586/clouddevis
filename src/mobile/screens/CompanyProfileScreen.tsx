@@ -38,13 +38,19 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   // ── Form state ──
   const [form, setForm] = useState({
     name: company?.name || '',
+    activity: company?.activity || '',
     nif: company?.nif || '',
     rc: company?.rc || '',
     nis: company?.nis || '',
     ai: company?.ai || '',
     phone: company?.phone || '',
+    email: company?.email || '',
+    fax: company?.fax || '',
     address: company?.address || '',
     capital: company?.capital || '',
+    rib: company?.rib || '',
+    ccp: company?.ccp || '',
+    bankName: company?.bankName || '',
   });
 
   const handleSave = useCallback(() => {
@@ -203,13 +209,19 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             {/* Form fields */}
             {[
               { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
+              { label: 'Activité (sous le nom)', field: 'activity', placeholder: 'Ex: Importation · Vente · SAV' },
               { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
               { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
               { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
               { label: 'AI', field: 'ai', placeholder: '1234567890' },
               { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
+              { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
+              { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
               { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
-              { label: 'Capital', field: 'capital', placeholder: 'Ex: 100,000 DA' },
+              { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
+              { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
+              { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
+              { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
             ].map(({ label, field, placeholder }) => (
               <div key={field}>
                 <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">

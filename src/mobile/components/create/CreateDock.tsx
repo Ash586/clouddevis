@@ -130,38 +130,59 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
   const removeItem = useDocumentStore((s) => s.removeItem);
   const editing = editingLineId ? items.find((i) => i.id === editingLineId) ?? null : null;
 
+  const [code, setCode] = useState(editing?.code ?? '');
   const [label, setLabel] = useState(editing?.label ?? '');
   const [qty, setQty] = useState(String(editing?.quantity ?? 1));
   const [unit, setUnit] = useState<UnitMeasure>(editing?.unit ?? 'u');
   const [price, setPrice] = useState(editing ? String(editing.unitPrice) : '');
   const [tva, setTva] = useState<0 | 9 | 19>(editing?.tvaRate ?? 19);
+  const [remise, setRemise] = useState(editing?.remise ? String(editing.remise) : '');
 
   const priceNum = parseFloat(price.replace(',', '.')) || 0;
   const qtyNum = parseFloat(qty.replace(',', '.')) || 0;
-  const lineTotal = qtyNum * priceNum;
+  const remiseNum = Math.min(100, Math.max(0, parseFloat(remise.replace(',', '.')) || 0));
+  const lineTotal = qtyNum * priceNum * (1 - remiseNum / 100);
   const canSubmit = label.trim().length > 0 && priceNum > 0 && qtyNum > 0;
 
   function submit() {
     if (!canSubmit) return;
-    const data = { label: label.trim(), quantity: qtyNum, unit, unitPrice: priceNum, tvaRate: tva };
+    const data = {
+      code: code.trim() || undefined,
+      label: label.trim(),
+      quantity: qtyNum,
+      unit,
+      unitPrice: priceNum,
+      tvaRate: tva,
+      remise: remiseNum || undefined,
+    };
     if (editing) {
       updateItem(editing.id, data);
       onDone();
     } else {
       addItem(data);
-      setLabel(''); setQty('1'); setUnit('u'); setPrice(''); setTva(19);
+      setCode(''); setLabel(''); setQty('1'); setUnit('u'); setPrice(''); setTva(19); setRemise('');
     }
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <input
-        type="text"
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        placeholder="Désignation de l'article"
-        className={cn(inputCls, 'w-full')}
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="Code"
+          className={cn(inputCls, 'w-[84px]')}
+          aria-label="Code article"
+        />
+        <input
+          type="text"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder="Désignation de l'article"
+          className={cn(inputCls, 'flex-1')}
+        />
+      </div>
       <div className="flex gap-2">
         <input
           type="text" inputMode="decimal" value={qty}
@@ -204,12 +225,23 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
             </button>
           ))}
         </div>
-        {lineTotal > 0 && (
-          <span className="text-xs font-semibold text-[var(--sand)] whitespace-nowrap min-w-[64px] text-right">
-            {lineTotal.toLocaleString('fr-DZ')} DA
-          </span>
-        )}
+        <div className="relative">
+          <input
+            type="text" inputMode="decimal" value={remise}
+            onChange={(e) => setRemise(e.target.value)}
+            placeholder="Remise"
+            className={cn(inputCls, 'w-[88px] h-9 pr-6 text-center')}
+            aria-label="Remise en pourcentage"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-[var(--sand-muted)]">%</span>
+        </div>
       </div>
+      {lineTotal > 0 && (
+        <div className="flex justify-between text-xs">
+          <span className="text-[var(--sand-muted)]">Total ligne{remiseNum > 0 ? ` (−${remiseNum}%)` : ''}</span>
+          <span className="font-semibold text-[var(--sand)]">{lineTotal.toLocaleString('fr-DZ')} DA</span>
+        </div>
+      )}
       <div className="flex gap-2">
         {editing && (
           <button
@@ -247,7 +279,7 @@ function ClientMode({ onDone }: { onDone: () => void }) {
 
   const [q, setQ] = useState('');
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', nif: '', rc: '' });
+  const [form, setForm] = useState({ name: '', phone: '', nif: '', rc: '', nis: '', ai: '', address: '' });
 
   const list = useMemo(() => (q.trim() ? searchClients(q) : clients.slice(0, 12)), [q, clients, searchClients]);
   const nifState = form.nif.trim() ? validateNIF(form.nif) : null;
@@ -261,6 +293,9 @@ function ClientMode({ onDone }: { onDone: () => void }) {
       phone: form.phone.trim(),
       nif: form.nif.trim() || undefined,
       rc: form.rc.trim() || undefined,
+      nis: form.nis.trim() || undefined,
+      ai: form.ai.trim() || undefined,
+      address: form.address.trim() || undefined,
     });
     setClient(c);
     onDone();
@@ -282,8 +317,16 @@ function ClientMode({ onDone }: { onDone: () => void }) {
             </span>
           )}
         </div>
-        <input className={cn(inputCls, 'w-full')} placeholder="RC (optionnel)" value={form.rc}
-          onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
+        <div className="flex gap-2">
+          <input className={cn(inputCls, 'w-full')} placeholder="RC" value={form.rc}
+            onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
+          <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS" value={form.nis}
+            onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
+          <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI" value={form.ai}
+            onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
+        </div>
+        <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)" value={form.address}
+          onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
         <div className="flex gap-2">
           <button type="button" onClick={() => setCreating(false)}
             className="flex-1 h-11 rounded-xl text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]">
@@ -342,6 +385,8 @@ function DetailsMode() {
   const setValidUntil = useDocumentStore((s) => s.setValidUntil);
   const setLanguage = useDocumentStore((s) => s.setLanguage);
   const setNotes = useDocumentStore((s) => s.setNotes);
+  const setObjet = useDocumentStore((s) => s.setObjet);
+  const setReference = useDocumentStore((s) => s.setReference);
 
   const [acompte, setAcompteLocal] = useState(doc.acompte ? String(doc.acompte) : '');
   useEffect(() => { setAcompte(parseFloat(acompte.replace(',', '.')) || 0); }, [acompte, setAcompte]);
@@ -353,7 +398,21 @@ function DetailsMode() {
   );
 
   return (
-    <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pb-1">
+    <div className="flex flex-col gap-3 max-h-[320px] overflow-y-auto pb-1">
+      <div>
+        <FieldLabel>Objet du document</FieldLabel>
+        <textarea
+          className={cn(inputCls, 'w-full h-auto py-2 min-h-[48px] resize-none')}
+          placeholder="Ex : Réparation et remise en état d'un appareil…"
+          value={doc.objet}
+          onChange={(e) => setObjet(e.target.value)}
+        />
+      </div>
+      <div>
+        <FieldLabel>Référence (Bon de commande N°)</FieldLabel>
+        <input className={cn(inputCls, 'w-full')} placeholder="Ex : BC N° 15/2024 du 07/03/2024"
+          value={doc.reference} onChange={(e) => setReference(e.target.value)} />
+      </div>
       <div>
         <FieldLabel>Type de document</FieldLabel>
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">

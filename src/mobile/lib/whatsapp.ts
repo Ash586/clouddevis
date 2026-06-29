@@ -1,11 +1,21 @@
-// CloudDevis Mobile — WhatsApp Share Helper
-// Share PDF documents via WhatsApp
+// CloudDevis Mobile — Share Helper
+// Cross-platform: native (Capacitor) → Web Share API (mobile browsers) →
+// download fallback (desktop browsers). Returns how it was delivered so the
+// caller can give the right follow-up (e.g. open WhatsApp / mailto on web).
 
-import { Share } from '@capacitor/share';
-import { Filesystem, Directory } from '@capacitor/filesystem';
+import { downloadDocument } from './pdf';
+
+export type ShareResult = 'shared' | 'downloaded';
+
+function base64ToBlob(base64: string, type = 'application/pdf'): Blob {
+  const bin = atob(base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type });
+}
 
 /**
- * Share a document via WhatsApp or native share sheet
+ * Share a document PDF through the best channel available on this platform.
  */
 export async function shareDocument(options: {
   pdfBase64: string;
@@ -13,24 +23,44 @@ export async function shareDocument(options: {
   clientName: string;
   total: number;
   currency?: string;
-}): Promise<void> {
+}): Promise<ShareResult> {
   const { pdfBase64, docNumber, clientName, total, currency = 'DA' } = options;
-
-  // 1. Save PDF to cache
   const fileName = `${docNumber}.pdf`;
-  const { uri } = await Filesystem.writeFile({
-    path: fileName,
-    data: pdfBase64,
-    directory: Directory.Cache,
-  });
+  const title = `${docNumber} — ${clientName}`;
+  const text = `${docNumber}\nClient: ${clientName}\nTotal: ${total.toLocaleString('fr-DZ')} ${currency}`;
 
-  // 2. Share via native share sheet (user picks WhatsApp)
-  await Share.share({
-    title: `${docNumber} — ${clientName}`,
-    text: `${docNumber}\nClient: ${clientName}\nTotal: ${total.toLocaleString('fr-DZ')} ${currency}`,
-    files: [uri],
-    dialogTitle: 'Partager le document',
-  });
+  // 1. Native (Capacitor) — write to cache then open the OS share sheet.
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (Capacitor.isNativePlatform()) {
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      const { Share } = await import('@capacitor/share');
+      const { uri } = await Filesystem.writeFile({ path: fileName, data: pdfBase64, directory: Directory.Cache });
+      await Share.share({ title, text, files: [uri], dialogTitle: 'Partager le document' });
+      return 'shared';
+    }
+  } catch {
+    // fall through to web
+  }
+
+  // 2. Web Share API with a real file (works on most mobile browsers).
+  try {
+    const file = new File([base64ToBlob(pdfBase64)], fileName, { type: 'application/pdf' });
+    const nav = navigator as Navigator & {
+      canShare?: (data?: ShareData) => boolean;
+      share?: (data?: ShareData) => Promise<void>;
+    };
+    if (nav.canShare && nav.share && nav.canShare({ files: [file] })) {
+      await nav.share({ files: [file], title, text });
+      return 'shared';
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name === 'AbortError') return 'shared';
+  }
+
+  // 3. Desktop fallback — download the PDF so the user can attach it.
+  downloadDocument(pdfBase64, fileName);
+  return 'downloaded';
 }
 
 /**

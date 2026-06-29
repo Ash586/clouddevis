@@ -92,11 +92,15 @@ export async function generatePDFBase64(options: {
   clientName: string;
   clientAddress?: string;
   clientNif?: string;
+  clientRc?: string;
+  clientNis?: string;
   items: Array<{
     designation: string;
+    code?: string;
     quantity: number;
     unit: string;
     unitPrice: number;
+    tvaRate?: 0 | 9 | 19;
     total: number;
   }>;
   subTotalHT: number;
@@ -110,14 +114,26 @@ export async function generatePDFBase64(options: {
   companyRc?: string;
   companyNis?: string;
   companyAi?: string;
+  companyActivity?: string;
+  companyCapital?: string;
+  companyRib?: string;
+  companyCcp?: string;
+  companyBank?: string;
+  reference?: string;
+  objet?: string;
   date?: string;
   notes?: string;
 }): Promise<string> {
+  const notes = options.objet
+    ? `Objet : ${options.objet}${options.notes ? `\n${options.notes}` : ''}`
+    : options.notes;
+
   const pdfData: PDFDocumentData = {
     type: (options.docType.toUpperCase() as PDFDocumentData['type']) || 'FACTURE',
     number: options.docNumber,
     date: options.date || new Date().toISOString().split('T')[0],
-    notes: options.notes,
+    notes,
+    reference: options.reference,
     company: {
       name: options.companyName || '',
       nif: options.companyNif || '',
@@ -126,17 +142,24 @@ export async function generatePDFBase64(options: {
       ai: options.companyAi,
       address: options.companyAddress || '',
     },
+    companyTagline: options.companyActivity,
+    companyCapital: options.companyCapital,
+    rib: options.companyRib,
+    bankName: options.companyBank,
+    ccpNumber: options.companyCcp,
     client: {
       name: options.clientName,
       address: options.clientAddress,
       nif: options.clientNif,
+      rc: options.clientRc,
+      nis: options.clientNis,
     },
     items: options.items.map((item) => ({
-      label: item.designation,
+      label: item.code ? `${item.code} — ${item.designation}` : item.designation,
       quantity: item.quantity,
       unit: item.unit,
       unitPrice: item.unitPrice,
-      tvaRate: 19, // Default, will be overridden per item
+      tvaRate: item.tvaRate ?? 19,
       totalHT: item.total,
     })),
     totalHT: options.subTotalHT,

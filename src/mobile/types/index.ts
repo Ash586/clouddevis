@@ -41,9 +41,15 @@ export interface Company {
   ai: string;           // Identifiant d'Acte (10 digits)
   phone: string;
   address: string;
+  email?: string;        // Contact email (shown on letterhead)
+  fax?: string;          // Fax number
   logo?: string;         // Base64 data URL or file path
   tvaRate: 9 | 19;       // Default TVA rate
   capital?: string;      // Share capital
+  activity?: string;     // Activité / tagline (e.g. "Importation · Vente · SAV")
+  rib?: string;          // Bank RIB
+  ccp?: string;          // CCP (postal) account
+  bankName?: string;     // Bank name + agency
   signature?: string;    // Base64 signature image
 }
 
@@ -53,9 +59,10 @@ export interface Company {
 export interface Client {
   id: string;
   name: string;
-  nif?: string;          // Client's NIF (15 digits for companies)
-  rc?: string;           // Client's RC
+  nif?: string;          // Client's NIF (11 or 15 digits)
+  rc?: string;           // Client's RC (Registre du Commerce)
   nis?: string;          // Client's NIS
+  ai?: string;           // Client's AI (Identifiant / Article d'Imposition)
   phone: string;
   email?: string;
   address?: string;
@@ -70,12 +77,14 @@ export interface Client {
  */
 export interface LineItem {
   id: string;
+  code?: string;         // Optional article code (e.g. "DEM-COM")
   label: string;         // Designation / description
   quantity: number;
   unit: UnitMeasure;
   unitPrice: number;
   tvaRate: 0 | 9 | 19;   // TVA rate per item
-  totalHT: number;       // Computed: quantity * unitPrice
+  remise?: number;       // Optional per-line discount % (RIS.%), 0–100
+  totalHT: number;       // Computed: quantity * unitPrice * (1 - remise/100)
 }
 
 /**
@@ -106,6 +115,7 @@ export interface Document {
   paymentMode: PaymentMode;
 
   // Optional
+  objet?: string;        // OBJET — purpose/subject of the document
   notes?: string;
   validUntil?: string;   // Devis validity date
   acompte?: number;      // Deposit amount

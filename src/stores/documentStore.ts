@@ -39,6 +39,8 @@ interface CurrentDocument {
   type: DocumentType;
   client: Partial<Client>;
   items: LineItem[];
+  objet: string;
+  reference: string;
   notes: string;
   language: Language;
   paymentMode: PaymentMode;
@@ -50,6 +52,8 @@ const defaultCurrentDoc: CurrentDocument = {
   type: 'DEVIS',
   client: {},
   items: [],
+  objet: '',
+  reference: '',
   notes: '',
   language: 'FR',
   paymentMode: 'especes',
@@ -75,6 +79,8 @@ export interface DocumentStore {
   setPaymentMode: (mode: PaymentMode) => void;
   setAcompte: (acompte: number) => void;
   setNotes: (notes: string) => void;
+  setObjet: (objet: string) => void;
+  setReference: (reference: string) => void;
   setValidUntil: (date: string | undefined) => void;
 
   // ── Line item CRUD ──
@@ -111,10 +117,15 @@ export interface DocumentStore {
 
 // ── Helper: recompute totals from current state ───────────────
 
+/** Effective unit price after the line's remise (%), so the shared calc stays untouched. */
+function netUnitPrice(item: { unitPrice: number; remise?: number }): number {
+  return item.unitPrice * (1 - (item.remise ?? 0) / 100);
+}
+
 function computeTotals(doc: CurrentDocument): DocumentCalculationResult {
   const items = doc.items.map((item) => ({
     quantity: item.quantity,
-    unitPrice: item.unitPrice,
+    unitPrice: netUnitPrice(item),
     tvaRate: item.tvaRate,
   }));
   return calculateDocumentTotals(items, doc.type, doc.acompte);
@@ -146,6 +157,8 @@ function buildDocument(
     status: 'DRAFT' as DocumentStatus,
     language: doc.language,
     paymentMode: doc.paymentMode,
+    objet: doc.objet || undefined,
+    reference: doc.reference || undefined,
     notes: doc.notes || undefined,
     validUntil: doc.validUntil,
     acompte: doc.acompte || undefined,
@@ -198,6 +211,16 @@ export const useDocumentStore = create<DocumentStore>()(
           currentDoc: { ...state.currentDoc, notes },
         })),
 
+      setObjet: (objet) =>
+        set((state) => ({
+          currentDoc: { ...state.currentDoc, objet },
+        })),
+
+      setReference: (reference) =>
+        set((state) => ({
+          currentDoc: { ...state.currentDoc, reference },
+        })),
+
       setValidUntil: (date) =>
         set((state) => ({
           currentDoc: { ...state.currentDoc, validUntil: date },
@@ -207,7 +230,7 @@ export const useDocumentStore = create<DocumentStore>()(
 
       addItem: (itemData) =>
         set((state) => {
-          const totalHT = round2(itemData.quantity * itemData.unitPrice);
+          const totalHT = round2(itemData.quantity * netUnitPrice(itemData));
           const newItem: LineItem = {
             id: generateId(),
             ...itemData,
@@ -222,8 +245,8 @@ export const useDocumentStore = create<DocumentStore>()(
           const newItems = state.currentDoc.items.map((item) => {
             if (item.id !== id) return item;
             const updated = { ...item, ...updates };
-            // Recompute totalHT if quantity or unitPrice changed
-            updated.totalHT = round2(updated.quantity * updated.unitPrice);
+            // Recompute totalHT (quantity / unitPrice / remise may have changed)
+            updated.totalHT = round2(updated.quantity * netUnitPrice(updated));
             return updated;
           });
           const newDoc = { ...state.currentDoc, items: newItems };
@@ -327,6 +350,8 @@ export const useDocumentStore = create<DocumentStore>()(
             type: doc.type,
             client: { ...doc.client },
             items: [...doc.items],
+            objet: doc.objet || '',
+            reference: doc.reference || '',
             notes: doc.notes || '',
             language: doc.language,
             paymentMode: doc.paymentMode,

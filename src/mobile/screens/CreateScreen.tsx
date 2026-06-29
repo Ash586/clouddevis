@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer,
+  ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
@@ -20,11 +20,12 @@ import {
   fetchDocumentDetail, createApiDocument, updateApiDocument, type ApiDocumentDetail,
 } from '@/mobile/lib/api';
 import { generatePDFBase64, printDocument, downloadDocument } from '@/mobile/lib/pdf';
-import { shareDocument } from '@/mobile/lib/whatsapp';
+import { shareDocument, openWhatsApp } from '@/mobile/lib/whatsapp';
 import { notify } from '@/mobile/lib/toast';
 import { generateDocNumber, numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
 import { LivePaper } from '@/mobile/components/create/LivePaper';
 import { CreateDock, type DockMode, type CatalogItem } from '@/mobile/components/create/CreateDock';
+import { DocumentPreview } from '@/mobile/components/create/DocumentPreview';
 import { DOCUMENT_TYPE_LABELS } from '@/mobile/types';
 import type { DocumentType, Client, LineItem, PaymentMode } from '@/mobile/types';
 
@@ -57,6 +58,7 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const pdfRef = useRef<string | null>(null);
 
   // ── Real document number ──
@@ -90,42 +92,44 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
       pdfRef.current = null;
       return;
     }
+    const loadIntoStore = (raw: ApiDocumentDetail) => {
+      let parsed: Array<Record<string, unknown>> = [];
+      try { parsed = JSON.parse(raw.items) as Array<Record<string, unknown>>; } catch { parsed = []; }
+      const valid = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR']);
+      setType((valid.has(raw.type) ? raw.type : 'DEVIS') as DocumentType);
+      if (raw.client) {
+        setClient({
+          id: raw.client.id, name: raw.client.name,
+          phone: raw.client.phone ?? '', email: raw.client.email ?? undefined,
+          address: raw.client.address ?? undefined, nif: raw.client.nif ?? undefined,
+          rc: raw.client.rc ?? undefined, nis: raw.client.nis ?? undefined,
+          ai: raw.client.ai ?? undefined,
+        } as Partial<Client>);
+      }
+      setPaymentMode((raw.paymentMode || 'especes') as PaymentMode);
+      setAcompte(raw.acompte ?? 0);
+      setNotes(raw.notes ?? '');
+      clearItems();
+      for (const i of parsed) {
+        addItem({
+          code: i.code ? String(i.code) : undefined,
+          label: String(i.designation || i.label || ''),
+          quantity: Number(i.quantity) || 1,
+          unit: (String(i.unit || 'u')) as LineItem['unit'],
+          unitPrice: Number(i.unitPrice) || 0,
+          tvaRate: (Number(i.tvaRate) || 19) as 0 | 9 | 19,
+          remise: i.remise ? Number(i.remise) : undefined,
+        });
+      }
+    };
     setLoadingDoc(true);
     setLoadError('');
     fetchDocumentDetail(editingDocId)
-      .then((raw) => loadIntoStore(raw))
+      .then(loadIntoStore)
       .catch(() => setLoadError('Impossible de charger le document.'))
       .finally(() => setLoadingDoc(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingDocId, retryToken]);
-
-  function loadIntoStore(raw: ApiDocumentDetail) {
-    let parsed: Array<Record<string, unknown>> = [];
-    try { parsed = JSON.parse(raw.items) as Array<Record<string, unknown>>; } catch { parsed = []; }
-    const valid = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR']);
-    setType((valid.has(raw.type) ? raw.type : 'DEVIS') as DocumentType);
-    if (raw.client) {
-      setClient({
-        id: raw.client.id, name: raw.client.name,
-        phone: raw.client.phone ?? '', email: raw.client.email ?? undefined,
-        address: raw.client.address ?? undefined, nif: raw.client.nif ?? undefined,
-        rc: raw.client.rc ?? undefined, nis: raw.client.nis ?? undefined,
-      } as Partial<Client>);
-    }
-    setPaymentMode((raw.paymentMode || 'especes') as PaymentMode);
-    setAcompte(raw.acompte ?? 0);
-    setNotes(raw.notes ?? '');
-    clearItems();
-    for (const i of parsed) {
-      addItem({
-        label: String(i.designation || i.label || ''),
-        quantity: Number(i.quantity) || 1,
-        unit: (String(i.unit || 'u')) as LineItem['unit'],
-        unitPrice: Number(i.unitPrice) || 0,
-        tvaRate: (Number(i.tvaRate) || 19) as 0 | 9 | 19,
-      });
-    }
-  }
 
   // ── Zone taps morph the dock ──
   const tapType = useCallback(() => { setEditingLineId(null); setDockMode('details'); }, []);
@@ -148,8 +152,11 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
         clientName: currentDoc.client?.name || 'Client',
         clientAddress: currentDoc.client?.address,
         clientNif: currentDoc.client?.nif,
+        clientRc: currentDoc.client?.rc,
+        clientNis: currentDoc.client?.nis,
         items: currentDoc.items.map((it) => ({
-          designation: it.label, quantity: it.quantity, unit: it.unit, unitPrice: it.unitPrice, total: it.totalHT,
+          designation: it.label, code: it.code, quantity: it.quantity, unit: it.unit,
+          unitPrice: it.unitPrice, tvaRate: it.tvaRate, total: it.totalHT,
         })),
         subTotalHT: totals.subTotalHT,
         tvaAmount: totals.totalTVA,
@@ -162,6 +169,13 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
         companyRc: company?.rc,
         companyNis: company?.nis,
         companyAi: company?.ai,
+        companyActivity: company?.activity,
+        companyCapital: company?.capital,
+        companyRib: company?.rib,
+        companyCcp: company?.ccp,
+        companyBank: company?.bankName,
+        reference: currentDoc.reference || undefined,
+        objet: currentDoc.objet || undefined,
         date: new Date().toISOString().split('T')[0],
         notes: currentDoc.notes,
       });
@@ -213,14 +227,20 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     }
   }, [company, editingDocId, guardReady, saveDocument, updateSavedDocument, currentDoc, totals, onExit]);
 
-  // ── Share actions ──
+  // ── Share actions (all web-aware) ──
   const handleWhatsApp = useCallback(async () => {
+    setShareOpen(false);
     if (!guardReady()) return;
     setBusy(true);
     const pdf = await buildPdf();
     setBusy(false);
-    if (pdf) {
-      void shareDocument({ pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer });
+    if (!pdf) return;
+    const result = await shareDocument({
+      pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
+    });
+    if (result === 'downloaded') {
+      void notify('PDF téléchargé — joignez-le à votre message');
+      void openWhatsApp({ phone: currentDoc.client?.phone, message: `${DOCUMENT_TYPE_LABELS[currentDoc.type]} ${docNumber}` });
     }
   }, [guardReady, buildPdf, docNumber, currentDoc, totals]);
 
@@ -230,7 +250,7 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     setBusy(true);
     const pdf = await buildPdf();
     setBusy(false);
-    if (pdf) downloadDocument(pdf, `${docNumber}.pdf`);
+    if (pdf) { downloadDocument(pdf, `${docNumber}.pdf`); void notify('PDF téléchargé ✓'); }
   }, [guardReady, buildPdf, docNumber]);
 
   const handlePrint = useCallback(async () => {
@@ -242,16 +262,34 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     if (pdf) printDocument(pdf);
   }, [guardReady, buildPdf]);
 
-  const handleEmail = useCallback(() => {
+  const handleEmail = useCallback(async () => {
     setShareOpen(false);
-    const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
-    const subject = `${label} ${docNumber}`;
-    const body =
-      `Bonjour ${currentDoc.client?.name || ''},\n\n` +
-      `Veuillez trouver votre ${label.toLowerCase()} ${docNumber} d'un montant de ` +
-      `${totals.netAPayer.toLocaleString('fr-DZ')} DA.\n\nCordialement,\n${company?.name || 'CloudDevis'}`;
-    window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_system');
-  }, [currentDoc, docNumber, totals, company]);
+    if (!guardReady()) return;
+    setBusy(true);
+    const pdf = await buildPdf();
+    setBusy(false);
+    if (!pdf) return;
+    // Prefer the native/web share sheet so the PDF actually attaches.
+    const result = await shareDocument({
+      pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
+    });
+    if (result === 'downloaded') {
+      // Desktop: PDF was downloaded — open the mail composer (mailto can't attach).
+      const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
+      const subject = `${label} ${docNumber}`;
+      const body =
+        `Bonjour ${currentDoc.client?.name || ''},\n\n` +
+        `Veuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ` +
+        `${totals.netAPayer.toLocaleString('fr-DZ')} DA.\n\nCordialement,\n${company?.name || 'CloudDevis'}`;
+      void notify('PDF téléchargé — joignez-le à l’email');
+      window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_system');
+    }
+  }, [guardReady, buildPdf, currentDoc, docNumber, totals, company]);
+
+  const openPreview = useCallback(() => {
+    if (currentDoc.items.length === 0) { setDockMode('add'); void notify('Ajoutez au moins un article'); return; }
+    setPreviewOpen(true);
+  }, [currentDoc.items.length]);
 
   // ── Loading / error states ──
   if (loadingDoc) {
@@ -325,23 +363,34 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
 
       {/* Action bar */}
       <div className="flex items-center gap-2 px-3 py-2 bg-[var(--navy-2)] border-t border-[var(--border)]">
+        <button type="button" onClick={openPreview}
+          className="h-12 px-3 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform"
+          aria-label="Aperçu du document">
+          <Eye size={18} /> Aperçu
+        </button>
         <button type="button" onClick={handleSave} disabled={saving}
-          className="flex-[1.4] h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-all disabled:opacity-60"
+          className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-all disabled:opacity-60"
           style={{ background: 'var(--green-2)' }}>
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Enregistrer
         </button>
-        <button type="button" onClick={handleWhatsApp} disabled={busy}
-          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[#25D366]/14 text-[#0a7d39] active:scale-[0.98] transition-transform disabled:opacity-60"
-          aria-label="Envoyer par WhatsApp">
-          {busy ? <Loader2 size={16} className="animate-spin" /> : <MessageCircle size={18} />}
-        </button>
         <button type="button" onClick={() => setShareOpen(true)} disabled={busy}
-          className="w-11 h-11 rounded-xl flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform disabled:opacity-60"
-          aria-label="Partager">
-          <Share2 size={18} />
+          className="h-12 px-3 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform disabled:opacity-60"
+          aria-label="Envoyer">
+          {busy ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={18} />}
+          Envoyer
         </button>
       </div>
+
+      {/* Full document preview (see before download) */}
+      <DocumentPreview
+        open={previewOpen}
+        docNumber={docNumber}
+        busy={busy}
+        onClose={() => setPreviewOpen(false)}
+        onDownload={handleDownload}
+        onShare={handleWhatsApp}
+      />
 
       {/* Share menu */}
       <AnimatePresence>
@@ -356,15 +405,17 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}>
               <div className="flex justify-center pt-1 pb-3"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
+              <p className="px-4 pb-2 text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">Envoyer le document</p>
               {[
-                { icon: Mail, label: 'Email', on: handleEmail },
-                { icon: Download, label: 'Télécharger le PDF', on: handleDownload },
-                { icon: Printer, label: 'Imprimer', on: handlePrint },
-              ].map(({ icon: Icon, label, on }) => (
+                { icon: MessageCircle, label: 'WhatsApp', tint: '#25D366', on: handleWhatsApp },
+                { icon: Mail, label: 'Email', tint: 'var(--green-2)', on: handleEmail },
+                { icon: Download, label: 'Télécharger le PDF', tint: 'var(--green-2)', on: handleDownload },
+                { icon: Printer, label: 'Imprimer', tint: 'var(--gold)', on: handlePrint },
+              ].map(({ icon: Icon, label, tint, on }) => (
                 <button key={label} type="button" onClick={on}
                   className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl active:bg-[var(--navy-3)] transition-colors">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--blue-bg)] flex items-center justify-center">
-                    <Icon size={18} className="text-[var(--green-2)]" />
+                  <span className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--blue-bg)' }}>
+                    <Icon size={18} style={{ color: tint }} />
                   </span>
                   <span className="text-[15px] font-medium text-[var(--sand)]">{label}</span>
                 </button>

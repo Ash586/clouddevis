@@ -105,9 +105,12 @@ function toApiDocumentBody(doc: Document) {
     items: doc.items.map((item) => ({
       id: item.id,
       designation: item.label,
+      code: item.code ?? null,
       quantity: item.quantity,
       unit: item.unit,
       unitPrice: item.unitPrice,
+      tvaRate: item.tvaRate,
+      remise: item.remise ?? null,
       category: null,
     })),
     tvaRate,
