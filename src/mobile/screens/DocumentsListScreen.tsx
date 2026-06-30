@@ -12,7 +12,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FilePlus, Files, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
+import { Loader2 } from 'lucide-react';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
+import { refreshAllData } from '@/mobile/lib/useApiSync';
+import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64FromDoc, printDocument } from '@/mobile/lib/pdf';
@@ -88,6 +91,17 @@ export function DocumentsListScreen({
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
   const deleteDocument = useDocumentStore((s) => s.deleteDocument);
   const duplicateDocument = useDocumentStore((s) => s.duplicateDocument);
+
+  // ── Pull-to-refresh ────────────────────────────────────────
+  const handleRefresh = useCallback(async () => {
+    try {
+      const ok = await refreshAllData();
+      void notify(ok ? 'Documents à jour ✓' : 'Hors ligne — impossible d’actualiser');
+    } catch {
+      void notify('Échec de l’actualisation');
+    }
+  }, []);
+  const { pull, refreshing, handlers } = usePullToRefresh(handleRefresh);
 
   // ── Filter + search ────────────────────────────────────────
   const filteredDocs = useMemo(() => {
@@ -293,7 +307,27 @@ export function DocumentsListScreen({
       </div>
 
       {/* ── Document list ───────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-5 pb-24">
+      <div
+        className="flex-1 overflow-y-auto px-5 pb-24 relative"
+        style={{ overscrollBehaviorY: 'contain' }}
+        onTouchStart={handlers.onTouchStart}
+        onTouchMove={handlers.onTouchMove}
+        onTouchEnd={handlers.onTouchEnd}
+      >
+        {/* Pull-to-refresh spinner */}
+        {(pull > 0 || refreshing) && (
+          <div
+            className="absolute left-0 right-0 top-0 flex items-center justify-center pointer-events-none z-10"
+            style={{ height: pull || 40, opacity: refreshing ? 1 : Math.min(1, pull / 70) }}
+          >
+            <Loader2
+              size={20}
+              className={cn('text-[var(--green-2)]', refreshing && 'animate-spin')}
+              style={{ transform: refreshing ? undefined : `rotate(${pull * 3}deg)` }}
+            />
+          </div>
+        )}
+        <div style={{ transform: `translateY(${pull}px)`, transition: pull === 0 ? 'transform 0.25s' : undefined }}>
         {filteredDocs.length === 0 ? (
           <motion.div
             className="flex flex-col items-center justify-center py-20"
@@ -335,6 +369,7 @@ export function DocumentsListScreen({
             ))}
           </motion.div>
         )}
+        </div>
       </div>
 
       {/* ── ActionSheet ──────────────────────────────────────── */}

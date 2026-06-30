@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building, ChevronRight, Pencil, Image as ImageIcon, Users, X } from 'lucide-react';
+import { Building, ChevronRight, ChevronDown, Pencil, Image as ImageIcon, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
@@ -15,6 +15,39 @@ import { Badge } from '@/components/ui/badge';
 import { notify } from '@/mobile/lib/toast';
 
 const MAX_LOGO_BYTES = 500 * 1024; // 500 KB
+
+interface FieldDef { label: string; field: string; placeholder: string; type?: string }
+const FIELD_SECTIONS: Array<{ id: string; title: string; fields: FieldDef[] }> = [
+  {
+    id: 'identity', title: 'Identité',
+    fields: [
+      { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
+      { label: 'Activité (sous le nom)', field: 'activity', placeholder: 'Ex: Importation · Vente · SAV' },
+      { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
+      { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
+      { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
+      { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
+    ],
+  },
+  {
+    id: 'fiscal', title: 'Identifiants fiscaux',
+    fields: [
+      { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
+      { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
+      { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
+      { label: 'AI', field: 'ai', placeholder: '1234567890' },
+      { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
+    ],
+  },
+  {
+    id: 'bank', title: 'Coordonnées bancaires',
+    fields: [
+      { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
+      { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
+      { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
+    ],
+  },
+];
 
 interface CompanyProfileScreenProps {
   /** Navigate to clients list */
@@ -33,6 +66,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [logoData, setLogoData] = useState<string | undefined>(company?.logo);
   const [logoError, setLogoError] = useState('');
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ identity: true });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form state ──
@@ -63,6 +97,14 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
     if (result && !result.valid) {
       setErrors(result.errors);
+      // Expand any section that contains an invalid field so the error is visible.
+      setOpenSections((prev) => {
+        const next = { ...prev };
+        for (const section of FIELD_SECTIONS) {
+          if (section.fields.some((f) => result.errors[f.field])) next[section.id] = true;
+        }
+        return next;
+      });
       void notify('Vérifiez les champs en rouge');
       return;
     }
@@ -206,52 +248,62 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
               )}
             </div>
 
-            {/* Form fields */}
-            {[
-              { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
-              { label: 'Activité (sous le nom)', field: 'activity', placeholder: 'Ex: Importation · Vente · SAV' },
-              { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
-              { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
-              { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
-              { label: 'AI', field: 'ai', placeholder: '1234567890' },
-              { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
-              { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
-              { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
-              { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
-              { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
-              { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
-              { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
-              { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
-            ].map(({ label, field, placeholder }) => (
-              <div key={field}>
-                <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">
-                  {label}
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={form[field as keyof typeof form]}
-                    onChange={(e) => handleFieldChange(field, e.target.value)}
-                    placeholder={placeholder}
-                    className={cn(
-                      'w-full px-4 py-3 rounded-xl text-sm',
-                      'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-                      'border transition-colors',
-                      errors[field]
-                        ? 'border-red-400/50 focus:border-red-400'
-                        : 'border-[var(--border)] focus:border-[var(--green-2)]',
-                    )}
-                  />
-                ) : (
-                  <div className="px-4 py-3 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">
-                    {company?.[field as keyof typeof company] || '—'}
-                  </div>
-                )}
-                {errors[field] && (
-                  <p className="text-[11px] text-red-400 mt-1">{errors[field]}</p>
-                )}
-              </div>
-            ))}
+            {/* Form fields — grouped into collapsible sections */}
+            {FIELD_SECTIONS.map((section) => {
+              const isOpen = openSections[section.id] ?? false;
+              const errorCount = section.fields.filter((f) => errors[f.field]).length;
+              return (
+                <div key={section.id} className="rounded-2xl border border-[var(--border)] overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setOpenSections((s) => ({ ...s, [section.id]: !isOpen }))}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-[var(--navy-3)] active:bg-[var(--navy-4)] transition-colors"
+                  >
+                    <span className="flex items-center gap-2 text-sm font-semibold text-[var(--sand)]">
+                      {section.title}
+                      {errorCount > 0 && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-400/15 text-red-400">
+                          {errorCount}
+                        </span>
+                      )}
+                    </span>
+                    {isOpen
+                      ? <ChevronDown size={18} className="text-[var(--sand-muted)]" />
+                      : <ChevronRight size={18} className="text-[var(--sand-muted)] rtl:rotate-180" />}
+                  </button>
+                  {isOpen && (
+                    <div className="p-3 flex flex-col gap-3">
+                      {section.fields.map(({ label, field, placeholder }) => (
+                        <div key={field}>
+                          <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">{label}</label>
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={form[field as keyof typeof form]}
+                              onChange={(e) => handleFieldChange(field, e.target.value)}
+                              placeholder={placeholder}
+                              className={cn(
+                                'w-full px-4 py-3 rounded-xl text-sm',
+                                'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
+                                'border transition-colors',
+                                errors[field]
+                                  ? 'border-red-400/50 focus:border-red-400'
+                                  : 'border-[var(--border)] focus:border-[var(--green-2)]',
+                              )}
+                            />
+                          ) : (
+                            <div className="px-4 py-3 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">
+                              {company?.[field as keyof typeof company] || '—'}
+                            </div>
+                          )}
+                          {errors[field] && <p className="text-[11px] text-red-400 mt-1">{errors[field]}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
             {/* Save button */}
             {isEditing && (

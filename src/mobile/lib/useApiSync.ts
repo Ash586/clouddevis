@@ -95,6 +95,29 @@ function mapApiDocumentToStore(d: ApiDocumentListItem): Document {
   };
 }
 
+// ── Standalone refresh (used by pull-to-refresh) ──────────────
+
+/**
+ * Flush queued mutations then pull fresh clients + documents into the stores.
+ * Safe to call from anywhere (uses store getState, no hook context).
+ * Returns false if offline (nothing fetched).
+ */
+export async function refreshAllData(): Promise<boolean> {
+  const online = await checkNetworkStatus();
+  if (!online) return false;
+
+  await useSyncStore.getState().processQueue(processWebSyncItem);
+
+  const [apiClients, apiDocuments] = await Promise.all([
+    fetchAllClients(),
+    fetchDocuments(1, 100),
+  ]);
+
+  useClientStore.getState().replaceAll(apiClients.map(mapApiClientToStore));
+  useDocumentStore.getState().replaceAll(apiDocuments.map(mapApiDocumentToStore));
+  return true;
+}
+
 // ── Hook ──────────────────────────────────────────────────────
 
 interface UseApiSyncOptions {
@@ -105,9 +128,6 @@ interface UseApiSyncOptions {
 }
 
 export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void {
-  const replaceClients = useClientStore((s) => s.replaceAll);
-  const replaceDocuments = useDocumentStore((s) => s.replaceAll);
-  const processQueue = useSyncStore((s) => s.processQueue);
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -123,34 +143,17 @@ export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void
       console.error('[useApiSync] error', err);
     };
 
-    async function bootstrap() {
-      const online = await checkNetworkStatus();
-      if (!online) return;
-
-      // 1. Flush any queued offline mutations first
-      await processQueue(processWebSyncItem);
-
-      // 2. Pull fresh data in parallel
-      const [apiClients, apiDocuments] = await Promise.all([
-        fetchAllClients(),
-        fetchDocuments(1, 100),
-      ]);
-
-      replaceClients(apiClients.map(mapApiClientToStore));
-      replaceDocuments(apiDocuments.map(mapApiDocumentToStore));
-    }
-
     // Wire future reconnects → flush + refresh
     onReconnect(async () => {
       try {
-        await bootstrap();
+        await refreshAllData();
       } catch (err) {
         handleApiError(err);
       }
     });
 
     // Bootstrap immediately
-    bootstrap().catch(handleApiError);
+    refreshAllData().catch(handleApiError);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
