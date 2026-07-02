@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LandingAnimations, LandingFAQ, LangSwitcher } from '@/components/landing/LandingPageClient';
 import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
+import { NavAuthCta } from '@/components/landing/NavAuthCta';
 import { PLANS, formatPrice } from '@/lib/pricing';
 
 const FAQ_ITEMS = [
@@ -30,10 +31,7 @@ export default function HomePage() {
                   <li><a href="#pricing">Tarifs</a></li>
                   <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <div className="nav-cta">
-                  <Link href="/auth/login" className="btn btn-ghost">Se connecter à mon tableau de bord</Link>
-                  <Link href="/auth/register" className="btn btn-primary" data-plausible="CTA Click" data-event-location="nav" data-event-label="Commencer gratuitement">Commencer gratuitement</Link>
-                </div>
+                <NavAuthCta />
               </div>
             </div>
           </nav>
