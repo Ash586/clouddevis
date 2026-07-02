@@ -13,12 +13,12 @@ export function GeneralSection() {
         {!hiddenFields.has('validUntil') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.validUntil')}</label>
           <input type="date" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validUntil ?? ''} onChange={(e) => updateDoc('validUntil', e.target.value)} /></div>}
         {!hiddenFields.has('objet') && <div className="col-span-2">
-          <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('objet')}</label>
-          <input type="text" placeholder={te('objet') || 'Objet du devis'} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.objet ?? ''} onChange={(e) => updateDoc('objet', e.target.value)} />
+          <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('fields.objet')}</label>
+          <input type="text" placeholder={te('fields.objet')} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.objet ?? ''} onChange={(e) => updateDoc('objet', e.target.value)} />
         </div>}
         {!hiddenFields.has('docCity') && <div>
-          <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('docCity')}</label>
-          <input type="text" placeholder={te('docCity') || 'Ville'} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.docCity ?? ''} onChange={(e) => updateDoc('docCity', e.target.value)} />
+          <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('fields.docCity')}</label>
+          <input type="text" placeholder={te('fields.docCity')} className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.docCity ?? ''} onChange={(e) => updateDoc('docCity', e.target.value)} />
         </div>}
         {doc.documentType === 'bc' && <>
           <div className="col-span-2">

@@ -40,7 +40,7 @@ export function PrestationsSection() {
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.unit')}</label>
               <select className="w-full border p-1.5 sm:p-2 rounded-lg text-[10px] bg-[var(--navy-2)] outline-none focus:ring-2 focus:ring-[var(--green-2)]"
                 value={newItem.unit} onChange={(e) => setNewItem(p => ({ ...p, unit: e.target.value as typeof newItem.unit }))}>
-                {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.labelKey)}</option>)}
+                {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{tu(u.value)}</option>)}
               </select>
             </div>
             <div>

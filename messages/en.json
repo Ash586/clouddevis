@@ -346,7 +346,8 @@
       "verifications": "Verifications",
       "travaux": "Work",
       "pieces": "Parts",
-      "etat": "Device State"
+      "etat": "Device State",
+      "devis": "Quote Information"
     },
     "customizer": {
       "docInfo": "Document",
@@ -464,7 +465,19 @@
       "sigCompanyNameFr": "Company name (French)",
       "sigDirectionNameFr": "Direction (Name)",
       "sigDirectionRole": "Direction (Role)",
-      "sigDirectionNameAr": "Direction (Arabic name)"
+      "sigDirectionNameAr": "Direction (Arabic name)",
+      "companyTagline": "Motto / Slogan",
+      "companyCapital": "Share capital",
+      "rcNumber": "Trade Register (RC)",
+      "nisNumber": "NIS",
+      "aiNumber": "AI No.",
+      "reference": "Reference",
+      "rib": "Bank account (RIB)",
+      "bankName": "Bank",
+      "bankAgency": "Branch",
+      "ccpNumber": "Postal account (CCP)",
+      "validityDays": "Validity (days)",
+      "showWatermark": "DEVIS watermark"
     },
     "general": {
       "docNumber": "Document No.",

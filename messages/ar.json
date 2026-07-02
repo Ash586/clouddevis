@@ -346,7 +346,8 @@
       "verifications": "الفحوصات",
       "travaux": "الأعمال",
       "pieces": "الأجزاء",
-      "etat": "حالة الجهاز"
+      "etat": "حالة الجهاز",
+      "devis": "معلومات العرض"
     },
     "customizer": {
       "docInfo": "المستند",
@@ -464,7 +465,19 @@
       "sigCompanyNameFr": "اسم المؤسسة (فرنسية)",
       "sigDirectionNameFr": "المديرية (الاسم)",
       "sigDirectionRole": "المديرية (الدور)",
-      "sigDirectionNameAr": "المديرية (الاسم بالعربية)"
+      "sigDirectionNameAr": "المديرية (الاسم بالعربية)",
+      "companyTagline": "الشعار",
+      "companyCapital": "رأس المال الاجتماعي",
+      "rcNumber": "السجل التجاري",
+      "nisNumber": "رقم التعريف الإحصائي (NIS)",
+      "aiNumber": "رقم المادة (AI)",
+      "reference": "المرجع",
+      "rib": "الحساب البنكي (RIB)",
+      "bankName": "البنك",
+      "bankAgency": "الوكالة",
+      "ccpNumber": "الحساب البريدي (CCP)",
+      "validityDays": "مدة الصلاحية (أيام)",
+      "showWatermark": "علامة مائية DEVIS"
     },
     "general": {
       "docNumber": "رقم المستند",

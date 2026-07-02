@@ -346,7 +346,8 @@
       "verifications": "Vérifications",
       "travaux": "Travaux",
       "pieces": "Pièces",
-      "etat": "État Appareil"
+      "etat": "État Appareil",
+      "devis": "Informations Devis"
     },
     "customizer": {
       "docInfo": "Document",
@@ -464,7 +465,19 @@
       "sigCompanyNameFr": "Nom entreprise (Français)",
       "sigDirectionNameFr": "Direction (Nom)",
       "sigDirectionRole": "Direction (Rôle)",
-      "sigDirectionNameAr": "Direction (Nom Arabe)"
+      "sigDirectionNameAr": "Direction (Nom Arabe)",
+      "companyTagline": "Devise / Slogan",
+      "companyCapital": "Capital social",
+      "rcNumber": "R.C.",
+      "nisNumber": "NIS",
+      "aiNumber": "N° AI",
+      "reference": "Référence",
+      "rib": "RIB",
+      "bankName": "Banque",
+      "bankAgency": "Agence",
+      "ccpNumber": "CCP",
+      "validityDays": "Validité (jours)",
+      "showWatermark": "Filigrane DEVIS"
     },
     "general": {
       "docNumber": "N° Document",

@@ -32,7 +32,7 @@ export function registerAllBuiltinSections(): void {
   // ── Core sections ──
   registerSection('design', DesignSection, { sectionId: 'design', titleKey: 'sections.design' });
   registerSection('general', GeneralSection, { sectionId: 'general', titleKey: 'sections.general', blockId: 'header' });
-  registerSection('devis', DevisSection, { sectionId: 'devis', titleKey: 'Informations Devis' });
+  registerSection('devis', DevisSection, { sectionId: 'devis', titleKey: 'sections.devis' });
   registerSection('client', ClientSection, { sectionId: 'client', titleKey: 'sections.client', blockId: 'client' });
   registerSection('mode', ModeSection, { sectionId: 'mode', titleKey: 'sections.mode' });
   registerSection('chantier', ChantierSection, { sectionId: 'chantier', titleKey: 'sections.chantier', blockId: 'chantier' });
