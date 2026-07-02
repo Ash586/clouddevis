@@ -111,6 +111,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
     });
 
     let user = existingAccount?.user;
+    let isNewUser = false;
 
     if (!user) {
       const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -120,6 +121,7 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
         });
         user = existingUser;
       } else {
+        isNewUser = true;
         const oauthPassword = crypto.randomBytes(32).toString('hex');
         const { hashPassword } = await import('@/lib/auth');
         const hashedPassword = await hashPassword(oauthPassword);
@@ -153,9 +155,17 @@ async function getHandler(_req: Request, { params }: { params: Promise<{ provide
 
     const referralCode = parsedCookies['oauth_referral'] || '';
     const savedRedirect = parsedCookies['oauth_redirect'] || '/dashboard';
-    const safeRedirect = savedRedirect.startsWith('/dashboard') || savedRedirect.startsWith('/auth') ? savedRedirect : '/dashboard';
+    const isAllowedTarget =
+      savedRedirect.startsWith('/dashboard') || savedRedirect.startsWith('/auth') || savedRedirect.startsWith('/mobile');
+    const safeRedirect = isAllowedTarget ? savedRedirect : '/dashboard';
 
-    const redirect = NextResponse.redirect(new URL(safeRedirect, _req.url));
+    // First OAuth login → one-screen onboarding to pick Artisan/Entreprise.
+    // Keep the mobile hint so the welcome page can send the user back to /mobile.
+    const finalTarget = isNewUser
+      ? `/auth/welcome${safeRedirect.startsWith('/mobile') ? '?from=mobile' : ''}`
+      : safeRedirect;
+
+    const redirect = NextResponse.redirect(new URL(finalTarget, _req.url));
     applySessionCookie(redirect, token, maxAge);
     redirect.cookies.delete('oauth_state');
     redirect.cookies.delete('oauth_referral');

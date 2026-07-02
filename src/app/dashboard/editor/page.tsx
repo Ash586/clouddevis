@@ -12,6 +12,7 @@ import { getSection, SectionProvider } from '@/components/editor/sections/Sectio
 import '@/components/editor/sections';
 import { useEditor } from '@/hooks/useEditor';
 import { useEditorUndo } from '@/hooks/useEditorUndo';
+import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
 import { getDesign } from '@/lib/documentDesign';
@@ -57,6 +58,19 @@ function EditorContent() {
   const tp = useTranslations('preview');
   const tc = useTranslations('common');
   const locale = useLocale();
+
+  // Persona default: with no explicit ?mode= and a NEW document, follow the
+  // account's mode (JWT carries it lowercase). Existing docs keep their own
+  // mode; a manual in-editor toggle is never overridden (applied once).
+  const { user: sessionUser } = useUser();
+  const sessionModeApplied = useRef(false);
+  useEffect(() => {
+    if (sessionModeApplied.current || modeParam || docIdParam || !sessionUser?.mode) return;
+    sessionModeApplied.current = true;
+    const m = sessionUser.mode.toLowerCase();
+    if (m === 'entreprise' || m === 'artisan') setMode(m as UserMode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionUser?.mode]);
 
   const [fieldPrefs, setFieldPrefs] = useState<Record<string, Record<string, string[]>> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -179,9 +193,25 @@ function EditorContent() {
   const defaultsForType = DOC_TYPE_DEFAULT_FIELDS[docType] ?? {};
   const userPrefsForType = fieldPrefs?.[doc.documentType] as Record<string, string[]> | undefined;
 
+  // Persona soft-gating: for artisans, company-bureaucracy fields are hidden
+  // BY DEFAULT only — saved user prefs always win, and everything stays
+  // re-enableable from the customizer.
+  const ARTISAN_HIDDEN_DEFAULTS: Record<string, string[]> = {
+    devis: ['companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'rib', 'bankName', 'bankAgency', 'ccpNumber'],
+    client: ['clientNis', 'clientRc', 'clientAi'],
+    general: ['stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+    paiement: ['paymentIban'],
+  };
+  const sectionDefaults = (s: string): string[] => {
+    const base = defaultsForType[s as keyof typeof defaultsForType] ?? [...(SECTION_FIELDS[s] ?? [])];
+    if (mode !== 'artisan') return base as string[];
+    const hidden = ARTISAN_HIDDEN_DEFAULTS[s];
+    return hidden ? (base as string[]).filter(f => !hidden.includes(f)) : (base as string[]);
+  };
+
   const prefFields: Record<string, string[]> = {
-    ...Object.fromEntries(DEFAULT_SECTION_ORDER.map(s => [s, userPrefsForType?.[s] ?? defaultsForType[s] ?? [...SECTION_FIELDS[s]]])),
-    ...Object.fromEntries(relevantSections.filter(s => !DEFAULT_SECTION_ORDER.includes(s)).map(s => [s, userPrefsForType?.[s] ?? defaultsForType[s] ?? [...(SECTION_FIELDS[s] ?? [])]])),
+    ...Object.fromEntries(DEFAULT_SECTION_ORDER.map(s => [s, userPrefsForType?.[s] ?? sectionDefaults(s)])),
+    ...Object.fromEntries(relevantSections.filter(s => !DEFAULT_SECTION_ORDER.includes(s)).map(s => [s, userPrefsForType?.[s] ?? sectionDefaults(s)])),
     ...Object.fromEntries(customSections.map(cs => [cs.id, userPrefsForType?.[cs.id] ?? cs.fields.map(f => f.id)])),
   };
   const hiddenFields = new Set<string>();

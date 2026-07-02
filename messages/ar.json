@@ -114,7 +114,8 @@
       "bonReception": "ورقة استلام",
       "intervention": "استمارة تدخل",
       "attachement": "ملحق الأشغال"
-    }
+    },
+    "switchToCompany": "التحويل إلى وضع الشركة"
   },
   "home": {
     "heroBadge": "مطابق للتشريع الجزائري",
@@ -1038,7 +1039,14 @@
       "clients": "العملاء",
       "templates": "القوالب",
       "admins": "المسؤولون",
-      "memoryDetail": "تفاصيل الذاكرة"
+      "memoryDetail": "تفاصيل الذاكرة",
+      "healthy": "سليم",
+      "degraded": "متدهور",
+      "down": "معطل",
+      "lastBackup": "آخر نسخة احتياطية",
+      "noBackup": "لا توجد نسخة احتياطية",
+      "dbSize": "حجم قاعدة البيانات",
+      "requests": "طلب/ثانية"
     },
     "analytics": {
       "newUsers": "المستخدمون الجدد",
@@ -1105,26 +1113,6 @@
       "noSuspended": "لا يوجد مستخدمون معلقون",
       "suspendSuccess": "تم تعليق المستخدم بنجاح",
       "unsuspendSuccess": "تم إعادة تنشيط المستخدم بنجاح"
-    },
-    "system": {
-      "status": "الحالة",
-      "uptime": "وقت التشغيل",
-      "memory": "الذاكرة",
-      "nodeVersion": "Node.js",
-      "dbCounts": "عدادات قاعدة البيانات",
-      "users": "المستخدمون",
-      "documents": "الوثائق",
-      "clients": "العملاء",
-      "templates": "القوالب",
-      "admins": "المسؤولون",
-      "memoryDetail": "تفاصيل الذاكرة",
-      "healthy": "سليم",
-      "degraded": "متدهور",
-      "down": "معطل",
-      "lastBackup": "آخر نسخة احتياطية",
-      "noBackup": "لا توجد نسخة احتياطية",
-      "dbSize": "حجم قاعدة البيانات",
-      "requests": "طلب/ثانية"
     },
     "export": {
       "title": "تصدير البيانات",

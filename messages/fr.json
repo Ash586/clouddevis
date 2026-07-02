@@ -114,17 +114,18 @@
       "bonReception": "Bon de Réception",
       "intervention": "Fiche d'Intervention",
       "attachement": "Attachement des Travaux"
-    }
+    },
+    "switchToCompany": "Passer en mode Entreprise"
   },
   "home": {
     "heroBadge": "Conforme à la réglementation algérienne",
-     "heroTitle1": "Générez vos devis et factures conformes en 2 minutes",
+    "heroTitle1": "Générez vos devis et factures conformes en 2 minutes",
     "heroTitle2": "en quelques clics.",
-     "heroSubtitle": "Éliminez les erreurs de facturation et gagnez du temps avec une solution entièrement conforme aux normes algériennes, conçue pour les artisans, TPE et PME.",
-     "ctaFree": "Créer votre premier devis gratuit",
-     "ctaCreateAccount": "Créer mon compte gratuit",
-     "ctaTryNow": "Essayez dès maintenant — Créez votre compte gratuit",
-     "editorBannerTitle": "Éditeur en temps réel — Essayez gratuitement",
+    "heroSubtitle": "Éliminez les erreurs de facturation et gagnez du temps avec une solution entièrement conforme aux normes algériennes, conçue pour les artisans, TPE et PME.",
+    "ctaFree": "Créer votre premier devis gratuit",
+    "ctaCreateAccount": "Créer mon compte gratuit",
+    "ctaTryNow": "Essayez dès maintenant — Créez votre compte gratuit",
+    "editorBannerTitle": "Éditeur en temps réel — Essayez gratuitement",
     "editorBannerSubtitle": "Modifiez les données en temps réel",
     "successTitle": "Document prêt !",
     "successBody": "Vous avez aimé la démo ? Créez votre compte gratuitement pour télécharger, sauvegarder et générer tous vos documents.",
@@ -1038,7 +1039,14 @@
       "clients": "Clients",
       "templates": "Templates",
       "admins": "Admins",
-      "memoryDetail": "Détail mémoire"
+      "memoryDetail": "Détail mémoire",
+      "healthy": "En bonne santé",
+      "degraded": "Dégradé",
+      "down": "Hors ligne",
+      "lastBackup": "Dernière sauvegarde",
+      "noBackup": "Aucune sauvegarde",
+      "dbSize": "Taille de la DB",
+      "requests": "Requêtes/s"
     },
     "analytics": {
       "newUsers": "Nouveaux utilisateurs",
@@ -1105,26 +1113,6 @@
       "noSuspended": "Aucun utilisateur suspendu",
       "suspendSuccess": "Utilisateur suspendu avec succès",
       "unsuspendSuccess": "Utilisateur réactivé avec succès"
-    },
-    "system": {
-      "status": "Statut",
-      "uptime": "Uptime",
-      "memory": "Mémoire",
-      "nodeVersion": "Node.js",
-      "dbCounts": "Compteurs base de données",
-      "users": "Utilisateurs",
-      "documents": "Documents",
-      "clients": "Clients",
-      "templates": "Templates",
-      "admins": "Admins",
-      "memoryDetail": "Détail mémoire",
-      "healthy": "En bonne santé",
-      "degraded": "Dégradé",
-      "down": "Hors ligne",
-      "lastBackup": "Dernière sauvegarde",
-      "noBackup": "Aucune sauvegarde",
-      "dbSize": "Taille de la DB",
-      "requests": "Requêtes/s"
     },
     "export": {
       "title": "Exporter les données",

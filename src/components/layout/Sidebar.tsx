@@ -109,6 +109,10 @@ function SidebarInner() {
 
   const userName = user?.name || tc('user');
   const userInitial = userName.charAt(0);
+  // Soft persona gating: artisans get a simplified nav (Team is company-only);
+  // switching mode from the profile restores everything instantly.
+  // Note: the JWT carries mode in lowercase while Prisma uses uppercase — compare case-insensitively.
+  const isEntreprise = user?.mode?.toUpperCase() === 'ENTREPRISE';
 
   const sidebarContent = () => (
     <>
@@ -122,7 +126,7 @@ function SidebarInner() {
           <div className="flex-1 min-w-0 text-start">
             <div className="text-[13px] font-bold text-[var(--sand)] truncate">{userName}</div>
             <div className="text-[10px] text-[var(--sand-muted)] font-semibold uppercase tracking-wider">
-              {user?.mode === 'ENTREPRISE' ? s('company') : s('artisan')}
+              {isEntreprise ? s('company') : s('artisan')}
             </div>
           </div>
           <ChevronDown size={14} className={`text-[var(--sand-muted)] transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
@@ -236,7 +240,9 @@ function SidebarInner() {
         <NavGroup label={s('groups.gestion')}>
           <NavItem icon={<FileStack size={18} />} label={s('templates')} active={isActive('/dashboard/templates')} onClick={() => { router.push('/dashboard/templates'); setMobileOpen(false); }} />
           <NavItem icon={<BarChart3 size={18} />} label={s('reports')} active={isActive('/dashboard/reports')} onClick={() => { router.push('/dashboard/reports'); setMobileOpen(false); }} />
-          <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => { router.push('/dashboard/team'); setMobileOpen(false); }} />
+          {isEntreprise && (
+            <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => { router.push('/dashboard/team'); setMobileOpen(false); }} />
+          )}
         </NavGroup>
 
         {/* Compte */}
@@ -245,6 +251,17 @@ function SidebarInner() {
           <NavItem icon={<Share2 size={18} />} label={s('shared')} active={isActive('/dashboard/shared')} onClick={() => { router.push('/dashboard/shared'); setMobileOpen(false); }} />
           <NavItem icon={<RefreshCw size={18} />} label={s('recurring')} active={isActive('/dashboard/recurring')} onClick={() => { router.push('/dashboard/recurring'); setMobileOpen(false); }} />
         </NavGroup>
+
+        {/* Soft-gating affordance: artisan can discover the full company mode */}
+        {user && !isEntreprise && (
+          <button
+            type="button"
+            onClick={() => { router.push('/dashboard/profile'); setMobileOpen(false); }}
+            className="w-full text-start px-4 py-2 text-[11px] font-semibold text-[var(--sand-muted)] hover:text-[var(--green-3)] transition-colors underline decoration-dotted underline-offset-2"
+          >
+            {s('switchToCompany')}
+          </button>
+        )}
       </nav>
     </>
   );

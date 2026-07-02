@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withApiErrorHandling } from '@/lib/sentry/api';
-import { withAuth } from '@/lib/auth';
+import { withAuth, createSession, applySessionCookie } from '@/lib/auth';
 import { migrateUserCompany } from '@/lib/migrateDeprecated';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
@@ -58,9 +58,28 @@ export const PUT = withApiErrorHandling(withAuth(async (req, session) => {
     if (Object.keys(data).length === 0) {
       return NextResponse.json({ error: 'Aucun champ à mettre à jour' }, { status: 400 });
     }
-    await prisma.user.update({ where: { id: session.userId }, data });
+    const updated = await prisma.user.update({ where: { id: session.userId }, data });
     if (body.companyInfo) migrateUserCompany(session.userId).catch(() => {});
-    return NextResponse.json({ ok: true });
+
+    const response = NextResponse.json({ ok: true, mode: updated.mode });
+
+    // The JWT carries `mode` — re-issue the session cookie when it changes so
+    // the sidebar/editor reflect the new mode without re-login.
+    if (data.mode && data.mode !== session.mode?.toUpperCase()) {
+      const { token, maxAge } = await createSession({
+        id: updated.id,
+        email: updated.email,
+        name: updated.name,
+        mode: updated.mode?.toLowerCase() || 'artisan',
+        sector: updated.sector,
+        country: updated.country,
+        language: updated.language,
+        subscriptionStatus: updated.subscriptionStatus,
+      });
+      applySessionCookie(response, token, maxAge);
+    }
+
+    return response;
   } catch (error) {
     logger.error('PUT /api/user/profile', { error: String(error) });
     throw error;
