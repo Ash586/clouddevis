@@ -8,7 +8,7 @@
 // ============================================================
 
 import { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Plus, Check, Trash2, ChevronLeft, Search, UserPlus, CornerDownLeft,
 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
+import { useUserStore } from '@/stores/userStore';
 import { DOCUMENT_TYPE_LABELS, UNIT_LABELS } from '@/mobile/types';
 import type { DocumentType, Client, UnitMeasure, PaymentMode, Language } from '@/mobile/types';
 
@@ -75,22 +76,22 @@ export function CreateDock({ mode, editingLineId, catalog, onModeChange }: Creat
         </div>
       )}
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={mode + (editingLineId ?? '')}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18 }}
-        >
-          {mode === 'add' && <AddMode catalog={catalog} />}
-          {mode === 'line' && (
-            <LineForm editingLineId={editingLineId} onDone={() => onModeChange('add')} />
-          )}
-          {mode === 'client' && <ClientMode onDone={() => onModeChange('add')} />}
-          {mode === 'details' && <DetailsMode />}
-        </motion.div>
-      </AnimatePresence>
+      {/* No AnimatePresence "wait" here: if an exit animation ever stalls
+          (frozen rAF on weak devices), the next mode would never mount.
+          A keyed enter-only transition gives the same morph feel, robustly. */}
+      <motion.div
+        key={mode + (editingLineId ?? '')}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18 }}
+      >
+        {mode === 'add' && <AddMode catalog={catalog} />}
+        {mode === 'line' && (
+          <LineForm editingLineId={editingLineId} onDone={() => onModeChange('add')} />
+        )}
+        {mode === 'client' && <ClientMode onDone={() => onModeChange('add')} />}
+        {mode === 'details' && <DetailsMode />}
+      </motion.div>
     </div>
   );
 }
@@ -391,6 +392,13 @@ function DetailsMode() {
   const [acompte, setAcompteLocal] = useState(doc.acompte ? String(doc.acompte) : '');
   useEffect(() => { setAcompte(parseFloat(acompte.replace(',', '.')) || 0); }, [acompte, setAcompte]);
 
+  // Persona soft-gating: artisans see the 3 everyday types; BC/BR sit behind
+  // a "Plus" chip (auto-expanded when editing a BC/BR document).
+  const userMode = useUserStore((s) => s.mode);
+  const [showAllTypes, setShowAllTypes] = useState(false);
+  const typesCollapsed = userMode === 'artisan' && !showAllTypes && !['BC', 'BR'].includes(doc.type);
+  const visibleTypes: DocumentType[] = typesCollapsed ? ['DEVIS', 'FACTURE', 'PROFORMA'] : DOC_TYPES;
+
   const chip = (active: boolean) => cn(
     'px-3 h-9 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap',
     active ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
@@ -416,11 +424,21 @@ function DetailsMode() {
       <div>
         <FieldLabel>Type de document</FieldLabel>
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
-          {DOC_TYPES.map((t) => (
+          {visibleTypes.map((t) => (
             <button key={t} type="button" onClick={() => setType(t)} className={chip(doc.type === t)}>
               {DOCUMENT_TYPE_LABELS[t]}
             </button>
           ))}
+          {typesCollapsed && (
+            <button
+              type="button"
+              onClick={() => setShowAllTypes(true)}
+              className={cn(chip(false), 'border-dashed')}
+              aria-label="Afficher plus de types de documents"
+            >
+              + Plus
+            </button>
+          )}
         </div>
       </div>
       <div>

@@ -10,6 +10,7 @@ import { loginApi, logoutApi, fetchCurrentUser, ApiError } from './api';
 import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
+import { useUserStore } from '@/stores/userStore';
 
 export type AuthState = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -31,6 +32,8 @@ export function useAuthGuard(): AuthGuard {
     fetchCurrentUser()
       .then((user) => {
         setUserName(user.name);
+        // Server is source of truth for the persona
+        useUserStore.getState().setMode(user.mode === 'ENTREPRISE' ? 'entreprise' : 'artisan');
         setAuthState('authenticated');
       })
       .catch((err: unknown) => {
@@ -59,6 +62,10 @@ export function useAuthGuard(): AuthGuard {
     const user = await loginApi(email, password, rememberMe);
     setUserName(user.name);
     setAuthState('authenticated');
+    // loginApi doesn't return the mode — refresh it from the profile
+    fetchCurrentUser()
+      .then((u) => useUserStore.getState().setMode(u.mode === 'ENTREPRISE' ? 'entreprise' : 'artisan'))
+      .catch(() => {});
   }, []);
 
   // ── Logout ────────────────────────────────────────────────
@@ -72,6 +79,7 @@ export function useAuthGuard(): AuthGuard {
     useClientStore.getState().clearAll();
     useDocumentStore.getState().resetDocument();
     useSyncStore.getState().clearQueue();
+    useUserStore.getState().reset();
     setUserName('');
     setAuthState('unauthenticated');
   }, []);

@@ -241,11 +241,24 @@ export async function logoutApi(): Promise<void> {
   await request('/api/auth/logout', { method: 'POST' });
 }
 
-export async function fetchCurrentUser(): Promise<{ id: string; name: string; email: string }> {
-  const res = await request<{ user: { id: string; name: string; email: string } }>(
-    '/api/user/profile'
-  );
-  return res.user;
+export async function fetchCurrentUser(): Promise<{
+  id: string;
+  name: string;
+  email: string;
+  mode: 'ARTISAN' | 'ENTREPRISE';
+}> {
+  const res = await request<{
+    user: { id: string; name: string; email: string; mode?: string };
+  }>('/api/user/profile');
+  return {
+    ...res.user,
+    mode: res.user.mode === 'ENTREPRISE' ? 'ENTREPRISE' : 'ARTISAN',
+  };
+}
+
+/** Update the account mode (Artisan ↔ Entreprise). */
+export async function updateUserMode(mode: 'ARTISAN' | 'ENTREPRISE'): Promise<void> {
+  await request('/api/user/profile', { method: 'PUT', body: JSON.stringify({ mode }) });
 }
 
 // ── Profile / Company ─────────────────────────────────────────

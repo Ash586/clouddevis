@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -17,8 +17,11 @@ import {
 import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useCompanyStore } from '@/stores/companyStore';
+import { useUserStore } from '@/stores/userStore';
+import { updateUserMode } from '@/mobile/lib/api';
 import { notify } from '@/mobile/lib/toast';
 import { APP_VERSION } from '@/mobile/constants';
+import type { UserMode } from '@/mobile/types';
 
 interface SettingsScreenProps {
   onLogout?: () => Promise<void>;
@@ -54,6 +57,22 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     getSettings().then(setLocalSettings);
   }, []);
 
+  // ── Account persona (artisan | entreprise) ──
+  const userMode = useUserStore((s) => s.mode);
+  const setUserMode = useUserStore((s) => s.setMode);
+  const handleModeChange = async (next: UserMode) => {
+    if (next === userMode) return;
+    const previous = userMode;
+    setUserMode(next); // optimistic
+    try {
+      await updateUserMode(next === 'entreprise' ? 'ENTREPRISE' : 'ARTISAN');
+      void notify(next === 'entreprise' ? 'Mode Entreprise activé ✓' : 'Mode Artisan activé ✓');
+    } catch {
+      setUserMode(previous);
+      void notify('Impossible de changer le mode');
+    }
+  };
+
   const handleSettingChange = async (key: keyof AppSettings, value: unknown) => {
     const updated = { ...settings, [key]: value };
     setLocalSettings(updated);
@@ -79,6 +98,32 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
 
       {/* ── Content ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-5 pb-24 space-y-4">
+
+        {/* ── Account persona ───────────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
+          <div className="px-4 py-3 flex items-center gap-3">
+            <Briefcase size={18} className="text-[var(--sand-muted)]" />
+            <div className="flex-1">
+              <span className="block text-sm font-semibold text-[var(--sand)]">Type de compte</span>
+              <span className="block text-[10px] text-[var(--sand-muted)]">Adapte les champs et documents affichés</span>
+            </div>
+          </div>
+          <div className="px-4 pb-3 flex gap-2">
+            {([['artisan', '🔨 Artisan'], ['entreprise', '🏢 Entreprise']] as Array<[UserMode, string]>).map(([m, label]) => (
+              <button type="button" key={m}
+                onClick={() => handleModeChange(m)}
+                className={cn(
+                  'flex-1 px-4 py-2 rounded-xl text-xs font-semibold transition-all border min-h-[40px]',
+                  userMode === m
+                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
+                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)]',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* ── Language ──────────────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">

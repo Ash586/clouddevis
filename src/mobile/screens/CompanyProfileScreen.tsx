@@ -11,43 +11,59 @@ import { Building, ChevronRight, ChevronDown, Pencil, Image as ImageIcon, Users,
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
+import { useUserStore } from '@/stores/userStore';
 import { Badge } from '@/components/ui/badge';
 import { notify } from '@/mobile/lib/toast';
+import type { UserMode } from '@/mobile/types';
 
 const MAX_LOGO_BYTES = 500 * 1024; // 500 KB
 
 interface FieldDef { label: string; field: string; placeholder: string; type?: string }
-const FIELD_SECTIONS: Array<{ id: string; title: string; fields: FieldDef[] }> = [
-  {
-    id: 'identity', title: 'Identité',
-    fields: [
-      { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
-      { label: 'Activité (sous le nom)', field: 'activity', placeholder: 'Ex: Importation · Vente · SAV' },
-      { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
-      { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
-      { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
-      { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
-    ],
-  },
-  {
-    id: 'fiscal', title: 'Identifiants fiscaux',
-    fields: [
-      { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
-      { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
-      { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
-      { label: 'AI', field: 'ai', placeholder: '1234567890' },
-      { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
-    ],
-  },
-  {
-    id: 'bank', title: 'Coordonnées bancaires',
-    fields: [
-      { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
-      { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
-      { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
-    ],
-  },
-];
+interface FieldSection { id: string; title: string; fields: FieldDef[] }
+
+/**
+ * Persona-aware sections (soft gating): an artisan sees an "individual"
+ * identity, an 11-digit NIF, and the fiscal/bank sections marked optional —
+ * nothing is removed, everything stays fillable.
+ */
+function getFieldSections(mode: UserMode): FieldSection[] {
+  const artisan = mode === 'artisan';
+  return [
+    {
+      id: 'identity', title: 'Identité',
+      fields: [
+        artisan
+          ? { label: 'Nom complet ou enseigne', field: 'name', placeholder: 'Ex: Karim Plomberie' }
+          : { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
+        { label: 'Activité (sous le nom)', field: 'activity', placeholder: artisan ? 'Ex: Plomberie · Chauffage' : 'Ex: Importation · Vente · SAV' },
+        { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
+        { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
+        { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
+        { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
+      ],
+    },
+    {
+      id: 'fiscal', title: artisan ? 'Identifiants fiscaux (optionnel)' : 'Identifiants fiscaux',
+      fields: [
+        artisan
+          ? { label: 'NIF (11 chiffres)', field: 'nif', placeholder: '12345678901', type: 'nif' }
+          : { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
+        { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
+        { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
+        { label: 'AI', field: 'ai', placeholder: '1234567890' },
+        { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
+      ],
+    },
+    {
+      id: 'bank', title: artisan ? 'Coordonnées bancaires (optionnel)' : 'Coordonnées bancaires',
+      fields: [
+        { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
+        { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
+        { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
+      ],
+    },
+  ];
+}
 
 interface CompanyProfileScreenProps {
   /** Navigate to clients list */
@@ -61,6 +77,9 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   const setCompany = useCompanyStore((s) => s.setCompany);
   const setLogo = useCompanyStore((s) => s.setLogo);
   const validate = useCompanyStore((s) => s.validate);
+
+  const userMode = useUserStore((s) => s.mode);
+  const fieldSections = getFieldSections(userMode);
 
   const [isEditing, setIsEditing] = useState(!isSetup);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -100,7 +119,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
       // Expand any section that contains an invalid field so the error is visible.
       setOpenSections((prev) => {
         const next = { ...prev };
-        for (const section of FIELD_SECTIONS) {
+        for (const section of fieldSections) {
           if (section.fields.some((f) => result.errors[f.field])) next[section.id] = true;
         }
         return next;
@@ -112,7 +131,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
     setErrors({});
     setIsEditing(false);
     void notify('Société enregistrée ✓');
-  }, [form, company, logoData, setCompany]);
+  }, [form, company, logoData, setCompany, fieldSections]);
 
   // ── Logo upload (base64, max 500 KB) ──
   const handleLogoPick = useCallback(() => {
@@ -167,7 +186,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-xl font-bold text-[var(--sand)]">Société</h1>
+          <h1 className="text-xl font-bold text-[var(--sand)]">{userMode === 'artisan' ? 'Mon activité' : 'Société'}</h1>
           {isSetup && (
             <button type="button"               onClick={() => setIsEditing(!isEditing)}
               className="w-11 h-11 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
@@ -249,7 +268,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             </div>
 
             {/* Form fields — grouped into collapsible sections */}
-            {FIELD_SECTIONS.map((section) => {
+            {fieldSections.map((section) => {
               const isOpen = openSections[section.id] ?? false;
               const errorCount = section.fields.filter((f) => errors[f.field]).length;
               return (
