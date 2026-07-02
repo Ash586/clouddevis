@@ -4,11 +4,14 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
+import { useGuestOnly } from '@/hooks/useGuestOnly';
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const redirectTo = searchParams.get('redirect') || '';
+  const safeRedirectTarget = redirectTo.startsWith('/dashboard') ? redirectTo : '/dashboard';
+  useGuestOnly(safeRedirectTarget);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);

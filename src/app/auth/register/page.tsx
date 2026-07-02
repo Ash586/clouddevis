@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Hammer, Truck, Sparkles, Hotel, Wrench, Heart, BookOpen, Building, Bus, Palette, Wheat, Scale, Monitor, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { track, AUTH_EVENTS } from '@/lib/analytics';
+import { useGuestOnly } from '@/hooks/useGuestOnly';
 
 const SECTORS = [
   { value: 'btp', label: 'BTP', Icon: Hammer },
@@ -31,6 +32,9 @@ const COUNTRIES = [
 function RegisterForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  // A logged-in visitor doesn't need the signup form → send them to the app.
+  // Partner-application intent is allowed through (that flow needs the form).
+  useGuestOnly(searchParams.get('intent') === 'partner' ? '/dashboard/partner/apply' : '/dashboard');
   const refCode = searchParams.get('ref');
   const intentPartner = searchParams.get('intent') === 'partner';
   const [step, setStep] = useState(1);
