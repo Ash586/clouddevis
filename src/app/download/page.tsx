@@ -15,7 +15,7 @@ export const metadata = {
 
 // Direct-download link to the hosted APK on Google Drive.
 // (Share link → direct download: drive.google.com/uc?export=download&id=<fileId>)
-const APK_URL = 'https://drive.google.com/uc?export=download&id=1y9WWMJIaZzns6bRm6wHeWOZE43yB2sc-';
+const APK_URL = 'https://drive.usercontent.google.com/download?id=1y9WWMJIaZzns6bRm6wHeWOZE43yB2sc-&export=download&authuser=0';
 
 export default async function DownloadPage() {
   const qrSvg = await QRCode.toString(APK_URL, {
