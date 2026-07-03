@@ -54,6 +54,9 @@ export interface SyncStore extends SyncState {
   /** Remove a specific item from the queue */
   remove: (id: string) => void;
 
+  /** Remove all queued operations for a given entity id (e.g. after a direct API success) */
+  removeByEntity: (entityId: string) => void;
+
   /** Clear the entire queue */
   clearQueue: () => void;
 
@@ -152,6 +155,15 @@ export const useSyncStore = create<SyncStore>()(
         set((state) => ({
           queue: state.queue.filter((item) => item.id !== id),
         })),
+
+      removeByEntity: (entityId) =>
+        set((state) => {
+          const queue = state.queue.filter((item) => item.entityId !== entityId);
+          return {
+            queue,
+            status: queue.length > 0 ? state.status : 'synced',
+          };
+        }),
 
       clearQueue: () => set({ queue: [], status: 'synced', failedCount: 0 }),
 

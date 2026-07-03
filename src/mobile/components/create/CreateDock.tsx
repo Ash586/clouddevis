@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
+import { hapticLight, hapticSuccess, hapticWarning } from '@/mobile/lib/haptics';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useUserStore } from '@/stores/userStore';
@@ -108,7 +109,7 @@ function AddMode({ catalog }: { catalog: CatalogItem[] }) {
             <button
               key={`${c.label}-${i}`}
               type="button"
-              onClick={() => addItem({ label: c.label, quantity: 1, unit: c.unit, unitPrice: c.unitPrice, tvaRate: c.tvaRate })}
+              onClick={() => { hapticLight(); addItem({ label: c.label, quantity: 1, unit: c.unit, unitPrice: c.unitPrice, tvaRate: c.tvaRate }); }}
               className="shrink-0 flex items-center gap-1.5 px-3 h-9 rounded-full bg-[var(--navy-3)] border border-[var(--border)] text-xs text-[var(--sand)] active:scale-95 transition-transform"
             >
               <Plus size={13} className="text-[var(--green-2)]" />
@@ -157,9 +158,11 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
       remise: remiseNum || undefined,
     };
     if (editing) {
+      hapticSuccess();
       updateItem(editing.id, data);
       onDone();
     } else {
+      hapticSuccess();
       addItem(data);
       setCode(''); setLabel(''); setQty('1'); setUnit('u'); setPrice(''); setTva(19); setRemise('');
     }
@@ -247,7 +250,7 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
         {editing && (
           <button
             type="button"
-            onClick={() => { removeItem(editing.id); onDone(); }}
+            onClick={() => { hapticWarning(); removeItem(editing.id); onDone(); }}
             className="h-11 px-4 rounded-xl flex items-center justify-center gap-1.5 bg-red-400/10 text-red-400 text-sm font-semibold active:scale-[0.97] transition-transform"
           >
             <Trash2 size={16} /> Supprimer
@@ -280,24 +283,27 @@ function ClientMode({ onDone }: { onDone: () => void }) {
 
   const [q, setQ] = useState('');
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', nif: '', rc: '', nis: '', ai: '', address: '' });
+  const [moreFields, setMoreFields] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', email: '', nif: '', rc: '', nis: '', ai: '', address: '' });
 
   const list = useMemo(() => (q.trim() ? searchClients(q) : clients.slice(0, 12)), [q, clients, searchClients]);
   const nifState = form.nif.trim() ? validateNIF(form.nif) : null;
   const canCreate = form.name.trim().length >= 2 && form.phone.trim().length >= 8;
 
-  function pick(c: Client) { setClient(c); onDone(); }
+  function pick(c: Client) { hapticLight(); setClient(c); onDone(); }
   function create() {
     if (!canCreate) return;
     const c = addClient({
       name: form.name.trim(),
       phone: form.phone.trim(),
+      email: form.email.trim() || undefined,
       nif: form.nif.trim() || undefined,
       rc: form.rc.trim() || undefined,
       nis: form.nis.trim() || undefined,
       ai: form.ai.trim() || undefined,
       address: form.address.trim() || undefined,
     });
+    hapticSuccess();
     setClient(c);
     onDone();
   }
@@ -309,25 +315,38 @@ function ClientMode({ onDone }: { onDone: () => void }) {
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
         <input className={cn(inputCls, 'w-full')} inputMode="tel" placeholder="Téléphone *" value={form.phone}
           onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
-        <div className="relative">
-          <input className={cn(inputCls, 'w-full pr-9')} inputMode="numeric" placeholder="NIF (11 ou 15 chiffres)" value={form.nif}
-            onChange={(e) => setForm((f) => ({ ...f, nif: e.target.value }))} />
-          {nifState === true && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-              <Check size={12} className="text-white" strokeWidth={3} />
-            </span>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <input className={cn(inputCls, 'w-full')} placeholder="RC" value={form.rc}
-            onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
-          <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS" value={form.nis}
-            onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
-          <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI" value={form.ai}
-            onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
-        </div>
-        <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)" value={form.address}
-          onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
+        {/* Extra identity/fiscal fields stay folded — name+phone is enough
+            to keep the flow fast; unfold for the full DGI identity. */}
+        {moreFields ? (
+          <>
+            <input className={cn(inputCls, 'w-full')} inputMode="email" placeholder="Email (optionnel)" value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+            <div className="relative">
+              <input className={cn(inputCls, 'w-full pr-9')} inputMode="numeric" placeholder="NIF (11 ou 15 chiffres)" value={form.nif}
+                onChange={(e) => setForm((f) => ({ ...f, nif: e.target.value }))} />
+              {nifState === true && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <Check size={12} className="text-white" strokeWidth={3} />
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <input className={cn(inputCls, 'w-full')} placeholder="RC" value={form.rc}
+                onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
+              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS" value={form.nis}
+                onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
+              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI" value={form.ai}
+                onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
+            </div>
+            <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)" value={form.address}
+              onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
+          </>
+        ) : (
+          <button type="button" onClick={() => setMoreFields(true)}
+            className="h-9 rounded-lg text-xs font-semibold text-[var(--green-2)] bg-[var(--blue-bg)] active:scale-[0.98] transition-transform">
+            + Détails (email, NIF, RC, adresse…)
+          </button>
+        )}
         <div className="flex gap-2">
           <button type="button" onClick={() => setCreating(false)}
             className="flex-1 h-11 rounded-xl text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]">
@@ -345,6 +364,13 @@ function ClientMode({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-[var(--sand-muted)]">Pour qui&nbsp;? 👤</p>
+        <button type="button" onClick={onDone}
+          className="text-[11px] font-semibold text-[var(--sand-muted)] px-2 py-1 active:opacity-70">
+          Passer
+        </button>
+      </div>
       <div className="relative">
         <Search size={16} className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]" />
         <input className={cn(inputCls, 'w-full ltr:pl-9 rtl:pr-9')} placeholder="Rechercher un client…" value={q}
@@ -388,6 +414,7 @@ function DetailsMode() {
   const setNotes = useDocumentStore((s) => s.setNotes);
   const setObjet = useDocumentStore((s) => s.setObjet);
   const setReference = useDocumentStore((s) => s.setReference);
+  const setTemplate = useDocumentStore((s) => s.setTemplate);
   const updateDelivery = useDocumentStore((s) => s.updateDelivery);
 
   const [acompte, setAcompteLocal] = useState(doc.acompte ? String(doc.acompte) : '');
@@ -442,6 +469,20 @@ function DetailsMode() {
               + Plus
             </button>
           )}
+        </div>
+      </div>
+
+      {/* PDF style template — applied when the doc is rendered on the web */}
+      <div>
+        <FieldLabel>Modèle PDF</FieldLabel>
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
+          {([['classic', 'Classique'], ['haussmann', 'Haussmann'], ['nordic', 'Nordic'], ['velours', 'Velours'], ['industrielle', 'Industrielle']] as Array<[string, string]>).map(([id, label]) => (
+            <button key={id} type="button"
+              onClick={() => { hapticLight(); setTemplate(id); }}
+              className={chip((doc.template ?? 'classic') === id)}>
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 

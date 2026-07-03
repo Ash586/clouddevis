@@ -12,6 +12,8 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useSyncStore } from '@/stores/syncStore';
+import { useDocumentStore } from '@/stores/documentStore';
+import { processWebSyncItem } from '@/lib/webSync';
 import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
@@ -123,15 +125,33 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     setShowWizard(true);
   }, []);
 
+  // ── Duplicate from the documents list: prefill the draft (new doc,
+  // new number/date) and open the creator — NOT edit mode. ──
+  const handleDuplicateDocument = useCallback((doc: Document) => {
+    useDocumentStore.getState().loadDocumentIntoWizard(doc.id);
+    setEditingDocId(null);
+    setShowWizard(true);
+  }, []);
+
+  // ── Missing-company guard → land on the Company tab ──────
+  const handleConfigureCompany = useCallback(() => {
+    setShowWizard(false);
+    setEditingDocId(null);
+    setCompanyView('profile');
+    setActiveTab('company');
+  }, []);
+
   // ── Company navigation ────────────────────────────────────
   const handleGoToClients = useCallback(() => setCompanyView('clients'), []);
   const handleBackToProfile = useCallback(() => setCompanyView('profile'), []);
 
   // ── Network retry: flush pending queue ───────────────────
+  // NOTE: must use the REAL processor — a stub `() => true` used to
+  // clear the queue without actually syncing (silent data loss).
   const processQueue = useSyncStore((s) => s.processQueue);
   const handleRetry = useCallback(() => {
     if (isOnline) {
-      void processQueue(async () => true);
+      void processQueue(processWebSyncItem);
     }
   }, [isOnline, processQueue]);
 
@@ -160,6 +180,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
           <DocumentsListScreen
             onNewDocument={handleNewDevis}
             onEditDocument={handleEditDocument}
+            onDuplicateDocument={handleDuplicateDocument}
           />
         );
 
@@ -255,6 +276,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             <CreateScreen
               onExit={handleWizardClose}
               editingDocId={editingDocId ?? undefined}
+              onConfigureCompany={handleConfigureCompany}
             />
           </motion.div>
         )}

@@ -6,9 +6,10 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    // Remote Server Mode — يفتح واجهة الهاتف /mobile مباشرةً (وليس صفحة التسويق)
-    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000/mobile'
-    url: 'https://clouddevis.vercel.app/mobile',
+    // Remote Server Mode — /app يعرض MobileShell كامل الشاشة (بلا إطار المعاينة).
+    // ملاحظة: /mobile هو غلاف معاينة للمتصفح فقط — لا تستعمله في الإنتاج.
+    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000/app'
+    url: 'https://clouddevis.vercel.app/app',
     cleartext: false,
   },
   plugins: {

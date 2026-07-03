@@ -13,12 +13,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
+  Building2, CheckCircle2,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
+import { useSyncStore } from '@/stores/syncStore';
 import {
-  fetchDocumentDetail, createApiDocument, updateApiDocument, type ApiDocumentDetail,
+  fetchDocumentDetail, createApiDocument, updateApiDocument, updateDocumentStatus,
+  type ApiDocumentDetail,
 } from '@/mobile/lib/api';
+import { hapticSuccess, hapticError } from '@/mobile/lib/haptics';
+import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64, printDocument, downloadDocument } from '@/mobile/lib/pdf';
 import { shareDocument, openWhatsApp } from '@/mobile/lib/whatsapp';
 import { notify } from '@/mobile/lib/toast';
@@ -36,9 +41,11 @@ const PAYMENT_LABEL: Record<string, string> = {
 interface CreateScreenProps {
   editingDocId?: string;
   onExit?: () => void;
+  /** Navigate to the Company tab (used by the missing-company guard). */
+  onConfigureCompany?: () => void;
 }
 
-export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
+export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: CreateScreenProps) {
   const currentDoc = useDocumentStore((s) => s.currentDoc);
   const totals = useDocumentStore((s) => s.totals);
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
@@ -63,7 +70,18 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
   const [busy, setBusy] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [exitConfirmOpen, setExitConfirmOpen] = useState(false);
+  /** Post-save success sheet: real server number + share CTAs.
+   *  Carries a snapshot (the draft is reset right after save). */
+  const [savedSheet, setSavedSheet] = useState<{
+    id: string; number: string; offline: boolean;
+    clientName: string; clientPhone?: string; total: number; typeLabel: string;
+  } | null>(null);
+  const savedPdfRef = useRef<string | null>(null);
   const pdfRef = useRef<string | null>(null);
+  /** Smart-morph: after the FIRST item lands with no client, morph the dock
+   *  to client mode once — a natural pause to capture the identity. */
+  const clientPromptShown = useRef(false);
 
   // ── Real document number ──
   const docNumber = useMemo(() => {
@@ -89,17 +107,27 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     return [...map.values()].sort((a, b) => b.count - a.count).slice(0, 8).map((e) => e.item);
   }, [savedDocuments]);
 
-  // ── Load on mount: edit pre-loads doc; new resets ──
+  // ── Load on mount: edit pre-loads doc; new resets — UNLESS a prefill
+  // (duplicate) or a restored draft is waiting in the store. ──
   useEffect(() => {
     if (!editingDocId) {
-      resetDocument();
+      const store = useDocumentStore.getState();
+      const prefilled = store.consumePrefill();
+      const hasDraft = store.currentDoc.items.length > 0 || !!store.currentDoc.client?.name;
+      if (prefilled) {
+        void notify('Document dupliqué — vérifiez et enregistrez');
+      } else if (hasDraft) {
+        void notify('Brouillon restauré ✓');
+      } else {
+        resetDocument();
+      }
       pdfRef.current = null;
       return;
     }
     const loadIntoStore = (raw: ApiDocumentDetail) => {
       let parsed: Array<Record<string, unknown>> = [];
       try { parsed = JSON.parse(raw.items) as Array<Record<string, unknown>>; } catch { parsed = []; }
-      const valid = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR']);
+      const valid = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'BL']);
       setType((valid.has(raw.type) ? raw.type : 'DEVIS') as DocumentType);
       if (raw.client) {
         setClient({
@@ -130,7 +158,16 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     setLoadError('');
     fetchDocumentDetail(editingDocId)
       .then(loadIntoStore)
-      .catch(() => setLoadError('Impossible de charger le document.'))
+      .catch(() => {
+        // Offline / not-yet-synced doc → fall back to the local copy.
+        const local = useDocumentStore.getState().savedDocuments.find((d) => d.id === editingDocId);
+        if (local) {
+          useDocumentStore.getState().loadDocumentIntoWizard(local.id);
+          useDocumentStore.getState().consumePrefill(); // not a duplicate — plain edit
+        } else {
+          setLoadError('Impossible de charger le document.');
+        }
+      })
       .finally(() => setLoadingDoc(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingDocId, retryToken]);
@@ -142,16 +179,40 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
   const tapLine = useCallback((id: string) => { setEditingLineId(id); setDockMode('line'); }, []);
 
   const handleBack = useCallback(() => {
+    // Unsaved work → confirm; the draft is kept (autosaved in the store)
+    // and restored on the next open. No more silent data loss.
+    const hasWork = !editingDocId && (currentDoc.items.length > 0 || !!currentDoc.client?.name);
+    if (hasWork) { setExitConfirmOpen(true); return; }
     if (!editingDocId) resetDocument();
     onExit?.();
-  }, [editingDocId, onExit, resetDocument]);
+  }, [editingDocId, onExit, resetDocument, currentDoc]);
+
+  // ── Smart-morph: first item added while no client → ask "pour qui ?" once.
+  // Deferred a beat so the new line's landing animation finishes first. ──
+  useEffect(() => {
+    if (editingDocId || clientPromptShown.current) return;
+    if (currentDoc.items.length >= 1 && !currentDoc.client?.name) {
+      clientPromptShown.current = true;
+      const t = setTimeout(() => setDockMode('client'), 350);
+      return () => clearTimeout(t);
+    }
+  }, [currentDoc.items.length, currentDoc.client?.name, editingDocId]);
+
+  // ── DGI awareness: announce the timbre fiscal when it kicks in ──
+  const prevTimbre = useRef(totals.timbreFiscal);
+  useEffect(() => {
+    if (totals.timbreFiscal && !prevTimbre.current) {
+      void notify(`Timbre fiscal (${totals.timbreAmount.toLocaleString('fr-DZ')} DA) ajouté — Art. 220 CII`);
+    }
+    prevTimbre.current = totals.timbreFiscal;
+  }, [totals.timbreFiscal, totals.timbreAmount]);
 
   // ── PDF (cached until the doc changes) ──
-  const buildPdf = useCallback(async (): Promise<string | null> => {
-    if (pdfRef.current) return pdfRef.current;
+  const buildPdf = useCallback(async (overrideNumber?: string): Promise<string | null> => {
+    if (!overrideNumber && pdfRef.current) return pdfRef.current;
     try {
       const base64 = await generatePDFBase64({
-        docNumber,
+        docNumber: overrideNumber ?? docNumber,
         docType: currentDoc.type,
         clientName: currentDoc.client?.name || 'Client',
         clientAddress: currentDoc.client?.address,
@@ -212,13 +273,24 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
   // ── Save ──
   const handleSave = useCallback(async () => {
     if (!company) { void notify('Configurez votre société d’abord'); return; }
-    if (!guardReady()) return;
+    if (!guardReady()) { hapticError(); return; }
     setSaving(true);
     try {
       if (editingDocId) {
-        const temp = saveDocument(company);
+        // Edit path: PURE build — appending via saveDocument() here used to
+        // create a local duplicate + a queued CREATE for an existing doc.
+        const temp = useDocumentStore.getState().buildFromCurrent(company);
         if (!temp) { void notify('Aucun article à enregistrer'); return; }
-        await updateApiDocument(editingDocId, { ...temp, id: editingDocId });
+        try {
+          await updateApiDocument(editingDocId, { ...temp, id: editingDocId });
+        } catch {
+          // Offline: queue the UPDATE for replay — and say so honestly.
+          useSyncStore.getState().enqueue({
+            action: 'UPDATE', entity: 'document', entityId: editingDocId,
+            payload: { ...temp, id: editingDocId },
+          });
+          void notify('Modifié hors ligne — synchronisation automatique ✓');
+        }
         updateSavedDocument(editingDocId, {
           type: currentDoc.type, client: currentDoc.client as Client, items: currentDoc.items,
           notes: currentDoc.notes || undefined, paymentMode: currentDoc.paymentMode,
@@ -226,19 +298,83 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
           totalTVA: totals.totalTVA, totalTTC: totals.totalTTC,
           timbreFiscal: totals.timbreFiscal, timbreAmount: totals.timbreAmount,
         });
+        hapticSuccess();
+        void notify('Enregistré ✓');
+        setTimeout(() => onExit?.(), 700);
       } else {
+        // New path: local save (+ queued CREATE for offline resilience)…
         const doc = saveDocument(company);
         if (!doc) { void notify('Aucun article à enregistrer'); return; }
-        await createApiDocument(doc);
+        let finalId = doc.id;
+        let finalNumber = doc.number;
+        let offline = false;
+        try {
+          // …then direct POST. On success, adopt the SERVER identity and
+          // drop the queued CREATE so a later replay can't double-submit.
+          const res = await createApiDocument(doc);
+          useDocumentStore.getState().confirmDocSynced(doc.id, res);
+          finalId = res.id;
+          finalNumber = res.number;
+        } catch {
+          // Offline / server error: the doc IS saved locally and queued.
+          offline = true;
+        }
+        // Build the PDF with the real number BEFORE the draft is reset,
+        // so the success sheet can share it instantly.
+        savedPdfRef.current = await buildPdf(finalNumber);
+        hapticSuccess();
+        setSavedSheet({
+          id: finalId, number: finalNumber, offline,
+          clientName: currentDoc.client?.name || 'Client',
+          clientPhone: currentDoc.client?.phone || undefined,
+          total: totals.netAPayer,
+          typeLabel: DOCUMENT_TYPE_LABELS[currentDoc.type],
+        });
+        resetDocument();
+        clientPromptShown.current = false;
       }
-      void notify('Enregistré ✓');
-      setTimeout(() => onExit?.(), 700);
-    } catch {
-      void notify('Erreur lors de l’enregistrement');
     } finally {
       setSaving(false);
     }
-  }, [company, editingDocId, guardReady, saveDocument, updateSavedDocument, currentDoc, totals, onExit]);
+  }, [company, editingDocId, guardReady, saveDocument, updateSavedDocument, resetDocument, currentDoc, totals, onExit, buildPdf]);
+
+  // ── Success-sheet actions (post-save) ──
+  const whatsappMessage = useCallback((s: NonNullable<typeof savedSheet>) =>
+    `Bonjour ${s.clientName}, veuillez trouver ci-joint votre ${s.typeLabel.toLowerCase()} N°${s.number} ` +
+    `d'un montant de ${s.total.toLocaleString('fr-DZ')} DA. Merci de votre confiance — ${company?.name || 'CloudDevis'}.`,
+  [company?.name]);
+
+  const markSent = useCallback((s: NonNullable<typeof savedSheet>) => {
+    useDocumentStore.getState().setDocumentStatus(s.id, 'SENT');
+    if (!s.offline) updateDocumentStatus(s.id, 'SENT').catch(() => {});
+  }, []);
+
+  const handleSheetWhatsApp = useCallback(async () => {
+    const s = savedSheet;
+    if (!s || !savedPdfRef.current) return;
+    const result = await shareDocument({
+      pdfBase64: savedPdfRef.current, docNumber: s.number, clientName: s.clientName, total: s.total,
+    });
+    if (result === 'downloaded') {
+      void notify('PDF téléchargé — joignez-le à votre message');
+      void openWhatsApp({ phone: s.clientPhone, message: whatsappMessage(s) });
+    }
+    markSent(s);
+    setSavedSheet(null);
+    onExit?.();
+  }, [savedSheet, whatsappMessage, markSent, onExit]);
+
+  const handleSheetDownload = useCallback(() => {
+    const s = savedSheet;
+    if (!s || !savedPdfRef.current) return;
+    downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
+    void notify('PDF téléchargé ✓');
+  }, [savedSheet]);
+
+  const handleSheetDone = useCallback(() => {
+    setSavedSheet(null);
+    onExit?.();
+  }, [onExit]);
 
   // ── Share actions (all web-aware) ──
   const handleWhatsApp = useCallback(async () => {
@@ -253,9 +389,16 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     });
     if (result === 'downloaded') {
       void notify('PDF téléchargé — joignez-le à votre message');
-      void openWhatsApp({ phone: currentDoc.client?.phone, message: `${DOCUMENT_TYPE_LABELS[currentDoc.type]} ${docNumber}` });
+      const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
+      void openWhatsApp({
+        phone: currentDoc.client?.phone,
+        message:
+          `Bonjour ${currentDoc.client?.name || ''}, veuillez trouver ci-joint votre ${label.toLowerCase()} ` +
+          `N°${docNumber} d'un montant de ${totals.netAPayer.toLocaleString('fr-DZ')} DA. ` +
+          `Merci de votre confiance — ${company?.name || 'CloudDevis'}.`,
+      });
     }
-  }, [guardReady, buildPdf, docNumber, currentDoc, totals]);
+  }, [guardReady, buildPdf, docNumber, currentDoc, totals, company?.name]);
 
   const handleDownload = useCallback(async () => {
     setShareOpen(false);
@@ -303,6 +446,31 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
     if (currentDoc.items.length === 0) { setDockMode('add'); void notify('Ajoutez au moins un article'); return; }
     setPreviewOpen(true);
   }, [currentDoc.items.length]);
+
+  // ── Company guard: don't let the user build a doc that can't be saved ──
+  if (!company && !savedSheet) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--navy)] px-8">
+        <div className="text-center max-w-[280px]">
+          <span className="inline-flex w-16 h-16 rounded-2xl bg-[var(--blue-bg)] items-center justify-center mb-4">
+            <Building2 size={28} className="text-[var(--green-2)]" />
+          </span>
+          <h2 className="text-lg font-bold text-[var(--sand)]">Configurez votre société</h2>
+          <p className="text-sm text-[var(--sand-muted)] mt-2 mb-6">
+            Vos documents ont besoin de l&apos;en-tête de votre activité (nom, NIF…) pour être valides.
+          </p>
+          <button type="button" onClick={() => (onConfigureCompany ?? onExit)?.()}
+            className="w-full h-12 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-[0.98] transition-transform">
+            Configurer ma société
+          </button>
+          <button type="button" onClick={() => onExit?.()}
+            className="mt-3 text-xs text-[var(--sand-muted)] underline">
+            Plus tard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── Loading / error states ──
   if (loadingDoc) {
@@ -352,7 +520,7 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
       {/* Living invoice */}
       <LivePaper
         type={currentDoc.type}
-        docNumber={docNumber}
+        docNumber={editingDocId ? docNumber : 'Brouillon — N° à l’enregistrement'}
         dateLabel={formatDateAlgerian(new Date())}
         editing={!!editingDocId}
         client={currentDoc.client}
@@ -387,7 +555,12 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Enregistrer
         </button>
-        <button type="button" onClick={() => setShareOpen(true)} disabled={busy}
+        {/* New doc: "Envoyer" routes through save first (real server number
+            on the PDF) then the success sheet offers WhatsApp instantly.
+            Edit mode: the number already exists → direct share menu. */}
+        <button type="button"
+          onClick={() => (editingDocId ? setShareOpen(true) : handleSave())}
+          disabled={busy || saving}
           className="h-12 px-3 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform disabled:opacity-60"
           aria-label="Envoyer">
           {busy ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={18} />}
@@ -433,6 +606,64 @@ export function CreateScreen({ editingDocId, onExit }: CreateScreenProps) {
                   <span className="text-[15px] font-medium text-[var(--sand)]">{label}</span>
                 </button>
               ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Exit guard — the draft is autosaved; leaving keeps it */}
+      <ConfirmSheet
+        open={exitConfirmOpen}
+        title="Quitter la création ?"
+        message="Votre brouillon sera conservé et restauré à la prochaine ouverture."
+        confirmLabel="Quitter"
+        cancelLabel="Continuer"
+        destructive={false}
+        onConfirm={() => { setExitConfirmOpen(false); onExit?.(); }}
+        onClose={() => setExitConfirmOpen(false)}
+      />
+
+      {/* Post-save success sheet — the real server number + instant send */}
+      <AnimatePresence>
+        {savedSheet && (
+          <>
+            <motion.div className="fixed inset-0 z-[80] bg-black/50"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-[90] max-w-lg mx-auto bg-[var(--navy-2)] rounded-t-3xl border-t border-[var(--border)] p-5"
+              style={{ paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))' }}
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}>
+              <div className="text-center mb-4">
+                <motion.span
+                  initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 18, delay: 0.05 }}
+                  className="inline-flex w-14 h-14 rounded-full bg-emerald-500/15 items-center justify-center mb-2">
+                  <CheckCircle2 size={30} className="text-emerald-400" />
+                </motion.span>
+                <p className="text-base font-bold text-[var(--sand)]">
+                  {savedSheet.typeLabel} enregistré
+                </p>
+                <p className="mono text-sm text-[var(--green-2)] mt-0.5">{savedSheet.number}</p>
+                {savedSheet.offline && (
+                  <p className="text-[11px] text-[var(--gold)] mt-1.5">
+                    Hors ligne — synchronisation automatique au retour du réseau ✓
+                  </p>
+                )}
+              </div>
+              <button type="button" onClick={handleSheetWhatsApp}
+                className="w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-transform"
+                style={{ background: '#25D366' }}>
+                <MessageCircle size={18} /> Envoyer via WhatsApp
+              </button>
+              <button type="button" onClick={handleSheetDownload}
+                className="w-full h-11 mt-2 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform">
+                <Download size={17} /> Télécharger le PDF
+              </button>
+              <button type="button" onClick={handleSheetDone}
+                className="w-full h-10 mt-1 text-sm font-medium text-[var(--sand-muted)]">
+                Terminé
+              </button>
             </motion.div>
           </>
         )}

@@ -14,9 +14,8 @@ import { useClientStore } from '@/stores/clientStore';
 import { useUserStore } from '@/stores/userStore';
 import { Badge } from '@/components/ui/badge';
 import { notify } from '@/mobile/lib/toast';
+import { compressImageFile } from '@/mobile/lib/image';
 import type { UserMode } from '@/mobile/types';
-
-const MAX_LOGO_BYTES = 500 * 1024; // 500 KB
 
 interface FieldDef { label: string; field: string; placeholder: string; type?: string }
 interface FieldSection { id: string; title: string; fields: FieldDef[] }
@@ -148,20 +147,16 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
         setLogoError('Veuillez choisir une image.');
         return;
       }
-      if (file.size > MAX_LOGO_BYTES) {
-        setLogoError('Image trop lourde (max 500 KB).');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
-        setLogoData(dataUrl);
-        // Persist immediately if the company already exists; otherwise it is
-        // saved together with the form on "Enregistrer".
-        if (isSetup) setLogo(dataUrl);
-      };
-      reader.onerror = () => setLogoError('Lecture du fichier impossible.');
-      reader.readAsDataURL(file);
+      // Compress client-side (≤500 KB) instead of rejecting heavy photos —
+      // artisans pick camera shots, not optimized PNGs.
+      compressImageFile(file, 500)
+        .then((dataUrl) => {
+          setLogoData(dataUrl);
+          // Persist immediately if the company already exists; otherwise it is
+          // saved together with the form on "Enregistrer".
+          if (isSetup) setLogo(dataUrl);
+        })
+        .catch(() => setLogoError('Lecture du fichier impossible.'));
     },
     [isSetup, setLogo],
   );

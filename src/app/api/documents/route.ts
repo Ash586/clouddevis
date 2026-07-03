@@ -73,7 +73,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       if (validTypes.includes(upperType)) where.type = upperType;
     }
     if (status) {
-      const validStatuses = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
+      const validStatuses = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED', 'SENT', 'PAID'];
       const upperStatus = status.toUpperCase();
       if (validStatuses.includes(upperStatus)) where.status = upperStatus;
     }
@@ -228,15 +228,24 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
 
     const editorMeta = buildEditorMeta(doc as Record<string, unknown>);
 
+    // Server-side numbering: clients that don't send a number (mobile) get
+    // the next sequential one. NOTE: assignDocumentNumber existed but was
+    // never called — an empty number collided on the (userId, number) unique
+    // constraint from the second mobile document onward.
+    const documentNumber =
+      String(doc.documentNumber || '').trim() ||
+      (await assignDocumentNumber(session.userId, typeValue));
+
     const created = await prisma.document.create({
       data: {
         userId: session.userId,
         type: typeValue,
-        number: String(doc.documentNumber || ''),
+        number: documentNumber,
         date: doc.date ? new Date(String(doc.date)) : new Date(),
         validUntil: doc.validUntil ? new Date(String(doc.validUntil)) : undefined,
         mode: (String(doc.mode || 'ARTISAN').toUpperCase()) as 'ARTISAN' | 'ENTREPRISE',
         paymentMode: String(doc.paymentMode || 'cheque'),
+        template: ['classic', 'haussmann', 'nordic', 'velours', 'industrielle'].includes(String(doc.template)) ? String(doc.template) : undefined,
         bcRef: (doc.bcRef as string) || null,
         brRef: (doc.brRef as string) || null,
         items: JSON.stringify(items),

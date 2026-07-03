@@ -5,8 +5,10 @@
 // Logo left, user avatar right
 // ============================================================
 
-import { Bell } from 'lucide-react';
+import { Bell, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUserStore } from '@/stores/userStore';
+import { hapticLight } from '@/mobile/lib/haptics';
 
 interface HomeHeaderProps {
   userName: string;
@@ -36,8 +38,10 @@ export function HomeHeader({
         </span>
       </div>
 
-      {/* Right side: notification bell + avatar */}
+      {/* Right side: privacy toggle + notification bell + avatar */}
       <div className="flex items-center gap-3">
+        {/* Privacy mode: mask amounts when showing the phone to a client */}
+        <PrivacyToggle />
         {/* Notification bell */}
         <button type="button"           onClick={onNotificationTap}
           className={cn(
@@ -71,5 +75,24 @@ export function HomeHeader({
         </div>
       </div>
     </header>
+  );
+}
+
+function PrivacyToggle() {
+  const privacyMode = useUserStore((s) => s.privacyMode);
+  const togglePrivacy = useUserStore((s) => s.togglePrivacy);
+  return (
+    <button
+      type="button"
+      onClick={() => { hapticLight(); togglePrivacy(); }}
+      className={cn(
+        'w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-transform',
+        privacyMode ? 'bg-[var(--blue-bg)] text-[var(--green-2)]' : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
+      )}
+      aria-label={privacyMode ? 'Afficher les montants' : 'Masquer les montants'}
+      aria-pressed={privacyMode}
+    >
+      {privacyMode ? <EyeOff size={19} strokeWidth={1.8} /> : <Eye size={19} strokeWidth={1.8} />}
+    </button>
   );
 }

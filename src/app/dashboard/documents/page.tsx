@@ -53,6 +53,9 @@ const STATUS_COLORS: Record<string, string> = {
   ACCEPTED: 'bg-blue-400/10 text-blue-400',
   PROGRESS: 'bg-amber-400/10 text-amber-400',
   DELIVERED: 'bg-[rgba(37,99,235,0.1)] text-[var(--green-3)]',
+  // Mobile invoice-lifecycle statuses (DRAFT → SENT → PAID)
+  SENT: 'bg-sky-400/10 text-sky-400',
+  PAID: 'bg-emerald-400/10 text-emerald-400',
 };
 
 const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];

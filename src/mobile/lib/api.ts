@@ -120,6 +120,7 @@ function toApiDocumentBody(doc: Document) {
     paymentMode: doc.paymentMode,
     acompte: doc.acompte ?? 0,
     notes: doc.notes,
+    template: doc.template,
     clientInfo: {
       name: doc.client.name,
       phone: doc.client.phone,
@@ -175,11 +176,11 @@ export async function fetchDocumentDetail(id: string): Promise<ApiDocumentDetail
 export async function createApiDocument(
   doc: Document
 ): Promise<{ id: string; number: string }> {
-  const res = await request<{ document: { id: string; number: string } }>(
+  // NOTE: POST /api/documents returns a FLAT { id, number } (not { document }).
+  return request<{ id: string; number: string }>(
     '/api/documents',
     { method: 'POST', body: JSON.stringify(toApiDocumentBody(doc)) }
   );
-  return res.document;
 }
 
 export async function updateApiDocument(
@@ -194,6 +195,17 @@ export async function updateApiDocument(
 
 export async function deleteApiDocument(id: string): Promise<void> {
   await request(`/api/documents/${id}`, { method: 'DELETE' });
+}
+
+/** Lifecycle transition (DRAFT → SENT → PAID). Best-effort from the mobile UI. */
+export async function updateDocumentStatus(
+  id: string,
+  status: 'DRAFT' | 'SENT' | 'PAID'
+): Promise<void> {
+  await request(`/api/documents/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
 }
 
 // ── Documents (list) ─────────────────────────────────────────

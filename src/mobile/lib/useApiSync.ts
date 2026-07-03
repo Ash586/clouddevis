@@ -42,7 +42,7 @@ function mapApiClientToStore(c: {
 }
 
 // Valid DocumentType values from the mobile types
-const VALID_DOC_TYPES = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR']);
+const VALID_DOC_TYPES = new Set(['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'BL']);
 
 function mapApiDocumentToStore(d: ApiDocumentListItem): Document {
   // The API returns INTERVENTION and ATTACHEMENT which aren't in the mobile DocumentType.

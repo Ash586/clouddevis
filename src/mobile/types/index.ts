@@ -133,6 +133,8 @@ export interface Document {
   validityDays?: number;
   reference?: string;
   showWatermark?: boolean;
+  /** PDF style template: classic | haussmann | nordic | velours | industrielle */
+  template?: string;
 
   // BL (Bon de Livraison) fields
   delivererName?: string;

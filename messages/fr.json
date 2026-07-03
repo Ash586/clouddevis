@@ -59,7 +59,9 @@
     "footer": {
       "allRightsReserved": "Tous droits réservés.",
       "algerianCompliance": "Conforme aux normes algériennes"
-    }
+    },
+    "sent": "Envoyé",
+    "paid": "Payé"
   },
   "navbar": {
     "dashboard": "Tableau de bord",

@@ -9,7 +9,29 @@ import { getLang } from '@/lib/api-i18n';
 import { buildEditorMeta } from '@/lib/editorMeta';
 import { DocumentState } from '@/types';
 
-const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
+const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'BL' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', bl: 'BL', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT' };
+
+const VALID_STATUSES = new Set(['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED', 'SENT', 'PAID']);
+
+/** Lightweight status-only update (mobile lifecycle: DRAFT → SENT → PAID). */
+export const PATCH = withApiErrorHandling(withAuth(async (req, session, ctx) => {
+  const { id } = await ctx!.params as { id: string };
+  const existing = await prisma.document.findFirst({ where: { id, userId: session.userId }, select: { id: true } });
+  if (!existing) return NextResponse.json({ error: 'Document introuvable' }, { status: 404 });
+
+  const body = await req.json().catch(() => ({}));
+  const status = String(body.status || '').toUpperCase();
+  if (!VALID_STATUSES.has(status)) {
+    return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
+  }
+
+  const doc = await prisma.document.update({
+    where: { id },
+    data: { status: status as 'DRAFT' },
+    select: { id: true, status: true },
+  });
+  return NextResponse.json({ document: doc });
+}), { component: 'invoice', severity: 'medium', userImpact: 'degraded' });
 
 export const GET = withApiErrorHandling(withAuth(async (_req, session, ctx) => {
   try {

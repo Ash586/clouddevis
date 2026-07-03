@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useUserStore } from '@/stores/userStore';
 import { Badge } from '@/components/ui/badge';
 import { formatAmount } from '@/mobile/lib/format';
 import type { Document, DocumentType } from '@/mobile/types';
@@ -65,6 +66,7 @@ const itemVariants = {
 };
 
 export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDocumentsProps) {
+  const privacyMode = useUserStore((s) => s.privacyMode);
   const recentDocs = [...documents]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
@@ -159,7 +161,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
                   {status.label}
                 </Badge>
                 <span className="text-xs font-semibold text-[var(--sand)] whitespace-nowrap">
-                  {formatAmount(doc.totalTTC)}
+                  {privacyMode ? '••••' : formatAmount(doc.totalTTC)}
                 </span>
               </div>
             </motion.button>

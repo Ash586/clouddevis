@@ -3,6 +3,7 @@
 import { FileText, Users, TrendingUp, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useUserStore } from '@/stores/userStore';
 import type { DashboardStats } from '@/mobile/lib/useDashboardStats';
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -68,6 +69,8 @@ interface StatCardsProps {
 }
 
 export function StatCards({ stats, loading }: StatCardsProps) {
+  // Privacy mode masks the revenue figure (showing the app to a client).
+  const privacyMode = useUserStore((s) => s.privacyMode);
   const cards: Omit<CardProps, 'loading'>[] = [
     {
       icon: <FileText size={16} strokeWidth={2} className="text-[var(--green-3)]" />,
@@ -81,7 +84,7 @@ export function StatCards({ stats, loading }: StatCardsProps) {
       icon: <TrendingUp size={16} strokeWidth={2} className="text-emerald-400" />,
       iconBg: 'bg-[rgba(16,185,129,0.12)]',
       label: "Chiffre d'affaires",
-      value: formatDA(stats.totalTTC),
+      value: privacyMode ? '••••' : formatDA(stats.totalTTC),
       sub: 'DA total TTC',
       delay: 0.08,
     },

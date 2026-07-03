@@ -59,7 +59,9 @@
     "footer": {
       "allRightsReserved": "جميع الحقوق محفوظة.",
       "algerianCompliance": "متوافق مع المعايير الجزائرية"
-    }
+    },
+    "sent": "مُرسَل",
+    "paid": "مدفوع"
   },
   "navbar": {
     "dashboard": "لوحة التحكم",

@@ -46,6 +46,8 @@ interface CurrentDocument {
   paymentMode: PaymentMode;
   acompte: number;
   validUntil?: string;
+  /** PDF style template (rendered by the web templates; stored on the doc). */
+  template?: string;
   // BL (Bon de Livraison) delivery fields
   delivererName?: string;
   delivererIdCard?: string;
@@ -87,6 +89,7 @@ export interface DocumentStore {
   setNotes: (notes: string) => void;
   setObjet: (objet: string) => void;
   setReference: (reference: string) => void;
+  setTemplate: (template: string) => void;
   updateDelivery: (patch: Partial<Pick<CurrentDocument, 'delivererName' | 'delivererIdCard' | 'transporterName' | 'transporterIdCard' | 'deliveryAddress'>>) => void;
   setValidUntil: (date: string | undefined) => void;
 
@@ -103,13 +106,29 @@ export interface DocumentStore {
 
   // ── Document lifecycle ──
   saveDocument: (company: Company) => Document | null;
+  /** Pure build of the current draft (no local append, no sync enqueue) — for the edit/update path. */
+  buildFromCurrent: (company: Company) => Document | null;
   deleteDocument: (id: string) => void;
   duplicateDocument: (id: string) => Document | null;
   loadDocumentIntoWizard: (id: string) => void;
+  /**
+   * Set when loadDocumentIntoWizard pre-fills the draft (edit-less duplicate):
+   * tells CreateScreen NOT to reset on mount. Cleared by resetDocument/consumePrefill.
+   */
+  pendingPrefill: boolean;
+  consumePrefill: () => boolean;
+  /** Update a saved document's workflow status (DRAFT → SENT → PAID). */
+  setDocumentStatus: (id: string, status: DocumentStatus) => void;
 
   // ── Sync ──
   setSyncStatus: (status: 'synced' | 'pending' | 'offline') => void;
   markDocumentSynced: (id: string) => void;
+  /**
+   * Reconcile a locally-created doc with the server's identity after a
+   * successful direct POST: swap in the server id + number and drop the
+   * queued CREATE so the sync replay can't double-submit it.
+   */
+  confirmDocSynced: (localId: string, server: { id: string; number: string }) => void;
   /**
    * Replace savedDocuments with server data.
    * Locally-created docs whose ID isn't on the server are preserved (offline-created).
@@ -171,6 +190,7 @@ function buildDocument(
     notes: doc.notes || undefined,
     validUntil: doc.validUntil,
     acompte: doc.acompte || undefined,
+    template: doc.template || undefined,
     delivererName: doc.delivererName || undefined,
     delivererIdCard: doc.delivererIdCard || undefined,
     transporterName: doc.transporterName || undefined,
@@ -238,6 +258,11 @@ export const useDocumentStore = create<DocumentStore>()(
       setValidUntil: (date) =>
         set((state) => ({
           currentDoc: { ...state.currentDoc, validUntil: date },
+        })),
+
+      setTemplate: (template) =>
+        set((state) => ({
+          currentDoc: { ...state.currentDoc, template },
         })),
 
       updateDelivery: (patch) =>
@@ -359,12 +384,37 @@ export const useDocumentStore = create<DocumentStore>()(
         return duplicatedDoc;
       },
 
+      buildFromCurrent: (company) => {
+        const state = get();
+        if (state.currentDoc.items.length === 0) return null;
+        // Pure build: same shape as saveDocument's output, but without
+        // appending to savedDocuments or enqueueing a CREATE — the edit
+        // path PUTs directly and must not create a local duplicate.
+        return buildDocument(state.currentDoc, company, state.totals, state.savedDocuments.length + 1);
+      },
+
+      pendingPrefill: false,
+
+      consumePrefill: () => {
+        const was = get().pendingPrefill;
+        if (was) set({ pendingPrefill: false });
+        return was;
+      },
+
+      setDocumentStatus: (id, status) =>
+        set((state) => ({
+          savedDocuments: state.savedDocuments.map((doc) =>
+            doc.id === id ? { ...doc, status } : doc
+          ),
+        })),
+
       loadDocumentIntoWizard: (id) => {
         const state = get();
         const doc = state.savedDocuments.find((d) => d.id === id);
         if (!doc) return;
 
         set({
+          pendingPrefill: true,
           currentDoc: {
             type: doc.type,
             client: { ...doc.client },
@@ -406,6 +456,20 @@ export const useDocumentStore = create<DocumentStore>()(
           syncStatus: state.savedDocuments.length > 0 ? 'synced' : 'offline',
         })),
 
+      confirmDocSynced: (localId, server) => {
+        // Drop the queued CREATE for this doc — the direct POST succeeded,
+        // so a later queue replay must not re-submit it (duplicate invoice!).
+        useSyncStore.getState().removeByEntity(localId);
+        set((state) => ({
+          savedDocuments: state.savedDocuments.map((doc) =>
+            doc.id === localId
+              ? { ...doc, id: server.id, number: server.number }
+              : doc
+          ),
+          syncStatus: useSyncStore.getState().queue.length > 0 ? 'pending' : 'synced',
+        }));
+      },
+
       updateSavedDocument: (id, updates) =>
         set((state) => ({
           savedDocuments: state.savedDocuments.map((doc) =>
@@ -431,6 +495,7 @@ export const useDocumentStore = create<DocumentStore>()(
           currentDoc: { ...defaultCurrentDoc },
           step: 1,
           totals: { ...emptyTotals },
+          pendingPrefill: false,
         }),
     }),
     {
@@ -447,11 +512,19 @@ export const useDocumentStore = create<DocumentStore>()(
           removeItem: () => {},
         };
       }),
-      // Only persist savedDocuments and syncStatus (not current wizard state)
+      // Persist savedDocuments + syncStatus + the in-progress draft (autosave:
+      // killing the app mid-creation restores the draft on next open).
       partialize: (state) => ({
         savedDocuments: state.savedDocuments,
         syncStatus: state.syncStatus,
+        currentDoc: state.currentDoc,
       }),
+      // totals is derived — recompute it from the rehydrated draft.
+      merge: (persisted, current) => {
+        const merged = { ...current, ...(persisted as Partial<DocumentStore>) };
+        merged.totals = computeTotals(merged.currentDoc);
+        return merged;
+      },
     }
   )
 );

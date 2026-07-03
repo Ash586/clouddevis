@@ -11,7 +11,10 @@ import type { UserMode } from '@/mobile/types';
 
 interface UserStore {
   mode: UserMode;
+  /** Mask financial figures on Home (show the app to a client safely). */
+  privacyMode: boolean;
   setMode: (mode: UserMode) => void;
+  togglePrivacy: () => void;
   reset: () => void;
 }
 
@@ -19,8 +22,10 @@ export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
       mode: 'artisan',
+      privacyMode: false,
       setMode: (mode) => set({ mode }),
-      reset: () => set({ mode: 'artisan' }),
+      togglePrivacy: () => set((s) => ({ privacyMode: !s.privacyMode })),
+      reset: () => set({ mode: 'artisan', privacyMode: false }),
     }),
     {
       name: 'clouddevis-user-store',

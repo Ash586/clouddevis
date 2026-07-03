@@ -7,7 +7,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pencil, Copy, Share2, Download, Printer, Trash2, X, type LucideIcon } from 'lucide-react';
+import { Pencil, Copy, Share2, Download, Printer, Trash2, X, BadgeCheck, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Document } from '@/mobile/types';
 
@@ -24,6 +24,7 @@ interface Action {
 const DOCUMENT_ACTIONS: Action[] = [
   { id: 'edit', label: 'Modifier', icon: Pencil, color: '#2563EB' },
   { id: 'duplicate', label: 'Dupliquer', icon: Copy, color: '#059669' },
+  { id: 'markPaid', label: 'Marquer payé', icon: BadgeCheck, color: '#10B981' },
   { id: 'share', label: 'Partager', icon: Share2, color: '#7C3AED' },
   { id: 'download', label: 'Télécharger PDF', icon: Download, color: '#D97706' },
   { id: 'print', label: 'Imprimer', icon: Printer, color: '#6B7280' },
@@ -124,7 +125,9 @@ export function ActionSheet({ open, actionDoc, onClose, onAction }: ActionSheetP
 
               {/* ── Actions ────────────────────────────────────── */}
               <div className="px-3 pb-2">
-                {DOCUMENT_ACTIONS.map((action, i) => {
+                {DOCUMENT_ACTIONS.filter(
+                  (a) => a.id !== 'markPaid' || actionDoc?.status !== 'PAID'
+                ).map((action, i) => {
                   const Icon = action.icon;
                   return (
                     <motion.button

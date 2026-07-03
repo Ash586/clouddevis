@@ -10,8 +10,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, UserPlus, Pencil, ChevronRight } from 'lucide-react';
+import { FileText, UserPlus, Pencil, ChevronRight, CloudOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSyncStore } from '@/stores/syncStore';
 import { DOCUMENT_TYPE_LABELS } from '@/mobile/types';
 import type { DocumentType, Client, LineItem } from '@/mobile/types';
 import type { DocumentCalculationResult } from '@/lib/dgi';
@@ -68,6 +69,10 @@ export function LivePaper({
   activeZone, activeLineId, onTapType, onTapClient, onTapDetails, onTapLine,
 }: LivePaperProps) {
   const net = useCountUp(totals.netAPayer);
+  const pendingSync = useSyncStore((s) => s.queue.length > 0);
+  // Client becomes visually "required" once work has started —
+  // amber (guidance), not red (the user hasn't made an error).
+  const clientRequired = !client?.name && items.length > 0;
 
   return (
     <div className="flex-1 overflow-hidden px-3 pt-3">
@@ -108,7 +113,9 @@ export function LivePaper({
             'active:scale-[0.99] transition-transform',
             client?.name
               ? 'bg-[var(--blue-bg)] border border-[var(--accent-ring)]'
-              : 'bg-[var(--navy-3)] border border-dashed border-[var(--border-2)]',
+              : clientRequired
+                ? 'bg-amber-400/5 border border-dashed border-amber-400/50'
+                : 'bg-[var(--navy-3)] border border-dashed border-[var(--border-2)]',
             activeZone === 'client' && 'ring-2 ring-[var(--accent-ring)]',
           )}
           aria-label={client?.name ? 'Modifier le client' : 'Ajouter un client'}
@@ -126,10 +133,18 @@ export function LivePaper({
             </>
           ) : (
             <>
-              <span className="w-8 h-8 rounded-full bg-[var(--navy-4)] text-[var(--sand-muted)] flex items-center justify-center shrink-0">
+              <span className={cn(
+                'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                clientRequired ? 'bg-amber-400/15 text-amber-400' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
+              )}>
                 <UserPlus size={16} />
               </span>
-              <span className="flex-1 text-sm font-semibold text-[var(--sand-muted)]">Ajouter un client</span>
+              <span className={cn(
+                'flex-1 text-sm font-semibold',
+                clientRequired ? 'text-amber-400' : 'text-[var(--sand-muted)]',
+              )}>
+                {clientRequired ? 'Client requis' : 'Ajouter un client'}
+              </span>
             </>
           )}
         </button>
@@ -210,7 +225,12 @@ export function LivePaper({
             >
               Détails
             </button>
-            <span className="text-xl font-bold text-[var(--green-2)] heading">{formatDA(net)}</span>
+            <span className="flex items-center gap-2">
+              {pendingSync && (
+                <CloudOff size={14} className="text-[var(--gold)]" aria-label="En attente de synchronisation" />
+              )}
+              <span className="text-xl font-bold text-[var(--green-2)] heading">{formatDA(net)}</span>
+            </span>
           </div>
         </div>
       </div>

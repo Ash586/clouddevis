@@ -15,6 +15,7 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { Loader2 } from 'lucide-react';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
+import { updateDocumentStatus } from '@/mobile/lib/api';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
@@ -73,6 +74,8 @@ function filterDocuments(docs: Document[], filter: FilterId): Document[] {
 interface DocumentsListScreenProps {
   onNewDocument?: () => void;
   onEditDocument?: (doc: Document) => void;
+  /** Prefill the creator with a copy of this doc (new number/date). */
+  onDuplicateDocument?: (doc: Document) => void;
 }
 
 // ── Component ────────────────────────────────────────────────
@@ -80,6 +83,7 @@ interface DocumentsListScreenProps {
 export function DocumentsListScreen({
   onNewDocument,
   onEditDocument,
+  onDuplicateDocument,
 }: DocumentsListScreenProps) {
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -174,7 +178,15 @@ export function DocumentsListScreen({
           onEditDocument?.(doc);
           break;
         case 'duplicate':
-          if (duplicateDocument(doc.id)) void notify('Document dupliqué');
+          // Open the creator prefilled (new number/date) instead of
+          // silently saving a hidden copy.
+          if (onDuplicateDocument) onDuplicateDocument(doc);
+          else if (duplicateDocument(doc.id)) void notify('Document dupliqué');
+          break;
+        case 'markPaid':
+          useDocumentStore.getState().setDocumentStatus(doc.id, 'PAID');
+          updateDocumentStatus(doc.id, 'PAID').catch(() => {});
+          void notify('Marqué payé ✓');
           break;
         case 'delete':
           setDocToDelete(doc);
@@ -203,7 +215,7 @@ export function DocumentsListScreen({
           break;
       }
     },
-    [onEditDocument, duplicateDocument]
+    [onEditDocument, onDuplicateDocument, duplicateDocument]
   );
 
   return (
