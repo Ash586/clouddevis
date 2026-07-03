@@ -14,6 +14,7 @@ import {
   ReceiptText,
   ClipboardList,
   PackageCheck,
+  Truck,
   Pencil,
   Copy,
   Trash2,
@@ -35,6 +36,7 @@ const DOC_ICONS: Record<DocumentType, LucideIcon> = {
   PROFORMA: ReceiptText,
   BC: ClipboardList,
   BR: PackageCheck,
+  BL: Truck,
 };
 
 const DOC_COLORS: Record<DocumentType, string> = {
@@ -43,6 +45,7 @@ const DOC_COLORS: Record<DocumentType, string> = {
   PROFORMA: '#7C3AED',
   BC: '#D97706',
   BR: '#059669',
+  BL: '#0284C7',
 };
 
 type BadgeVariant = 'success' | 'warning' | 'default' | 'danger';

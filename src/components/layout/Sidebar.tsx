@@ -27,6 +27,7 @@ import {
   Wrench,
   FilePen,
   ScrollText,
+  Truck,
   X,
 } from 'lucide-react';
 
@@ -36,6 +37,7 @@ const ALL_QUICK_DOCS = [
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
   { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack },
   { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText },
+  { type: 'bon_livraison', labelKey: 'bonLivraison', icon: Truck },
   { type: 'intervention', labelKey: 'intervention', icon: Wrench },
   { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ] as const;
@@ -47,6 +49,7 @@ const ALL_DOCUMENT_TYPES = [
   { id: 'proforma', key: 'proforma' },
   { id: 'bon_commande', key: 'bonCommande' },
   { id: 'bon_reception', key: 'bonReception' },
+  { id: 'bon_livraison', key: 'bonLivraison' },
   { id: 'intervention', key: 'intervention' },
   { id: 'attachement', key: 'attachement' },
 ] as const;
@@ -54,7 +57,7 @@ const DOCUMENT_TYPES = ALL_DOCUMENT_TYPES.filter(d => ENABLED_DOC_TYPES.includes
 
 const TYPE_MAP: Record<string, string> = {
   devis: 'DEVIS', facture: 'FACTURE', proforma: 'PROFORMA',
-  bon_commande: 'BC', bon_reception: 'BR', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT',
+  bon_commande: 'BC', bon_reception: 'BR', bon_livraison: 'BL', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT',
 };
 
 function SidebarInner() {
@@ -210,14 +213,6 @@ function SidebarInner() {
 
             {documentsOpen && (
               <div className="mt-1 ms-4 space-y-0.5 border-l border-[rgba(15,39,71,0.1)] pl-2 animate-in">
-                <button type="button" onClick={() => { router.push('/dashboard/documents'); setMobileOpen(false); }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
-                    pathname === '/dashboard/documents' && !searchParams?.get('type') 
-                      ? 'text-[var(--sand)] bg-[var(--navy-3)]' 
-                      : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
-                  }`}>
-                  {s('allDocuments')}
-                </button>
                 {DOCUMENT_TYPES.map((dt) => (
                   <button type="button" key={dt.id} onClick={() => filterDocumentsByType(dt.id)}
                     className={`w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-semibold transition min-h-[44px] ${
@@ -275,9 +270,9 @@ function SidebarInner() {
       {mobileOpen && (
         <div className="fixed inset-0 z-[150] md:hidden">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
-          <aside className="fixed inset-y-0 right-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-l border-[rgba(15,39,71,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <aside className="fixed inset-y-0 left-0 w-[280px] flex flex-col p-4 bg-[var(--navy)] shadow-2xl z-[160] animate-in border-r border-[rgba(15,39,71,0.1)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             <button type="button" onClick={() => setMobileOpen(false)}
-              className="absolute top-4 left-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="absolute top-4 right-4 p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)] rounded-lg transition min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label={s('close') || 'Fermer le menu'}>
               <X size={18} />
             </button>
@@ -290,7 +285,7 @@ function SidebarInner() {
 
       {!mobileOpen && (
         <button type="button" onClick={() => setMobileOpen(true)}
-          className="flex md:hidden fixed bottom-6 right-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(15,39,71,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
+          className="flex md:hidden fixed bottom-6 left-5 z-[140] w-12 h-12 bg-[var(--navy-2)] text-[var(--sand)] border border-[rgba(15,39,71,0.14)] rounded-full shadow-xl items-center justify-center hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition active:scale-95"
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
           aria-label="Menu">
 

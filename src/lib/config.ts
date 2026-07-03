@@ -5,4 +5,4 @@ import type { DocumentType } from '@/types';
  * To enable a type, add it to this list and it will appear everywhere
  * (Sidebar, editor type menu, dashboard filters).
  */
-export const ENABLED_DOC_TYPES: DocumentType[] = ['devis', 'facture'];
+export const ENABLED_DOC_TYPES: DocumentType[] = ['devis', 'facture', 'bl'];

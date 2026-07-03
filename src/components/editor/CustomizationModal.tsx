@@ -90,6 +90,12 @@ const CUSTOMIZER_GROUPS: Array<{
     section: 'paiement',
   },
   {
+    id: 'livraison', icon: <ClipboardList size={16} />, labelKey: 'sections.livraison',
+    color: 'bg-[var(--navy-3)] text-sky-400 border-sky-400/20',
+    fields: ['delivererName', 'delivererIdCard', 'transporterName', 'transporterIdCard', 'deliveryAddress'],
+    section: 'livraison', onlyFor: ['bl'] as DocumentType[],
+  },
+  {
     id: 'notes', icon: <ScrollText size={16} />, labelKey: 'sections.notes',
     color: 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[rgba(245,237,214,0.08)]',
     fields: ['notes', 'mentionsLegales', 'conditionsGenerales'], section: 'notes',

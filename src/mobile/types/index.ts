@@ -6,7 +6,7 @@
 // ── Enums / Union Types ──────────────────────────────────────
 
 /** Types of documents supported */
-export type DocumentType = 'DEVIS' | 'FACTURE' | 'PROFORMA' | 'BC' | 'BR';
+export type DocumentType = 'DEVIS' | 'FACTURE' | 'PROFORMA' | 'BC' | 'BR' | 'BL';
 
 /** Document workflow status */
 export type DocumentStatus = 'DRAFT' | 'SENT' | 'PAID' | 'CANCELLED';
@@ -133,6 +133,13 @@ export interface Document {
   validityDays?: number;
   reference?: string;
   showWatermark?: boolean;
+
+  // BL (Bon de Livraison) fields
+  delivererName?: string;
+  delivererIdCard?: string;
+  transporterName?: string;
+  transporterIdCard?: string;
+  deliveryAddress?: string;
 }
 
 // ── User & Auth ──────────────────────────────────────────────
@@ -202,6 +209,7 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   PROFORMA: 'Proforma',
   BC: 'Bon de Commande',
   BR: 'Bon de Réception',
+  BL: 'Bon de Livraison',
 };
 
 export const DOCUMENT_STATUS_LABELS: Record<DocumentStatus, string> = {

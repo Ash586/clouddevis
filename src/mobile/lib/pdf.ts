@@ -26,6 +26,11 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
     notes: doc.notes,
     objet: doc.objet,
     acompte: doc.acompte,
+    delivererName: doc.delivererName,
+    delivererIdCard: doc.delivererIdCard,
+    transporterName: doc.transporterName,
+    transporterIdCard: doc.transporterIdCard,
+    deliveryAddress: doc.deliveryAddress,
     company: {
       name: doc.company.name,
       nif: doc.company.nif,

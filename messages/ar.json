@@ -113,9 +113,11 @@
       "bonCommande": "أمر شراء",
       "bonReception": "ورقة استلام",
       "intervention": "استمارة تدخل",
-      "attachement": "ملحق الأشغال"
+      "attachement": "ملحق الأشغال",
+      "bonLivraison": "وصل تسليم"
     },
-    "switchToCompany": "التحويل إلى وضع الشركة"
+    "switchToCompany": "التحويل إلى وضع الشركة",
+    "bonLivraison": "وصل تسليم"
   },
   "home": {
     "heroBadge": "مطابق للتشريع الجزائري",
@@ -306,7 +308,8 @@
       "bonCommande": "أمر شراء",
       "bonReception": "وصل استلام",
       "intervention": "تدخل",
-      "attachement": "كشف"
+      "attachement": "كشف",
+      "bonLivraison": "وصل تسليم"
     },
     "next": "التالي",
     "back": "رجوع"
@@ -347,7 +350,8 @@
       "travaux": "الأعمال",
       "pieces": "الأجزاء",
       "etat": "حالة الجهاز",
-      "devis": "معلومات العرض"
+      "devis": "معلومات العرض",
+      "livraison": "التسليم"
     },
     "customizer": {
       "docInfo": "المستند",
@@ -477,7 +481,12 @@
       "bankAgency": "الوكالة",
       "ccpNumber": "الحساب البريدي (CCP)",
       "validityDays": "مدة الصلاحية (أيام)",
-      "showWatermark": "علامة مائية DEVIS"
+      "showWatermark": "علامة مائية DEVIS",
+      "delivererName": "المُسلِّم — الاسم",
+      "delivererIdCard": "المُسلِّم — رقم البطاقة",
+      "transporterName": "الناقل — الاسم",
+      "transporterIdCard": "الناقل — رقم البطاقة",
+      "deliveryAddress": "مكان التسليم"
     },
     "general": {
       "docNumber": "رقم المستند",
@@ -627,7 +636,8 @@
       "garanties": "الضمانات",
       "legal": "الإشارات القانونية",
       "signature": "التوقيع"
-    }
+    },
+    "documentTypeBL": "وصل تسليم"
   },
   "preview": {
     "docTypeQuote": "تقدير",
@@ -720,7 +730,8 @@
       "ml": "م.ط",
       "kg": "كغ",
       "forfait": "مقطوع"
-    }
+    },
+    "docTypeBL": "وصل تسليم"
   },
   "trial": {
     "trialBanner": "فترة تجريبية — استفد من جميع الميزات.",

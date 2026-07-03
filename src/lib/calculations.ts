@@ -27,6 +27,25 @@ export function calculateDocument(doc: DocumentState): CalculationResult {
     doc.paymentMode
   );
 
+  // Bon de Livraison carries no VAT / timbre / TTC — only HT amounts.
+  // Zeroing the tax here makes every downstream renderer (HTML templates,
+  // PDF engine, live preview) hide the tax rows via their existing guards.
+  if (doc.documentType === 'bl') {
+    const ht = result.totalHTAfterDiscount;
+    return {
+      subTotalHT: result.subTotalHT,
+      tvaRate: 0,
+      tvaAmount: 0,
+      timbreFiscal: 0,
+      discountAmount: result.discountAmount,
+      totalHTAfterDiscount: ht,
+      totalTTC: ht,
+      acompte: 0,
+      netAPayer: ht,
+      totalInWords: dgiNumberToFrenchWords(ht),
+    };
+  }
+
   return {
     subTotalHT: result.subTotalHT,
     tvaRate: doc.tvaRate,

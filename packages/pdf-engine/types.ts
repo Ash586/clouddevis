@@ -48,7 +48,7 @@ export interface PDFLineItem {
 }
 
 /** Document type for PDF */
-export type PDFDocumentType = 'DEVIS' | 'FACTURE' | 'PROFORMA' | 'BC' | 'BR';
+export type PDFDocumentType = 'DEVIS' | 'FACTURE' | 'PROFORMA' | 'BC' | 'BR' | 'BL';
 
 /** Complete data needed to generate a PDF */
 export interface PDFDocumentData {
@@ -97,6 +97,13 @@ export interface PDFDocumentData {
   validityDays?: number;
   reference?: string;
   showWatermark?: boolean;
+
+  // BL (Bon de Livraison) specific fields
+  delivererName?: string;
+  delivererIdCard?: string;
+  transporterName?: string;
+  transporterIdCard?: string;
+  deliveryAddress?: string;
 }
 
 /** PDF generation options */

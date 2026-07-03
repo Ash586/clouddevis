@@ -94,6 +94,7 @@ const TYPE_MAP: Record<DocumentType, string> = {
   PROFORMA: 'proforma',
   BC: 'bc',
   BR: 'br',
+  BL: 'bl',
 };
 
 /** Convert a mobile Document to the shape the /api/documents POST endpoint expects. */

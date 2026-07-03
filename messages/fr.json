@@ -113,9 +113,11 @@
       "bonCommande": "Bon de Commande",
       "bonReception": "Bon de Réception",
       "intervention": "Fiche d'Intervention",
-      "attachement": "Attachement des Travaux"
+      "attachement": "Attachement des Travaux",
+      "bonLivraison": "Bon de Livraison"
     },
-    "switchToCompany": "Passer en mode Entreprise"
+    "switchToCompany": "Passer en mode Entreprise",
+    "bonLivraison": "Bon de Livraison"
   },
   "home": {
     "heroBadge": "Conforme à la réglementation algérienne",
@@ -306,7 +308,8 @@
       "bonCommande": "Bon de Commande",
       "bonReception": "Bon de Réception",
       "intervention": "Intervention",
-      "attachement": "Attachement"
+      "attachement": "Attachement",
+      "bonLivraison": "Bon de Livraison"
     },
     "next": "Suivant",
     "back": "Retour"
@@ -347,7 +350,8 @@
       "travaux": "Travaux",
       "pieces": "Pièces",
       "etat": "État Appareil",
-      "devis": "Informations Devis"
+      "devis": "Informations Devis",
+      "livraison": "Livraison"
     },
     "customizer": {
       "docInfo": "Document",
@@ -477,7 +481,12 @@
       "bankAgency": "Agence",
       "ccpNumber": "CCP",
       "validityDays": "Validité (jours)",
-      "showWatermark": "Filigrane DEVIS"
+      "showWatermark": "Filigrane DEVIS",
+      "delivererName": "Livreur — Nom",
+      "delivererIdCard": "Livreur — N° CIN",
+      "transporterName": "Transporteur — Nom",
+      "transporterIdCard": "Transporteur — N° CIN",
+      "deliveryAddress": "Lieu de livraison"
     },
     "general": {
       "docNumber": "N° Document",
@@ -627,7 +636,8 @@
       "garanties": "Garanties",
       "legal": "Mentions légales",
       "signature": "Signature"
-    }
+    },
+    "documentTypeBL": "Bon de livraison"
   },
   "preview": {
     "docTypeQuote": "Devis",
@@ -720,7 +730,8 @@
       "ml": "ml",
       "kg": "Kg",
       "forfait": "Forfait"
-    }
+    },
+    "docTypeBL": "Bon de livraison"
   },
   "trial": {
     "trialBanner": "Période d'essai — Profitez de toutes les fonctionnalités.",

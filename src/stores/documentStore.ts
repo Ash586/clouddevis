@@ -46,6 +46,12 @@ interface CurrentDocument {
   paymentMode: PaymentMode;
   acompte: number;
   validUntil?: string;
+  // BL (Bon de Livraison) delivery fields
+  delivererName?: string;
+  delivererIdCard?: string;
+  transporterName?: string;
+  transporterIdCard?: string;
+  deliveryAddress?: string;
 }
 
 const defaultCurrentDoc: CurrentDocument = {
@@ -81,6 +87,7 @@ export interface DocumentStore {
   setNotes: (notes: string) => void;
   setObjet: (objet: string) => void;
   setReference: (reference: string) => void;
+  updateDelivery: (patch: Partial<Pick<CurrentDocument, 'delivererName' | 'delivererIdCard' | 'transporterName' | 'transporterIdCard' | 'deliveryAddress'>>) => void;
   setValidUntil: (date: string | undefined) => void;
 
   // ── Line item CRUD ──
@@ -123,12 +130,14 @@ function netUnitPrice(item: { unitPrice: number; remise?: number }): number {
 }
 
 function computeTotals(doc: CurrentDocument): DocumentCalculationResult {
+  // Bon de Livraison carries no VAT / timbre → force tax-free totals.
+  const isBL = doc.type === 'BL';
   const items = doc.items.map((item) => ({
     quantity: item.quantity,
     unitPrice: netUnitPrice(item),
-    tvaRate: item.tvaRate,
+    tvaRate: isBL ? 0 : item.tvaRate,
   }));
-  return calculateDocumentTotals(items, doc.type, doc.acompte);
+  return calculateDocumentTotals(items, doc.type, isBL ? 0 : doc.acompte);
 }
 
 // ── Helper: build a full Document from current state ──────────
@@ -162,6 +171,11 @@ function buildDocument(
     notes: doc.notes || undefined,
     validUntil: doc.validUntil,
     acompte: doc.acompte || undefined,
+    delivererName: doc.delivererName || undefined,
+    delivererIdCard: doc.delivererIdCard || undefined,
+    transporterName: doc.transporterName || undefined,
+    transporterIdCard: doc.transporterIdCard || undefined,
+    deliveryAddress: doc.deliveryAddress || undefined,
   };
 }
 
@@ -224,6 +238,11 @@ export const useDocumentStore = create<DocumentStore>()(
       setValidUntil: (date) =>
         set((state) => ({
           currentDoc: { ...state.currentDoc, validUntil: date },
+        })),
+
+      updateDelivery: (patch) =>
+        set((state) => ({
+          currentDoc: { ...state.currentDoc, ...patch },
         })),
 
       // ── Line item CRUD ──
@@ -357,6 +376,11 @@ export const useDocumentStore = create<DocumentStore>()(
             paymentMode: doc.paymentMode,
             acompte: doc.acompte || 0,
             validUntil: doc.validUntil,
+            delivererName: doc.delivererName,
+            delivererIdCard: doc.delivererIdCard,
+            transporterName: doc.transporterName,
+            transporterIdCard: doc.transporterIdCard,
+            deliveryAddress: doc.deliveryAddress,
           },
           step: 1,
           totals: {

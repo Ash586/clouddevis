@@ -17,6 +17,8 @@ import { RemiseSection } from './RemiseSection';
 import { GarantiesSection } from './GarantiesSection';
 import { PaiementSection } from './PaiementSection';
 import { NotesSection } from './NotesSection';
+import { SignatureSection } from './SignatureSection';
+import { LivraisonSection } from './LivraisonSection';
 import { CustomSectionRenderer } from './CustomSectionRenderer';
 import {
   EquipementSection,
@@ -42,6 +44,8 @@ export function registerAllBuiltinSections(): void {
   registerSection('garanties', GarantiesSection, { sectionId: 'garanties', titleKey: 'sections.garanties', blockId: 'garanties' });
   registerSection('paiement', PaiementSection, { sectionId: 'paiement', titleKey: 'sections.paiement', blockId: 'payment' });
   registerSection('notes', NotesSection, { sectionId: 'notes', titleKey: 'sections.notes' });
+  registerSection('signature', SignatureSection, { sectionId: 'signature', titleKey: 'sections.signature' });
+  registerSection('livraison', LivraisonSection, { sectionId: 'livraison', titleKey: 'sections.livraison' });
 
   // ── Intervention sections ──
   registerSection('equipement', EquipementSection, { sectionId: 'equipement', titleKey: 'sections.equipement' });

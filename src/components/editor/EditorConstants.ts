@@ -8,6 +8,7 @@ export const DOC_TYPE_EDITOR_LABELS: Record<string, string> = {
   proforma: 'documentTypeProforma',
   bc: 'documentTypeBC',
   br: 'documentTypeBR',
+  bl: 'documentTypeBL',
   intervention: 'documentTypeIntervention',
   attachement: 'documentTypeAttachement',
 };
@@ -19,6 +20,7 @@ export const DOC_TYPE_PREVIEW_LABELS: Record<string, string> = {
   proforma: 'docTypeProforma',
   bc: 'docTypeOrder',
   br: 'docTypeBR',
+  bl: 'docTypeBL',
   intervention: 'docTypeIntervention',
   attachement: 'docTypeAttachement',
 };
@@ -27,10 +29,11 @@ export const DOC_TYPE_PREVIEW_LABELS: Record<string, string> = {
 export const URL_TYPE_MAP: Record<string, DocumentType> = {
   bon_commande: 'bc',
   bon_reception: 'br',
+  bon_livraison: 'bl',
 };
 
 /** All valid internal document types */
-const VALID_DOC_TYPES: DocumentType[] = ['devis', 'proforma', 'bc', 'br', 'facture', 'intervention', 'attachement'];
+const VALID_DOC_TYPES: DocumentType[] = ['devis', 'proforma', 'bc', 'br', 'bl', 'facture', 'intervention', 'attachement'];
 
 /**
  * Normalize a raw `?type=` URL param into a valid internal DocumentType.
@@ -55,6 +58,7 @@ export function getDocTypeIcon(type: DocumentType) {
     proforma: 'ClipboardList',
     bc: 'FileStack',
     br: 'ScrollText',
+    bl: 'Truck',
     intervention: 'Wrench',
     attachement: 'FileText',
   } as const;
@@ -75,4 +79,5 @@ export const sectionFocusMap: Record<string, PreviewFocus> = {
   notes: null,
   mode: 'header',
   devis: 'header',
+  livraison: 'header',
 };

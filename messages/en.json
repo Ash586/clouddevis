@@ -113,9 +113,11 @@
       "bonCommande": "Purchase Order",
       "bonReception": "Receipt Note",
       "intervention": "Intervention Sheet",
-      "attachement": "Work Attachment"
+      "attachement": "Work Attachment",
+      "bonLivraison": "Delivery Note"
     },
-    "switchToCompany": "Switch to Company mode"
+    "switchToCompany": "Switch to Company mode",
+    "bonLivraison": "Delivery Note"
   },
   "home": {
     "heroBadge": "Compliant with Algerian regulations",
@@ -306,7 +308,8 @@
       "bonCommande": "Purchase Order",
       "bonReception": "Delivery Receipt",
       "intervention": "Intervention",
-      "attachement": "Attachment"
+      "attachement": "Attachment",
+      "bonLivraison": "Delivery Note"
     },
     "next": "Next",
     "back": "Back"
@@ -347,7 +350,8 @@
       "travaux": "Work",
       "pieces": "Parts",
       "etat": "Device State",
-      "devis": "Quote Information"
+      "devis": "Quote Information",
+      "livraison": "Delivery"
     },
     "customizer": {
       "docInfo": "Document",
@@ -477,7 +481,12 @@
       "bankAgency": "Branch",
       "ccpNumber": "Postal account (CCP)",
       "validityDays": "Validity (days)",
-      "showWatermark": "DEVIS watermark"
+      "showWatermark": "DEVIS watermark",
+      "delivererName": "Deliverer — Name",
+      "delivererIdCard": "Deliverer — ID No.",
+      "transporterName": "Transporter — Name",
+      "transporterIdCard": "Transporter — ID No.",
+      "deliveryAddress": "Delivery location"
     },
     "general": {
       "docNumber": "Document No.",
@@ -627,7 +636,8 @@
       "garanties": "Guarantees",
       "legal": "Legal mentions",
       "signature": "Signature"
-    }
+    },
+    "documentTypeBL": "Delivery note"
   },
   "preview": {
     "docTypeQuote": "Quote",
@@ -720,7 +730,8 @@
       "ml": "l.m",
       "kg": "Kg",
       "forfait": "Lump sum"
-    }
+    },
+    "docTypeBL": "Delivery note"
   },
   "trial": {
     "trialBanner": "Trial period — Enjoy all features.",

@@ -4,7 +4,7 @@ export type SectorId =
   | 'reparation_auto' | 'sante' | 'formation' | 'immobilier'
   | 'transport_personnes' | 'artisanat' | 'agriculture'
   | 'professions_liberales' | 'informatique';
-export type DocumentType = 'devis' | 'proforma' | 'bc' | 'br' | 'facture' | 'intervention' | 'attachement';
+export type DocumentType = 'devis' | 'proforma' | 'bc' | 'br' | 'bl' | 'facture' | 'intervention' | 'attachement';
 export type WorkflowState = 'draft' | 'accepted' | 'progress' | 'delivered';
 export type TaxRegimeId = 'tva_19' | 'tva_9' | 'tva_0';
 export type PaymentMode = 'cheque' | 'virement' | 'especes' | 'cb';
@@ -100,7 +100,7 @@ export type SectionId = string;
 
 export const DEFAULT_SECTION_ORDER: string[] = [
   'design', 'general', 'devis', 'mode', 'client', 'chantier', 'materiaux',
-  'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature',
+  'prestations', 'livraison', 'remise', 'garanties', 'paiement', 'notes', 'signature',
 ];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
@@ -117,6 +117,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   paiement: 'Payment',
   notes: 'Notes',
   signature: 'Signature',
+  livraison: 'Livraison',
   equipement: 'Équipement',
   visite: 'Visite',
   verifications: 'Vérifications',
@@ -189,9 +190,17 @@ export interface DocumentState {
   ccpNumber?: string;
   validityDays?: number;
   reference?: string;
+  deliveryRef?: string;
   showWatermark?: boolean;
   objet?: string;
   docCity?: string;
+
+  // Real-document Devis fields
+  activityDescription?: string;
+  articleNumber?: string;
+  closingLegalText?: string;
+  signatoryName?: string;
+  signatoryTitle?: string;
 
   // Attachement signature fields (left column only)
   sigClientSubtitle?: string;
@@ -206,12 +215,19 @@ export interface DocumentState {
 
   // Company phone
   companyPhone?: string;
+
+  // BL (Bon de Livraison) fields
+  delivererName?: string;
+  delivererIdCard?: string;
+  transporterName?: string;
+  transporterIdCard?: string;
+  deliveryAddress?: string;
 }
 
 export const SECTION_FIELDS: Record<SectionId, string[]> = {
   design: ['logo', 'logoPosition', 'logoSize'],
   general: ['docNumber', 'orderRef', 'issueDate', 'validUntil', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle', 'objet', 'docCity'],
-  devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
+  devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark', 'activityDescription', 'articleNumber', 'closingLegalText', 'signatoryName', 'signatoryTitle'],
   mode: ['businessMode'],
   client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
   chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
@@ -221,7 +237,8 @@ export const SECTION_FIELDS: Record<SectionId, string[]> = {
   garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
   paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
   notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
-  signature: ['companyPhone', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
+  signature: ['companyPhone', 'signatoryName', 'signatoryTitle', 'sigClientSubtitle', 'sigClientNameFr', 'sigClientRole', 'sigClientRoleFr', 'sigClientNameAr', 'sigCompanyNameFr', 'sigDirectionNameFr', 'sigDirectionRole', 'sigDirectionNameAr'],
+  livraison: ['delivererName', 'delivererIdCard', 'transporterName', 'transporterIdCard', 'deliveryAddress'],
   equipement: ['equipementDesignation', 'equipementType', 'equipementSerie'],
   visite: ['typeVisite', 'duree', 'intervenants'],
   verifications: [],
@@ -240,27 +257,28 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     design: ['logo', 'logoPosition', 'logoSize'],
 
     general: ['docNumber', 'issueDate', 'validUntil', 'orderRef', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
-    devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
+    devis: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark', 'activityDescription', 'articleNumber', 'closingLegalText', 'signatoryName', 'signatoryTitle'],
     mode: ['businessMode'],
     client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
-    chantier: ['chantierAddress', 'chantierType', 'chantierCondition', 'chantierSurface', 'chantierProtection', 'chantierResponsable'],
-    materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+    chantier: [],
+    materiaux: [],
     prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
-    remise: ['remiseType', 'remiseValue', 'remiseReason'],
-    garanties: ['garantieLabor', 'garantieMaterials', 'garantieNotes', 'garantieDuree', 'garantieRetenue'],
-    paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
+    remise: [],
+    garanties: [],
+    paiement: [],
     notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
   },
   facture: {
     design: ['logo', 'logoPosition', 'logoSize'],
-
-    general: ['docNumber', 'issueDate', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+    general: ['docNumber', 'issueDate', 'orderRef', 'objet', 'vatRate', 'stampRate', 'stampMin', 'stampMax'],
+    devis: ['activityDescription', 'articleNumber', 'reference', 'deliveryRef', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'closingLegalText', 'signatoryName', 'signatoryTitle'],
     mode: ['businessMode'],
-    client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail'],
     prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice', 'itemTvaRate'],
-    remise: ['remiseType', 'remiseValue', 'remiseReason'],
-    paiement: ['paymentMethod', 'paymentDeposit', 'paymentConditions', 'paymentIban', 'paymentEcheance', 'paymentModeReglement'],
-    notes: ['notes', 'mentionsLegales', 'conditionsGenerales'],
+    remise: [],
+    garanties: [],
+    paiement: [],
+    notes: ['notes'],
   },
   proforma: {
     design: ['logo', 'logoPosition', 'logoSize'],
@@ -287,6 +305,14 @@ export const DOC_TYPE_DEFAULT_FIELDS: Record<DocumentType, Record<string, string
     general: ['docNumber', 'issueDate'],
     client: ['clientName', 'clientAddress'],
     materiaux: ['materiauxBrand', 'materiauxType', 'materiauxColor', 'materiauxQty', 'materiauxUnite'],
+    notes: ['notes'],
+  },
+  bl: {
+    design: ['logo', 'logoPosition', 'logoSize'],
+    general: ['docNumber', 'issueDate', 'orderRef'],
+    client: ['clientName', 'clientAddress', 'clientNif', 'clientPhone'],
+    prestations: ['itemsTable', 'itemDescription', 'itemQuantity', 'itemUnit', 'itemUnitPrice'],
+    livraison: ['delivererName', 'delivererIdCard', 'transporterName', 'transporterIdCard', 'deliveryAddress'],
     notes: ['notes'],
   },
   intervention: {
@@ -384,6 +410,12 @@ export const DOC_TYPE_CATEGORIES: Record<DocumentType, { value: string; labelKey
     { value: 'equipement', labelKey: 'preview.categories.equipement' },
     { value: 'divers', labelKey: 'preview.categories.divers' },
   ],
+  bl: [
+    { value: '', labelKey: 'preview.categories.none' },
+    { value: 'materiaux', labelKey: 'preview.categories.materiaux' },
+    { value: 'equipement', labelKey: 'preview.categories.equipement' },
+    { value: 'divers', labelKey: 'preview.categories.divers' },
+  ],
   intervention: [
     { value: '', labelKey: 'preview.categories.none' },
     { value: 'diagnostic', labelKey: 'preview.categories.diagnostic' },
@@ -428,21 +460,23 @@ export function categoryLabelKey(value: string): string | undefined {
 }
 
 export const DOC_TYPE_SECTION_ORDER: Record<DocumentType, string[]> = {
-  devis: ['design', 'general', 'devis', 'client', 'chantier', 'materiaux', 'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature'],
-  facture: ['design', 'general', 'client', 'prestations', 'remise', 'garanties', 'paiement', 'notes'],
+  devis: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
+  facture: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
   proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
   bc: ['design', 'general', 'client', 'prestations', 'notes'],
   br: ['design', 'general', 'client', 'materiaux', 'notes'],
-  intervention: ['design', 'general', 'client', 'chantier', 'prestations', 'garanties', 'paiement', 'notes'],
+  bl: ['design', 'general', 'client', 'prestations', 'livraison', 'notes'],
+  intervention: ['design', 'general', 'client', 'chantier', 'prestations', 'garanties', 'paiement', 'notes', 'signature'],
   attachement: ['design', 'general', 'client', 'chantier', 'materiaux', 'prestations', 'notes', 'signature'],
 };
 
 export const DOC_TYPE_SECTIONS: Record<DocumentType, string[]> = {
-  devis: ['design', 'general', 'devis', 'client', 'chantier', 'materiaux', 'prestations', 'remise', 'garanties', 'paiement', 'notes', 'signature'],
-  facture: ['design', 'general', 'client', 'prestations', 'remise', 'garanties', 'paiement', 'notes'],
+  devis: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
+  facture: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
   proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
   bc: ['design', 'general', 'client', 'prestations', 'notes'],
   br: ['design', 'general', 'client', 'materiaux', 'notes'],
+  bl: ['design', 'general', 'client', 'prestations', 'livraison', 'notes'],
   intervention: ['design', 'general', 'client', 'equipement', 'visite', 'verifications', 'travaux', 'pieces', 'etat', 'notes', 'signature'],
   attachement: ['design', 'general', 'client', 'chantier', 'materiaux', 'prestations', 'notes', 'signature'],
 };

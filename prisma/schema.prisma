@@ -26,6 +26,7 @@ enum DocumentType {
   PROFORMA
   BC
   BR
+  BL
   FACTURE
   INTERVENTION
   ATTACHEMENT

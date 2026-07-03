@@ -11,6 +11,7 @@ import {
   ClipboardList,
   ReceiptText,
   PackageCheck,
+  Truck,
   type LucideIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -27,6 +28,7 @@ const DOC_ICONS: Record<DocumentType, LucideIcon> = {
   PROFORMA: ReceiptText,
   BC: ClipboardList,
   BR: PackageCheck,
+  BL: Truck,
 };
 
 // ── Status → badge variant mapping ────────────────────────────

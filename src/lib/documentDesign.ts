@@ -62,6 +62,16 @@ const DESIGNS: Record<DocumentType, DocTypeDesign> = {
     gradientTo: '#0d9488',
     accent: '#14b8a6',
   },
+  bl: {
+    primary: 'sky-600',
+    primaryHex: '#0284c7',
+    primaryLight: '#e0f2fe',
+    primaryDark: '#075985',
+    borderColor: '#0284c7',
+    gradientFrom: '#075985',
+    gradientTo: '#0284c7',
+    accent: '#0ea5e9',
+  },
   intervention: {
     primary: 'rose-600',
     primaryHex: '#e11d48',

@@ -12,10 +12,10 @@ import { getLang } from '@/lib/api-i18n';
 import { buildEditorMeta } from '@/lib/editorMeta';
 import type { DocumentState } from '@/types';
 
-const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT', bon_commande: 'BC', bon_reception: 'BR' };
+const DOC_TYPE_MAP: Record<string, 'DEVIS' | 'PROFORMA' | 'BC' | 'BR' | 'BL' | 'FACTURE' | 'INTERVENTION' | 'ATTACHEMENT'> = { devis: 'DEVIS', proforma: 'PROFORMA', bc: 'BC', br: 'BR', bl: 'BL', facture: 'FACTURE', intervention: 'INTERVENTION', attachement: 'ATTACHEMENT', bon_commande: 'BC', bon_reception: 'BR', bon_livraison: 'BL' };
 
 const DOC_PREFIX_MAP: Record<string, string> = {
-  DEVIS: 'DEV', FACTURE: 'FAC', PROFORMA: 'PRO', BC: 'BC', BR: 'BR', INTERVENTION: 'INT', ATTACHEMENT: 'ATT',
+  DEVIS: 'DEV', FACTURE: 'FAC', PROFORMA: 'PRO', BC: 'BC', BR: 'BR', BL: 'BL', INTERVENTION: 'INT', ATTACHEMENT: 'ATT',
 };
 
 async function assignDocumentNumber(userId: string, type: string): Promise<string> {
@@ -68,7 +68,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       ];
     }
     if (type) {
-      const validTypes = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE', 'INTERVENTION', 'ATTACHEMENT'];
+      const validTypes = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'BL', 'FACTURE', 'INTERVENTION', 'ATTACHEMENT'];
       const upperType = type.toUpperCase();
       if (validTypes.includes(upperType)) where.type = upperType;
     }

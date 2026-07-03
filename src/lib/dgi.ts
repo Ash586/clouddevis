@@ -179,7 +179,8 @@ export function shouldApplyTimbre(
   paymentMode?: string
 ): boolean {
   // Devis and attachements are exempt
-  const exemptTypes = ['DEVIS', 'devis', 'ATTACHEMENT', 'attachement'];
+  // BL (bon de livraison) carries no fiscal stamp, no TVA, no TTC.
+  const exemptTypes = ['DEVIS', 'devis', 'ATTACHEMENT', 'attachement', 'BL', 'bl'];
   if (exemptTypes.includes(documentType)) return false;
 
   // Cheque and virement are exempt per Art. 220 CII
@@ -366,6 +367,7 @@ export function generateDocNumber(
     PROFORMA: 'PRO',
     BC: 'BC',
     BR: 'BR',
+    BL: 'BL',
     INTERVENTION: 'INT',
     ATTACHEMENT: 'ATT',
   };

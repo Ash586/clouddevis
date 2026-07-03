@@ -39,7 +39,7 @@ function joinDot(parts: Array<string | undefined | false>): string {
 
 const TYPE_LABELS: Record<string, string> = {
   DEVIS: 'Devis', FACTURE: 'Facture', PROFORMA: 'Facture Proforma',
-  BC: 'Bon de Commande', BR: 'Bon de Réception',
+  BC: 'Bon de Commande', BR: 'Bon de Réception', BL: 'Bon de Livraison',
 };
 
 /** "Arrêté(e) … à la somme de" framing per document type. */
@@ -115,6 +115,8 @@ const styles = StyleSheet.create({
   notesLabel: { fontSize: 7, color: COLORS.textLight, textTransform: 'uppercase', marginBottom: 2 },
   notesText: { fontSize: 8, color: COLORS.text },
 
+  deliveryBox: { marginTop: 12, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: COLORS.border },
+  deliveryLine: { fontSize: 9, color: COLORS.text, marginBottom: 3 },
   signature: { marginTop: 22, flexDirection: 'row', justifyContent: 'flex-end' },
   signatureBox: { width: 150, alignItems: 'center' },
   signatureLabel: { fontSize: 8, color: COLORS.textLight, marginBottom: 28 },
@@ -151,6 +153,9 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
   ]);
   const net = data.netAPayer ?? (data.totalTTC + (data.timbreFiscal ? data.timbreAmount : 0) - (data.acompte || 0));
   const typeLabel = TYPE_LABELS[data.type] || 'Document';
+  // A Bon de Livraison proves delivery, not payment: no TVA column, no timbre,
+  // no TTC / Net à payer, no "arrêté à la somme de", and a dual signature footer.
+  const isBL = data.type === 'BL';
 
   return (
     <Document>
@@ -227,7 +232,7 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
             <Text style={[styles.th, styles.cPrice]}>P.U HT</Text>
             <Text style={[styles.th, styles.cRem]}>Rem.</Text>
             <Text style={[styles.th, styles.cTotal]}>Montant HT</Text>
-            <Text style={[styles.th, styles.cTva]}>TVA</Text>
+            {!isBL ? <Text style={[styles.th, styles.cTva]}>TVA</Text> : null}
           </View>
           {data.items.map((item, index) => (
             <View key={index} style={index % 2 === 1 ? [styles.tableRow, styles.tableRowAlt] : styles.tableRow}>
@@ -241,7 +246,7 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
               <Text style={styles.cPrice}>{formatNum(item.unitPrice)}</Text>
               <Text style={styles.cRem}>{item.remise ? `${item.remise}%` : '—'}</Text>
               <Text style={styles.cTotal}>{formatNum(item.totalHT)}</Text>
-              <Text style={styles.cTva}>{item.tvaRate}%</Text>
+              {!isBL ? <Text style={styles.cTva}>{item.tvaRate}%</Text> : null}
             </View>
           ))}
         </View>
@@ -249,37 +254,67 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
         {/* Totals */}
         <View style={styles.bottomRow}>
           <View style={styles.totalsBox}>
-            <View style={styles.totalsRow}>
-              <Text style={styles.totalsLabel}>Total HT</Text>
-              <Text style={styles.totalsValue}>{formatDA(data.totalHT)}</Text>
-            </View>
-            <View style={styles.totalsRow}>
-              <Text style={styles.totalsLabel}>TVA</Text>
-              <Text style={styles.totalsValue}>{formatDA(data.totalTVA)}</Text>
-            </View>
-            {data.timbreFiscal ? (
-              <View style={[styles.totalsRow, styles.totalsRowTimbre]}>
-                <Text style={styles.totalsLabel}>Timbre fiscal</Text>
-                <Text style={[styles.totalsValue, { color: COLORS.timbreAmber }]}>{formatDA(data.timbreAmount)}</Text>
+            {isBL ? (
+              <View style={[styles.totalsRow, styles.totalsNet]}>
+                <Text style={styles.totalsNetLabel}>Total HT</Text>
+                <Text style={styles.totalsNetValue}>{formatDA(data.totalHT)}</Text>
               </View>
-            ) : null}
-            {data.acompte ? (
-              <View style={styles.totalsRow}>
-                <Text style={styles.totalsLabel}>Acompte</Text>
-                <Text style={styles.totalsValue}>- {formatDA(data.acompte)}</Text>
-              </View>
-            ) : null}
-            <View style={[styles.totalsRow, styles.totalsNet]}>
-              <Text style={styles.totalsNetLabel}>Net à payer</Text>
-              <Text style={styles.totalsNetValue}>{formatDA(net)}</Text>
-            </View>
+            ) : (
+              <>
+                <View style={styles.totalsRow}>
+                  <Text style={styles.totalsLabel}>Total HT</Text>
+                  <Text style={styles.totalsValue}>{formatDA(data.totalHT)}</Text>
+                </View>
+                <View style={styles.totalsRow}>
+                  <Text style={styles.totalsLabel}>TVA</Text>
+                  <Text style={styles.totalsValue}>{formatDA(data.totalTVA)}</Text>
+                </View>
+                {data.timbreFiscal ? (
+                  <View style={[styles.totalsRow, styles.totalsRowTimbre]}>
+                    <Text style={styles.totalsLabel}>Timbre fiscal</Text>
+                    <Text style={[styles.totalsValue, { color: COLORS.timbreAmber }]}>{formatDA(data.timbreAmount)}</Text>
+                  </View>
+                ) : null}
+                {data.acompte ? (
+                  <View style={styles.totalsRow}>
+                    <Text style={styles.totalsLabel}>Acompte</Text>
+                    <Text style={styles.totalsValue}>- {formatDA(data.acompte)}</Text>
+                  </View>
+                ) : null}
+                <View style={[styles.totalsRow, styles.totalsNet]}>
+                  <Text style={styles.totalsNetLabel}>Net à payer</Text>
+                  <Text style={styles.totalsNetValue}>{formatDA(net)}</Text>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
-        {/* Amount in words */}
-        <Text style={styles.words}>
-          {`${wordsPrefix(data.type)} : ${data.totalInWords}.`}
-        </Text>
+        {/* Amount in words (payment documents only) */}
+        {!isBL ? (
+          <Text style={styles.words}>
+            {`${wordsPrefix(data.type)} : ${data.totalInWords}.`}
+          </Text>
+        ) : null}
+
+        {/* BL delivery block: deliverer / transporter identity + delivery location */}
+        {isBL && (data.delivererName || data.transporterName || data.deliveryAddress) ? (
+          <View style={styles.deliveryBox}>
+            {data.deliveryAddress ? (
+              <Text style={styles.deliveryLine}>Lieu de livraison : {data.deliveryAddress}</Text>
+            ) : null}
+            {data.delivererName ? (
+              <Text style={styles.deliveryLine}>
+                Livreur : {data.delivererName}{data.delivererIdCard ? `  (CIN : ${data.delivererIdCard})` : ''}
+              </Text>
+            ) : null}
+            {data.transporterName ? (
+              <Text style={styles.deliveryLine}>
+                Transporteur : {data.transporterName}{data.transporterIdCard ? `  (CIN : ${data.transporterIdCard})` : ''}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
 
         {/* Notes */}
         {data.notes ? (
@@ -289,13 +324,26 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
           </View>
         ) : null}
 
-        {/* Signature */}
-        <View style={styles.signature}>
-          <View style={styles.signatureBox}>
-            <Text style={styles.signatureLabel}>Cachet et signature</Text>
-            {c.signature ? <Image src={c.signature} style={styles.signatureImg} /> : <View style={styles.signatureLine} />}
+        {/* Signature — BL needs both parties (livreur + réception client) */}
+        {isBL ? (
+          <View style={[styles.signature, { justifyContent: 'space-between' }]}>
+            <View style={styles.signatureBox}>
+              <Text style={styles.signatureLabel}>Signature du livreur</Text>
+              <View style={styles.signatureLine} />
+            </View>
+            <View style={styles.signatureBox}>
+              <Text style={styles.signatureLabel}>Signature et cachet du client (réception)</Text>
+              <View style={styles.signatureLine} />
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.signature}>
+            <View style={styles.signatureBox}>
+              <Text style={styles.signatureLabel}>Cachet et signature</Text>
+              {c.signature ? <Image src={c.signature} style={styles.signatureImg} /> : <View style={styles.signatureLine} />}
+            </View>
+          </View>
+        )}
       </Page>
     </Document>
   );

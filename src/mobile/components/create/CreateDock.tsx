@@ -31,7 +31,7 @@ export interface CatalogItem {
 
 const UNIT_OPTIONS = Object.keys(UNIT_LABELS) as UnitMeasure[];
 const TVA_OPTIONS: Array<0 | 9 | 19> = [0, 9, 19];
-const DOC_TYPES: DocumentType[] = ['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR'];
+const DOC_TYPES: DocumentType[] = ['DEVIS', 'FACTURE', 'PROFORMA', 'BC', 'BR', 'BL'];
 const PAYMENT_MODES: Array<{ id: PaymentMode; label: string }> = [
   { id: 'especes', label: 'Espèces' },
   { id: 'cheque', label: 'Chèque' },
@@ -388,15 +388,18 @@ function DetailsMode() {
   const setNotes = useDocumentStore((s) => s.setNotes);
   const setObjet = useDocumentStore((s) => s.setObjet);
   const setReference = useDocumentStore((s) => s.setReference);
+  const updateDelivery = useDocumentStore((s) => s.updateDelivery);
 
   const [acompte, setAcompteLocal] = useState(doc.acompte ? String(doc.acompte) : '');
   useEffect(() => { setAcompte(parseFloat(acompte.replace(',', '.')) || 0); }, [acompte, setAcompte]);
 
-  // Persona soft-gating: artisans see the 3 everyday types; BC/BR sit behind
-  // a "Plus" chip (auto-expanded when editing a BC/BR document).
+  const isBL = doc.type === 'BL';
+
+  // Persona soft-gating: artisans see the 3 everyday types; BC/BR/BL sit behind
+  // a "Plus" chip (auto-expanded when editing one of those documents).
   const userMode = useUserStore((s) => s.mode);
   const [showAllTypes, setShowAllTypes] = useState(false);
-  const typesCollapsed = userMode === 'artisan' && !showAllTypes && !['BC', 'BR'].includes(doc.type);
+  const typesCollapsed = userMode === 'artisan' && !showAllTypes && !['BC', 'BR', 'BL'].includes(doc.type);
   const visibleTypes: DocumentType[] = typesCollapsed ? ['DEVIS', 'FACTURE', 'PROFORMA'] : DOC_TYPES;
 
   const chip = (active: boolean) => cn(
@@ -441,6 +444,29 @@ function DetailsMode() {
           )}
         </div>
       </div>
+
+      {/* BL — delivery block (décret 05-468): deliverer/transporter + location */}
+      {isBL ? (
+        <div className="flex flex-col gap-2 rounded-xl border border-[var(--border)] p-2.5">
+          <FieldLabel>Livraison</FieldLabel>
+          <div className="flex gap-2">
+            <input className={cn(inputCls, 'flex-1')} placeholder="Livreur — Nom"
+              value={doc.delivererName ?? ''} onChange={(e) => updateDelivery({ delivererName: e.target.value })} />
+            <input className={cn(inputCls, 'flex-1')} placeholder="Livreur — N° CIN"
+              value={doc.delivererIdCard ?? ''} onChange={(e) => updateDelivery({ delivererIdCard: e.target.value })} />
+          </div>
+          <div className="flex gap-2">
+            <input className={cn(inputCls, 'flex-1')} placeholder="Transporteur — Nom"
+              value={doc.transporterName ?? ''} onChange={(e) => updateDelivery({ transporterName: e.target.value })} />
+            <input className={cn(inputCls, 'flex-1')} placeholder="Transporteur — N° CIN"
+              value={doc.transporterIdCard ?? ''} onChange={(e) => updateDelivery({ transporterIdCard: e.target.value })} />
+          </div>
+          <input className={cn(inputCls, 'w-full')} placeholder="Lieu de livraison (si différent du client)"
+            value={doc.deliveryAddress ?? ''} onChange={(e) => updateDelivery({ deliveryAddress: e.target.value })} />
+        </div>
+      ) : null}
+
+      {!isBL ? (
       <div>
         <FieldLabel>Mode de paiement</FieldLabel>
         <div className="flex gap-1.5 flex-wrap">
@@ -451,12 +477,15 @@ function DetailsMode() {
           ))}
         </div>
       </div>
+      ) : null}
       <div className="flex gap-2">
+        {!isBL ? (
         <div className="flex-1">
           <FieldLabel>Acompte (DA)</FieldLabel>
           <input className={cn(inputCls, 'w-full')} inputMode="decimal" placeholder="0" value={acompte}
             onChange={(e) => setAcompteLocal(e.target.value)} />
         </div>
+        ) : null}
         <div className="flex-1">
           <FieldLabel>Valable jusqu&apos;au</FieldLabel>
           <input className={cn(inputCls, 'w-full')} type="date" value={doc.validUntil ?? ''}
