@@ -4,6 +4,10 @@ import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
 import { NavAuthCta } from '@/components/landing/NavAuthCta';
 import { PLANS, formatPrice } from '@/lib/pricing';
 
+// Android APK download URL — replace with the hosted .apk (or a Play Store link)
+// once the build is published. Drop the file at public/clouddevis.apk to serve it here.
+const APK_URL = '/clouddevis.apk';
+
 const FAQ_ITEMS = [
    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
    { q: 'Puis-je essayer CloudDevis gratuitement ?', a: "Oui : avec le plan gratuit vous pouvez créer jusqu’à 5 documents par mois, suffit pour tester." },
@@ -29,6 +33,7 @@ export default function HomePage() {
                 <ul className="nav-links">
                   <li><a href="#features">Fonctionnalités</a></li>
                   <li><a href="#pricing">Tarifs</a></li>
+                  <li><a href="#download">Application</a></li>
                   <li><a href="#faq">FAQ</a></li>
                 </ul>
                 <NavAuthCta />
@@ -397,6 +402,41 @@ export default function HomePage() {
             </div>
           </section>
 
+          {/* ════════════ TÉLÉCHARGEMENT APP ════════════ */}
+          <section id="download" style={{ padding: '72px 0', background: 'var(--navy-2)', borderTop: '1px solid rgba(15,39,71,0.06)', borderBottom: '1px solid rgba(15,39,71,0.06)' }}>
+            <div className="container">
+              <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+                <div className="section-eyebrow">Application mobile</div>
+                <h2 className="section-title">Emportez CloudDevis dans votre poche</h2>
+                <p className="section-sub" style={{ marginBottom: 28 }}>
+                  Créez et envoyez vos devis, factures et bons de livraison depuis votre téléphone —
+                  même hors ligne. Vos documents se synchronisent dès le retour du réseau.
+                </p>
+                <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <a
+                    href={APK_URL}
+                    download
+                    className="btn btn-primary btn-lg"
+                    data-plausible="App Download"
+                    data-event-location="download_section"
+                    data-event-label="Android APK"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Télécharger pour Android
+                  </a>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--sand-muted)', marginTop: 16 }}>
+                  Android 8.0+ · fichier APK · Version iOS bientôt disponible
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* ════════════ FAQ ════════════ */}
           <section className="faq" id="faq">
             <div className="container">
@@ -464,6 +504,7 @@ export default function HomePage() {
                     <li><Link href="/legal/cgu">{"Conditions d\u2019utilisation"}</Link></li>
                     <li><Link href="/legal/privacy">Politique de confidentialité</Link></li>
                     <li><Link href="/legal/mentions">Mentions légales</Link></li>
+                    <li><Link href="/legal/reglementation">Réglementation</Link></li>
                   </ul>
                 </div>
               </div>

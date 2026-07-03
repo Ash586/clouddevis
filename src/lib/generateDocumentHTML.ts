@@ -286,20 +286,29 @@ ${isAr ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
         ` + (results.timbreFiscal > 0 ? `<tr class="sep"><td colspan="2"></td></tr>
         <tr><td class="lbl">${tp('stampDuty')}</td><td class="val">` + fmt(results.timbreFiscal) + ` ${currency}</td></tr>` : '') + `
         ` + (results.acompte > 0 ? `<tr class="disc"><td class="lbl">${tp('depositPaid')}</td><td class="val">-` + fmt(results.acompte) + ` ${currency}</td></tr>` : '') + `
-        <tr class="grand"><td class="lbl">${tp('netToPay')}</td><td class="val">` + fmt(results.netAPayer) + ` ${currency}</td></tr>
+        ` + (doc.documentType === 'bl' ? '' : `<tr class="grand"><td class="lbl">${tp('netToPay')}</td><td class="val">` + fmt(results.netAPayer) + ` ${currency}</td></tr>`) + `
       </table>
-      <div class="inwords">` + s(results.totalInWords) + `</div>
+      ` + (doc.documentType === 'bl' ? '' : `<div class="inwords">` + s(results.totalInWords) + `</div>`) + `
     </div>
   </div>
 
-  ` + (vb('signature') ? `
+  ` + (doc.documentType === 'bl' ? `
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:11px;color:#334155;line-height:1.7">
+    ` + (doc.deliveryAddress ? `<div><strong>Lieu de livraison :</strong> ` + s(doc.deliveryAddress) + `</div>` : '') + `
+    ` + (doc.delivererName ? `<div><strong>Livreur :</strong> ` + s(doc.delivererName) + (doc.delivererIdCard ? ` (CIN : ` + s(doc.delivererIdCard) + `)` : '') + `</div>` : '') + `
+    ` + (doc.transporterName ? `<div><strong>Transporteur :</strong> ` + s(doc.transporterName) + (doc.transporterIdCard ? ` (CIN : ` + s(doc.transporterIdCard) + `)` : '') + `</div>` : '') + `
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;gap:40px">
+    <div style="flex:1"><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:38px">Signature du livreur</div><div style="border-top:1px solid #cbd5e1"></div></div>
+    <div style="flex:1"><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:38px">Signature et cachet du client (réception)</div><div style="border-top:1px solid #cbd5e1"></div></div>
+  </div>` : (vb('signature') ? `
   <div class="signature">
     <div class="loc">${tp('signatureLine', { city: s(doc.companyInfo?.address?.split(',')[0] ?? '________'), date: s(doc.date) })}</div>
     <div class="stamp">
       <div class="lbl2">${tp('signatureLabel')}</div>
       <div class="box">` + (doc.companyInfo?.signature ? `<img src="` + s(doc.companyInfo.signature) + `" style="max-width:100%;max-height:100%"/>` : tp('signatureStamp')) + `</div>
     </div>
-  </div>` : '') + `
+  </div>` : '')) + `
 
   <div class="print-footer">${tp('footer')}` + (doc.paymentDetails?.iban ? `<span style="margin:0 8px">|</span>IBAN: ${s(doc.paymentDetails.iban)}` : '') + `</div>
 </div>
@@ -406,12 +415,16 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
 .montant-box{border:0.5px solid ${A.border};padding:11px 16px;font-size:12px;line-height:1.55;color:#444;background:${A.cream}}
 .montant-box strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:${A.green};margin-bottom:4px}
 .montant-box em{font-style:italic}
+.legal-section{padding:0 ${PX}px ${PX-14}px}
+.legal-box{border:0.5px solid ${A.border};padding:11px 16px;font-size:11px;line-height:1.6;color:#555;background:#FAFAF8}
+.legal-box strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:${A.green};margin-bottom:4px}
 .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:${PX-12}px ${PX}px ${PX-4}px;border-top:1px solid ${A.border}}
 .sig-block{text-align:center}
 .sig-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${A.green};margin-bottom:6px}
 .sig-area{height:60px;border-bottom:1px solid ${A.border};display:flex;align-items:center;justify-content:center;color:#CCC;font-size:10px;margin-bottom:6px}
 .gerant-seal{width:80px;height:80px;border:1.5px solid ${A.green};border-radius:50%;margin:0 auto 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:${A.green};font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:center;line-height:1.4}
 .sig-name{font-size:12px;color:#333;font-weight:600}
+.sig-title{font-size:10px;color:#777;font-style:italic;margin-top:2px}
 .doc-footer{background:#F8F7F4;border-top:0.5px solid ${A.border};padding:10px 36px;font-size:10px;color:#999;text-align:center;line-height:1.7;font-family:'JetBrains Mono',monospace}
 .doc-footer strong{color:#777;font-family:'Inter',sans-serif}
 @media print{.page{box-shadow:none}}
@@ -422,6 +435,7 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
 <div class="doc-header">
   <div>
     ${companyName ? `<div class="co-name">${companyName}</div>` : ''}
+    ${doc.activityDescription ? `<div class="co-activity">${e(doc.activityDescription)}</div>` : ''}
     ${doc.companyTagline ? `<div class="co-activity">${e(doc.companyTagline)}</div>` : ''}
     ${doc.companyCapital ? `<div class="co-capital">Au Capital Social de ${e(doc.companyCapital)}</div>` : ''}
     ${isEnt && doc.companyInfo ? `<div class="co-meta">
@@ -446,7 +460,10 @@ table.items tbody td.r{text-align:right;font-family:'JetBrains Mono',monospace}
 
 <div class="title-row">
   <div class="doc-title">Devis <span class="num-part">N° ${e(doc.documentNumber)}</span></div>
-  <div class="date-part"><strong>Date</strong>${e(doc.date)}</div>
+  <div class="date-part">
+    ${doc.articleNumber ? `<strong>N° Article</strong>${e(doc.articleNumber)}<br>` : ''}
+    <strong>Date</strong>${e(doc.date)}
+  </div>
 </div>
 
 <div class="info-section">
@@ -490,6 +507,11 @@ ${doc.items.length ? `<div class="table-wrap">
     ${doc.bankName ? e(doc.bankName) : ''}${doc.bankAgency ? ' — '+e(doc.bankAgency) : ''}<br>
     ${doc.ccpNumber ? 'C.C.P. N° '+e(doc.ccpNumber) : ''}
   </div>` : ''}
+  ${doc.ccpNumber && !doc.paymentDetails.iban ? `<div class="rib-area">
+    <span class="rc-title">Coordonnées bancaires</span>
+    C.C.P. N° ${e(doc.ccpNumber)}<br>
+    ${doc.bankName ? e(doc.bankName) : ''}${doc.bankAgency ? ' — '+e(doc.bankAgency) : ''}
+  </div>` : ''}
   <div class="totals-card">
     <div class="total-row">
       <span class="tl">MT HT</span>
@@ -505,6 +527,13 @@ ${doc.items.length ? `<div class="table-wrap">
     </div>
   </div>
 </div>
+
+${doc.closingLegalText ? `<div class="legal-section">
+  <div class="legal-box">
+    <strong>Mentions légales</strong>
+    ${e(doc.closingLegalText)}
+  </div>
+</div>` : ''}
 
 ${totalInWords ? `<div class="montant-section">
   <div class="montant-box">
@@ -522,15 +551,17 @@ ${totalInWords ? `<div class="montant-section">
   <div class="sig-block">
     <div class="sig-label">Cachet & Signature</div>
     ${companyName ? `<div class="gerant-seal">
-      EURL<br>${companyName.split(' ').slice(0,2).join(' ')}<br>Gérant
+      EURL<br>${companyName.split(' ').slice(0,2).join(' ')}<br>${doc.signatoryTitle ? e(doc.signatoryTitle) : 'Gérant'}
     </div>` : ''}
-    <div class="sig-name">${companyName || 'Gérant'}</div>
+    <div class="sig-name">${doc.signatoryName ? e(doc.signatoryName) : (companyName || 'Gérant')}</div>
+    ${doc.signatoryTitle ? `<div class="sig-title">${e(doc.signatoryTitle)}</div>` : ''}
   </div>
 </div>
 
 <div class="doc-footer">
   ${companyAddr ? `<strong>Siège Social :</strong> ${companyAddr}` : ''}
   ${doc.companyPhone ? ` <span style="margin:0 6px">·</span><strong>Tél :</strong> ${e(doc.companyPhone)}` : ''}
+  ${doc.ccpNumber ? ` <span style="margin:0 6px">·</span><strong>CCP :</strong> ${e(doc.ccpNumber)}` : ''}
   <br>
   ${isEnt && doc.companyInfo?.taxIds?.nif ? `<strong>N.I.F. :</strong> ${e(doc.companyInfo.taxIds.nif)}` : ''}
   ${isEnt && doc.companyInfo?.taxIds?.rc ? ` <span style="margin:0 6px">·</span><strong>R.C. :</strong> ${e(doc.companyInfo.taxIds.rc)}` : ''}
@@ -563,7 +594,7 @@ export function generateHaussmannHTML(params: {
   const isEnt = doc.mode === 'entreprise';
   const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
-  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':doc.documentType==='bl'?'BON DE LIVRAISON':'DEVIS';
   return `<!DOCTYPE html>
 <html lang="${lang}"${dir}><head><meta charset="utf-8"><title>DEVIS N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -638,7 +669,7 @@ export function generateNordicHTML(params: {
   const isEnt = doc.mode === 'entreprise';
   const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
-  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':doc.documentType==='bl'?'BON DE LIVRAISON':'DEVIS';
   return `<!DOCTYPE html>
 <html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -706,7 +737,7 @@ export function generateVeloursHTML(params: {
   const isEnt = doc.mode === 'entreprise';
   const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
-  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':doc.documentType==='bl'?'BON DE LIVRAISON':'DEVIS';
   return `<!DOCTYPE html>
 <html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -773,7 +804,7 @@ export function generateIndustrielleHTML(params: {
   const companyName = isEnt ? (doc.companyInfo?.name ?? '') : (doc.artisanInfo?.name ?? '');
   const companyAddr = isEnt ? (doc.companyInfo?.address ?? '') : (doc.artisanInfo?.address ?? '');
   const companyPhone = doc.companyPhone || (!isEnt ? (doc.artisanInfo?.phone ?? '') : '');
-  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':'DEVIS';
+  const docLabel = doc.documentType==='facture'?'FACTURE':doc.documentType==='proforma'?'PROFORMA':doc.documentType==='bc'?'BON DE COMMANDE':doc.documentType==='br'?'BON DE RÉCEPTION':doc.documentType==='bl'?'BON DE LIVRAISON':'DEVIS';
   return `<!DOCTYPE html>
 <html lang="${lang}"${dir}><head><meta charset="utf-8"><title>${e(docLabel)} N° ${e(doc.documentNumber)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1019,6 +1050,330 @@ table.items tbody tr.cat-row td{padding:6px 10px;font-size:10px;font-weight:600;
     ${doc.companyInfo?.taxIds?.rc ? `<span style="margin:0 6px">·</span><strong>RC :</strong> ${e(doc.companyInfo.taxIds.rc)}` : ''}
     <br>Document généré par <strong>CloudDevis</strong>
   </div>
+</div>
+</div>
+<script>document.fonts.ready.then(function(){window.print();});</script>
+</body></html>`;
+}
+
+export function generateFactureHTML(params: {
+  doc: DocumentState;
+  results: CalculationResult;
+  sf: (id: string) => boolean;
+  bv: (...ids: string[]) => boolean;
+  vb: (block: string) => boolean;
+  tc: (key: string) => string;
+  tp: (key: string, vars?: Record<string, string | number>) => string;
+  currency: string;
+  design: DocTypeDesign;
+  lang?: string;
+  isEnt?: boolean;
+  docTypeLabel?: string;
+  catLabels?: Record<string, string>;
+  paymentLabels?: Record<string, string>;
+  unitLabels?: Record<string, string>;
+  grouped?: Record<string, LineItem[]>;
+  uncategorized?: LineItem[];
+  catOrder?: string[];
+  customSections?: CustomSectionDef[];
+  te?: (key: string) => string;
+  tu?: (key: string) => string;
+  companyTagline?: string;
+  companyCapital?: string;
+  rcNumber?: string;
+  nisNumber?: string;
+  aiNumber?: string;
+  rib?: string;
+  bankName?: string;
+  bankAgency?: string;
+  ccpNumber?: string;
+  validityDays?: number;
+  reference?: string;
+  deliveryRef?: string;
+}) {
+  const { doc, sf, vb, bv, results, currency, lang = 'fr', isEnt = doc.mode === 'entreprise' } = params;
+  const isAr = lang === 'ar';
+  const dir = isAr ? ' dir="rtl"' : '';
+  const arFont = isAr ? `,'Noto Naskh Arabic'` : '';
+  const e = (x: string) => x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+
+  const companyTagline = params.companyTagline ?? '';
+  const companyCapital = params.companyCapital ?? '';
+  const rcNumber = params.rcNumber ?? '';
+  const nisNumber = params.nisNumber ?? '';
+  const aiNumber = params.aiNumber ?? '';
+  const rib = params.rib ?? '';
+  const bankName = params.bankName ?? '';
+  const bankAgency = params.bankAgency ?? '';
+  const ccpNumber = params.ccpNumber ?? '';
+  const reference = params.reference ?? '';
+  const deliveryRef = params.deliveryRef ?? '';
+
+  const F = {
+    slate: '#1e293b',
+    slateMid: '#334155',
+    slateLight: '#f1f5f9',
+    blue: '#2563eb',
+    blueLight: '#93c5fd',
+    blueDeep: '#1d4ed8',
+    text: '#0f172a',
+    muted: '#5a6b85',
+    faint: '#94a3b8',
+    rule: '#e2e8f0',
+    white: '#ffffff',
+    green: '#0B3D2E',
+    gold: '#C4A35A',
+    border: '#E4E0D8',
+    cream: '#FFFBF3',
+  };
+
+  const numFmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const companyName = isEnt && doc.companyInfo ? doc.companyInfo.name : '';
+  const companyAddr = isEnt && doc.companyInfo ? doc.companyInfo.address : '';
+  const logoUrl = isEnt && doc.companyInfo?.logo ? doc.companyInfo.logo : null;
+  const logoPos = doc.logoPosition ?? 'right';
+
+  // Build items table
+  let rowIdx = 0;
+  const tbody: string[] = [];
+  const grouped = params.grouped ?? {};
+  const uncategorized = params.uncategorized ?? doc.items.filter(i => !i.category);
+  const catOrder = params.catOrder ?? [];
+  const catLabels = params.catLabels ?? {};
+
+  for (const item of uncategorized) {
+    rowIdx++;
+    tbody.push(`<tr>
+      <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center;color:${F.faint};font-family:'JetBrains Mono',monospace">${String(rowIdx).padStart(2,'0')}</td>
+      <td style="padding:6px 8px;border-bottom:0.5px solid ${F.border};font-size:11px;color:${F.text}">${e(item.designation)}${item.description ? `<div style="font-size:9px;color:${F.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>` : ''}</td>
+      <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center">${e(item.unit)}</td>
+      <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center">${item.quantity}</td>
+      <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace">${numFmt(item.unitPrice)}</td>
+      <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:right;font-weight:600;font-family:'JetBrains Mono',monospace">${numFmt(item.quantity * item.unitPrice)}</td>
+    </tr>`);
+  }
+  for (const cat of catOrder) {
+    const items = grouped[cat];
+    if (!items?.length) continue;
+    const label = catLabels[cat] ?? cat;
+    tbody.push(`<tr><td colspan="6" style="padding:8px 4px 2px;border:none"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:${F.blue}">${e(label)}</div></td></tr>`);
+    for (const item of items) {
+      rowIdx++;
+      tbody.push(`<tr>
+        <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center;color:${F.faint};font-family:'JetBrains Mono',monospace">${String(rowIdx).padStart(2,'0')}</td>
+        <td style="padding:6px 8px;border-bottom:0.5px solid ${F.border};font-size:11px;color:${F.text}">${e(item.designation)}${item.description ? `<div style="font-size:9px;color:${F.faint};margin-top:1px;font-style:italic">${e(item.description)}</div>` : ''}</td>
+        <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center">${e(item.unit)}</td>
+        <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:center">${item.quantity}</td>
+        <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:right;font-family:'JetBrains Mono',monospace">${numFmt(item.unitPrice)}</td>
+        <td style="padding:6px 4px;border-bottom:0.5px solid ${F.border};font-size:10px;text-align:right;font-weight:600;font-family:'JetBrains Mono',monospace">${numFmt(item.quantity * item.unitPrice)}</td>
+      </tr>`);
+    }
+  }
+
+  const totalInWords = results.totalInWords || '';
+
+  const S2 = (sel: string, rules: string) => `${sel}{${rules}}`;
+  const css2 = `
+    ${S2('@page','size:A4;margin:0')}
+    ${S2('*','box-sizing:border-box;margin:0;padding:0')}
+    ${S2('body',`font-family:${isAr ? "'Noto Naskh Arabic'," : ''}'Inter',Helvetica,Arial,sans-serif;color:${F.text};font-size:12px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact`)}
+    ${S2('.page','width:190mm;margin:0 auto;min-height:297mm;background:#fff;display:flex;flex-direction:column')}
+    ${S2('.accent-bar',`height:3px;background:${F.blue}`)}
+    ${S2('.doc-header',`padding:28px 36px 20px;border-bottom:1px solid ${F.rule}`)}
+    ${S2('.header-top','display:flex;justify-content:space-between;align-items:flex-start')}
+    ${S2('.header-company','flex:1')}
+    ${S2('.co-name',`font-family:'Source Serif 4',Georgia,serif;font-size:20px;font-weight:700;color:${F.text};margin-bottom:2px`)}
+    ${S2('.co-activity',`font-size:10.5px;color:${F.muted};line-height:1.5;margin-bottom:2px`)}
+    ${S2('.co-address',`font-size:10px;color:${F.faint};line-height:1.6`)}
+    ${S2('.co-contact',`font-size:9.5px;color:${F.faint};margin-top:3px`)}
+    ${S2('.co-capital',`font-size:10px;color:${F.muted};margin-top:4px`)}
+    ${S2('.co-meta',`display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:9.5px;font-family:'JetBrains Mono',monospace;color:${F.muted};margin-top:4px`)}
+    ${S2('.co-meta .mk',`font-weight:600;color:${F.blue};font-size:9px;text-transform:uppercase;letter-spacing:0.04em;font-family:'Inter',sans-serif`)}
+    ${S2('.header-logo','flex-shrink:0;margin-left:20px')}
+    ${S2('.header-logo img','max-width:100px;max-height:60px;object-fit:contain')}
+    ${S2('.header-bank',`margin-top:10px;padding-top:8px;border-top:1px solid ${F.rule};font-size:9.5px;font-family:'JetBrains Mono',monospace;color:${F.muted};line-height:1.7`)}
+    ${S2('.header-bank strong',`color:${F.blue};font-family:'Inter',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.05em`)}
+    ${S2('.doc-title-bar','display:flex;justify-content:space-between;align-items:center;padding:14px 36px 10px')}
+    ${S2('.doc-title',`font-size:20px;font-weight:800;color:${F.slate};text-transform:uppercase;letter-spacing:0.02em`)}
+    ${S2('.doc-title .num',`color:${F.blue}`)}
+    ${S2('.doc-meta-right',`text-align:right;font-size:10px;color:${F.muted};line-height:1.7`)}
+    ${S2('.doc-meta-right strong',`display:block;font-size:8.5px;font-weight:700;color:${F.blue};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1px`)}
+    ${S2('.client-ref-section','padding:0 36px 14px;display:grid;grid-template-columns:1fr 1fr;gap:20px')}
+    ${S2('.client-box',`padding:10px 14px;background:${F.slateLight};border-left:3px solid ${F.blue}`)}
+    ${S2('.client-box .cl-label',`font-size:8.5px;font-weight:700;color:${F.blue};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px`)}
+    ${S2('.client-box .cl-name',`font-size:13px;font-weight:700;color:${F.text};margin-bottom:3px`)}
+    ${S2('.client-box .cl-addr',`font-size:10px;color:${F.muted};line-height:1.5`)}
+    ${S2('.client-box .cl-ids',`font-size:9px;color:${F.faint};margin-top:3px;font-family:'JetBrains Mono',monospace`)}
+    ${S2('.ref-box',`padding:10px 14px;background:${F.slateLight};border-left:3px solid ${F.blue}`)}
+    ${S2('.ref-box .ref-label',`font-size:8.5px;font-weight:700;color:${F.blue};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px`)}
+    ${S2('.ref-box .ref-line',`font-size:10px;color:${F.muted};margin-bottom:2px`)}
+    ${S2('.ref-box .ref-line strong',`font-weight:600;color:${F.text}`)}
+    ${S2('.objet-box',`margin:0 36px 14px;padding:10px 14px;border-left:3px solid ${F.blue};font-size:11px;color:${F.muted};background:#FAFBFC`)}
+    ${S2('.objet-box strong',`display:block;font-size:8.5px;font-weight:700;color:${F.blue};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px`)}
+    ${S2('.table-section','padding:0 36px')}
+    ${S2('table.items','width:100%;border-collapse:collapse;font-size:11px')}
+    ${S2('table.items thead',`background:${F.slate}`)}
+    ${S2('table.items thead th',`padding:8px 6px;font-size:9px;font-weight:700;color:${F.white};text-transform:uppercase;letter-spacing:0.05em;text-align:left`)}
+    ${S2('table.items thead th.c','text-align:center')}
+    ${S2('table.items thead th.r','text-align:right')}
+    ${S2('table.items tbody tr',`border-bottom:0.5px solid ${F.rule}`)}
+    ${S2('table.items tbody tr:last-child',`border-bottom:2px solid ${F.slate}`)}
+    ${S2('table.items tbody td',`padding:7px 6px;color:${F.text};vertical-align:top;line-height:1.4`)}
+    ${S2('table.items tbody td.num',`text-align:center;color:${F.faint};font-family:'JetBrains Mono',monospace;font-size:10px`)}
+    ${S2('table.items tbody td.c','text-align:center')}
+    ${S2('table.items tbody td.r','text-align:right;font-family:JetBrains Mono,monospace')}
+    ${S2('.totals-section','display:flex;justify-content:flex-end;padding:14px 36px')}
+    ${S2('.totals-card','width:240px')}
+    ${S2('.total-row',`display:flex;justify-content:space-between;padding:4px 0;font-size:11px;color:${F.muted}`)}
+    ${S2('.total-row .tv',`font-family:'JetBrains Mono',monospace;font-weight:500;color:${F.text}`)}
+    ${S2('.total-row.grand',`border-top:2px solid ${F.slate};padding-top:6px;margin-top:4px`)}
+    ${S2('.total-row.grand .tl',`font-weight:700;font-size:12px;color:${F.text};text-transform:uppercase`)}
+    ${S2('.total-row.grand .tv',`font-size:14px;font-weight:800;color:${F.blue}`)}
+    ${S2('.montant-section','padding:0 36px 14px')}
+    ${S2('.montant-box',`border:0.5px solid ${F.rule};padding:10px 14px;font-size:11px;color:${F.muted};background:#FAFBFC;line-height:1.5`)}
+    ${S2('.montant-box strong',`display:block;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${F.blue};margin-bottom:3px`)}
+    ${S2('.montant-box em','font-style:italic')}
+    ${S2('.legal-section','padding:0 36px 14px')}
+    ${S2('.legal-box',`border:0.5px solid ${F.rule};padding:10px 14px;font-size:10.5px;color:${F.muted};background:#FAFBFC;line-height:1.6`)}
+    ${S2('.legal-box strong',`display:block;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${F.blue};margin-bottom:3px`)}
+    ${S2('.sig-section',`display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 36px;border-top:1px solid ${F.rule}`)}
+    ${S2('.sig-block','text-align:center')}
+    ${S2('.sig-label',`font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${F.blue};margin-bottom:6px`)}
+    ${S2('.sig-area',`height:60px;border-bottom:1px solid ${F.rule};display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:9px;margin-bottom:6px`)}
+    ${S2('.sig-name',`font-size:11px;color:${F.text};font-weight:600`)}
+    ${S2('.sig-title',`font-size:9px;color:${F.muted};font-style:italic;margin-top:2px`)}
+    ${S2('.doc-footer',`background:${F.slateLight};border-top:0.5px solid ${F.rule};padding:10px 36px;font-size:9px;color:${F.faint};text-align:center;line-height:1.7;font-family:'JetBrains Mono',monospace;margin-top:auto`)}
+    ${S2('.doc-footer strong',`color:${F.muted};font-family:'Inter',sans-serif`)}
+    ${S2('@media print','.page{box-shadow:none}')}
+  `;
+
+  return `<!DOCTYPE html>
+<html lang="${lang}"${dir}><head><meta charset="utf-8"><title>Facture N° ${e(doc.documentNumber)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@500;600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>` + css2 + `</style></head><body>
+<div class="page">
+<div class="accent-bar"></div>
+
+<div class="doc-header">
+  <div class="header-top">
+    <div class="header-company">
+      ${companyName ? `<div class="co-name">${e(companyName)}</div>` : ''}
+      ${doc.activityDescription ? `<div class="co-activity">${e(doc.activityDescription)}</div>` : ''}
+      ${companyTagline ? `<div class="co-activity">${e(companyTagline)}</div>` : ''}
+      ${companyAddr ? `<div class="co-address">${e(companyAddr)}</div>` : ''}
+      ${doc.companyPhone ? `<div class="co-contact">Tél : ${e(doc.companyPhone)}</div>` : ''}
+      ${companyCapital ? `<div class="co-capital">Capital Social : ${e(companyCapital)}</div>` : ''}
+      ${isEnt && doc.companyInfo ? `<div class="co-meta">
+        ${doc.companyInfo.taxIds.rc ? `<span class="mk">RC</span><span>${e(doc.companyInfo.taxIds.rc)}</span>` : ''}
+        ${doc.companyInfo.taxIds.nif ? `<span class="mk">NIF</span><span>${e(doc.companyInfo.taxIds.nif)}</span>` : ''}
+        ${doc.companyInfo.taxIds.nis ? `<span class="mk">NIS</span><span>${e(doc.companyInfo.taxIds.nis)}</span>` : ''}
+        ${doc.companyInfo.taxIds.ai ? `<span class="mk">AI</span><span>${e(doc.companyInfo.taxIds.ai)}</span>` : ''}
+        ${doc.articleNumber ? `<span class="mk">Art. d'impôt</span><span>${e(doc.articleNumber)}</span>` : ''}
+      </div>` : ''}
+      ${(rib || bankName || ccpNumber) ? `<div class="header-bank">
+        <strong>Coordonnées Bancaires</strong><br>
+        ${rib ? `RIB : ${e(rib)}` : ''}${rib && bankName ? ' · ' : ''}${bankName ? `${e(bankName)}${bankAgency ? ' — ' + e(bankAgency) : ''}` : ''}<br>
+        ${ccpNumber ? `CCP : ${e(ccpNumber)}` : ''}
+      </div>` : ''}
+    </div>
+    ${logoUrl ? `<div class="header-logo"><img src="${e(logoUrl)}" alt="Logo" /></div>` : ''}
+  </div>
+</div>
+
+<div class="doc-title-bar">
+  <div class="doc-title">Facture <span class="num">N° ${e(doc.documentNumber)}</span></div>
+  <div class="doc-meta-right">
+    ${doc.paymentMode ? `<strong>Mode de Paiement</strong>${e(doc.paymentMode === 'virement' ? 'Virement' : doc.paymentMode === 'cheque' ? 'Chèque' : doc.paymentMode === 'especes' ? 'Espèces' : doc.paymentMode)}` : ''}
+    <strong>Date</strong>${e(doc.date)}
+  </div>
+</div>
+
+<div class="client-ref-section">
+  <div class="client-box">
+    <div class="cl-label">Doit</div>
+    ${doc.clientInfo.name ? `<div class="cl-name">${e(doc.clientInfo.name)}</div>` : ''}
+    ${doc.clientInfo.address ? `<div class="cl-addr">${e(doc.clientInfo.address)}</div>` : ''}
+    ${(doc.clientInfo.nif || doc.clientInfo.rc || doc.clientInfo.nis || doc.clientInfo.ai) ? `<div class="cl-ids">
+      ${doc.clientInfo.nif ? `NIF : ${e(doc.clientInfo.nif)}` : ''}
+      ${doc.clientInfo.rc ? `${doc.clientInfo.nif ? ' · ' : ''}RC : ${e(doc.clientInfo.rc)}` : ''}
+      ${doc.clientInfo.nis ? `${(doc.clientInfo.nif || doc.clientInfo.rc) ? ' · ' : ''}NIS : ${e(doc.clientInfo.nis)}` : ''}
+      ${doc.clientInfo.ai ? `${(doc.clientInfo.nif || doc.clientInfo.rc || doc.clientInfo.nis) ? ' · ' : ''}AI : ${e(doc.clientInfo.ai)}` : ''}
+    </div>` : ''}
+  </div>
+  <div class="ref-box">
+    <div class="ref-label">Références</div>
+    ${doc.bcRef ? `<div class="ref-line"><strong>BC N° :</strong> ${e(doc.bcRef)}</div>` : ''}
+    ${deliveryRef ? `<div class="ref-line"><strong>BL N° :</strong> ${e(deliveryRef)}</div>` : ''}
+    ${reference ? `<div class="ref-line"><strong>Réf :</strong> ${e(reference)}</div>` : ''}
+    ${doc.validUntil ? `<div class="ref-line"><strong>Date échéance :</strong> ${e(doc.validUntil)}</div>` : ''}
+  </div>
+</div>
+
+${doc.objet ? `<div class="objet-box"><strong>Objet</strong>${e(doc.objet)}</div>` : ''}
+
+${doc.items.length ? `<div class="table-section">
+  <table class="items">
+    <thead><tr>
+      <th style="width:32px;text-align:center">N°</th>
+      <th>Désignation</th>
+      <th class="c" style="width:48px">Unité</th>
+      <th class="c" style="width:44px">Qté</th>
+      <th class="r" style="width:90px">P.U. HT</th>
+      <th class="r" style="width:100px">Montant HT</th>
+    </tr></thead>
+    <tbody>${tbody.join('')}</tbody>
+  </table>
+</div>` : ''}
+
+<div class="totals-section">
+  <div class="totals-card">
+    <div class="total-row"><span class="tl">Total HT</span><span class="tv">${numFmt(results.subTotalHT)} ${e(currency)}</span></div>
+    ${results.discountAmount > 0 ? `<div class="total-row" style="color:#ef4444"><span class="tl">Remise</span><span class="tv">-${numFmt(results.discountAmount)} ${e(currency)}</span></div>` : ''}
+    ${results.tvaAmount > 0 ? `<div class="total-row"><span class="tl">TVA ${results.tvaRate}%</span><span class="tv">${numFmt(results.tvaAmount)} ${e(currency)}</span></div>` : ''}
+    ${results.timbreFiscal > 0 ? `<div class="total-row"><span class="tl">Timbre</span><span class="tv">${numFmt(results.timbreFiscal)} ${e(currency)}</span></div>` : ''}
+    <div class="total-row grand"><span class="tl">Net à Payer</span><span class="tv">${numFmt(results.netAPayer)} ${e(currency)}</span></div>
+  </div>
+</div>
+
+${totalInWords ? `<div class="montant-section">
+  <div class="montant-box">
+    <strong>Arrêté la présente facture à la somme de</strong>
+    <em>${e(totalInWords)}</em>
+  </div>
+</div>` : ''}
+
+${doc.closingLegalText ? `<div class="legal-section">
+  <div class="legal-box">
+    <strong>Mentions légales</strong>
+    ${e(doc.closingLegalText)}
+  </div>
+</div>` : ''}
+
+<div class="sig-section">
+  <div class="sig-block">
+    <div class="sig-label">Le Client</div>
+    <div class="sig-area">Signature & cachet</div>
+    <div class="sig-name">Bon pour accord</div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-label">Cachet & Signature</div>
+    ${companyName ? `<div class="sig-area" style="border:1.5px solid ${F.blue};border-radius:50%;width:80px;height:80px;margin:0 auto 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:${F.blue};font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;text-align:center;line-height:1.4">
+      ${e(companyName.split(' ').slice(0,2).join(' '))}<br>${doc.signatoryTitle ? e(doc.signatoryTitle) : 'Gérant'}
+    </div>` : ''}
+    <div class="sig-name">${doc.signatoryName ? e(doc.signatoryName) : (companyName || 'Gérant')}</div>
+    ${doc.signatoryTitle ? `<div class="sig-title">${e(doc.signatoryTitle)}</div>` : ''}
+  </div>
+</div>
+
+<div class="doc-footer">
+  ${companyAddr ? `<strong>Siège Social :</strong> ${e(companyAddr)}` : ''}
+  ${doc.companyPhone ? ` <span style="margin:0 6px">·</span><strong>Tél :</strong> ${e(doc.companyPhone)}` : ''}
+  ${ccpNumber ? ` <span style="margin:0 6px">·</span><strong>CCP :</strong> ${e(ccpNumber)}` : ''}
+  <br>
+  ${isEnt && doc.companyInfo?.taxIds?.nif ? `<strong>NIF :</strong> ${e(doc.companyInfo.taxIds.nif)}` : ''}
+  ${isEnt && doc.companyInfo?.taxIds?.rc ? ` <span style="margin:0 6px">·</span><strong>RC :</strong> ${e(doc.companyInfo.taxIds.rc)}` : ''}
+  <br>Document généré par <strong>CloudDevis</strong>
 </div>
 </div>
 <script>document.fonts.ready.then(function(){window.print();});</script>
