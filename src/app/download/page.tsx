@@ -13,12 +13,12 @@ export const metadata = {
   description: 'Téléchargez l’application mobile CloudDevis pour créer vos devis, factures et bons de livraison depuis votre téléphone.',
 };
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app').replace(/\/$/, '');
-const APK_PATH = '/clouddevis.apk';
-const APK_ABSOLUTE = `${APP_URL}${APK_PATH}`;
+// Direct-download link to the hosted APK on Google Drive.
+// (Share link → direct download: drive.google.com/uc?export=download&id=<fileId>)
+const APK_URL = 'https://drive.google.com/uc?export=download&id=1y9WWMJIaZzns6bRm6wHeWOZE43yB2sc-';
 
 export default async function DownloadPage() {
-  const qrSvg = await QRCode.toString(APK_ABSOLUTE, {
+  const qrSvg = await QRCode.toString(APK_URL, {
     type: 'svg', margin: 1, width: 190,
     color: { dark: '#0F2747', light: '#FFFFFF' },
   });
@@ -49,8 +49,9 @@ export default async function DownloadPage() {
 
           {/* Direct button */}
           <a
-            href={APK_PATH}
-            download
+            href={APK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             data-plausible="App Download"
             data-event-location="download_page"
             data-event-label="Android APK"
