@@ -4,10 +4,6 @@ import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
 import { NavAuthCta } from '@/components/landing/NavAuthCta';
 import { PLANS, formatPrice } from '@/lib/pricing';
 
-// Android APK download URL — replace with the hosted .apk (or a Play Store link)
-// once the build is published. Drop the file at public/clouddevis.apk to serve it here.
-const APK_URL = '/clouddevis.apk';
-
 const FAQ_ITEMS = [
    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
    { q: 'Puis-je essayer CloudDevis gratuitement ?', a: "Oui : avec le plan gratuit vous pouvez créer jusqu’à 5 documents par mois, suffit pour tester." },
@@ -414,8 +410,7 @@ export default function HomePage() {
                 </p>
                 <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <a
-                    href={APK_URL}
-                    download
+                    href="/download"
                     className="btn btn-primary btn-lg"
                     data-plausible="App Download"
                     data-event-location="download_section"
