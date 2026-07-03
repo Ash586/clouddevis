@@ -193,10 +193,11 @@ function EditorContent() {
   const defaultsForType = DOC_TYPE_DEFAULT_FIELDS[docType] ?? {};
   const userPrefsForType = fieldPrefs?.[doc.documentType] as Record<string, string[]> | undefined;
 
-  // Persona soft-gating: for artisans, company-bureaucracy fields are hidden
+  // Real-document gating: for devis, extra fields (chantier, materiaux, garanties, remise, paiement)
+  // are hidden by default. Artisans also hide company-bureaucracy fields.
   // BY DEFAULT only — saved user prefs always win, and everything stays
   // re-enableable from the customizer.
-  const ARTISAN_HIDDEN_DEFAULTS: Record<string, string[]> = {
+  const REAL_DOC_HIDDEN_DEFAULTS: Record<string, string[]> = {
     devis: ['companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'rib', 'bankName', 'bankAgency', 'ccpNumber'],
     client: ['clientNis', 'clientRc', 'clientAi'],
     general: ['stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
@@ -204,8 +205,12 @@ function EditorContent() {
   };
   const sectionDefaults = (s: string): string[] => {
     const base = defaultsForType[s as keyof typeof defaultsForType] ?? [...(SECTION_FIELDS[s] ?? [])];
+    if (doc.documentType === 'devis' || doc.documentType === 'facture') {
+      const hidden = REAL_DOC_HIDDEN_DEFAULTS[s];
+      return hidden ? (base as string[]).filter(f => !hidden.includes(f)) : (base as string[]);
+    }
     if (mode !== 'artisan') return base as string[];
-    const hidden = ARTISAN_HIDDEN_DEFAULTS[s];
+    const hidden = REAL_DOC_HIDDEN_DEFAULTS[s];
     return hidden ? (base as string[]).filter(f => !hidden.includes(f)) : (base as string[]);
   };
 
@@ -279,6 +284,29 @@ function EditorContent() {
     } else if (doc.documentType === 'bc') {
       const { generateBonCommandeHTML } = await import('@/lib/generateBonCommandeHTML');
       html = generateBonCommandeHTML(commonArgs);
+    } else if (doc.documentType === 'facture') {
+      const { generateFactureHTML } = await import('@/lib/generateDocumentHTML');
+      html = generateFactureHTML({
+        ...commonArgs,
+        isEnt, docTypeLabel, catLabels, paymentLabels, unitLabels,
+        grouped, uncategorized, catOrder,
+        te: (k: string) => te(k),
+        tu: (k: string) => tu(k),
+        customSections,
+        companyTagline: doc.companyTagline,
+        companyCapital: doc.companyCapital,
+        rcNumber: doc.rcNumber,
+        nisNumber: doc.nisNumber,
+        aiNumber: doc.aiNumber,
+        rib: doc.rib,
+        bankName: doc.bankName,
+        bankAgency: doc.bankAgency,
+        ccpNumber: doc.ccpNumber,
+        validityDays: doc.validityDays,
+        reference: doc.reference,
+        deliveryRef: doc.deliveryRef,
+        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
+      });
     } else if (doc.documentType === 'intervention') {
       const { generateInterventionHTML } = await import('@/lib/generateInterventionHTML');
       html = generateInterventionHTML(commonArgs);
@@ -594,6 +622,13 @@ function EditorContent() {
                 <Download size={14} />
                 <span>{te('downloadPdf')}</span>
               </Button>
+              {(['devis', 'facture', 'bl'] as string[]).includes(doc.documentType) && (
+                <a href="/legal/reglementation" target="_blank" rel="noopener noreferrer"
+                  className="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 text-green-700 text-[10px] font-semibold border border-green-200 hover:bg-green-100 transition whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  Conforme D.E. 05-468
+                </a>
+              )}
             </div>
           </div>
         </div>

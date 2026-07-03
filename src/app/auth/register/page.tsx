@@ -24,9 +24,6 @@ const SECTORS = [
 
 const COUNTRIES = [
   { value: 'algeria', label: 'Algérie' },
-  { value: 'tunisia', label: 'Tunisie' },
-  { value: 'morocco', label: 'Maroc' },
-  { value: 'france', label: 'France' },
 ];
 
 function RegisterForm() {

@@ -640,7 +640,16 @@ CloudDevis calcule le timbre automatiquement :
 1. Vérifie si le montant dépasse 10 000 DA
 2. Applique le taux de 1%
 3. Respecte le minimum et maximum
-4. Affiche le détail sur la facture`,
+4. Affiche le détail sur la facture
+
+## 📌 Base légale
+
+- **Loi n°05-01** — Code du Timbre algérien
+- **Taux** : 1% du montant TTC (art. du Code du Timbre)
+- **Seuil** : 10 000 DA TTC
+- **Bornes** : minimum 5 DA, maximum 2 500 DA
+- **Exemptions** : Devis, Proforma, Bon de Livraison, Attachement
+- Plus d'infos : [Réglementation](/legal/reglementation)`,
   },
   {
     slug: 'calculer-tva',
@@ -685,7 +694,15 @@ Opérations exonérées de TVA.
 
 - Le NIF du client est requis pour la TVA
 - Conservez vos factures 10 ans
-- Déclarez la TVA mensuellement`,
+- Déclarez la TVA mensuellement
+
+## 📌 Base légale
+
+- **D.E. 05-468** art. 12 : Mentions TVA obligatoires sur facture
+- **Taux normal** : 19% (majorité des biens/services)
+- **Taux réduit** : 9% (produits de première nécessité)
+- **Taux exonéré** : 0% (exportations, opérations bancaires)
+- Plus d'infos : [Réglementation](/legal/reglementation)`,
   },
   {
     slug: 'nif-rc-nis-ai',
@@ -726,7 +743,15 @@ CloudDevis valide automatiquement :
 - NIF : 11 chiffres exactement
 - RC : Format alphanumérique
 - NIS : 10 chiffres exactement
-- AI : 10 chiffres exactement`,
+- AI : 10 chiffres exactement
+
+## 📌 Base légale
+
+- **NIF** : 15 chiffres, délivré par la DGI (Décret 05-468)
+- **NIS** : 15 chiffres, délivré par l'ONS (automatique avec le RC)
+- **RC** : Wilaya/Type/Année/Numéro, délivré par le CNRC
+- **AI** : Numéro fiscal interne complémentaire
+- Plus d'infos : [Réglementation](/legal/reglementation)`,
   },
   {
     slug: 'facture-legale',
@@ -775,53 +800,15 @@ Une facture non conforme peut entraîner :
 - Pénalités de retard
 - Amendes
 
-> **CloudDevis** génère des factures 100% conformes.`,
-  },
-  {
-    slug: 'compliance-tunisia-morocco',
-    title: 'Conformité dans les pays voisins',
-    description: 'Exigences fiscales en Tunisie et au Maroc.',
-    readTime: '6 min',
-    category: 'legal',
-    tags: ['tunisie', 'maroc', 'conformité', 'étranger'],
-    content: `# Conformité dans les pays voisins
+> **CloudDevis** génère des factures 100% conformes.
 
-## Tunisie
+## 📌 Base légale
 
-### Identifiants
-- **Matricule fiscal** : 13 chiffres
-- **RC** : Registre du commerce
-- **MF** : Matricule fiscal
-
-### TVA
-- Taux normal : **19%**
-- Taux réduit : **7%** et **0%**
-- Timbre : **1%** (plafonné)
-
-### Mentions obligatoires
-- Numéro de facture
-- Date
-- Désignation
-- TVA détaillée
-
-## Maroc
-
-### Identifiants
-- **IF** : Identifiant fiscal (15 chiffres)
-- **RC** : Registre du commerce
-- **Patente** : Numéro de patente
-
-### TVA
-- Taux normal : **20%**
-- Taux réduit : **14%**, **10%**, **7%**
-- Exonéré : **0%**
-
-### Mentions obligatoires
-- Numéro de facture séquentiel
-- Désignation détaillée
-- TVA détaillée
-
-> **Note** : CloudDevis est optimisé pour l'Algérie. L'utilisation pour d'autres pays nécessite des ajustements.`,
+- **Loi n°04-02** (23/06/2004) : Obligation de facturation
+- **D.E. n°05-468** (10/12/2005) : 19 mentions obligatoires
+- **D.E. n°16-66** (16/02/2016) : Modèle de facture
+- **Code du Timbre** : Timbre 1% TTC (≥10 000 DA)
+- Plus d'infos : [Réglementation](/legal/reglementation)`,
   },
 
   // ═══════════ TROUBLESHOOTING ═══════════

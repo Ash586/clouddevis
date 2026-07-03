@@ -7,91 +7,71 @@
 
     <!-- Document shadow -->
     <path
-        android:pathData="M32.5,22.5 h45 a4,4 0 0 1 4,4 v60 a4,4 0 0 1 -4,4 h-45 a4,4 0 0 1 -4,-4 v-60 a4,4 0 0 1 4,-4 Z"
+        android:pathData="M30,18 h36 a3,3 0 0 1 3,3 v54 a3,3 0 0 1 -3,3 h-36 a3,3 0 0 1 -3,-3 v-54 a3,3 0 0 1 3,-3 Z"
         android:fillColor="#000000"
-        android:fillAlpha="0.18"
+        android:fillAlpha="0.15"
         android:translateX="1"
         android:translateY="1.5"/>
 
     <!-- Document body -->
     <path
-        android:pathData="M32,21 h35 l14,13 v58 a4,4 0 0 1 -4,4 h-45 a4,4 0 0 1 -4,-4 v-67 a4,4 0 0 1 4,-4 Z"
-        android:fillColor="#F7FAFC"/>
+        android:pathData="M29,17 h36 a3,3 0 0 1 3,3 v54 a3,3 0 0 1 -3,3 h-36 a3,3 0 0 1 -3,-3 v-54 a3,3 0 0 1 3,-3 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.95"/>
 
     <!-- Corner fold -->
     <path
-        android:pathData="M67,21 l14,13 h-14 Z"
-        android:fillColor="#CBD5E0"/>
-    <path
-        android:pathData="M67,21 l14,13 l-14,0 Z"
+        android:pathData="M65,17 l8,8 h-8 Z"
         android:fillColor="#E2E8F0"/>
-
-    <!-- Gold accent stripe -->
     <path
-        android:pathData="M28,21 h39 v2.5 h-39 z"
-        android:fillColor="#C8963A"
-        android:fillAlpha="0.6"/>
-
-    <!-- Content placeholder lines -->
-    <path
-        android:pathData="M36,40 h20 a1.5,1.5 0 0 1 0,3 h-20 a1.5,1.5 0 0 1 0,-3 Z"
-        android:fillColor="#CBD5E0"/>
-    <path
-        android:pathData="M36,48 h28 a1,1 0 0 1 0,2 h-28 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.8"/>
-    <path
-        android:pathData="M36,53 h24 a1,1 0 0 1 0,2 h-24 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.6"/>
-
-    <path
-        android:pathData="M36,60 h36 v1 h-36 Z"
+        android:pathData="M65,17 l8,8 l-8,0 Z"
         android:fillColor="#CBD5E0"/>
 
+    <!-- Letter C -->
     <path
-        android:pathData="M36,64 h19 a1,1 0 0 1 0,2 h-19 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.7"/>
-    <path
-        android:pathData="M63,64 h9 a1,1 0 0 1 0,2 h-9 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.9"/>
-    <path
-        android:pathData="M36,69 h17 a1,1 0 0 1 0,2 h-17 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.55"/>
-    <path
-        android:pathData="M63,69 h9 a1,1 0 0 1 0,2 h-9 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#DDE3EC"
-        android:fillAlpha="0.7"/>
+        android:pathData="M36,33 a14,14 0 1 1 0,28"
+        android:strokeColor="#1D4ED8"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
 
+    <!-- Letter D -->
     <path
-        android:pathData="M36,74 h36 v1 h-36 Z"
-        android:fillColor="#B0BCCC"/>
+        android:pathData="M52,33 L52,61"
+        android:strokeColor="#1D4ED8"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M52,33 a14,14 0 0 1 0,28"
+        android:strokeColor="#1D4ED8"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
 
+    <!-- Gold accent line -->
     <path
-        android:pathData="M36,76.5 h36 a1.5,1.5 0 0 1 1.5,1.5 v3 a1.5,1.5 0 0 1 -1.5,1.5 h-36 a1.5,1.5 0 0 1 -1.5,-1.5 v-3 a1.5,1.5 0 0 1 1.5,-1.5 Z"
-        android:fillColor="#C8963A"
-        android:fillAlpha="0.15"/>
-    <path
-        android:pathData="M54,77 h18 a1,1 0 0 1 0,2 h-18 a1,1 0 0 1 0,-2 Z"
-        android:fillColor="#C8963A"
-        android:fillAlpha="0.7"/>
-    <path
-        android:pathData="M36,77 h12 a1,1 0 0 1 0,2 h-12 a1,1 0 0 1 0,-2 Z"
+        android:pathData="M26,17 h40 v1.5 h-40 z"
         android:fillColor="#C8963A"
         android:fillAlpha="0.5"/>
 
+    <!-- Bottom gold bar -->
     <path
-        android:pathData="M72,78 m-8,0 a8,8 0 1 1 16,0 a8,8 0 1 1 -16,0"
-        android:fillColor="#1D6B4A"/>
+        android:pathData="M26,72.5 h40 a1.5,1.5 0 0 1 1.5,1.5 v2 a1.5,1.5 0 0 1 -1.5,1.5 h-40 a1.5,1.5 0 0 1 -1.5,-1.5 v-2 a1.5,1.5 0 0 1 1.5,-1.5 Z"
+        android:fillColor="#C8963A"
+        android:fillAlpha="0.12"/>
+
+    <!-- Checkmark circle -->
+    <path
+        android:pathData="M72,66 m-7,0 a7,7 0 1 1 14,0 a7,7 0 1 1 -14,0"
+        android:fillColor="#16A34A"/>
 
     <path
-        android:pathData="M67.5,78 L71,81.5 L76.5,74.5"
-        android:fillColor="#00000000"
+        android:pathData="M68.5,66 L71,68.5 L75.5,63"
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.8"
+        android:strokeWidth="1.6"
         android:strokeLineCap="round"
-        android:strokeLineJoin="round"/>
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"/>
+
 </vector>
