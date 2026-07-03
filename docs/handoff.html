@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CloudDevis — Engineering Handoff</title>
+<style>
+  :root{
+    --navy:#0B0F1A; --navy-2:#111827; --navy-3:#1a2233; --navy-4:#232d42;
+    --ink:#E8EDF6; --muted:#93A2BC; --faint:#5c6b85;
+    --blue:#2563EB; --blue-2:#60A5FA; --blue-bg:rgba(37,99,235,.12);
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#a78bfa;
+    --border:rgba(255,255,255,.09); --card:#141b2c;
+    --code:#0d1424; --radius:12px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--navy);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code);
+    padding:1.5px 6px;border-radius:5px;border:1px solid var(--border);color:#cbd5e1}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#cbd5e1}
+  pre code{background:none;border:0;padding:0}
+  h1,h2,h3,h4{line-height:1.25;font-weight:700;color:#fff}
+  h2{font-size:24px;margin:0 0 4px;padding-top:8px}
+  h3{font-size:17px;margin:26px 0 8px;color:#dbe6ff}
+  h4{font-size:14px;margin:18px 0 6px;color:var(--blue-2);text-transform:uppercase;letter-spacing:.05em}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px}
+  li{margin:4px 0}
+  hr{border:0;border-top:1px solid var(--border);margin:16px 0}
+
+  /* Layout */
+  .wrap{display:flex;max-width:1400px;margin:0 auto}
+  nav.toc{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;
+    width:280px;flex:0 0 280px;padding:26px 18px 40px;border-right:1px solid var(--border);
+    background:linear-gradient(180deg,var(--navy-2),var(--navy))}
+  nav.toc .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  nav.toc .brand .logo{width:34px;height:34px;border-radius:9px;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  nav.toc .brand b{font-size:15px}
+  nav.toc a{display:block;color:var(--muted);font-size:13px;padding:5px 10px;border-radius:7px;
+    border-left:2px solid transparent}
+  nav.toc a:hover{background:var(--navy-3);color:var(--ink);text-decoration:none}
+  nav.toc .sect{margin-top:14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--faint);padding:0 10px 4px}
+  main{flex:1;min-width:0;padding:34px 46px 120px;max-width:1000px}
+
+  section{padding-top:26px;margin-top:8px;border-top:1px solid var(--border)}
+  section:first-of-type{border-top:0}
+  .lead{color:var(--muted);font-size:15px;max-width:70ch}
+  .num{color:var(--blue-2);font-variant-numeric:tabular-nums;font-weight:800;margin-right:8px}
+
+  /* Cards / callouts */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+  .card h4{margin-top:0}
+  .kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:120px}
+  .kpi b{display:block;font-size:18px;color:#fff}
+  .kpi span{font-size:11.5px;color:var(--muted)}
+
+  .callout{border-radius:var(--radius);padding:12px 16px;margin:14px 0;border:1px solid var(--border);
+    background:var(--navy-3)}
+  .callout.crit{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+  .callout.warn{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+  .callout.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+  .callout .tag{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-right:8px}
+  .crit .tag{color:#fca5a5}.warn .tag{color:#fcd34d}.ok .tag{color:#86efac}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--blue-2);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  td code{white-space:nowrap}
+
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;
+    border:1px solid var(--border);color:var(--muted)}
+  .pill.p0{background:rgba(239,68,68,.14);color:#fca5a5;border-color:transparent}
+  .pill.p1{background:rgba(245,158,11,.14);color:#fcd34d;border-color:transparent}
+  .pill.p2{background:rgba(96,165,250,.14);color:#93c5fd;border-color:transparent}
+  .muted{color:var(--muted)}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color:var(--faint);font-size:12px}
+
+  @media (max-width:900px){
+    nav.toc{display:none}
+    main{padding:24px 18px 90px}
+  }
+  @media print{
+    nav.toc{display:none} main{max-width:none;padding:0}
+    body{background:#fff;color:#111;font-size:12px}
+    .card,.callout,pre,code{background:#f6f7f9;color:#111;border-color:#ddd}
+    h1,h2,h3,h4,.card h4{color:#0b2a6b} a{color:#0b2a6b}
+    section{border-top:1px solid #ddd}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc">
+  <div class="brand"><div class="logo">CD</div><b>CloudDevis<br><span style="font-weight:400;color:var(--muted);font-size:11px">Engineering Handoff</span></b></div>
+  <div class="sect">Get oriented</div>
+  <a href="#overview">1 · Overview</a>
+  <a href="#stack">2 · Tech stack</a>
+  <a href="#start">3 · Getting started</a>
+  <a href="#tree">4 · Directory map</a>
+  <div class="sect">How it works</div>
+  <a href="#arch">5 · Architecture & routing</a>
+  <a href="#auth">6 · Authentication</a>
+  <a href="#data">7 · Data model</a>
+  <a href="#api">8 · API surface</a>
+  <a href="#dgi">9 · Algerian business logic</a>
+  <a href="#pipeline">10 · Document & PDF pipeline</a>
+  <a href="#mobile">11 · Mobile app</a>
+  <a href="#subs">12 · Subscription & gating</a>
+  <a href="#sec">13 · Security & compliance</a>
+  <a href="#deploy">14 · Deployment</a>
+  <div class="sect">Take over</div>
+  <a href="#debt" style="color:#fca5a5">15 · Known issues & tech debt</a>
+  <a href="#roadmap">16 · Roadmap</a>
+  <a href="#glossary">17 · Glossary</a>
+</nav>
+
+<main>
+
+<header style="margin-bottom:8px">
+  <div class="pill" style="background:var(--blue-bg);color:var(--blue-2);border:0">Developer handoff · living document</div>
+  <h1 style="font-size:34px;margin:12px 0 6px">CloudDevis — Engineering Handoff</h1>
+  <p class="lead">Everything a new engineer needs to take over the whole product: a full-stack
+  invoicing SaaS for Algeria (web + Android), French primary with Arabic/English, artisan &amp;
+  entreprise personas, DGI-compliant devis / factures / bons de livraison.</p>
+  <div class="kpis">
+    <div class="kpi"><b>Next 16.2</b><span>React 19 · App Router</span></div>
+    <div class="kpi"><b>Prisma 7.8</b><span>PostgreSQL (Neon)</span></div>
+    <div class="kpi"><b>Capacitor 8</b><span>Android wrapper</span></div>
+    <div class="kpi"><b>~73</b><span>API routes</span></div>
+    <div class="kpi"><b>3 langs</b><span>FR · AR (RTL) · EN</span></div>
+  </div>
+  <p class="muted" style="font-size:12.5px">Prod: <a href="https://clouddevis.vercel.app">clouddevis.vercel.app</a>
+  · Repo: <code>github.com/Ash586/clouddevis</code> · Generated from a full codebase scan.</p>
+</header>
+
+<!-- 1 -->
+<section id="overview">
+  <h2><span class="num">1</span>Overview</h2>
+  <p>CloudDevis lets Algerian artisans and companies create legally-compliant commercial documents
+  (quotes, invoices, delivery notes) in minutes — with automatic TVA, Timbre Fiscal, and NIF/RC/NIS/AI
+  validation. The same Next.js codebase serves the marketing site, the web dashboard/editor, an admin
+  back-office, and the mobile app (a Capacitor wrapper around the <code>/mobile</code> route).</p>
+  <div class="grid">
+    <div class="card"><h4>Who uses it</h4><p><b>Artisan</b> (self-employed, simplified, 11-digit NIF)
+      and <b>Entreprise</b> (full fiscal IDs, RIB/CCP). Persona is chosen at signup and drives what UI shows.</p></div>
+    <div class="card"><h4>Surfaces</h4><p>Landing · Auth · Dashboard (editor, documents, clients,
+      reports, team, subscription, partner) · Admin (dark theme) · Mobile app.</p></div>
+    <div class="card"><h4>Status</h4><p>Web mature. Mobile functional but ships behind a browser-preview
+      wrapper (see <a href="#debt">§15</a>). BL (bon de livraison) recently added end-to-end.</p></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="stack">
+  <h2><span class="num">2</span>Tech stack</h2>
+  <div class="grid">
+    <div class="card"><h4>Framework</h4>Next.js <b>16.2.6</b> (App Router) · React <b>19.2</b> · TypeScript 5 (strict).</div>
+    <div class="card"><h4>Data</h4>Prisma <b>7.8</b> + <code>@prisma/adapter-pg</code> · PostgreSQL on <b>Neon</b> (pooled).</div>
+    <div class="card"><h4>UI</h4>Tailwind <b>4</b> · lucide-react · framer-motion · custom components (no UI kit).</div>
+    <div class="card"><h4>i18n</h4>next-intl <b>4.13</b> · <code>messages/{fr,ar,en}.json</code> · cookie locale · RTL.</div>
+    <div class="card"><h4>State</h4>zustand <b>5</b> (persisted) · react-hook-form + zod (forms).</div>
+    <div class="card"><h4>Auth/Sec</h4>jose (JWT) · bcryptjs · CSRF · Upstash rate-limit · AES-256-GCM field crypto.</div>
+    <div class="card"><h4>PDF</h4>@react-pdf/renderer <b>4.5</b> (mobile/engine) + HTML print templates (web).</div>
+    <div class="card"><h4>Mobile</h4>Capacitor <b>8</b> (+ Preferences, Filesystem, Push, SQLite, Network, Share…).</div>
+    <div class="card"><h4>Observability</h4>Sentry (+replay) · Plausible · qrcode · structured logger.</div>
+    <div class="card"><h4>Billing</h4>LemonSqueezy (cards) + Wise (manual DZD) · webhook.</div>
+    <div class="card"><h4>Tests</h4>vitest (unit + api) · Playwright (e2e) · GitHub Actions schema-drift check.</div>
+  </div>
+  <h4>Scripts</h4>
+  <table>
+    <tr><th>Command</th><th>Does</th></tr>
+    <tr><td><code>npm run dev</code></td><td>Next dev server.</td></tr>
+    <tr><td><code>npm run build</code></td><td><code>prisma generate</code> + <code>next build</code> (no migrations — Vercel default).</td></tr>
+    <tr><td><code>npm run build:prod</code></td><td>generate + <b><code>prisma migrate deploy</code></b> + build. <span class="muted">Vercel uses this via vercel.json.</span></td></tr>
+    <tr><td><code>npm run test / :unit / :api / :e2e</code></td><td>vitest &amp; playwright suites.</td></tr>
+    <tr><td><code>npm run mobile:sync / :android</code></td><td><code>cap sync</code> / open Android Studio.</td></tr>
+  </table>
+</section>
+
+<!-- 3 -->
+<section id="start">
+  <h2><span class="num">3</span>Getting started (local)</h2>
+  <ol>
+    <li><code>git clone …</code> &amp; <code>npm install</code></li>
+    <li>Copy <code>.env.example</code> → <code>.env</code> and fill the required vars below.</li>
+    <li><code>npx prisma generate</code> (and <code>npx prisma migrate dev</code> against a dev DB).</li>
+    <li><code>npm run dev</code> → <code>http://localhost:3000</code>. The mobile shell renders at <code>/mobile</code>.</li>
+  </ol>
+  <h4>Required environment variables</h4>
+  <table>
+    <tr><th>Var</th><th>Purpose</th></tr>
+    <tr><td><code>DATABASE_URL</code></td><td>Postgres (Neon). Migrations need a direct (non-pooler) URL.</td></tr>
+    <tr><td><code>JWT_SECRET</code> / <code>ADMIN_JWT_SECRET</code></td><td>User &amp; (separate) admin session signing.</td></tr>
+    <tr><td><code>FIELD_ENCRYPTION_KEY</code></td><td>64-hex (32-byte) AES-256-GCM key for NIF/RC/NIS/AI at rest.</td></tr>
+    <tr><td><code>NEXT_PUBLIC_APP_URL</code></td><td>Canonical URL (also encoded in the download QR).</td></tr>
+    <tr><td><code>GOOGLE_/GITHUB_CLIENT_ID/SECRET</code></td><td>OAuth.</td></tr>
+    <tr><td><code>SENTRY_*</code></td><td>Error tracking / releases.</td></tr>
+    <tr><td><code>LEMONSQUEEZY_* · WISE_*</code></td><td>Billing (cards / manual DZD).</td></tr>
+    <tr><td><code>UPSTASH_REDIS_REST_*</code></td><td>Rate limiting (falls back to in-memory in dev).</td></tr>
+    <tr><td><code>ADMIN_EMAIL / ADMIN_PASSWORD</code></td><td>Seed the admin account.</td></tr>
+  </table>
+</section>
+
+<!-- 4 -->
+<section id="tree">
+  <h2><span class="num">4</span>Directory map</h2>
+<pre><code>clouddevis/
+├─ src/app/                 App Router: landing, auth/*, dashboard/*, admin/*, legal/*,
+│                           download, mobile, api/**  (~73 route handlers)
+├─ src/components/          editor/, dashboard/, admin/, landing/, layout/, mobile/, ui/, errors/
+├─ src/lib/                 31 utils — auth, adminAuth, dgi, calculations, validation, fieldCrypto,
+│                           subscription, pricing, generateDocumentHTML, fcm, sentry/*, offline …
+├─ src/hooks/               useEditor*, useUser, useAuth, useGuestOnly, useNetwork …
+├─ src/stores/              zustand: documentStore, clientStore, companyStore, syncStore, userStore
+├─ src/mobile/              MobileShell, screens/*, components/create/* (FlashFacture), lib/* (api,
+│                           useApiSync, pdf, toast, whatsapp, network), types
+├─ src/i18n/                next-intl routing + request config
+├─ src/types/index.ts       DocumentState, DocumentType, SECTION/DOC_TYPE config
+├─ packages/pdf-engine/     @react-pdf templates (devis-fr type-aware, template-ar) + types
+├─ prisma/                  schema.prisma + migrations/*
+├─ messages/                fr.json · ar.json · en.json
+├─ android/                 Capacitor Android project (+ signing)
+├─ capacitor.config.ts      ⚠ server.url = …/mobile  (see §15)
+└─ vercel.json              buildCommand = build:prod</code></pre>
+</section>
+
+<!-- 5 -->
+<section id="arch">
+  <h2><span class="num">5</span>Architecture &amp; routing</h2>
+  <p>Next.js App Router. Server components by default; auth pages, dashboard layout, editor and mobile
+  are client components. Mutations always go through <code>/api/*</code> routes (no Server Actions) so
+  every write gets Sentry wrapping + explicit validation.</p>
+  <h4>Route groups</h4>
+  <table>
+    <tr><th>Group</th><th>Guard</th><th>Notes</th></tr>
+    <tr><td>Public (<code>/</code>, <code>/auth/*</code>, <code>/legal/*</code>, <code>/download</code>, <code>/enterprise</code>, <code>/help</code>)</td><td>none</td><td>Login/register also run <code>useGuestOnly</code> → bounce authed users to <code>/dashboard</code>.</td></tr>
+    <tr><td><code>/dashboard/*</code></td><td><code>layout.tsx</code> → <code>/api/auth/me</code></td><td>Wraps <code>OfflineSyncProvider</code> + <code>TrialGate</code>.</td></tr>
+    <tr><td><code>/admin/*</code></td><td>separate admin session</td><td>Dark theme (<code>admin.css</code>), <code>withAdminAuth</code> on APIs.</td></tr>
+    <tr><td><code>/mobile</code></td><td>MobileShell self-auth</td><td>Capacitor target — but it's a <b>preview wrapper</b> (see §15).</td></tr>
+  </table>
+  <h4>i18n</h4>
+  <p><code>localePrefix:'never'</code> — no <code>/fr</code> URL segment; locale comes from the
+  <code>NEXT_LOCALE</code> cookie / Accept-Language and is applied in the root layout
+  (<code>&lt;html dir&gt;</code> flips to <code>rtl</code> for Arabic). API responses are localized via
+  <code>src/lib/api-i18n.ts</code>.</p>
+</section>
+
+<!-- 6 -->
+<section id="auth">
+  <h2><span class="num">6</span>Authentication</h2>
+  <p>Stateless JWT (HS256 via <b>jose</b>) stored in an httpOnly cookie, backed by a <code>Session</code>
+  row keyed by <code>jti</code> so tokens are revocable (logout deletes the row; every check re-verifies
+  the row exists). The JWT payload carries <code>userId, email, name, <b>mode</b>, sector, country,
+  language, subscriptionStatus, jti</code>.</p>
+  <h4>Flows</h4>
+  <ul>
+    <li><b>Email/password</b> → <code>/api/auth/login</code> (rate-limit + CSRF + bcrypt) → <code>createSession()</code> → cookie.</li>
+    <li><b>OAuth</b> (Google/GitHub) → <code>/api/auth/oauth/[provider]</code> → callback links/creates an
+      <code>Account</code>+<code>User</code>. <b>New</b> users are routed to <code>/auth/welcome</code> to pick
+      Artisan/Entreprise, which <code>PUT /api/user/profile {mode}</code> and re-issues the cookie.</li>
+    <li><b>Guest guard</b> — <code>useGuestOnly()</code> sends already-authed visitors away from login/register.</li>
+  </ul>
+  <div class="callout"><span class="tag">Note</span>Admin auth is <b>separate</b> — its own
+    <code>ADMIN_JWT_SECRET</code>, cookie, and <code>withAdminAuth</code> middleware. Never mix the two.</div>
+  <p class="muted">Key files: <code>src/lib/auth.ts</code>, <code>src/lib/adminAuth.ts</code>,
+  <code>src/app/api/auth/**</code>, <code>src/app/auth/welcome/page.tsx</code>, <code>src/hooks/useGuestOnly.ts</code>.</p>
+</section>
+
+<!-- 7 -->
+<section id="data">
+  <h2><span class="num">7</span>Data model (Prisma)</h2>
+  <p>Source of truth: <code>prisma/schema.prisma</code>. Sensitive company IDs (NIF/RC/NIS/AI/IBAN…) are
+  encrypted at rest with AES-256-GCM via <code>src/lib/fieldCrypto.ts</code> (prefix <code>enc:v1:</code>, idempotent).</p>
+  <h4>Core models</h4>
+  <table>
+    <tr><th>Model</th><th>Role</th></tr>
+    <tr><td><code>User</code></td><td>Account: email/password, <code>mode</code>, subscription, trial counters, <code>fcmToken</code>. <span class="muted">Deprecated <code>companyInfo:Json</code>.</span></td></tr>
+    <tr><td><code>Company</code> <span class="pill">new</span></td><td>1:1 with User — name, NIF/RC/NIS/AI, capital, logo, signature, RIB/CCP. Replaces <code>User.companyInfo</code>.</td></tr>
+    <tr><td><code>Client</code></td><td>Customer records (+ optional tax IDs).</td></tr>
+    <tr><td><code>Document</code></td><td>Invoice/quote/… — type, status, number, totals, <code>customFields</code>, template, BL/BC refs. <span class="muted">Deprecated <code>items:Json[]</code>.</span></td></tr>
+    <tr><td><code>LineItem</code> <span class="pill">new</span></td><td>Normalized line items (migration in progress — see §15).</td></tr>
+    <tr><td><code>DocumentShare · Template · Team · TeamMember</code></td><td>Sharing, saved templates, collaboration.</td></tr>
+    <tr><td><code>Partner · Referral · Commission · Payout</code></td><td>Affiliate program.</td></tr>
+    <tr><td><code>Transaction · RecurringInvoice · Notification · ActivityLog · EnterpriseRequest · Admin</code></td><td>Billing, recurring, in-app/push, audit, upgrades, admin accounts.</td></tr>
+    <tr><td><code>Account · Session · PasswordResetToken</code></td><td>OAuth links, revocable sessions, reset flow.</td></tr>
+  </table>
+  <h4>Enums</h4>
+<pre><code>UserMode            ARTISAN | ENTREPRISE
+SubscriptionStatus  FREE | TRIAL | STANDARD | PRO | MAX | ENTERPRISE | EXPIRED
+DocumentType        DEVIS | PROFORMA | BC | BR | <b>BL</b> | FACTURE | INTERVENTION | ATTACHEMENT
+DocumentStatus      DRAFT | ACCEPTED | PROGRESS | DELIVERED</code></pre>
+  <p class="muted">Migrations live in <code>prisma/migrations/</code> (latest: <code>…_add_bl_delivery_note</code>).
+  A GitHub Action (<code>schema-drift.yml</code>) fails CI if schema and migrations diverge.</p>
+</section>
+
+<!-- 8 -->
+<section id="api">
+  <h2><span class="num">8</span>API surface (~73 routes)</h2>
+  <p>All under <code>src/app/api/**</code>. Every handler is wrapped by
+  <code>withApiErrorHandling(fn,{component,severity,userImpact})</code> (Sentry), guarded by
+  <code>withAuth</code>/<code>withAdminAuth</code>, and validated (<code>validateDocumentBody</code>,
+  <code>validateAuthInput</code>). State-changing routes add CSRF + rate-limit.</p>
+  <table>
+    <tr><th>Area</th><th>Representative routes</th></tr>
+    <tr><td>Auth (8)</td><td><code>auth/login · register · logout · me · forgot/reset-password · oauth/[provider] · oauth/callback/[provider]</code></td></tr>
+    <tr><td>User (5)</td><td><code>user/profile (GET/PUT mode+company) · preferences · usage · custom-sections · push-token</code></td></tr>
+    <tr><td>Documents (4)</td><td><code>documents (list/create) · documents/[id] · [id]/share · shared</code></td></tr>
+    <tr><td>Clients (2)</td><td><code>clients · clients/[id]</code></td></tr>
+    <tr><td>Dashboard/Export</td><td><code>dashboard · export</code></td></tr>
+    <tr><td>Teams (7)</td><td><code>teams · [id] · members · invites/[token]</code></td></tr>
+    <tr><td>Templates · Recurring · Reports · Notifications</td><td>CRUD each.</td></tr>
+    <tr><td>Partner (7)</td><td><code>partner/apply · status · dashboard · commissions · payout/request · r/[code]</code></td></tr>
+    <tr><td>Billing (3)</td><td><code>subscription · subscribe/wise · webhooks/lemon-squeezy</code></td></tr>
+    <tr><td>Admin (~22)</td><td><code>admin/auth/* · users/[id]/(un)suspend · subscriptions · partners/[id]/approve · analytics · reports · logs · system</code></td></tr>
+  </table>
+</section>
+
+<!-- 9 -->
+<section id="dgi">
+  <h2><span class="num">9</span>Algerian business logic (the compliance core)</h2>
+  <p><code>src/lib/dgi.ts</code> is the single source of truth for tax + identity; <code>calculations.ts</code>
+  wraps it; <code>validation.ts</code> adds localized messages.</p>
+  <div class="grid">
+    <div class="card"><h4>TVA</h4>Legal rates <code>[0, 9, 19]</code>. Per-item rates supported and weighted after discount.</div>
+    <div class="card"><h4>Timbre Fiscal</h4><code>1000 DA</code>, applies when <code>TTC ≥ 10 000</code> (Art. 220 CII).
+      <b>Exempt:</b> DEVIS, ATTACHEMENT, <b>BL</b>, and cheque/virement payments.</div>
+    <div class="card"><h4>Identity</h4>NIF <b>11</b> (individual) vs <b>15</b> (company) — <code>isIndividualNIF/isCompanyNIF</code>; RC 9–14 alnum; NIS/AI 10 digits.</div>
+    <div class="card"><h4>Tafqit</h4>Amount-in-words in FR &amp; AR for the legal "arrêté à la somme de…" line.</div>
+    <div class="card"><h4>Numbering</h4><code>PREFIX-YYYY-NNNNN</code> — DEV/FAC/PRO/BC/BR/<b>BL</b>/INT/ATT.</div>
+    <div class="card"><h4>BL special case</h4><code>calculateDocument</code> zeroes TVA/timbre/TTC for <code>bl</code> so every renderer hides tax rows.</div>
+  </div>
+  <p class="muted">Runtime exposure is gated by <code>ENABLED_DOC_TYPES = ['devis','facture','bl']</code>
+  (<code>src/lib/config.ts</code>) — the other types exist in code but aren't shown in the UI.</p>
+</section>
+
+<!-- 10 -->
+<section id="pipeline">
+  <h2><span class="num">10</span>Document &amp; PDF pipeline</h2>
+  <h4>Web editor</h4>
+  <p><code>src/app/dashboard/editor/page.tsx</code> + <code>useEditorState / useEditorActions / useEditorUndo</code>.
+  A section registry (<code>src/components/editor/sections/*</code>) renders per-type sections driven by
+  <code>DOC_TYPE_SECTIONS</code> / <code>DOC_TYPE_DEFAULT_FIELDS</code>; users tune visibility in the
+  CustomizationModal. Drafts autosave to <code>localStorage</code>; live right-pane preview with 4 style
+  templates (Haussmann/Nordic/Velours/Industrielle).</p>
+  <div class="callout warn"><span class="tag">Gotcha</span>There are <b>two</b> PDF paths.
+    <b>Web download</b> builds HTML via <code>src/lib/generateDocumentHTML.ts</code> → print window.
+    <b>Mobile</b> (and any server render) uses <code>packages/pdf-engine</code> (@react-pdf, type-aware
+    <code>devis-fr.tsx</code>, Arabic <code>template-ar.tsx</code>). Keep both in sync when changing a doc type.</div>
+</section>
+
+<!-- 11 -->
+<section id="mobile">
+  <h2><span class="num">11</span>Mobile app</h2>
+  <p>A Capacitor wrapper. <code>MobileShell</code> hosts bottom-tab screens (Home, Documents, Company,
+  Clients, Settings, Create). State lives in zustand stores persisted through Capacitor Preferences /
+  localStorage; offline sync via <code>useApiSync</code> + <code>offline.ts</code> + SQLite, replaying a
+  queue on reconnect.</p>
+  <div class="card"><h4>FlashFacture (create/edit)</h4>
+    A single-canvas pattern (<code>src/mobile/components/create/*</code>): <b>LivePaper</b> renders the live
+    invoice; tapping a zone morphs the persistent <b>CreateDock</b> (add item / client / details) with no
+    navigation. Totals count up. Persona-aware: artisans see fewer doc types (BC/BR/BL behind "+ Plus") and
+    a simplified company form.</p>
+  </div>
+  <p class="muted">Libs: <code>pdf.ts</code> (engine bridge), <code>whatsapp.ts</code>/<code>share.ts</code>
+  (native → Web Share → download fallback), <code>toast.ts</code> (native → DOM pill), <code>network.ts</code>.</p>
+</section>
+
+<!-- 12 -->
+<section id="subs">
+  <h2><span class="num">12</span>Subscription &amp; gating</h2>
+  <p><code>src/lib/subscription.ts</code>: <code>TRIAL_DAYS = 7</code>, <code>canCreateDocument()</code>,
+  per-plan doc/team/storage limits. <code>TrialGate</code> shows a countdown for trials and a paywall for
+  <code>EXPIRED</code>. Plans in <code>pricing.ts</code> (free / standard / enterprise). Checkout via
+  <b>LemonSqueezy</b> (cards, webhook-driven) or <b>Wise</b> (manual DZD transfer).</p>
+</section>
+
+<!-- 13 -->
+<section id="sec">
+  <h2><span class="num">13</span>Security &amp; compliance</h2>
+  <ul>
+    <li><b>Field encryption</b> — AES-256-GCM for NIF/RC/NIS/AI/IBAN in the companyInfo JSON (<code>fieldCrypto.ts</code>).</li>
+    <li><b>Sessions</b> — httpOnly JWT + DB <code>jti</code> revocation; bcrypt (10) + 12-char password policy.</li>
+    <li><b>CSRF</b> on state-changing routes; <b>rate limiting</b> (Upstash / in-memory) on login &amp; admin login.</li>
+    <li><b>CSP</b> configured in <code>next.config.ts</code> (frame-ancestors none, object-src none).</li>
+    <li><b>DGI compliance</b> baked into validation &amp; calculations (§9).</li>
+  </ul>
+</section>
+
+<!-- 14 -->
+<section id="deploy">
+  <h2><span class="num">14</span>Deployment</h2>
+  <h4>Web (Vercel)</h4>
+  <p><code>vercel.json</code> runs <code>build:prod</code> → <b><code>prisma migrate deploy</code></b> then build.
+  So a schema change is only live once its migration is committed <i>and</i> a deploy runs. Env vars set in
+  the Vercel dashboard. DB is Neon (use the direct URL for migrations, pooler for runtime).</p>
+  <h4>Mobile (Capacitor / Android)</h4>
+  <p><code>npm run mobile:sync</code> then build/sign in Android Studio (keystore <code>clouddevis-release.jks</code>).
+  Users download the APK from <code>/download</code> (button + scan QR → Google Drive link). Drop a hosted
+  APK at <code>public/clouddevis.apk</code> for a first-party download.</p>
+  <div class="callout crit"><span class="tag">Read §15</span>The Capacitor <code>server.url</code> currently
+    points at <code>/mobile</code> — a production anti-pattern with real UX fallout. Fix before the next release.</div>
+</section>
+
+<!-- 15 -->
+<section id="debt">
+  <h2><span class="num">15</span>🔴 Known issues &amp; technical debt</h2>
+  <p class="lead">The honest state of things — start here when planning the next sprint.</p>
+
+  <div class="callout crit">
+    <span class="tag">P0 · Critical</span><b>Capacitor <code>server.url = /mobile</code> ships the browser-preview wrapper.</b>
+    <p>The APK loads <code>src/app/mobile/page.tsx</code>, which renders <code>MobileShell</code> inside a fake
+    390×844 "iPhone 14 Pro" frame with <i>Plein écran</i> / <i>Réinitialiser</i> dev controls. On a real phone the
+    app is boxed and clipped → the "non-scroll", "non-responsive", and stray-buttons bugs in the QA report are
+    <b>this wrapper</b>, not the app. Capacitor's own guidance is that <code>server.url</code> is
+    <b>not for production</b> (blank-screen / plugin-injection risks).
+    <b>Fix:</b> a clean route (e.g. <code>/app</code>) that renders <code>&lt;MobileShell/&gt;</code> full-bleed, point
+    <code>server.url</code> there — or, better, bundle <code>webDir</code> for true offline. Then rebuild the APK.</p>
+    <p class="muted">Refs: ionic-team/capacitor discussions
+      <a href="https://github.com/ionic-team/capacitor/discussions/5075">#5075</a>,
+      <a href="https://github.com/ionic-team/capacitor/discussions/4080">#4080</a>,
+      <a href="https://github.com/ionic-team/capacitor/discussions/1478">#1478</a>.</p>
+  </div>
+
+  <div class="callout warn"><span class="tag">P0 · Mobile UX safeguards</span>
+    <ul style="margin-bottom:0">
+      <li>No unsaved-changes guard on create — switching tabs risks losing the in-progress doc.</li>
+      <li>A document can be saved with <b>no client</b> → shows "Client inconnu" in lists. Client should be required.</li>
+      <li>No document <b>status workflow</b> — everything saves as <code>DRAFT</code> (no sent/paid transitions).</li>
+      <li>Mobile client form lacks an <b>email</b> field; the "Clients: 0" stat isn't a CTA.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn"><span class="tag">P1 · Data migrations mid-flight</span>
+    <code>LineItem</code> and <code>Company</code> models exist but <code>Document.items:Json</code> and
+    <code>User.companyInfo:Json</code> are still the live source; <code>migrateDocumentItems()</code> /
+    <code>migrateUserCompany()</code> are partial. Finish, backfill, then drop the JSON columns.</div>
+
+  <div class="card">
+    <h4>Other flagged items</h4>
+    <ul style="margin-bottom:0">
+      <li><b>Recurring invoices</b> — model + API exist, but there's no scheduler/cron to actually emit them.</li>
+      <li><b>Offline sync</b> — queue replays last-write; no conflict resolution strategy.</li>
+      <li><b>Tests thin</b> — unit (calculations/dgi/validation) + api (auth/clients/documents/teams); e2e minimal.</li>
+      <li><b>BL tax-hiding</b> relies on per-renderer guards; <b>attachement</b> signature templates partial.</li>
+      <li><code>generateDocumentHTML.ts</code> carries unrelated uncommitted work; the <b>BL enum migration must be deployed to prod</b> before BL is used (else <code>POST /api/documents</code> 500s).</li>
+      <li><code>.github/workflows/schema-drift.yml</code> is uncommitted (push token lacked <code>workflow</code> scope).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 16 -->
+<section id="roadmap">
+  <h2><span class="num">16</span>Roadmap (prioritised)</h2>
+  <table>
+    <tr><th>Prio</th><th>Item</th><th>Why</th></tr>
+    <tr><td><span class="pill p0">P0</span></td><td>Clean mobile route + rebuild/re-sign APK</td><td>Removes ~half the QA-report bugs at the root.</td></tr>
+    <tr><td><span class="pill p0">P0</span></td><td>Mobile safeguards: exit guard, client required, status workflow, client email</td><td>Data-loss &amp; correctness.</td></tr>
+    <tr><td><span class="pill p1">P1</span></td><td>Finish LineItem &amp; Company migrations; drop JSON columns</td><td>Removes dual-source fragility.</td></tr>
+    <tr><td><span class="pill p1">P1</span></td><td>Recurring-invoice scheduler (cron) + sync conflict strategy</td><td>Completes half-built features.</td></tr>
+    <tr><td><span class="pill p2">P2</span></td><td>Test coverage (e2e flows), PDF web/engine parity, partner-commission audit</td><td>Confidence &amp; consistency.</td></tr>
+  </table>
+</section>
+
+<!-- 17 -->
+<section id="glossary">
+  <h2><span class="num">17</span>Glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>DGI</td><td>Direction Générale des Impôts — Algerian tax authority.</td></tr>
+    <tr><td>NIF / RC / NIS / AI</td><td>Fiscal ID / trade register / statistical ID / article number. NIF: 11 (individual) or 15 (company).</td></tr>
+    <tr><td>Timbre Fiscal</td><td>Fiscal stamp (1000 DA) on cash invoices ≥ 10 000 DA.</td></tr>
+    <tr><td>Devis / Facture</td><td>Quote / Invoice.</td></tr>
+    <tr><td>BC / BR / BL</td><td>Bon de Commande (order) / Réception / <b>Livraison</b> (delivery note — no tax).</td></tr>
+    <tr><td>Tafqit</td><td>Writing an amount in words (legal requirement).</td></tr>
+    <tr><td>Persona</td><td>Artisan vs Entreprise account mode — drives visible fields, TVA defaults, doc types.</td></tr>
+    <tr><td>FlashFacture</td><td>The mobile single-canvas create pattern (LivePaper + CreateDock).</td></tr>
+  </table>
+  <div class="foot">
+    CloudDevis engineering handoff · living document — update it when architecture changes.
+    Facts verified against source at generation time (<code>ENABLED_DOC_TYPES</code>,
+    <code>TIMBRE_FISCAL_THRESHOLD=10 000</code>, <code>TRIAL_DAYS=7</code>, Next 16.2.6).
+  </div>
+</section>
+
+</main>
+</div>
+</body>
+</html>
