@@ -113,7 +113,13 @@ export async function refreshAllData(): Promise<boolean> {
     fetchDocuments(1, 100),
   ]);
 
-  useClientStore.getState().replaceAll(apiClients.map(mapApiClientToStore));
+  // Preserve local-only clients that are still in the sync queue
+  const pendingIds = new Set(useSyncStore.getState().queue.filter(q => q.entity === 'client').map(q => q.entityId));
+  const localOnly = useClientStore.getState().clients.filter(c => pendingIds.has(c.id));
+  const serverClients = apiClients.map(mapApiClientToStore);
+
+  // Merge: Server clients win, but local-only (unsynced) ones are appended
+  useClientStore.getState().replaceAll([...serverClients, ...localOnly]);
   useDocumentStore.getState().replaceAll(apiDocuments.map(mapApiDocumentToStore));
   return true;
 }

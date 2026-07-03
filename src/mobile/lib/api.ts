@@ -70,7 +70,7 @@ export async function createApiClient(
       nif: data.nif,
       rc: data.rc,
       nis: data.nis,
-      ai: data.nis, // map nis used for ai in mobile type
+      ai: data.ai, // corrected to use data.ai
     }),
   });
 }
