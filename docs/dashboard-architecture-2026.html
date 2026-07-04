@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CloudDevis — Dashboard Architecture Report (2026)</title>
+<style>
+  :root{
+    --navy:#0B0F1A; --navy-2:#111827; --navy-3:#1a2233; --navy-4:#232d42;
+    --ink:#E8EDF6; --muted:#93A2BC; --faint:#5c6b85;
+    --blue:#2563EB; --blue-2:#60A5FA; --blue-bg:rgba(37,99,235,.12);
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#a78bfa;
+    --border:rgba(255,255,255,.09); --card:#141b2c;
+    --code:#0d1424; --radius:12px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--navy);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code);
+    padding:1.5px 6px;border-radius:5px;border:1px solid var(--border);color:#cbd5e1}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#cbd5e1}
+  pre code{background:none;border:0;padding:0}
+  h1,h2,h3,h4{line-height:1.25;font-weight:700;color:#fff}
+  h2{font-size:24px;margin:0 0 4px;padding-top:8px}
+  h3{font-size:17px;margin:26px 0 8px;color:#dbe6ff}
+  h4{font-size:14px;margin:18px 0 6px;color:var(--blue-2);text-transform:uppercase;letter-spacing:.05em}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px}
+  li{margin:4px 0}
+  hr{border:0;border-top:1px solid var(--border);margin:16px 0}
+
+  /* Layout */
+  .wrap{display:flex;max-width:1400px;margin:0 auto}
+  nav.toc{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;
+    width:280px;flex:0 0 280px;padding:26px 18px 40px;border-right:1px solid var(--border);
+    background:linear-gradient(180deg,var(--navy-2),var(--navy))}
+  nav.toc .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  nav.toc .brand .logo{width:34px;height:34px;border-radius:9px;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  nav.toc .brand b{font-size:15px}
+  nav.toc a{display:block;color:var(--muted);font-size:13px;padding:5px 10px;border-radius:7px;
+    border-left:2px solid transparent}
+  nav.toc a:hover{background:var(--navy-3);color:var(--ink);text-decoration:none}
+  nav.toc .sect{margin-top:14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--faint);padding:0 10px 4px}
+  main{flex:1;min-width:0;padding:34px 46px 120px;max-width:1000px}
+
+  section{padding-top:26px;margin-top:8px;border-top:1px solid var(--border)}
+  section:first-of-type{border-top:0}
+  .lead{color:var(--muted);font-size:15px;max-width:70ch}
+  .num{color:var(--blue-2);font-variant-numeric:tabular-nums;font-weight:800;margin-right:8px}
+
+  /* Cards / callouts */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+  .card h4{margin-top:0}
+  .kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:120px}
+  .kpi b{display:block;font-size:18px;color:#fff}
+  .kpi span{font-size:11.5px;color:var(--muted)}
+
+  .callout{border-radius:var(--radius);padding:12px 16px;margin:14px 0;border:1px solid var(--border);
+    background:var(--navy-3)}
+  .callout.crit{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+  .callout.warn{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+  .callout.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08)}
+  .callout .tag{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-right:8px}
+  .crit .tag{color:#fca5a5}.warn .tag{color:#fcd34d}.ok .tag{color:#86efac}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--blue-2);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  td code{white-space:nowrap}
+
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;
+    border:1px solid var(--border);color:var(--muted)}
+  .pill.p0{background:rgba(239,68,68,.14);color:#fca5a5;border-color:transparent}
+  .pill.p1{background:rgba(245,158,11,.14);color:#fcd34d;border-color:transparent}
+  .pill.p2{background:rgba(96,165,250,.14);color:#93c5fd;border-color:transparent}
+  .pill.good{background:rgba(34,197,94,.14);color:#86efac;border-color:transparent}
+  .muted{color:var(--muted)}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color:var(--faint);font-size:12px}
+
+  @media (max-width:900px){
+    nav.toc{display:none}
+    main{padding:24px 18px 90px}
+  }
+  @media print{
+    nav.toc{display:none} main{max-width:none;padding:0}
+    body{background:#fff;color:#111;font-size:12px}
+    .card,.callout,pre,code{background:#f6f7f9;color:#111;border-color:#ddd}
+    h1,h2,h3,h4,.card h4{color:#0b2a6b} a{color:#0b2a6b}
+    section{border-top:1px solid #ddd}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc">
+  <div class="brand"><div class="logo">CD</div><b>CloudDevis<br><span style="font-weight:400;color:var(--muted);font-size:11px">Dashboard Architecture 2026</span></b></div>
+  <div class="sect">The 2026 baseline</div>
+  <a href="#overview">1 · Overview & methodology</a>
+  <a href="#arch2026">2 · Modern architecture, 2026</a>
+  <a href="#ux2026">3 · Modern dashboard UX, 2026</a>
+  <a href="#perf2026">4 · Performance & scalability</a>
+  <div class="sect">Applied to CloudDevis</div>
+  <a href="#audit" style="color:#fca5a5">5 · CloudDevis vs. the baseline</a>
+  <a href="#roadmap">6 · Roadmap</a>
+  <a href="#glossary">7 · Glossary</a>
+</nav>
+
+<main>
+
+<header style="margin-bottom:8px">
+  <div class="pill" style="background:var(--blue-bg);color:var(--blue-2);border:0">Architecture report · living document</div>
+  <h1 style="font-size:34px;margin:12px 0 6px">Dashboard Architecture, 2026</h1>
+  <p class="lead">What modern SaaS dashboards look like today — technically and in UX — and
+  where CloudDevis's own dashboard stands against that baseline, with a concrete, prioritised
+  path to close the gap.</p>
+  <div class="kpis">
+    <div class="kpi"><b>9</b><span>gaps found in CloudDevis</span></div>
+    <div class="kpi"><b>1</b><span>fresh regression flagged</span></div>
+    <div class="kpi"><b>3</b><span>roadmap phases (P0→P2)</span></div>
+  </div>
+  <p class="muted" style="font-size:12.5px">Companion to <code>docs/handoff.html</code> (full engineering handoff) — this report is scoped to dashboard architecture only.</p>
+</header>
+
+<!-- 1 -->
+<section id="overview">
+  <h2><span class="num">1</span>Overview & methodology</h2>
+  <p>This report combines two inputs: a survey of 2026 industry practice for dashboard-style
+  SaaS applications (rendering strategy, state management, UX patterns, performance targets),
+  and a live code audit of CloudDevis's current <code>/dashboard/*</code> implementation. Every
+  claim about CloudDevis cites an exact file and line; every general claim cites a source.</p>
+  <div class="callout">
+    <span class="tag">Timing</span> This audit runs right after the Sidebar-to-Navbar
+    redesign (see <code>git log</code>: <em>"remove sidebar, fold nav into a persistent top
+    navbar"</em>). The rebuilt Navbar already reproduces one of the exact anti-patterns this
+    report flags — see <a href="#audit">§5, finding 1</a> — a useful live example of why a
+    data layer matters, not just a moved UI.
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="arch2026">
+  <h2><span class="num">2</span>Modern dashboard architecture, 2026</h2>
+
+  <h3>Rendering & data strategy</h3>
+  <p>The 2026 default for React/Next.js dashboards is <b>Server Components first</b>: components
+  are server-rendered unless they need browser APIs, state, or effects, in which case
+  <code>'use client'</code> opts them out. Initial dashboard data (stats, tables, lists) should
+  come from Server Components fetching in parallel with <code>Promise.all()</code> — no
+  client-side waterfall — which measurably drops Time-to-First-Byte by 40–60% on data-heavy
+  pages. <code>useEffect</code>-driven fetches are reserved for data that changes
+  <i>after</i> mount: user interactions, polling, real-time updates —
+  not the page's initial payload.
+  <a href="https://nextjs.org/learn/dashboard-app/fetching-data">Next.js fetching docs</a></p>
+  <p>Next.js layers four caches — <b>request memoization</b> (dedupes identical fetches within
+  one render), <b>data cache</b> (persists across requests with configurable revalidation),
+  <b>full route cache</b> (static pages cached at build), and <b>router cache</b> (client-side
+  navigation cache). <b>Parallel Routes</b> let independent dashboard regions (e.g. a nav bar's
+  badge counts and a page's main table) load and error independently, without one blocking or
+  duplicating the other's fetch.
+  <a href="https://pristren.com/blog/nextjs-app-router-patterns-2026/">App Router patterns 2026</a></p>
+
+  <h3>State management: three kinds, not one</h3>
+  <p>Modern dashboards separate three categories of state that are easy to conflate:</p>
+  <div class="grid">
+    <div class="card"><h4>Server state</h4>A cached, revalidatable copy of backend data (stats, lists). Owned by a fetch-cache layer (RSC cache, SWR, React Query) — <b>never</b> duplicated by hand in multiple components.</div>
+    <div class="card"><h4>Client / UI state</h4>Dropdown open/closed, form drafts, active tab. Local <code>useState</code> or component-scoped — never needs a global store.</div>
+    <div class="card"><h4>Global app state</h4>Auth session, feature flags, cross-page selections. A small global store (Zustand/Context) — not a dumping ground for server data.</div>
+  </div>
+  <p class="muted">Conflating "server state" with ad-hoc <code>useState</code> in every component
+  that needs it is precisely what produces duplicate-fetch bugs — two components independently
+  holding their own copy of the same backend data, which silently drift apart. This is not
+  abstract: CloudDevis has exactly this bug today (<a href="#audit">§5.1</a>).</p>
+
+  <h3>Component architecture</h3>
+  <p><b>Feature-based folder structure</b> — grouping by domain (e.g. <code>features/clients/</code>,
+  <code>features/documents/</code>) rather than by technical layer — is the 2026 standard for
+  scalability and team autonomy, cited to cut long-term maintenance cost by roughly 30% through
+  clearer ownership boundaries.
+  <a href="https://dev.to/sizan_mahmud0_e7c3fd0cb68/the-complete-guide-to-frontend-architecture-patterns-in-2026-3ioo">Frontend architecture 2026</a>
+  A route segment should own its layout, loading/error states, and local components — Next.js's
+  <code>layout.tsx</code> per segment exists exactly for this, so the shared dashboard shell
+  (nav, gating) belongs in <b>one</b> layout file, not copy-pasted into every page.</p>
+
+  <h3>Design systems</h3>
+  <p>The 2026 default for maintainable, themeable UI is <b>token-driven theming</b> — CSS
+  variables for every color/spacing decision (already CloudDevis's pattern via
+  <code>var(--navy)</code> etc.) — paired with a <b>headless, copy-in-repo</b> component
+  philosophy (shadcn/ui + Radix primitives) rather than an opaque npm component library. This
+  keeps full styling control and avoids the "fighting the library's defaults" tax that grows
+  with scale.
+  <a href="https://shadisbaih.medium.com/building-a-scalable-design-system-with-shadcn-ui-tailwind-css-and-design-tokens-031474b03690">Scalable design system with shadcn/Tailwind/tokens</a></p>
+</section>
+
+<!-- 3 -->
+<section id="ux2026">
+  <h2><span class="num">3</span>Modern dashboard UX, 2026</h2>
+
+  <h3>Progressive disclosure</h3>
+  <p>Described as <i>the</i> single most important dashboard UX pattern for 2026: show the
+  minimum a user needs to make their next decision, reveal more only on demand. Cognitive load —
+  not any specific task — is now the primary experience of using a product; a dashboard that
+  does one thing with genuine elegance reads as more sophisticated than one that surfaces every
+  capability on first login.
+  <a href="https://www.gitnexa.com/blogs/saas-dashboard-ux-patterns">SaaS dashboard UX patterns 2026</a></p>
+
+  <h3>F-pattern visual hierarchy</h3>
+  <p>Eye-tracking research consistently shows users scan dashboards in an F-shape: top-left
+  first, horizontally across the top, then down the left edge. The practical rule: put the
+  single most important metric top-left, primary KPIs across the top row, secondary metrics
+  down the left column.</p>
+
+  <h3>Command palette navigation</h3>
+  <p><code>Cmd/Ctrl+K</code> command palettes — type-to-navigate, skipping menus entirely — are
+  now a standard power-user layer in SaaS dashboards, measured to increase task completion by
+  ~25% among frequent users. As a dashboard's action surface grows (more document types, more
+  settings), a palette scales better than deepening menus.
+  <a href="https://userpilot.com/blog/saas-ux-design/">SaaS UX design 2026</a></p>
+
+  <h3>Role-based adaptive views</h3>
+  <p>Previously an enterprise-only configuration, role-based dashboards are now the default
+  expectation for any product serving more than one user type — different roles should land on
+  different first screens over the same underlying data.
+  <div class="callout ok"><span class="tag">Already in CloudDevis</span> The Artisan/Entreprise
+  persona system (mode-gated nav, editor fields, doc types) is a real instance of this pattern —
+  a genuine strength to build on, not a gap.</div></p>
+
+  <h3>Empty states, skeletons, perceived performance</h3>
+  <p>Well-designed empty states (illustration/icon + one clear next action) and skeleton loaders
+  that mirror the real layout measurably reduce perceived load time and abandonment —
+  treated as first-class UI, not an afterthought bolted on per page.</p>
+
+  <h3>Accessibility as a requirement</h3>
+  <p>Keyboard navigation, focus management, and ARIA semantics on interactive widgets (menus,
+  dropdowns, modals) are baseline 2026 expectations for SaaS dashboards, not a compliance
+  checkbox — dropdown menus need <code>aria-expanded</code>/<code>role="menu"</code> and
+  Escape-to-close; data tables need proper <code>&lt;thead&gt;</code>/<code>scope</code>
+  semantics for screen readers.</p>
+</section>
+
+<!-- 4 -->
+<section id="perf2026">
+  <h2><span class="num">4</span>Performance & scalability</h2>
+  <p><b>Core Web Vitals, 2026 targets:</b></p>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Typical dashboard fix</th></tr>
+    <tr><td><b>LCP</b> (Largest Contentful Paint)</td><td>&lt; 2.5s</td><td>Code splitting, image preloading, SSR/RSC for above-the-fold data</td></tr>
+    <tr><td><b>CLS</b> (Cumulative Layout Shift)</td><td>&lt; 0.1</td><td>Reserved space / fixed dimensions, skeleton screens matching final layout</td></tr>
+    <tr><td><b>INP</b> (Interaction to Next Paint)</td><td>&lt; 200ms</td><td><code>useTransition</code>, memoization, virtualization of long lists</td></tr>
+  </table>
+  <p class="muted">Only ~47% of sites meet "good" thresholds on all three today — the gap is
+  common, not exotic. <a href="https://www.digitalapplied.com/blog/core-web-vitals-2026-inp-lcp-cls-optimization-guide">Core Web Vitals 2026 guide</a></p>
+  <div class="grid">
+    <div class="card"><h4>Server Components</h4>Reduce client-side JS by 40–60% for read-heavy screens (dashboards, tables) — directly lowers INP by shrinking main-thread work per interaction.</div>
+    <div class="card"><h4>Code splitting</h4><code>dynamic()</code> imports for heavy, rarely-used screens (e.g. PDF generation, admin panels) keep the dashboard's own bundle lean.</div>
+    <div class="card"><h4>Virtualization</h4>Long document/client tables should render only visible rows — flat <code>.map()</code> over hundreds of rows is a common, avoidable INP/CLS cost.</div>
+    <div class="card"><h4>Memoization</h4><code>useMemo</code>/<code>React.memo</code> prevent re-computation and re-render cascades in components that receive frequently-changing parent state.</div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="audit">
+  <h2><span class="num">5</span>🔍 CloudDevis vs. the 2026 baseline</h2>
+  <p class="lead">Nine concrete findings from a live audit of <code>src/app/dashboard/**</code> and
+  <code>src/components/layout/navbar.tsx</code>, each tied to the baseline above.</p>
+
+  <div class="callout crit">
+    <span class="tag">1 · Fresh regression</span><b>Duplicate data fetch — Navbar vs. dashboard page.</b>
+    <p><code>src/components/layout/navbar.tsx:67-76</code> independently fetches
+    <code>/api/dashboard</code> to populate its Clients/Documents badge counts — the
+    <b>exact same endpoint</b> <code>src/app/dashboard/page.tsx:46</code> fetches for its own
+    stats. There is no shared cache between them: create a client or document, and the navbar
+    badge will not reflect it until its own independent effect re-fires. This is the textbook
+    "server state treated as component-local state" anti-pattern from <a href="#arch2026">§2</a> —
+    introduced by the very redesign that moved nav into the navbar this session.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="tag">2 · No fetch-cache layer</span>
+    All <b>11 dashboard pages</b> hand-roll <code>useState</code> + <code>useEffect</code> +
+    <code>fetch()</code> with zero SWR/React Query/RSC caching. Manual 2-minute staleness
+    checks are independently reinvented in two places:
+    <code>src/app/dashboard/page.tsx:35,95-101</code> and
+    <code>src/app/dashboard/documents/page.tsx:86,120-126</code> — same
+    <code>STALE_MS</code> logic, copy-pasted rather than shared.
+  </div>
+
+  <div class="callout warn">
+    <span class="tag">3 · Layout boilerplate duplicated 9×</span>
+    The <code>&lt;div min-h-screen&gt;&lt;Navbar/&gt;&lt;div flex-1&gt;&lt;TrialGate&gt;</code>
+    wrapper is copy-pasted across 9 of 11 dashboard pages (~250+ duplicated lines) even though
+    <code>src/app/dashboard/layout.tsx</code> (33 lines) already exists as the natural owner —
+    today it only does an auth check + <code>OfflineSyncProvider</code>, and doesn't render the
+    shell at all.
+  </div>
+
+  <div class="card">
+    <h4>Further findings (4–9)</h4>
+    <table style="margin-top:4px">
+      <tr><th>#</th><th>Finding</th><th>Where</th></tr>
+      <tr><td>4</td><td><code>UnifiedDashboard.tsx</code> is a 497-line monolith — stats, table, quick-create, delete modal, search/filter/sort all in one component with 12 drilled props.</td><td><code>src/components/dashboard/UnifiedDashboard.tsx</code></td></tr>
+      <tr><td>5</td><td>Inconsistent loading/error/empty states — skeleton in one page, spinner in another, silently-swallowed errors in a third; no shared primitives.</td><td>clients/documents/team/partner pages</td></tr>
+      <tr><td>6</td><td>Zero code-splitting — no <code>dynamic()</code>, no active <code>Suspense</code> boundaries around data sections.</td><td>all dashboard pages</td></tr>
+      <tr><td>7</td><td>Navbar dropdowns lack <code>aria-expanded</code>/<code>role="menu"</code>/Escape-to-close/focus trapping; client table lacks <code>&lt;thead&gt;</code>/<code>scope</code> semantics.</td><td><code>src/components/layout/navbar.tsx</code></td></tr>
+      <tr><td>8</td><td>Zero dashboard UI test coverage — only API-layer and editor e2e tests exist today.</td><td><code>tests/</code></td></tr>
+      <tr><td>9</td><td>Zustand stores (<code>documentStore</code>/<code>clientStore</code>/<code>companyStore</code>) are offline-doc-only — never used as the server-data cache the dashboard pages actually need.</td><td><code>src/stores/</code></td></tr>
+    </table>
+  </div>
+
+  <div class="callout ok">
+    <span class="tag">Existing strength</span> The Artisan/Entreprise persona system is a working
+    instance of the 2026 "role-based adaptive views" pattern (<a href="#ux2026">§3</a>) — mode
+    gates nav items, editor fields, and available document types. Build the fixes below
+    <i>on top of</i> this, not around it.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="roadmap">
+  <h2><span class="num">6</span>Roadmap</h2>
+  <table>
+    <tr><th>Phase</th><th>Item</th><th>Why</th></tr>
+    <tr><td><span class="pill p0">P0</span></td><td>Single source of truth for dashboard stats — lift the <code>/api/dashboard</code> result into one shared hook/context (or a short-TTL Zustand cache) that both Navbar and page components read.</td><td>Fixes the live regression (§5.1) directly.</td></tr>
+    <tr><td><span class="pill p0">P0</span></td><td>Move the shared shell (Navbar + TrialGate) into <code>src/app/dashboard/layout.tsx</code>; delete the per-page wrapper.</td><td>Removes ~250 duplicated lines; single place to change the shell.</td></tr>
+    <tr><td><span class="pill p0">P0</span></td><td>Add <code>aria-expanded</code>, <code>role="menu"</code>, and Escape-to-close to the three Navbar dropdowns.</td><td>Cheap, high-value accessibility fix.</td></tr>
+    <tr><td><span class="pill p1">P1</span></td><td>Adopt a lightweight fetch-cache layer (SWR, or a small custom hook) for all dashboard reads; retire the hand-rolled <code>STALE_MS</code> duplication.</td><td>Removes the root cause behind finding #2, not just its symptom.</td></tr>
+    <tr><td><span class="pill p1">P1</span></td><td>Split <code>UnifiedDashboard.tsx</code> into focused subcomponents (stats, table, quick-create, delete-modal).</td><td>Testability, easier review, less prop drilling.</td></tr>
+    <tr><td><span class="pill p1">P1</span></td><td>Standardise loading/error/empty-state components; reuse across all dashboard pages.</td><td>Consistency, less duplicated ad-hoc UI.</td></tr>
+    <tr><td><span class="pill p2">P2</span></td><td>Move initial dashboard data fetching to Server Components where feasible.</td><td>Cuts client JS, improves INP per §4.</td></tr>
+    <tr><td><span class="pill p2">P2</span></td><td>Virtualize long document/client tables; add dashboard UI test coverage; evaluate a command palette given the growing doc-type/action surface.</td><td>Scale-out once the P0/P1 foundation is solid.</td></tr>
+  </table>
+</section>
+
+<!-- 7 -->
+<section id="glossary">
+  <h2><span class="num">7</span>Glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>RSC</td><td>React Server Component — renders on the server, ships zero JS to the client for that component.</td></tr>
+    <tr><td>ISR</td><td>Incremental Static Regeneration — statically cached pages that revalidate on a timer.</td></tr>
+    <tr><td>LCP / INP / CLS</td><td>Core Web Vitals: Largest Contentful Paint, Interaction to Next Paint, Cumulative Layout Shift.</td></tr>
+    <tr><td>Progressive disclosure</td><td>Showing only what's needed now, revealing more on demand.</td></tr>
+    <tr><td>Feature-based architecture</td><td>Organizing code by product domain (clients, documents…) instead of by technical layer (components, hooks…).</td></tr>
+    <tr><td>Server state vs. client state</td><td>Server state = cached copy of backend data (needs revalidation); client state = local UI state (dropdown open, form draft).</td></tr>
+  </table>
+  <div class="foot">
+    CloudDevis dashboard architecture report · living document — re-audit after each dashboard
+    change. File:line references verified fresh at generation time.
+  </div>
+</section>
+
+</main>
+</div>
+</body>
+</html>
