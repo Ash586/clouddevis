@@ -14,12 +14,9 @@ import {
   Bell,
   LogOut,
   Menu,
-  BarChart3,
   FileStack,
   CreditCard,
   UsersRound,
-  Share2,
-  RefreshCw,
   Plus,
   PenLine,
   Receipt,
@@ -142,6 +139,16 @@ function SidebarInner() {
                 <User size={16} strokeWidth={1.5} />
                 {s('profile')}
               </button>
+              <button type="button" onClick={() => { router.push('/dashboard/subscription'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
+                <CreditCard size={16} strokeWidth={1.5} />
+                {s('subscription')}
+              </button>
+              {isEntreprise && (
+                <button type="button" onClick={() => { router.push('/dashboard/team'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
+                  <UsersRound size={16} strokeWidth={1.5} />
+                  {s('team')}
+                </button>
+              )}
               <button type="button" className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
                 <Bell size={16} strokeWidth={1.5} />
                 {s('notifications')}
@@ -231,21 +238,9 @@ function SidebarInner() {
           </div>
         </NavGroup>
 
-        {/* Gestion */}
-        <NavGroup label={s('groups.gestion')}>
-          <NavItem icon={<FileStack size={18} />} label={s('templates')} active={isActive('/dashboard/templates')} onClick={() => { router.push('/dashboard/templates'); setMobileOpen(false); }} />
-          <NavItem icon={<BarChart3 size={18} />} label={s('reports')} active={isActive('/dashboard/reports')} onClick={() => { router.push('/dashboard/reports'); setMobileOpen(false); }} />
-          {isEntreprise && (
-            <NavItem icon={<UsersRound size={18} />} label={s('team')} active={isActive('/dashboard/team')} onClick={() => { router.push('/dashboard/team'); setMobileOpen(false); }} />
-          )}
-        </NavGroup>
-
-        {/* Compte */}
-        <NavGroup label={s('groups.compte')}>
-          <NavItem icon={<CreditCard size={18} />} label={s('subscription')} active={isActive('/dashboard/subscription')} onClick={() => { router.push('/dashboard/subscription'); setMobileOpen(false); }} />
-          <NavItem icon={<Share2 size={18} />} label={s('shared')} active={isActive('/dashboard/shared')} onClick={() => { router.push('/dashboard/shared'); setMobileOpen(false); }} />
-          <NavItem icon={<RefreshCw size={18} />} label={s('recurring')} active={isActive('/dashboard/recurring')} onClick={() => { router.push('/dashboard/recurring'); setMobileOpen(false); }} />
-        </NavGroup>
+        {/* GESTION + COMPTE groups intentionally removed from the nav for a
+            leaner sidebar. Abonnement (+ Équipe for entreprise) live in the
+            user-pill dropdown; the rest are reachable by direct URL. */}
 
         {/* Soft-gating affordance: artisan can discover the full company mode */}
         {user && !isEntreprise && (
