@@ -11,6 +11,7 @@ interface HeaderProps {
   vb: (block: string) => boolean;
   t: (key: string) => string;
   highlight?: boolean;
+  onZoneClick?: () => void;
 }
 
 const SIZE_CLASS: Record<string, string> = {
@@ -30,7 +31,7 @@ function LogoImg({ url, size = 'md' }: { url: string; size?: string }) {
   );
 }
 
-export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false }: HeaderProps) {
+export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false, onZoneClick }: HeaderProps) {
   if (!vb('header') || !bv('docNumber', 'issueDate', 'validUntil', 'orderRef')) return null;
 
   const docTypeLabel =
@@ -76,12 +77,12 @@ export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false }:
     </div>
   );
 
-  const wrapClass = `mb-8 transition-all duration-700 print:transition-none ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`;
+  const wrapClass = `mb-8 transition-all duration-700 print:transition-none ${onZoneClick ? 'cursor-pointer hover:ring-2 hover:ring-blue-300/40 hover:bg-blue-50/20 rounded-lg p-2 -m-2' : ''} ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`;
 
   /* ── CENTER layout ── */
   if (logoUrl && logoPos === 'center') {
     return (
-      <div className={wrapClass}>
+      <div className={wrapClass} onClick={onZoneClick} title={onZoneClick ? 'Cliquer pour modifier' : undefined}>
         <div className="flex justify-center mb-4">
           <LogoImg url={logoUrl} size={logoSize} />
         </div>
@@ -98,7 +99,7 @@ export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false }:
   const showLogoRight = !!(logoUrl && (logoPos === 'right' || !logoPos));
 
   return (
-    <div className={`flex justify-between items-start ${wrapClass}`}>
+    <div className={`flex justify-between items-start ${wrapClass}`} onClick={onZoneClick} title={onZoneClick ? 'Cliquer pour modifier' : undefined}>
       {/* Left side */}
       <div className={`flex items-start gap-4 ${showLogoRight ? 'max-w-[50%]' : ''}`}>
         {showLogoLeft && <LogoImg url={logoUrl!} size={logoSize} />}

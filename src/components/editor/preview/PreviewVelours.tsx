@@ -40,9 +40,13 @@ interface Props {
   };
   design: DocTypeDesign;
   highlight?: string | null;
+  onZoneClick?: (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') => void;
 }
 
-export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
+export function PreviewVelours({ doc, sf, bv, vb, tc, results, onZoneClick }: Props) {
+  const zoneProps = (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') =>
+    onZoneClick ? { onClick: () => onZoneClick(focus), title: 'Cliquer pour modifier' } : {};
+  const zoneCursor: React.CSSProperties = onZoneClick ? { cursor: 'pointer' } : {};
   const isEnt = doc.mode === 'entreprise';
   const currency = tc('currency') || 'DA';
   const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -113,7 +117,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Client — white box with #e8d5b7 border */}
         {vb('client') && bv('clientName', 'clientAddress') && doc.clientInfo.name && (
-          <div style={{ background: '#fff', border: `1px solid ${VR.goldBorder}`, padding: '14px 18px', marginBottom: 20 }}>
+          <div style={{ background: '#fff', border: `1px solid ${VR.goldBorder}`, padding: '14px 18px', marginBottom: 20, ...zoneCursor }} {...zoneProps('client')}>
             <div style={{ fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: VR.gold, fontWeight: 700, marginBottom: 5 }}>Adressé à</div>
             <div style={{ fontFamily: PLAYFAIR, fontSize: 16, fontWeight: 700, color: VR.bordeaux }}>{doc.clientInfo.name}</div>
             {doc.clientInfo.address && (
@@ -136,7 +140,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Items table — bordeaux column titles, alternating white/cream rows */}
         {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, marginBottom: 18 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, marginBottom: 18, ...zoneCursor }} {...zoneProps('items')}>
             <thead>
               <tr style={{ borderBottom: `2px solid ${VR.bordeaux}` }}>
                 <th style={{ padding: '7px 0', textAlign: 'left', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: VR.bordeaux, fontWeight: 700 }}>Désignation</th>
@@ -165,7 +169,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Totals */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <div style={{ width: 272 }}>
+          <div style={{ width: 272, ...zoneCursor }} {...zoneProps('totals')}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 11, color: VR.muted, borderBottom: `0.5px solid ${VR.rule}` }}>
               <span>Sous-total HT</span><span>{formatCurrency(results.subTotalHT, currency)}</span>
             </div>
@@ -212,7 +216,7 @@ export function PreviewVelours({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Payment */}
         {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) && (
-          <div style={{ marginTop: 12, padding: '10px 14px', border: `0.5px solid ${VR.goldBorder}`, fontSize: 10.5, color: VR.muted, lineHeight: 1.6 }}>
+          <div style={{ marginTop: 12, padding: '10px 14px', border: `0.5px solid ${VR.goldBorder}`, fontSize: 10.5, color: VR.muted, lineHeight: 1.6, ...zoneCursor }} {...zoneProps('payment')}>
             <strong style={{ display: 'block', fontSize: 9, color: VR.gold, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Paiement</strong>
             {doc.paymentDetails.terms && <div>{doc.paymentDetails.terms}</div>}
             {doc.paymentDetails.iban && <div style={{ fontSize: 10 }}>RIB : {doc.paymentDetails.iban}</div>}

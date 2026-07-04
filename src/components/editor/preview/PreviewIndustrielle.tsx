@@ -46,9 +46,13 @@ interface Props {
   };
   design: DocTypeDesign;
   highlight?: string | null;
+  onZoneClick?: (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') => void;
 }
 
-export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results }: Props) {
+export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results, onZoneClick }: Props) {
+  const zoneProps = (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') =>
+    onZoneClick ? { onClick: () => onZoneClick(focus), title: 'Cliquer pour modifier' } : {};
+  const zoneCursor: React.CSSProperties = onZoneClick ? { cursor: 'pointer' } : {};
   const isEnt = doc.mode === 'entreprise';
   const currency = tc('currency') || 'DA';
   const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -123,7 +127,7 @@ export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Client block on #f8fafc */}
       {vb('client') && doc.clientInfo.name && (
-        <div style={{ background: IND.slateBody, margin: '14px 26px', padding: '14px 18px' }}>
+        <div style={{ background: IND.slateBody, margin: '14px 26px', padding: '14px 18px', ...zoneCursor }} {...zoneProps('client')}>
           <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', color: IND.blue, marginBottom: 9 }}>Destinataire</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px 20px', fontSize: 11 }}>
             <div>
@@ -162,7 +166,7 @@ export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Items table */}
       {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-        <div style={{ padding: '0 26px' }}>
+        <div style={{ padding: '0 26px', ...zoneCursor }} {...zoneProps('items')}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
             <thead>
               <tr>
@@ -193,7 +197,7 @@ export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Totals — bordered grid cells */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '14px 26px 0' }}>
-        <table style={{ borderCollapse: 'collapse', width: 288, fontSize: 11 }}>
+        <table style={{ borderCollapse: 'collapse', width: 288, fontSize: 11, ...zoneCursor }} {...zoneProps('totals')}>
           <tbody>
             <tr>
               <td style={{ padding: '6px 12px', border: `1px solid ${IND.rule}`, color: IND.muted }}>Sous-total HT</td>
@@ -248,7 +252,7 @@ export function PreviewIndustrielle({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Payment */}
       {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) && (
-        <div style={{ margin: '10px 26px 0', padding: '10px 14px', background: IND.slateBody, border: `1px solid ${IND.rule}`, fontSize: 10.5, color: IND.muted, lineHeight: 1.6 }}>
+        <div style={{ margin: '10px 26px 0', padding: '10px 14px', background: IND.slateBody, border: `1px solid ${IND.rule}`, fontSize: 10.5, color: IND.muted, lineHeight: 1.6, ...zoneCursor }} {...zoneProps('payment')}>
           <strong style={{ display: 'block', fontSize: 9, color: IND.blue, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Paiement</strong>
           {doc.paymentDetails.terms && <div>{doc.paymentDetails.terms}</div>}
           {doc.paymentDetails.iban && <div style={{ fontSize: 10 }}>RIB : {doc.paymentDetails.iban}</div>}

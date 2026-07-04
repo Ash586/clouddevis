@@ -1013,7 +1013,8 @@
       "system": "Système",
       "partners": "Partenaires",
       "settings": "Paramètres",
-      "logout": "Déconnexion"
+      "logout": "Déconnexion",
+      "docs": "Documentation"
     },
     "stats": {
       "totalUsers": "Total utilisateurs",

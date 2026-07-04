@@ -38,9 +38,13 @@ interface Props {
   };
   design: DocTypeDesign;
   highlight?: string | null;
+  onZoneClick?: (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') => void;
 }
 
-export function PreviewNordic({ doc, sf, bv, vb, tc, results }: Props) {
+export function PreviewNordic({ doc, sf, bv, vb, tc, results, onZoneClick }: Props) {
+  const zoneProps = (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') =>
+    onZoneClick ? { onClick: () => onZoneClick(focus), title: 'Cliquer pour modifier' } : {};
+  const zoneCursor: React.CSSProperties = onZoneClick ? { cursor: 'pointer' } : {};
   const isEnt = doc.mode === 'entreprise';
   const currency = tc('currency') || 'DA';
   const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -110,7 +114,7 @@ export function PreviewNordic({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Client */}
       {vb('client') && bv('clientName', 'clientAddress') && doc.clientInfo.name && (
-        <div style={{ margin: '20px 40px', background: NK.tealLight, borderLeft: `3px solid ${NK.teal}`, padding: '12px 16px' }}>
+        <div style={{ margin: '20px 40px', background: NK.tealLight, borderLeft: `3px solid ${NK.teal}`, padding: '12px 16px', ...zoneCursor }} {...zoneProps('client')}>
           <div style={{ fontSize: 9, fontWeight: 700, color: NK.teal, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5 }}>Client</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: NK.text }}>{doc.clientInfo.name}</div>
           {doc.clientInfo.address && (
@@ -135,7 +139,7 @@ export function PreviewNordic({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Items table */}
       {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-        <div style={{ padding: '0 40px' }}>
+        <div style={{ padding: '0 40px', ...zoneCursor }} {...zoneProps('items')}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
             <thead>
               <tr style={{ borderBottom: `2px solid ${NK.teal}` }}>
@@ -166,7 +170,7 @@ export function PreviewNordic({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Totals */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 40px 0' }}>
-        <div style={{ width: 264 }}>
+        <div style={{ width: 264, ...zoneCursor }} {...zoneProps('totals')}>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 11, color: NK.muted, borderBottom: `0.5px solid ${NK.rule}` }}>
             <span>Sous-total HT</span>
             <span>{formatCurrency(results.subTotalHT, currency)}</span>
@@ -218,7 +222,7 @@ export function PreviewNordic({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Payment info */}
       {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails.terms || doc.paymentDetails.iban) && (
-        <div style={{ margin: '12px 40px 0', padding: '10px 14px', border: `0.5px solid ${NK.rule}`, fontSize: 10.5, color: NK.muted, lineHeight: 1.6 }}>
+        <div style={{ margin: '12px 40px 0', padding: '10px 14px', border: `0.5px solid ${NK.rule}`, fontSize: 10.5, color: NK.muted, lineHeight: 1.6, ...zoneCursor }} {...zoneProps('payment')}>
           <strong style={{ display: 'block', fontSize: 9, color: NK.teal, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Paiement</strong>
           {doc.paymentDetails.terms && <div>{doc.paymentDetails.terms}</div>}
           {doc.paymentDetails.iban && <div style={{ fontSize: 10 }}>RIB : {doc.paymentDetails.iban}</div>}

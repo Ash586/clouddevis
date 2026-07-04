@@ -37,9 +37,13 @@ interface Props {
   };
   design: DocTypeDesign;
   highlight?: string | null;
+  onZoneClick?: (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') => void;
 }
 
-export function PreviewHaussmann({ doc, sf, bv, vb, tc, results }: Props) {
+export function PreviewHaussmann({ doc, sf, bv, vb, tc, results, onZoneClick }: Props) {
+  const zoneProps = (focus: 'header' | 'client' | 'items' | 'totals' | 'payment') =>
+    onZoneClick ? { onClick: () => onZoneClick(focus), title: 'Cliquer pour modifier' } : {};
+  const zoneCursor: React.CSSProperties = onZoneClick ? { cursor: 'pointer' } : {};
   const isEnt = doc.mode === 'entreprise';
   const currency = tc('currency') || 'DA';
   const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -133,7 +137,7 @@ export function PreviewHaussmann({ doc, sf, bv, vb, tc, results }: Props) {
 
         {/* Right: client in Cormorant Garamond */}
         {vb('client') && doc.clientInfo.name && (
-          <div style={{ paddingLeft: 24 }}>
+          <div style={{ paddingLeft: 24, ...zoneCursor }} {...zoneProps('client')}>
             <div style={{ fontSize: 9, fontWeight: 700, color: HM.gold, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 10 }}>Adressé à</div>
             <div style={{ fontFamily: CORMORANT, fontSize: 22, fontWeight: 700, color: HM.green, lineHeight: 1.1, marginBottom: 6 }}>{doc.clientInfo.name}</div>
             {doc.clientInfo.address && (
@@ -159,7 +163,7 @@ export function PreviewHaussmann({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Items table — no vertical borders, thin horizontal only, amounts in gold */}
       {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-        <div style={{ padding: '0 44px' }}>
+        <div style={{ padding: '0 44px', ...zoneCursor }} {...zoneProps('items')}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
             <thead>
               <tr style={{ borderTop: `0.5px solid ${HM.rule}`, borderBottom: `1px solid ${HM.green}` }}>
@@ -190,7 +194,7 @@ export function PreviewHaussmann({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Totals */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '14px 44px 0' }}>
-        <div style={{ width: 280 }}>
+        <div style={{ width: 280, ...zoneCursor }} {...zoneProps('totals')}>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: 11, color: HM.muted, borderBottom: `0.5px solid ${HM.rule}` }}>
             <span>Sous-total HT</span><span>{formatCurrency(results.subTotalHT, currency)}</span>
           </div>
@@ -238,7 +242,7 @@ export function PreviewHaussmann({ doc, sf, bv, vb, tc, results }: Props) {
 
       {/* Payment */}
       {vb('payment') && bv('paymentConditions', 'paymentIban') && (doc.paymentDetails?.terms || doc.paymentDetails?.iban) && (
-        <div style={{ margin: '12px 44px 0', padding: '10px 0', fontSize: 10.5, color: HM.muted, lineHeight: 1.6, borderTop: `0.5px solid ${HM.rule}` }}>
+        <div style={{ margin: '12px 44px 0', padding: '10px 0', fontSize: 10.5, color: HM.muted, lineHeight: 1.6, borderTop: `0.5px solid ${HM.rule}`, ...zoneCursor }} {...zoneProps('payment')}>
           <strong style={{ display: 'block', fontSize: 9, color: HM.gold, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Paiement</strong>
           {doc.paymentDetails.terms && <div>{doc.paymentDetails.terms}</div>}
           {doc.paymentDetails.iban && <div style={{ fontSize: 10 }}>RIB : {doc.paymentDetails.iban}</div>}

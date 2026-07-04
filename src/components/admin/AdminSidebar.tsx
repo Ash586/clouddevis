@@ -11,6 +11,7 @@ import {
   FileText,
   Activity,
   Settings,
+  BookOpen,
 } from 'lucide-react';
 
 interface NavItemConfig {
@@ -28,6 +29,7 @@ const NAV_ITEMS: NavItemConfig[] = [
   { key: 'partners', href: '/admin/partners', icon: Handshake },
   { key: 'reports', href: '/admin/reports', icon: FileText },
   { key: 'logs', href: '/admin/logs', icon: Activity },
+  { key: 'docs', href: '/admin/docs', icon: BookOpen },
   { key: 'settings', href: '/admin/settings', icon: Settings },
 ];
 

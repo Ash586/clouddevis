@@ -24,15 +24,17 @@ import { track } from '@/lib/analytics';
 import {
   ChevronRight, Settings, Undo2, Redo2, Save, Download, Loader2, Check,
   AlertTriangle, ListOrdered, User, FileText, Palette, CreditCard,
-  MapPin, Package, Percent, Shield, StickyNote, Maximize, Eye,
+  MapPin, Package, Percent, Shield, ShieldCheck, ShieldAlert, StickyNote, Maximize, Eye,
   Grid3X3, MoreHorizontal,
   ChevronDown, MonitorCheck,
   Receipt, ClipboardList, FileStack, Wrench,
 } from 'lucide-react';
-import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, normalizeDocTypeParam, sectionFocusMap } from '@/components/editor/EditorConstants';
+import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, normalizeDocTypeParam, sectionFocusMap, previewFocusToSectionId } from '@/components/editor/EditorConstants';
 import { ENABLED_DOC_TYPES } from '@/lib/config';
 import { CustomSectionRenderer } from '@/components/editor/sections/CustomSectionRenderer';
 import { CustomizationModal } from '@/components/editor/CustomizationModal';
+import { Modal } from '@/components/ui/modal';
+import { auditDocument, type ComplianceIssue } from '@/lib/complianceAudit';
 
 function EditorContent() {
   const sp = useSearchParams();
@@ -82,6 +84,8 @@ function EditorContent() {
   const [mobileTab, setMobileTab] = useState<'editor' | 'preview' | 'totals'>('editor');
   const [showGrid, setShowGrid] = useState(false);
   const [showReadyChecks, setShowReadyChecks] = useState(false);
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [auditIssues, setAuditIssues] = useState<ComplianceIssue[]>([]);
   const [showSectionNav, setShowSectionNav] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prefsFetched = useRef(false);
@@ -339,6 +343,26 @@ function EditorContent() {
     const url = URL.createObjectURL(blob);
     printWindow.location.replace(url);
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
+  const jumpToSection = (section: SectionId) => {
+    setShowAuditModal(false);
+    setActiveSection(section);
+    setMobileTab('editor');
+    const el = scrollContainerRef.current?.querySelector(`[data-section-id="${section}"]`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handlePreviewZoneClick = (focus: NonNullable<PreviewFocus>) => {
+    const section = previewFocusToSectionId[focus];
+    if (section) jumpToSection(section);
+  };
+
+  const runComplianceAudit = () => {
+    const issues = auditDocument(doc, results);
+    setAuditIssues(issues);
+    setShowAuditModal(true);
+    track('Compliance Audit Run', { type: doc.documentType, issueCount: issues.length });
   };
 
   // Show draft restoration notification
@@ -614,6 +638,10 @@ function EditorContent() {
                 </button>
               )}
               <div className="w-px h-6 bg-[rgba(15,39,71,0.1)] mx-1.5" />
+              <Button size="sm" variant="secondary" onClick={runComplianceAudit} className="h-9 text-xs gap-1.5 px-3.5" title="Vérifier la conformité DGI avant enregistrement">
+                <ShieldCheck size={14} />
+                <span>Auditer</span>
+              </Button>
               <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 <span>{tc('save')}</span>
@@ -822,7 +850,7 @@ function EditorContent() {
                 <div className="print-area-wrapper origin-top transition-transform duration-200"
                   style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
                   <div className="rounded-[6px] bg-white/5 p-2 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ring-1 ring-white/10 print:p-0 print:shadow-none print:ring-0">
-                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} />
+                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} onZoneClick={handlePreviewZoneClick} />
                   </div>
                 </div>
               </div>
@@ -846,6 +874,41 @@ function EditorContent() {
         setShowSectionNav={setShowSectionNav}
         te={te}
       />
+
+      {/* ──── DGI COMPLIANCE AUDIT MODAL ──── */}
+      <Modal open={showAuditModal} onClose={() => setShowAuditModal(false)} title="Audit de conformité DGI" size="md">
+        {auditIssues.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-6 text-center">
+            <ShieldCheck size={32} className="text-green-600" />
+            <p className="text-sm font-semibold text-[var(--sand)]">Aucun problème détecté</p>
+            <p className="text-xs text-[var(--sand-muted)]">Le NIF client et le timbre fiscal sont conformes.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {auditIssues.map(issue => (
+              <div key={issue.id} className={cn(
+                'flex items-start gap-2.5 rounded-xl border p-3',
+                issue.severity === 'error' ? 'border-red-300 bg-red-50' : 'border-amber-300 bg-amber-50'
+              )}>
+                <ShieldAlert size={18} className={issue.severity === 'error' ? 'text-red-600 shrink-0 mt-0.5' : 'text-amber-600 shrink-0 mt-0.5'} />
+                <div className="flex-1 min-w-0">
+                  <span className={cn(
+                    'inline-block text-[10px] font-bold uppercase tracking-wide mb-1 px-1.5 py-0.5 rounded',
+                    issue.severity === 'error' ? 'bg-red-200 text-red-800' : 'bg-amber-200 text-amber-800'
+                  )}>
+                    {issue.severity === 'error' ? 'Erreur' : 'Avertissement'}
+                  </span>
+                  <p className="text-xs text-[var(--navy)] leading-relaxed">{issue.message}</p>
+                  <button type="button" onClick={() => jumpToSection(issue.section)}
+                    className="mt-1.5 text-xs font-bold text-blue-700 hover:text-blue-900 underline underline-offset-2">
+                    Corriger →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </TrialGate>
   );
 

@@ -81,3 +81,12 @@ export const sectionFocusMap: Record<string, PreviewFocus> = {
   devis: 'header',
   livraison: 'header',
 };
+
+/** Reverse of sectionFocusMap: preview zone clicked → section to jump the editor to. */
+export const previewFocusToSectionId: Partial<Record<NonNullable<PreviewFocus>, SectionId>> = {
+  header: 'general',
+  client: 'client',
+  items: 'prestations',
+  totals: 'remise',
+  payment: 'paiement',
+};

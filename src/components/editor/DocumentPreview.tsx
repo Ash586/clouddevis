@@ -25,9 +25,10 @@ interface Props {
   hiddenFields?: Set<string>;
   previewFocus?: PreviewFocus;
   showGrid?: boolean;
+  onZoneClick?: (focus: NonNullable<PreviewFocus>) => void;
 }
 
-export function DocumentPreview({ doc, results, customSections = [], hiddenFields, previewFocus = null, showGrid = false }: Props) {
+export function DocumentPreview({ doc, results, customSections = [], hiddenFields, previewFocus = null, showGrid = false, onZoneClick }: Props) {
   const t = useTranslations('preview');
   const tcat = useTranslations('preview.categories');
   const tcommon = useTranslations('common');
@@ -69,7 +70,7 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     return <PreviewIntervention doc={doc} results={results} sf={sf} bv={bv} vb={vb} t={t} tc={tcommon} tu={tu} design={design} highlight={previewFocus} />;
   }
 
-  const sharedProps = { doc, sf, bv, vb, t, tc: tcommon, tu, results, design, highlight: previewFocus };
+  const sharedProps = { doc, sf, bv, vb, t, tc: tcommon, tu, results, design, highlight: previewFocus, onZoneClick };
 
   if (doc.previewTemplate === 'haussmann') {
     return <PreviewHaussmann {...sharedProps} />;
@@ -95,11 +96,12 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
     <div id="print-area" className={`w-[21cm] min-h-[29.7cm] bg-white p-10 flex flex-col justify-between shadow-md print:shadow-none relative ${showGrid ? 'print:grid' : ''}`} style={{ borderTop: `12px solid ${design.borderColor}` }}>
       {showGrid && <div className="absolute inset-0 pointer-events-none print:hidden" style={{ backgroundImage: 'linear-gradient(rgba(200,200,200,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(200,200,200,0.15) 1px, transparent 1px)', backgroundSize: '10px 10px' }} />}
       <div>
-        <PreviewHeader doc={doc} design={design} sf={sf} bv={bv} vb={vb} t={t} highlight={previewFocus === 'header'} />
-        <PreviewMetaSections doc={doc} sf={sf} vb={vb} bv={bv} t={t} highlight={previewFocus === 'client'} />
+        <PreviewHeader doc={doc} design={design} sf={sf} bv={bv} vb={vb} t={t} highlight={previewFocus === 'header'} onZoneClick={onZoneClick ? () => onZoneClick('header') : undefined} />
+        <PreviewMetaSections doc={doc} sf={sf} vb={vb} bv={bv} t={t} highlight={previewFocus === 'client'} onZoneClick={onZoneClick ? () => onZoneClick('client') : undefined} />
 
         {vb('table') && sf('itemsTable') && doc.items.length > 0 && (
-          <div className={`mb-6 rounded-lg transition-all duration-700 print:rounded-none ${previewFocus === 'items' ? 'ring-2 ring-blue-400/50 bg-blue-50/40 p-2 -m-2' : ''}`}>
+          <div onClick={onZoneClick ? () => onZoneClick('items') : undefined} title={onZoneClick ? 'Cliquer pour modifier' : undefined}
+            className={`mb-6 rounded-lg transition-all duration-700 print:rounded-none ${onZoneClick ? 'cursor-pointer hover:ring-2 hover:ring-blue-300/40' : ''} ${previewFocus === 'items' ? 'ring-2 ring-blue-400/50 bg-blue-50/40 p-2 -m-2' : ''}`}>
           <table className="w-full text-left text-[10px] border-collapse">
             <thead>
               <tr style={{ borderBottom: `2px solid ${design.primaryHex}`, color: design.primaryHex }} className="text-[8px] font-black uppercase tracking-wider">
@@ -206,7 +208,9 @@ export function DocumentPreview({ doc, results, customSections = [], hiddenField
         })}
       </div>
 
-      <PreviewFooter doc={doc} results={results} design={design} vb={vb} bv={bv} sf={sf} highlight={previewFocus === 'totals' || previewFocus === 'payment'} />
+      <PreviewFooter doc={doc} results={results} design={design} vb={vb} bv={bv} sf={sf} highlight={previewFocus === 'totals' || previewFocus === 'payment'}
+        onTotalsClick={onZoneClick ? () => onZoneClick('totals') : undefined}
+        onPaymentClick={onZoneClick ? () => onZoneClick('payment') : undefined} />
     </div>
   );
 }

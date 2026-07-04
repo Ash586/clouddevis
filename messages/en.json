@@ -1013,7 +1013,8 @@
       "system": "System",
       "partners": "Partners",
       "settings": "Settings",
-      "logout": "Logout"
+      "logout": "Logout",
+      "docs": "Documentation"
     },
     "stats": {
       "totalUsers": "Total Users",

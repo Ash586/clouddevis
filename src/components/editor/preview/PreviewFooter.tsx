@@ -22,9 +22,11 @@ interface FooterProps {
   bv: (...fieldIds: string[]) => boolean;
   sf: (fieldId: string) => boolean;
   highlight?: boolean;
+  onTotalsClick?: () => void;
+  onPaymentClick?: () => void;
 }
 
-export function PreviewFooter({ doc, results, design, vb, bv, sf, highlight = false }: FooterProps) {
+export function PreviewFooter({ doc, results, design, vb, bv, sf, highlight = false, onTotalsClick, onPaymentClick }: FooterProps) {
   const t = useTranslations('preview');
   const tcommon = useTranslations('common');
 
@@ -42,7 +44,8 @@ export function PreviewFooter({ doc, results, design, vb, bv, sf, highlight = fa
           )}
 
           {vb('payment') && bv('paymentMethod','paymentDeposit','paymentConditions','paymentIban') && (
-            <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+            <div onClick={onPaymentClick} title={onPaymentClick ? 'Cliquer pour modifier' : undefined}
+              className={`bg-slate-50 p-2 rounded-lg border border-slate-100 ${onPaymentClick ? 'cursor-pointer hover:ring-2 hover:ring-blue-300/40' : ''}`}>
               {sf('paymentConditions') && doc.paymentDetails.terms && <p className="text-[8px] text-slate-600"><span className="font-semibold">{t('paymentLabel')}</span> {doc.paymentDetails.terms}</p>}
               {sf('paymentIban') && doc.paymentDetails.iban && <p className="text-[8px] text-slate-500 mt-0.5"><span className="font-semibold">{t('ibanLabel')}</span> {doc.paymentDetails.iban}</p>}
             </div>
@@ -75,7 +78,8 @@ export function PreviewFooter({ doc, results, design, vb, bv, sf, highlight = fa
               </tbody>
             </table>
           )}
-          <div className={`space-y-1 text-[11px] border-t border-slate-200 pt-2 transition-all duration-700 print:transition-none ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`}>
+          <div onClick={onTotalsClick} title={onTotalsClick ? 'Cliquer pour modifier' : undefined}
+            className={`space-y-1 text-[11px] border-t border-slate-200 pt-2 transition-all duration-700 print:transition-none ${onTotalsClick ? 'cursor-pointer hover:ring-2 hover:ring-blue-300/40 hover:bg-blue-50/20 rounded-lg p-2 -m-2' : ''} ${highlight ? 'ring-2 ring-blue-400/50 bg-blue-50/40 rounded-lg p-2 -m-2' : ''}`}>
             <div className="flex justify-between font-medium text-slate-500">
               <span>{t('totalHT')}</span>
               <span className="text-slate-700">{formatCurrency(results.subTotalHT, tcommon('currency'))}</span>
