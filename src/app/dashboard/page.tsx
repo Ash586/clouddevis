@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
 
@@ -104,9 +103,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
           <UnifiedDashboard
             userName={userName}
@@ -129,7 +126,6 @@ export default function DashboardPage() {
           />
         </TrialGate>
       </div>
-    </div>
     </div>
   );
 }

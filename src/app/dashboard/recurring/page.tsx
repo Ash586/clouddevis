@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,9 +69,7 @@ export default function RecurringInvoicesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
               <div className="flex items-center justify-between mb-6">
@@ -159,7 +156,6 @@ export default function RecurringInvoicesPage() {
               </Card>
             </main>
           </TrialGate>
-        </div>
       </div>
     </div>
   );

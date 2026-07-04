@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -89,9 +88,7 @@ export default function ClientDetailPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex flex-row flex-1">
-          <Sidebar />
-          <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
             <TrialGate>
               <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
                 <div className="animate-pulse space-y-4">
@@ -103,7 +100,6 @@ export default function ClientDetailPage() {
                 </div>
               </div>
             </TrialGate>
-          </div>
         </div>
       </div>
     );
@@ -114,9 +110,7 @@ export default function ClientDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
               <div className="flex items-center gap-3">
@@ -199,7 +193,6 @@ export default function ClientDetailPage() {
               </div>
             </div>
           </TrialGate>
-        </div>
       </div>
     </div>
   );

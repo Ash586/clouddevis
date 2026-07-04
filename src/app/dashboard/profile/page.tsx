@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -309,9 +308,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             {loading ? (
               <div className="max-w-4xl mx-auto p-6">
@@ -524,7 +521,6 @@ export default function ProfilePage() {
               </div>
             )}
           </TrialGate>
-        </div>
       </div>
     </div>
   );

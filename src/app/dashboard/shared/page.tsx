@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { MobileTable } from '@/components/mobile/MobileTable';
@@ -47,9 +46,7 @@ export default function SharedDocumentsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             <main className="flex-1 max-w-5xl mx-auto w-full px-3 sm:px-4 py-4 sm:py-8">
               <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)] mb-6">{t('title')}</h1>
@@ -81,7 +78,6 @@ export default function SharedDocumentsPage() {
               </Card>
             </main>
           </TrialGate>
-        </div>
       </div>
     </div>
   );

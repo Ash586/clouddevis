@@ -226,7 +226,9 @@ export function UnifiedDashboard({ userName, stats, docs, loading, onDelete, mod
       {/* ── Quick Create ── */}
       <div className="mb-6">
         <h2 className="text-xs font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-3">{t('quickActions')}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* auto-fit sizes columns to the actual card count instead of a fixed
+            5-col grid, so a trailing empty cell never appears */}
+        <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
           {QUICK_CREATE_TYPES.map((qd) => {
             const count = stats.typeBreakdown?.[({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', bon_reception:'BR', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'] || 0;
             return (

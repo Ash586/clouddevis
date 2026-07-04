@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -162,9 +161,7 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
               <div className="flex items-center justify-between gap-4">
@@ -251,7 +248,6 @@ export default function TemplatesPage() {
               )}
             </div>
           </TrialGate>
-        </div>
       </div>
 
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editingId ? t('editTemplate') : t('newTemplate')}>

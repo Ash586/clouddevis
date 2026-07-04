@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -161,9 +160,7 @@ export default function DocumentsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-row flex-1">
-        <Sidebar />
-        <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0">
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
 
@@ -414,7 +411,6 @@ export default function DocumentsPage() {
               )}
             </div>
           </TrialGate>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
