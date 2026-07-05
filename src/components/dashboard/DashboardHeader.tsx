@@ -1,14 +1,12 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
 
 interface Props {
   userName: string;
   mode: 'ARTISAN' | 'ENTREPRISE';
-  onNewDoc: () => void;
 }
 
-export function DashboardHeader({ userName, mode, onNewDoc }: Props) {
+export function DashboardHeader({ userName, mode }: Props) {
   const t = useTranslations('dashboard');
 
   const greeting = (() => {
@@ -28,13 +26,6 @@ export function DashboardHeader({ userName, mode, onNewDoc }: Props) {
           {greeting}, {userName}
         </h1>
       </div>
-      <button
-        type="button"
-        onClick={onNewDoc}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--green-2)] text-white text-sm font-bold shadow-sm hover:bg-[var(--green)] hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-[0.98]"
-      >
-        <Plus size={16} /> {t('newQuote')}
-      </button>
     </div>
   );
 }

@@ -57,7 +57,6 @@ export function UnifiedDashboard({
       <DashboardHeader
         userName={userName}
         mode={mode}
-        onNewDoc={() => router.push('/dashboard/editor?type=devis')}
       />
 
       <DashboardKpiRow stats={stats} />
