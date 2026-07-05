@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/hooks/useUser';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { SectionTabs } from '@/components/layout/SectionTabs';
 import { ENABLED_DOC_TYPES } from '@/lib/config';
 import {
   Menu, X, Home, LayoutDashboard, FileText, Users, ChevronDown, User, Bell, LogOut,
@@ -52,8 +53,6 @@ export function Navbar() {
   const s = useTranslations('sidebar');
   const tc = useTranslations('common');
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { lang, setLang } = useLanguage();
   const { user, loading, refresh } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -61,7 +60,6 @@ export function Navbar() {
   const [documentsOpen, setDocumentsOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [clientCount, setClientCount] = useState(0);
-  const [typeBreakdown, setTypeBreakdown] = useState<Record<string, number>>({});
 
   // Fetch nav badge data only once we know a user session exists.
   useEffect(() => {
@@ -70,7 +68,6 @@ export function Navbar() {
       .then(r => r.ok ? r.json() : { stats: {} })
       .then(dashData => {
         setClientCount(dashData.stats?.totalClients ?? 0);
-        setTypeBreakdown(dashData.stats?.typeBreakdown ?? {});
       })
       .catch(() => {});
   }, [user]);
@@ -81,11 +78,6 @@ export function Navbar() {
     router.push('/');
   }
 
-  function isActive(path: string) { return pathname === path; }
-  function isDocumentsActive(type?: string) {
-    const upperType = type ? TYPE_MAP[type] || type.toUpperCase() : type;
-    return pathname === '/dashboard/documents' && searchParams?.get('type') === upperType;
-  }
   function navigateTo(type: string) {
     setMobileOpen(false);
     const upperType = TYPE_MAP[type] || type.toUpperCase();
@@ -121,7 +113,7 @@ export function Navbar() {
 
       {userDropdownOpen && (
         <>
-          <div className="absolute top-full start-0 mt-2 w-56 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
+          <div className="absolute top-full end-0 mt-2 w-56 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
             <button type="button" onClick={() => { router.push('/dashboard/profile'); setUserDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-[var(--sand-muted)] hover:bg-[var(--navy-3)] hover:text-[var(--sand)] transition min-h-[44px]">
               <User size={16} strokeWidth={1.5} />
               {s('profile')}
@@ -152,55 +144,9 @@ export function Navbar() {
     </div>
   );
 
-  // ── Persistent nav links: Statistiques · Clients · Documents dropdown ──
-  const navLinks = user && (
-    <div className="flex items-center gap-1">
-      <button type="button" onClick={() => { router.push('/dashboard'); setMobileOpen(false); }}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all min-h-[44px] ${
-          isActive('/dashboard') ? 'bg-[rgba(37,99,235,0.12)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.06)] hover:text-[var(--sand)]'
-        }`}>
-        <LayoutDashboard size={16} />
-        <span className="hidden xl:inline">{s('stats')}</span>
-      </button>
-      <button type="button" onClick={() => { router.push('/dashboard/clients'); setMobileOpen(false); }}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all min-h-[44px] ${
-          isActive('/dashboard/clients') ? 'bg-[rgba(37,99,235,0.12)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.06)] hover:text-[var(--sand)]'
-        }`}>
-        <Users size={16} />
-        <span className="hidden xl:inline">{s('clients')}</span>
-        {clientCount > 0 && <span className="text-[10px] bg-[var(--navy-4)] text-[var(--sand-muted)] px-1.5 py-0.5 rounded-full">{clientCount}</span>}
-      </button>
-
-      <div className="relative">
-        <button type="button" onClick={() => setDocumentsOpen(!documentsOpen)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all min-h-[44px] ${
-            documentsOpen ? 'bg-[rgba(37,99,235,0.08)] text-[var(--green-3)]' : 'text-[var(--sand-muted)] hover:bg-[rgba(15,39,71,0.06)] hover:text-[var(--sand)]'
-          }`}>
-          <FileText size={16} />
-          <span className="hidden xl:inline">{s('documents')}</span>
-          <ChevronDown size={13} className={`transition-transform duration-200 ${documentsOpen ? 'rotate-180' : ''}`} />
-        </button>
-        {documentsOpen && (
-          <>
-            <div className="absolute top-full start-0 mt-2 w-52 bg-[var(--navy-2)] border border-[rgba(15,39,71,0.1)] rounded-xl shadow-2xl overflow-hidden z-[110] animate-in">
-              {DOCUMENT_TYPES.map((dt) => (
-                <button type="button" key={dt.id} onClick={() => { filterDocumentsByType(dt.id); setDocumentsOpen(false); }}
-                  className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-semibold transition min-h-[44px] ${
-                    isDocumentsActive(dt.id) ? 'text-[var(--sand)] bg-[var(--navy-3)]' : 'text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-3)]'
-                  }`}>
-                  <span>{s(`docTypes.${dt.key}`)}</span>
-                  {typeBreakdown[TYPE_MAP[dt.id]] > 0 && (
-                    <span className="text-[10px] bg-[var(--navy-4)] text-[var(--sand-muted)] px-1.5 py-0.5 rounded-md">{typeBreakdown[TYPE_MAP[dt.id]]}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-            <div className="fixed inset-0 z-[105]" onClick={() => setDocumentsOpen(false)} />
-          </>
-        )}
-      </div>
-    </div>
-  );
+  // Primary section links now live in the persistent <SectionTabs> row below the
+  // main navbar (Statistiques · Clients · Documents), matching the GitHub/Vercel pattern.
+  // Document-type filtering moved to in-page chips on /dashboard/documents.
 
   // ── "+ Nouveau document" quick-create (ported from the removed Sidebar) ──
   const quickCreate = user && (
@@ -252,14 +198,6 @@ export function Navbar() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
               <span className="text-lg sm:text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight hidden sm:inline">CloudDevis</span>
             </Link>
-
-            {!loading && user && (
-              <div className="hidden md:flex items-center gap-3 min-w-0">
-                {userPill}
-                <div className="w-px h-6 bg-[rgba(15,39,71,0.1)]" />
-                {navLinks}
-              </div>
-            )}
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -285,8 +223,14 @@ export function Navbar() {
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
+
+            {/* User account pill — far right (GitHub-style), was previously next to the logo */}
+            {!loading && user && <div className="hidden md:block">{userPill}</div>}
           </div>
         </div>
+
+        {/* Persistent section tabs (desktop) — primary dashboard navigation */}
+        {!loading && user && <SectionTabs clientCount={clientCount} />}
       </nav>
 
       {/* Mobile Bottom Sheet — user pill, nav links, quick-create, all stacked */}

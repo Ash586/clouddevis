@@ -362,6 +362,10 @@ html, body {
 }
 .scroll-chips::-webkit-scrollbar { display: none; }
 
+/* Hide scrollbar while keeping scroll (used by section tabs) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 /* Mobile tab bar (editor) */
 .mobile-tab-bar {
   display: flex;
