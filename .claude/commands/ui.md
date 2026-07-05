@@ -73,6 +73,22 @@ These are non-negotiable DGI (Direction Générale des Impôts) rules — always
 - Drag handle pattern from item reordering (`⠿` + HTML5 drag events)
 - Inline validation: red border + error message below field
 
+## RTL & Arabic UI Rules
+- Use `start`/`end` Tailwind classes instead of `left`/`right` for layout (e.g. `ms-2` not `ml-2`, `ps-4` not `pl-4`)
+- Arabic locale uses `dir="rtl"` on `<html>` — never assume LTR-only positioning
+- Icons that indicate direction (arrows, chevrons) must be mirrored in RTL — use `rtl:scale-x-[-1]`
+- Test all new components in both LTR (FR) and RTL (AR) — `messages/ar.json` is the AR source
+- Font: Arabic text inherits system fonts — avoid Latin-only font stacks that break Arabic glyphs
+- Number formatting: Dinar amounts display the same in both directions (`12 500 DA`)
+
+## Mobile UX Rules (Capacitor + Small Screens)
+- Touch targets minimum **44×44px** — no icon-only buttons smaller than this
+- Modals on mobile use **bottom sheet** pattern (`items-end` + `rounded-t-2xl`), not centered dialogs
+- Avoid `hover:` as the only affordance — pair with `active:` for touch feedback
+- Safe area insets: use `pb-safe` or `pb-24 md:pb-6` pattern (already established in dashboard)
+- Sticky elements (bottom nav, FABs) must not overlap content — test at 375px width
+- Avoid horizontal scroll on mobile — tables need either truncation or a card list alternative (both implemented in `DashboardDocumentsPanel.tsx`)
+
 ---
 
 # Key Responsibilities
