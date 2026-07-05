@@ -9,6 +9,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Overview
 Full-stack invoicing SaaS (Next.js 16, PostgreSQL/Prisma, Tailwind). French primary locale, AR/EN translations in `messages/*.json`. Custom UI components (no external library). Light theme for dashboard/editor, dark Midnight Slate for admin.
 
+## Project Skills (Slash Commands)
+
+Custom Claude Code skills live in `.claude/commands/`. Invoke them by typing `/skill-name` in a **new terminal Claude Code session** (they are loaded at session start).
+
+| Command | File | Purpose |
+|---|---|---|
+| `/ui` | `.claude/commands/ui.md` | Front-End / UX Architect persona — explains UX logic before writing any code. Use for dashboard redesigns, editor improvements, new UI components. Includes CloudDevis context (DGI, DA currency, design tokens, core files). |
+
 ## Progress
 
 ### ✅ Done
