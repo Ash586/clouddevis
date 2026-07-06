@@ -12,6 +12,10 @@ export function loadDraft(mode: UserMode, initialType?: DocumentType): DocumentS
     const saved = localStorage.getItem(LS_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as Partial<DocumentState>;
+      // Don't restore a draft of a different document type — start fresh instead
+      if (initialType && parsed.documentType && parsed.documentType !== initialType) {
+        return createEmptyDoc(mode, initialType);
+      }
       const savedMode = parsed.mode ?? mode;
       const defaults = createEmptyDoc(savedMode, initialType);
       const merged: DocumentState = {
@@ -32,6 +36,15 @@ export function loadDraft(mode: UserMode, initialType?: DocumentType): DocumentS
         if (parsed.discount) merged.discount = { ...defaults.discount, ...parsed.discount };
         if (parsed.customFields) merged.customFields = { ...parsed.customFields };
         if (initialType) merged.documentType = initialType;
+        // Fix corrupted document numbers: regenerate if prefix doesn't match the doc type
+        const prefixMap: Record<string, string> = {
+          devis: 'DEV', facture: 'FAC', proforma: 'PRO',
+          bc: 'BC', br: 'BR', bl: 'BL', intervention: 'INT', attachement: 'ATT',
+        };
+        const expectedPrefix = prefixMap[merged.documentType];
+        if (expectedPrefix && merged.documentNumber && !merged.documentNumber.startsWith(expectedPrefix + '-')) {
+          merged.documentNumber = generateDocumentNumber(merged.documentType, merged.mode);
+        }
         return merged;
     }
   } catch {}
@@ -121,6 +134,8 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
       const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<DocumentState>;
+        // Don't show restoration toast if saved draft is a different type
+        if (initialType && parsed.documentType && parsed.documentType !== initialType) return null;
         if (parsed.items?.length || parsed.clientInfo?.name) return 'unsaved_draft';
       }
     } catch {}

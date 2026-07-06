@@ -40,6 +40,7 @@ export function PreviewHeader({ doc, design, sf, bv, vb, t, highlight = false, o
     doc.documentType === 'proforma'     ? t('docTypeProforma') :
     doc.documentType === 'bc'           ? t('docTypeOrder')    :
     doc.documentType === 'br'           ? t('docTypeBR')       :
+    doc.documentType === 'bl'           ? t('docTypeBL')       :
     doc.documentType;
 
   // Logo resolution: companyInfo takes priority, then artisanInfo (not yet supported — future)

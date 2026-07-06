@@ -55,7 +55,9 @@ export function PreviewNordic({ doc, sf, bv, vb, tc, results, onZoneClick }: Pro
     doc.documentType === 'facture' ? 'FACTURE' :
     doc.documentType === 'proforma' ? 'PROFORMA' :
     doc.documentType === 'bc' ? 'BON DE COMMANDE' :
-    doc.documentType === 'br' ? 'BON DE RÉCEPTION' : 'DEVIS';
+    doc.documentType === 'br' ? 'BON DE RÉCEPTION' :
+    doc.documentType === 'bl' ? 'BON DE LIVRAISON' :
+    'DEVIS';
 
   return (
     <div id="print-area" className="w-[21cm] min-h-[29.7cm] flex flex-col shadow-md print:shadow-none" style={{ background: '#fff', fontFamily: FONT }}>
