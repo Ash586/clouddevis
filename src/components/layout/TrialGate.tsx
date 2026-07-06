@@ -53,20 +53,7 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
   return (
     <>
       {isTrial ? (
-        <div>
-          <div className="bg-amber-400/10 border-b border-amber-400/20 px-4 py-2">
-            <div className="max-w-4xl mx-auto flex items-center justify-center gap-3 flex-wrap">
-              <span className="text-xs font-medium text-amber-400">
-                {trialEndDateStr
-                  ? `Essai gratuit — ${trialDaysLeft} jour${trialDaysLeft > 1 ? 's' : ''} restant${trialDaysLeft > 1 ? 's' : ''} (se termine le ${trialEndDateStr})`
-                  : (s('trialBanner') || 'Période d\'essai — 7 jours')}
-                &ensp;
-                <button type="button" onClick={() => setShowUpgrade(true)} className="underline font-semibold">{s('subscribe') || 'Passer à un forfait payant'}</button>
-              </span>
-            </div>
-          </div>
-          {children}
-        </div>
+        <>{children}</>
       ) : isFree ? (
         <div className="flex items-center justify-center min-h-[60vh] p-8">
           <Card className="max-w-sm p-8 text-center">
