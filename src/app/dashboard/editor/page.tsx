@@ -545,7 +545,7 @@ function EditorContent() {
       const hasVisible = cs.fields.some(f => !hiddenFields.has(`custom_${cs.id}_${f.id}`));
       if (!hasVisible) return null;
       return (
-        <CollapsibleSection title={cs.label} sectionId={cs.id} {...s()} {...dragProps} defaultOpen={true}>
+        <CollapsibleSection title={cs.label} sectionId={cs.id} {...s()} {...dragProps} defaultOpen={false}>
           <SectionProvider {...sectionProps}>
             <CustomSectionRenderer />
           </SectionProvider>
@@ -567,7 +567,7 @@ function EditorContent() {
         sectionId={id}
         {...(meta.blockId ? s(meta.blockId as BlockId) : s())}
         {...dragProps}
-        defaultOpen={meta.defaultOpen ?? true}
+        defaultOpen={meta.defaultOpen ?? false}
       >
         <SectionProvider {...sectionProps}>
           <SectionComp />
