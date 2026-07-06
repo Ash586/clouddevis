@@ -86,7 +86,7 @@ export function Navbar() {
   function filterDocumentsByType(type: string) {
     setMobileOpen(false);
     const upperType = TYPE_MAP[type] || type.toUpperCase();
-    router.push(`/dashboard/documents?type=${upperType}`);
+    router.push(`/dashboard?tab=documents&type=${upperType}`);
   }
 
   const userName = user?.name || tc('user');
@@ -275,7 +275,7 @@ export function Navbar() {
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-[var(--sand-muted)] min-h-[44px]">
                       <LayoutDashboard size={16} /> {s('stats')}
                     </button>
-                    <button type="button" onClick={() => { router.push('/dashboard/clients'); setMobileOpen(false); }}
+                    <button type="button" onClick={() => { router.push('/dashboard?tab=clients'); setMobileOpen(false); }}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-[var(--sand-muted)] min-h-[44px]">
                       <Users size={16} /> {s('clients')}
                       {clientCount > 0 && <span className="text-[10px] bg-[var(--navy-4)] px-1.5 py-0.5 rounded-full">{clientCount}</span>}

@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
+import { ClientsPanel } from '@/components/dashboard/panels/ClientsPanel';
+import { DocumentsPanel } from '@/components/dashboard/panels/DocumentsPanel';
 import type { DashboardStats } from '@/components/dashboard/dashboardConstants';
 
 const DEFAULT_STATS: DashboardStats = {
@@ -14,6 +17,9 @@ const DEFAULT_STATS: DashboardStats = {
 const STALE_MS = 2 * 60 * 1000;
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const tab = searchParams?.get('tab') || '';
+
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
   const [companyInfo, setCompanyInfo] = useState<{ name?: string } | null>(null);
@@ -49,12 +55,18 @@ export default function DashboardPage() {
       <Navbar />
       <div className="flex-1 min-w-0">
         <TrialGate>
-          <UnifiedDashboard
-            userName={userName}
-            companyInfo={companyInfo}
-            stats={stats}
-            mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
-          />
+          {tab === 'clients' ? (
+            <ClientsPanel />
+          ) : tab === 'documents' ? (
+            <DocumentsPanel />
+          ) : (
+            <UnifiedDashboard
+              userName={userName}
+              companyInfo={companyInfo}
+              stats={stats}
+              mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
+            />
+          )}
         </TrialGate>
       </div>
     </div>

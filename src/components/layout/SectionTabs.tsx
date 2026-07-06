@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { LayoutDashboard, Users, FileText, type LucideIcon } from 'lucide-react';
 
@@ -10,34 +10,37 @@ interface Props {
 
 interface SectionTab {
   labelKey: string;
+  tabKey: string;
   href: string;
   icon: LucideIcon;
-  /** exact match (true) or prefix match (false) for active state */
-  exact?: boolean;
   badge?: number;
+  pathPrefix?: string;
 }
 
-/**
- * Persistent horizontal tab bar for the primary dashboard sections.
- * Rendered as a second row under the main navbar (GitHub/Vercel pattern).
- * Extensible up to ~7 sections — just add entries to `tabs`.
- */
 export function SectionTabs({ clientCount = 0 }: Props) {
   const t = useTranslations('sidebar');
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Only show on the authenticated dashboard, never on landing/pricing/etc.
   if (!pathname?.startsWith('/dashboard')) return null;
 
+  const activeTab = searchParams?.get('tab') || '';
+
   const tabs: SectionTab[] = [
-    { labelKey: 'stats',     href: '/dashboard',           icon: LayoutDashboard, exact: true },
-    { labelKey: 'clients',   href: '/dashboard/clients',   icon: Users, badge: clientCount },
-    { labelKey: 'documents', href: '/dashboard/documents', icon: FileText },
+    { labelKey: 'stats',     tabKey: '',          href: '/dashboard',                icon: LayoutDashboard },
+    { labelKey: 'clients',   tabKey: 'clients',   href: '/dashboard?tab=clients',   icon: Users,    badge: clientCount, pathPrefix: '/dashboard/clients' },
+    { labelKey: 'documents', tabKey: 'documents', href: '/dashboard?tab=documents', icon: FileText, pathPrefix: '/dashboard/documents' },
   ];
 
-  const isActive = (tab: SectionTab) =>
-    tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
+  const isActive = (tab: SectionTab) => {
+    if (tab.tabKey !== '') {
+      return activeTab === tab.tabKey ||
+        (tab.pathPrefix ? pathname !== '/dashboard' && pathname?.startsWith(tab.pathPrefix) : false);
+    }
+    // Overview tab: only active on /dashboard with no tab param
+    return pathname === '/dashboard' && !activeTab;
+  };
 
   return (
     <div className="hidden md:block border-t border-[rgba(15,39,71,0.06)] bg-[var(--navy)]/60">
@@ -47,7 +50,7 @@ export function SectionTabs({ clientCount = 0 }: Props) {
             const active = isActive(tab);
             return (
               <button
-                key={tab.href}
+                key={tab.tabKey}
                 type="button"
                 onClick={() => router.push(tab.href)}
                 aria-current={active ? 'page' : undefined}
