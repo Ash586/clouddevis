@@ -33,8 +33,10 @@ export function PrestationsSection() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             <div>
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.qty')}</label>
-              <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)]"
-                value={newItem.quantity} onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} />
+              <input type="number" min="0" step="any" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-center outline-none focus:ring-2 focus:ring-[var(--green-2)]"
+                value={newItem.quantity}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setNewItem(p => ({ ...p, quantity: parseFloat(e.target.value) || 0 }))} />
             </div>
             <div>
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.unit')}</label>
@@ -45,8 +47,10 @@ export function PrestationsSection() {
             </div>
             <div>
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.unitPrice')}</label>
-              <input type="number" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]"
-                value={newItem.unitPrice} onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} />
+              <input type="number" min="0" step="any" className="w-full border p-1.5 sm:p-2 rounded-lg text-[11px] bg-[var(--navy-2)] text-right outline-none focus:ring-2 focus:ring-[var(--green-2)]"
+                value={newItem.unitPrice}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setNewItem(p => ({ ...p, unitPrice: parseFloat(e.target.value) || 0 }))} />
             </div>
             <div>
               <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] leading-relaxed">{te('prestations.category')}</label>
