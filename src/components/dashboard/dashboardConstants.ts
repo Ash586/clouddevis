@@ -1,4 +1,4 @@
-import { FileText, FilePen, FileStack, ClipboardList, ScrollText, Wrench, Receipt } from 'lucide-react';
+import { FileText, FilePen, FileStack, ClipboardList, ScrollText, Wrench, Receipt, Truck } from 'lucide-react';
 import { ENABLED_DOC_TYPES } from '@/lib/config';
 
 export interface DocSummary {
@@ -31,6 +31,7 @@ export const DOC_TYPE_CONFIG: Record<string, { label: string; bg: string; text: 
 const ALL_QUICK_CREATE = [
   { type: 'devis',        labelKey: 'devis',        icon: FileText },
   { type: 'facture',      labelKey: 'facture',      icon: Receipt },
+  { type: 'bl',           labelKey: 'bonLivraison', icon: Truck },
   { type: 'proforma',     labelKey: 'proforma',     icon: ClipboardList },
   { type: 'bon_commande', labelKey: 'bonCommande',  icon: FileStack },
   { type: 'bon_reception',labelKey: 'bonReception', icon: ScrollText },

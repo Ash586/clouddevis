@@ -31,6 +31,7 @@ const TYPE_LABELS: Record<string, string> = {
   proforma: 'Proforma',
   bc: 'B. Commande',
   br: 'B. Réception',
+  bl: 'B. Livraison',
   intervention: 'Intervention',
   attachement: 'Attachement',
 };
@@ -41,6 +42,7 @@ const TYPE_COLORS: Record<string, string> = {
   PROFORMA: 'bg-purple-400/10 text-purple-400',
   BC: 'bg-amber-400/10 text-amber-400',
   BR: 'bg-teal-400/10 text-teal-400',
+  BL: 'bg-cyan-400/10 text-cyan-400',
   INTERVENTION: 'bg-rose-400/10 text-rose-400',
   ATTACHEMENT: 'bg-indigo-400/10 text-indigo-400',
 };
