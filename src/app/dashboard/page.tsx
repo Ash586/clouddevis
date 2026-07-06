@@ -4,93 +4,37 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
+import type { DashboardStats } from '@/components/dashboard/dashboardConstants';
 
-interface CompanyInfo {
-  name?: string;
-  address?: string;
-  capital?: string;
-  taxIds?: { nif?: string; nis?: string; rc?: string; ai?: string };
-}
+const DEFAULT_STATS: DashboardStats = {
+  totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0,
+  trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null,
+};
 
-interface DocSummary {
-  id: string; number: string; type: string; client: string;
-  total: string; date: string; status: string;
-}
+const STALE_MS = 2 * 60 * 1000;
 
 export default function DashboardPage() {
-  const [docs, setDocs] = useState<DocSummary[]>([]);
   const [userName, setUserName] = useState('');
   const [userMode, setUserMode] = useState('');
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [stats, setStats] = useState({ totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {} as Record<string, number>, typeBreakdown: {} as Record<string, number>, recentDraft: null as { id: string; number: string; type: string; clientName: string; updatedAt: string } | null });
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('ALL');
-  const [sortBy, setSortBy] = useState('date');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [companyInfo, setCompanyInfo] = useState<{ name?: string } | null>(null);
+  const [stats, setStats] = useState<DashboardStats>(DEFAULT_STATS);
 
   const lastFetchRef = useRef(0);
-  const STALE_MS = 2 * 60 * 1000;
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     try {
-      const docParams = new URLSearchParams({ page: String(page), limit: '20', sortBy, sortOrder });
-      if (searchQuery.trim()) docParams.set('search', searchQuery.trim());
-      if (typeFilter !== 'ALL') docParams.set('type', typeFilter);
-
-      const [docRes, dashRes] = await Promise.all([
-        fetch(`/api/documents?${docParams}`),
-        fetch('/api/dashboard'),
-      ]);
-
-      const docData = docRes.ok ? await docRes.json() : { documents: [], pagination: { totalPages: 1 } };
-      const dashData = dashRes.ok ? await dashRes.json() : { user: {}, stats: {} };
-
-      setDocs(docData.documents || []);
-      setTotalPages(docData.pagination?.totalPages || 1);
-      setUserName(dashData.user?.name || '');
-      setUserMode(dashData.user?.mode || '');
-      setCompanyInfo(dashData.user?.companyInfo || null);
-      setStats(dashData.stats || { totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0, trialDaysRemaining: 0, draftCount: 0, statusBreakdown: {}, typeBreakdown: {}, recentDraft: null });
+      const res = await fetch('/api/dashboard');
+      const data = res.ok ? await res.json() : { user: {}, stats: {} };
+      setUserName(data.user?.name || '');
+      setUserMode(data.user?.mode || '');
+      setCompanyInfo(data.user?.companyInfo || null);
+      setStats(data.stats || DEFAULT_STATS);
       lastFetchRef.current = Date.now();
-    } catch {
-      setDocs([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, searchQuery, typeFilter, sortBy, sortOrder]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    const res = await fetch(`/api/documents/${id}`, { method: 'DELETE' });
-    if (res.ok) fetchData();
-  }, [fetchData]);
-
-  const handleSearchChange = useCallback((q: string) => {
-    setSearchQuery(q);
-    setPage(1);
+    } catch { /* silent */ }
   }, []);
 
-  const handleTypeFilterChange = useCallback((t: string) => {
-    setTypeFilter(t);
-    setPage(1);
-  }, []);
-
-  const handleSortChange = useCallback((column: string) => {
-    setSortBy(prev => {
-      if (prev === column) {
-        setSortOrder(o => o === 'asc' ? 'desc' : 'asc');
-        return prev;
-      }
-      setSortOrder('desc');
-      return column;
-    });
-    setPage(1);
-  }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { void fetchData(); }, [fetchData]);
 
   useEffect(() => {
     const onVisible = () => {
@@ -104,25 +48,12 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 min-w-0">
-          <TrialGate>
+        <TrialGate>
           <UnifiedDashboard
             userName={userName}
             companyInfo={companyInfo}
             stats={stats}
-            docs={docs}
-            loading={loading}
-            onDelete={handleDelete}
             mode={userMode as 'ARTISAN' | 'ENTREPRISE'}
-            page={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            typeFilter={typeFilter}
-            onTypeFilterChange={handleTypeFilterChange}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortChange={handleSortChange}
           />
         </TrialGate>
       </div>

@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { FileEdit, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { QUICK_CREATE_TYPES, STATUS_LABELS, type DashboardStats } from './dashboardConstants';
+import { STATUS_LABELS, type DashboardStats } from './dashboardConstants';
 
 interface Props {
   stats: DashboardStats;
@@ -30,36 +30,6 @@ export function DashboardSidebar({ stats }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Quick Create */}
-      <Card className="p-4 border-[rgba(15,39,71,0.06)]">
-        <h2 className="text-[11px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-3">
-          {t('quickActions')}
-        </h2>
-        <div className="flex flex-col gap-1">
-          {QUICK_CREATE_TYPES.map((qd) => {
-            const count = stats.typeBreakdown?.[
-              ({ devis:'DEVIS', facture:'FACTURE', proforma:'PROFORMA', bon_commande:'BC', bon_reception:'BR', bl:'BL', intervention:'INTERVENTION', attachement:'ATTACHEMENT' } as Record<string,string>)[qd.type] || 'DEVIS'
-            ] || 0;
-            return (
-              <button key={qd.type} type="button"
-                onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
-                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--navy-3)] transition-all text-start">
-                <div className="w-8 h-8 rounded-lg bg-[var(--green-glow)] text-[var(--green-3)] flex items-center justify-center shrink-0 group-hover:bg-[var(--green-3)] group-hover:text-white transition-all">
-                  <qd.icon size={16} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold text-[var(--sand)] group-hover:text-[var(--green-3)] transition-colors truncate">
-                    {t(`docTypes.${qd.labelKey}`)}
-                  </div>
-                  <div className="text-[10px] text-[var(--sand-muted)]">{count} {t('created')}</div>
-                </div>
-                <ChevronRight size={13} className="text-[var(--sand-muted)] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
-              </button>
-            );
-          })}
-        </div>
-      </Card>
-
       {/* Continue draft */}
       {draftDoc && (
         <button type="button" onClick={() => router.push(`/dashboard/editor?id=${draftDoc.id}`)}

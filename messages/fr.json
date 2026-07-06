@@ -75,7 +75,7 @@
     "langEn": "English"
   },
   "sidebar": {
-    "stats": "Statistiques",
+    "stats": "Vue d'ensemble",
     "documents": "Documents & Factures",
     "facture": "Facture",
     "devis": "Devis",
@@ -255,6 +255,10 @@
     "goodMorning": "Bonjour",
     "goodAfternoon": "Bon après-midi",
     "goodEvening": "Bonsoir",
+    "greetingAllClear": "Tout est à jour",
+    "alertUnpaid": "En attente de paiement",
+    "alertDrafts": "Brouillons à finaliser",
+    "quickCreate": "Créer rapide",
     "subtitle": "Voici le résumé de votre activité.",
     "newQuote": "Nouveau Devis",
     "businessMode": "Mode Entreprise",

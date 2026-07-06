@@ -9,25 +9,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Overview
 Full-stack invoicing SaaS (Next.js 16, PostgreSQL/Prisma, Tailwind). French primary locale, AR/EN translations in `messages/*.json`. Custom UI components (no external library). Light theme for dashboard/editor, dark Midnight Slate for admin.
 
-## Project Skills (Slash Commands)
-
-Custom Claude Code skills live in `.claude/commands/`. Invoke them by typing `/skill-name` in a **new terminal Claude Code session** (they are loaded at session start).
-
-| Command | File | Purpose |
-|---|---|---|
-| `/ui` | `.claude/commands/ui.md` | Front-End / UX Architect — UX critique before code, RTL/Arabic UI rules, mobile UX (44px targets, bottom sheets, safe area). Use for dashboard redesigns, editor improvements, new components. |
-| `/dgi` | `.claude/commands/dgi.md` | DGI/Tax Compliance Expert — Timbre Fiscal, TVA 19%, NIF/NIS/RC/AI rules, G50 compliance. Use to verify invoice logic, audit field requirements, answer "is this legal?" questions. |
-| `/backend` | `.claude/commands/backend.md` | Prisma/PostgreSQL Architect — safe migrations, ACID transactions, N+1 detection, ownership checks. Use for schema changes, query optimization, new API routes. |
-| `/mobile` | `.claude/commands/mobile.md` | Capacitor/Android Specialist — WebView constraints, touch UX, safe area insets, Capacitor plugin bridging. Use for mobile-specific bugs and hybrid app flows. |
-| `/editor-dev` | `.claude/commands/editor-dev.md` | Document Editor Specialist — `useEditorState`, `useEditorActions`, undo/redo, drag-and-drop, preview sync, PDF generation. Use for all editor feature work. |
-| `/devops` | `.claude/commands/devops.md` | DevOps/Infrastructure — Vercel deploy, Neon pooling, CSP headers, Sentry, environment variables. Includes critical: Vercel build does NOT run migrations. |
-| `/support` | `.claude/commands/support.md` | Bilingual FR/AR Customer Support — professional email responses, help center articles, DGI questions in plain language, pricing objection handling. |
-| `/marketer` | `.claude/commands/marketer.md` | B2B Digital Marketer — Algerian SMB SEO (FR+AR keywords), Facebook/Instagram ads, landing page copy, blog articles on digital invoicing. |
-| `/b2b-data` | `.claude/commands/b2b-data.md` | Data Analyst & B2B Sales — SaaS KPIs (MRR/churn/LTV), usage metric analysis, enterprise partnership proposals, pricing strategy for Algerian market. |
-| `/security` | `.claude/commands/security.md` | Security Auditor — OWASP Top 10, auth/ownership review, AES-GCM encryption, CSP hardening, rate limiting. Response format: severity + attack scenario + fix. |
-| `/i18n` | `.claude/commands/i18n.md` | Translation Specialist — FR/AR/EN, Algerian business terminology, ICU pluralization, RTL layout rules, missing-key detection. Always outputs all 3 languages at once. |
-| `/qa` | `.claude/commands/qa.md` | QA/Testing Engineer — boundary-value tests for financial calculations, Timbre Fiscal thresholds, NIF validation, Jest test patterns. Prioritizes compliance-critical functions. |
-
 ## Progress
 
 ### ✅ Done
@@ -57,6 +38,7 @@ Custom Claude Code skills live in `.claude/commands/`. Invoke them by typing `/s
 - Fixed 6 ESLint errors: moved `TaxRow` component outside render in `PreviewDevis.tsx`, escaped apostrophes in `PreviewAttachement.tsx`
 - Added `companyInfo` field to Document model for logo/signature persistence
 - Updated document API to save/load `companyInfo` (including logo) with Base64 data
+- **Removed duplicate "Nouveau Devis" button** from dashboard header (redundant with Quick Create section)
 
 ## Key Decisions
 - **Section ID `prestations` forced first** in editor regardless of `sectionOrder`

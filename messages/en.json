@@ -75,7 +75,7 @@
     "langEn": "English"
   },
   "sidebar": {
-    "stats": "Statistics",
+    "stats": "Overview",
     "documents": "Documents & Invoices",
     "facture": "Invoice",
     "devis": "Quote",
@@ -255,6 +255,10 @@
     "goodMorning": "Good morning",
     "goodAfternoon": "Good afternoon",
     "goodEvening": "Good evening",
+    "greetingAllClear": "All caught up",
+    "alertUnpaid": "Awaiting payment",
+    "alertDrafts": "Drafts to finish",
+    "quickCreate": "Quick create",
     "subtitle": "Here is your activity summary.",
     "newQuote": "New Quote",
     "businessMode": "Business Mode",

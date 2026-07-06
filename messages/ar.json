@@ -75,7 +75,7 @@
     "langEn": "English"
   },
   "sidebar": {
-    "stats": "الإحصائيات",
+    "stats": "نظرة عامة",
     "documents": "المستندات والفواتير",
     "facture": "فاتورة",
     "devis": "تقدير",
@@ -255,6 +255,10 @@
     "goodMorning": "صباح الخير",
     "goodAfternoon": "مساء النور",
     "goodEvening": "مساء الخير",
+    "greetingAllClear": "كل شيء محدّث",
+    "alertUnpaid": "في انتظار الدفع",
+    "alertDrafts": "مسودات لإتمامها",
+    "quickCreate": "إنشاء سريع",
     "subtitle": "هذا ملخص نشاطك.",
     "newQuote": "تقدير جديد",
     "businessMode": "وضع الشركة",

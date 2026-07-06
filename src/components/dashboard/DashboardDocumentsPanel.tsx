@@ -5,7 +5,7 @@ import { Search, FileStack, ArrowUpDown, Eye, Trash2, ChevronLeft, ChevronRight,
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { DOC_TYPE_CONFIG, STATUS_LABELS, TYPE_FILTERS, type DocSummary } from './dashboardConstants';
+import { DOC_TYPE_CONFIG, STATUS_LABELS, TYPE_FILTERS, QUICK_CREATE_TYPES, type DocSummary } from './dashboardConstants';
 
 interface Props {
   docs: DocSummary[];
@@ -42,6 +42,24 @@ export function DashboardDocumentsPanel({
 
   return (
     <Card className="overflow-hidden border-[rgba(15,39,71,0.06)]">
+      {/* Quick-create row — merged from the former sidebar "Quick Access" card */}
+      <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-[rgba(15,39,71,0.06)] bg-[var(--navy-2)]/40">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider me-1">{t('quickCreate')}</span>
+          {QUICK_CREATE_TYPES.map((qd) => (
+            <button
+              key={qd.type}
+              type="button"
+              onClick={() => router.push(`/dashboard/editor?type=${qd.type}`)}
+              className="group inline-flex items-center gap-1.5 ps-2 pe-2.5 py-1.5 rounded-lg border border-[rgba(15,39,71,0.08)] bg-[var(--navy-2)] text-[var(--sand-muted)] text-[11px] font-bold hover:text-[var(--green-3)] hover:border-[rgba(37,99,235,0.25)] hover:bg-[rgba(37,99,235,0.06)] transition-all min-h-[36px]"
+            >
+              <qd.icon size={14} className="shrink-0" />
+              <span>{t(`docTypes.${qd.labelKey}`)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Header: title + search */}
       <div className="px-5 sm:px-6 pt-5 pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
