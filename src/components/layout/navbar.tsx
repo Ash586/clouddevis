@@ -25,7 +25,7 @@ const ALL_QUICK_DOCS = [
   { type: 'proforma', labelKey: 'proforma', icon: ClipboardList },
   { type: 'bon_commande', labelKey: 'bonCommande', icon: FileStack },
   { type: 'bon_reception', labelKey: 'bonReception', icon: ScrollText },
-  { type: 'bon_livraison', labelKey: 'bonLivraison', icon: Truck },
+  { type: 'bl', labelKey: 'bonLivraison', icon: Truck },
   { type: 'intervention', labelKey: 'intervention', icon: Wrench },
   { type: 'attachement', labelKey: 'attachement', icon: FilePen },
 ] as const;
