@@ -73,7 +73,7 @@ export function DevisSection() {
           </div>}
           {!hiddenFields.has('showWatermark') && <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)] cursor-pointer">
             <input type="checkbox" className="w-3.5 h-3.5 rounded text-[var(--green-3)]" checked={doc.showWatermark ?? false} onChange={(e) => updateDoc('showWatermark', e.target.checked)} />
-            <span className="text-[10px] font-bold text-[var(--sand-muted)]">Filigrane DEVIS</span>
+            <span className="text-[10px] font-bold text-[var(--sand-muted)]">Filigrane</span>
           </label>}
         </div>
       </div>

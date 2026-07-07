@@ -359,7 +359,7 @@
       "travaux": "Work",
       "pieces": "Parts",
       "etat": "Device State",
-      "devis": "Quote Information",
+      "devis": "Additional information",
       "livraison": "Delivery"
     },
     "customizer": {

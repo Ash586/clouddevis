@@ -119,7 +119,7 @@ function EditorContent() {
       { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
       { id: 'client' as SectionId, icon: User, label: te('sections.client').replace(/^\d+\.\s*/, '') },
       { id: 'general' as SectionId, icon: FileText, label: te('sections.general').replace(/^\d+\.\s*/, '') },
-      ...(doc.documentType === 'devis' ? [{ id: 'devis' as SectionId, icon: FileText, label: 'Devis' }] : []),
+      ...(doc.documentType === 'devis' ? [{ id: 'devis' as SectionId, icon: FileText, label: te('sections.devis') }] : []),
       { id: 'design' as SectionId, icon: Palette, label: te('sections.design') },
       { id: 'paiement' as SectionId, icon: CreditCard, label: te('sections.paiement').replace(/^\d+\.\s*/, '') },
       { id: 'chantier' as SectionId, icon: MapPin, label: te('sections.chantier').replace(/^\d+\.\s*/, '') },
