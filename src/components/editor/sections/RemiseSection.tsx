@@ -11,7 +11,7 @@ export function RemiseSection() {
           <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.type} onChange={(e) => updateDiscount({ type: e.target.value as 'percentage' | 'fixed' })}>
             <option value="percentage">{te('remise.pct')}</option><option value="fixed">{te('remise.amount')}</option></select></div>}
         {!hiddenFields.has('remiseValue') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{doc.discount.type === 'percentage' ? te('remise.valuePct') : te('remise.valueDA')}</label>
-          <input type="number" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.value} onChange={(e) => updateDiscount({ value: parseFloat(e.target.value) || 0 })} /></div>}
+          <input type="number" min="0" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.value} onFocus={(e) => e.target.select()} onChange={(e) => updateDiscount({ value: parseFloat(e.target.value) || 0 })} /></div>}
         {!hiddenFields.has('remiseReason') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('remise.reason')}</label>
           <input type="text" placeholder={te('remise.reasonPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.discount.reason} onChange={(e) => updateDiscount({ reason: e.target.value })} /></div>}
       </div>

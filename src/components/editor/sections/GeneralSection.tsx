@@ -49,11 +49,11 @@ export function GeneralSection() {
       {!hiddenFields.has('stampRate') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.stampDuty')}</label>
         <div className="grid grid-cols-3 gap-2">
           <div><label className="block text-[8px] text-[var(--sand-muted)]">{te('general.stampRate')}</label>
-            <input type="number" step="0.1" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.rate} onChange={(e) => updateStampDuty({ rate: parseFloat(e.target.value) || 0 })} /></div>
+            <input type="number" step="0.1" min="0" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.rate} onFocus={(e) => e.target.select()} onChange={(e) => updateStampDuty({ rate: parseFloat(e.target.value) || 0 })} /></div>
           <div><label className="block text-[8px] text-[var(--sand-muted)]">{te('general.stampMin')}</label>
-            <input type="number" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.minAmount} onChange={(e) => updateStampDuty({ minAmount: parseFloat(e.target.value) || 0 })} /></div>
+            <input type="number" min="0" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.minAmount} onFocus={(e) => e.target.select()} onChange={(e) => updateStampDuty({ minAmount: parseFloat(e.target.value) || 0 })} /></div>
           <div><label className="block text-[8px] text-[var(--sand-muted)]">{te('general.stampMax')}</label>
-            <input type="number" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.maxAmount} onChange={(e) => updateStampDuty({ maxAmount: parseFloat(e.target.value) || 0 })} /></div>
+            <input type="number" min="0" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.maxAmount} onFocus={(e) => e.target.select()} onChange={(e) => updateStampDuty({ maxAmount: parseFloat(e.target.value) || 0 })} /></div>
         </div></div>}
     </div>
   );

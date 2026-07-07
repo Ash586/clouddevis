@@ -16,7 +16,7 @@ export function PaiementSection() {
           </select></div>}
         {!hiddenFields.has('paymentDeposit') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.deposit')}</label>
           <input type="number" min="0" step="100" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]"
-            value={doc.acompte ?? 0} onChange={(e) => updateDoc('acompte', parseFloat(e.target.value) || 0)} /></div>}
+            value={doc.acompte ?? 0} onFocus={(e) => e.target.select()} onChange={(e) => updateDoc('acompte', parseFloat(e.target.value) || 0)} /></div>}
         {!hiddenFields.has('paymentConditions') && <div className="col-span-2"><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('paiement.conditions')}</label>
           <input type="text" placeholder={te('paiement.conditionsPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]"
             value={doc.paymentDetails.terms} onChange={(e) => updatePaymentDetails({ terms: e.target.value })} /></div>}

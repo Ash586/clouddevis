@@ -246,8 +246,16 @@ function EditorContent() {
   const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
 
   const handleDownload = async () => {
-    // Open window synchronously during click gesture — before any await — so popup blocker doesn't fire
+    // Open window synchronously during user-gesture so popup blockers don't fire.
+    // Write placeholder immediately so the window stays alive during async work.
+    // Using location.replace(blobUrl) instead of document.write() because document.write()
+    // on an about:blank window has null origin → blocks cross-origin Google Fonts → blank page.
     const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write('<html><head><title>Génération…</title></head><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8f8f8"><p style="color:#888;font-size:14px">⏳ Génération en cours…</p></body></html>');
+      printWindow.document.close();
+    }
+    try {
     await saveDoc();
     track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
     const isEnt = doc.mode === 'entreprise';
@@ -338,11 +346,33 @@ function EditorContent() {
       });
     }
 
-    if (!printWindow) { window.print(); return; }
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    printWindow.location.replace(url);
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+
+    if (printWindow && !printWindow.closed) {
+      // Navigate the already-open window to the blob URL.
+      // This preserves the blob's origin (inherits from parent) so Google Fonts load correctly.
+      printWindow.location.replace(url);
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } else {
+      // Popup was blocked — fallback: full-size iframe so fonts still load correctly
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999;background:#fff;';
+      document.body.appendChild(iframe);
+      iframe.addEventListener('load', () => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        setTimeout(() => {
+          try { document.body.removeChild(iframe); } catch { /* ignore */ }
+          URL.revokeObjectURL(url);
+        }, 60_000);
+      });
+      iframe.src = url;
+    }
+    } catch {
+      if (printWindow && !printWindow.closed) printWindow.close();
+      showToast('Erreur lors de la génération du PDF', 'error');
+    }
   };
 
   const jumpToSection = (section: SectionId) => {
@@ -625,6 +655,24 @@ function EditorContent() {
             ) : (
               <span className="flex items-center gap-1.5 text-xs text-[var(--sand-muted)]"><span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--cd-success))]" />{tc('saved')}</span>
             )}
+          </div>
+
+          {/* Mode toggle — always visible */}
+          <div className="hidden sm:flex items-center bg-[var(--navy-3)] rounded-lg p-0.5 border border-[rgba(15,39,71,0.1)] shrink-0">
+            {(['artisan', 'entreprise'] as const).map(m => (
+              <button key={m} type="button"
+                onClick={() => setDoc(prev => ({
+                  ...prev,
+                  mode: m,
+                  companyInfo: m === 'entreprise' ? (prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }) : undefined,
+                  artisanInfo: m === 'artisan' ? (prev.artisanInfo ?? { name: '', address: '', phone: '' }) : undefined,
+                }))}
+                title={m === 'artisan' ? 'Mode Artisan — nom + téléphone' : 'Mode Entreprise — RC, NIF, NIS, AI sur PDF'}
+                className={`flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded-md transition ${mode === m ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]'}`}>
+                <span>{m === 'artisan' ? '🔨' : '🏢'}</span>
+                <span className="hidden lg:inline">{m === 'artisan' ? 'Artisan' : 'Entreprise'}</span>
+              </button>
+            ))}
           </div>
 
           {/* Right: Undo/Redo (always) + lg-only Settings/Save/PDF (mobile bottom bar covers these below lg) */}

@@ -13,7 +13,7 @@ export function MateriauxSection() {
       {!hiddenFields.has('materiauxColor') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.color')}</label>
         <input type="text" placeholder={te('materiaux.colorPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxCouleur} onChange={(e) => setMateriauxField('materiauxCouleur', e.target.value)} /></div>}
       {!hiddenFields.has('materiauxQty') && <div><label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">{te('materiaux.quantity')}</label>
-        <input type="number" placeholder={te('materiaux.quantityPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxQte || ''} onChange={(e) => setMateriauxField('materiauxQte', parseFloat(e.target.value) || 0)} /></div>}
+        <input type="number" min="0" placeholder={te('materiaux.quantityPlaceholder')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.materiauxQte || ''} onFocus={(e) => e.target.select()} onChange={(e) => setMateriauxField('materiauxQte', parseFloat(e.target.value) || 0)} /></div>}
     </div>
   );
 }

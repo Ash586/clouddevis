@@ -249,12 +249,36 @@ function RegisterForm() {
             <>
               <div>
                 <label className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Type de compte</label>
-                <div className="flex gap-1.5" role="radiogroup" aria-label="Type de compte">
-                  {(['artisan', 'entreprise'] as const).map(m => (
-                    <button key={m} type="button" onClick={() => setMode(m)}
-                      role="radio" aria-checked={mode === m}
-                      className={`flex-1 py-2.5 rounded-lg text-[13px] font-semibold border transition min-h-[44px] ${mode === m ? 'bg-[var(--navy-3)] text-[var(--sand)] border-[rgba(15,39,71,0.15)]' : 'bg-transparent text-[var(--sand-muted)] border-[rgba(15,39,71,0.08)] hover:bg-[var(--navy-4)]'}`}>
-                      {m === 'artisan' ? 'Artisan' : 'Entreprise'}
+                <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Type de compte">
+                  {([
+                    {
+                      value: 'artisan' as const,
+                      icon: '🔨',
+                      title: 'Artisan',
+                      subtitle: 'Indépendant',
+                      features: ['Simple & rapide', 'Devis personnalisés', 'Nom + téléphone'],
+                    },
+                    {
+                      value: 'entreprise' as const,
+                      icon: '🏢',
+                      title: 'Entreprise',
+                      subtitle: 'SARL · EURL · SPA',
+                      features: ['RC, NIF, NIS, AI sur PDF', 'Capital social', 'Conformité DGI'],
+                    },
+                  ]).map(m => (
+                    <button key={m.value} type="button" onClick={() => setMode(m.value)}
+                      role="radio" aria-checked={mode === m.value}
+                      className={`text-left p-3 rounded-xl border-2 transition ${mode === m.value ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.06)]' : 'border-[rgba(15,39,71,0.08)] bg-[var(--navy-3)] hover:border-[rgba(15,39,71,0.15)]'}`}>
+                      <div className="text-xl mb-1">{m.icon}</div>
+                      <div className={`text-[13px] font-bold mb-0.5 ${mode === m.value ? 'text-[var(--green-3)]' : 'text-[var(--sand)]'}`}>{m.title}</div>
+                      <div className="text-[9px] text-[var(--sand-muted)] mb-2">{m.subtitle}</div>
+                      <ul className="space-y-0.5">
+                        {m.features.map(f => (
+                          <li key={f} className="text-[9px] text-[var(--sand-muted)] flex items-center gap-1">
+                            <span className={mode === m.value ? 'text-[var(--green-3)]' : ''}>✓</span> {f}
+                          </li>
+                        ))}
+                      </ul>
                     </button>
                   ))}
                 </div>
@@ -279,6 +303,13 @@ function RegisterForm() {
           {/* Step 3: Entreprise (conditional) */}
           {step === 3 && mode === 'entreprise' && (
             <div className="bg-[var(--navy-3)] rounded-lg p-3.5 space-y-3">
+              <div className="flex items-start gap-2 bg-[rgba(37,99,235,0.06)] border border-[rgba(37,99,235,0.15)] rounded-lg p-2.5">
+                <span className="text-base shrink-0">🏛️</span>
+                <div>
+                  <p className="text-[10px] font-bold text-[var(--green-3)] m-0">Ces informations apparaîtront sur tous vos documents</p>
+                  <p className="text-[9px] text-[var(--sand-muted)] mt-0.5 m-0">RC · NIF · NIS · AI · Capital — requis par la DGI pour la conformité fiscale</p>
+                </div>
+              </div>
               <p className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider m-0">Informations entreprise</p>
               <div>
                 <label htmlFor="reg-company-name" className="block text-[11px] font-semibold text-[var(--sand-muted)] mb-1.5">Raison sociale</label>

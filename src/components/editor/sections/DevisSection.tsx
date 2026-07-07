@@ -69,7 +69,7 @@ export function DevisSection() {
         <div className="grid grid-cols-2 gap-2 items-end">
           {!hiddenFields.has('validityDays') && <div>
             <label className="block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5">Validité (jours)</label>
-            <input type="number" min="1" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validityDays ?? 30} onChange={(e) => updateDoc('validityDays', parseInt(e.target.value) || 30)} />
+            <input type="number" min="1" className="w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.validityDays ?? 30} onFocus={(e) => e.target.select()} onChange={(e) => updateDoc('validityDays', parseInt(e.target.value) || 30)} />
           </div>}
           {!hiddenFields.has('showWatermark') && <label className="flex items-center gap-2 p-2 bg-[var(--navy-3)] rounded-xl border border-[rgba(245,237,214,0.06)] cursor-pointer">
             <input type="checkbox" className="w-3.5 h-3.5 rounded text-[var(--green-3)]" checked={doc.showWatermark ?? false} onChange={(e) => updateDoc('showWatermark', e.target.checked)} />

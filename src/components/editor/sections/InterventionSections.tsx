@@ -47,6 +47,7 @@ export function VisiteSection() {
         <label className="block text-[10px] sm:text-[9px] font-bold text-[var(--sand-muted)] mb-0.5 leading-relaxed">Durée (heures)</label>
         <input type="number" step="0.5" min="0" placeholder="1.5" className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]"
           value={Number((doc.customFields.intervention ?? {}).duree ?? 0) || ''}
+          onFocus={(e) => e.target.select()}
           onChange={(e) => updateCustomField('intervention', 'duree', parseFloat(e.target.value) || 0)} />
       </div>
       <div>
