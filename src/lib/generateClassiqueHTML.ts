@@ -290,6 +290,22 @@ table{width:100%;border-collapse:collapse}
   </div>
 
 </div>
-<script>document.fonts.ready.then(function(){window.print();});</script>
+<script>
+(function(){
+  // Print only AFTER the page is fully loaded AND painted. With system fonts only,
+  // document.fonts.ready resolves in ~0ms (no web fonts to await), which can fire
+  // window.print() before the browser paints → a blank sheet. Waiting for 'load'
+  // plus a double rAF + small timeout guarantees a painted page before printing.
+  function doPrint(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        setTimeout(function(){ try{ window.focus(); }catch(e){} window.print(); }, 250);
+      });
+    });
+  }
+  if (document.readyState === 'complete') doPrint();
+  else window.addEventListener('load', doPrint);
+})();
+</script>
 </body></html>`;
 }

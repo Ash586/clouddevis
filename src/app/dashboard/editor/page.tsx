@@ -253,7 +253,9 @@ function EditorContent() {
       printWindow.document.close();
     }
     try {
-    await saveDoc();
+    // Saving is best-effort: the PDF is built entirely from in-memory state, so a
+    // failed save (e.g. /api/documents 500) must NOT abort the download.
+    try { await saveDoc(); } catch { /* save failed — still generate the PDF */ }
     track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
     const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
     const hf = new Set(hiddenFields);
