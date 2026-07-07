@@ -15,8 +15,7 @@ import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
-import { getDesign } from '@/lib/documentDesign';
-import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, ALL_CATEGORY_OPTIONS, getCategoryOptions } from '@/types';
+import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, getCategoryOptions } from '@/types';
 import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
@@ -243,8 +242,6 @@ function EditorContent() {
 
   const router = useRouter();
 
-  const unitLabels: Record<string, string> = { u: tu('u'), h: tu('h'), j: tu('j'), m2: tu('m2'), m3: tu('m3'), ml: tu('ml'), kg: tu('kg'), forfait: tu('forfait') };
-
   const handleDownload = async () => {
     // Open window synchronously during user-gesture so popup blockers don't fire.
     // Write placeholder immediately so the window stays alive during async work.
@@ -258,93 +255,14 @@ function EditorContent() {
     try {
     await saveDoc();
     track('Document Downloaded', { type: doc.documentType, mode: doc.mode });
-    const isEnt = doc.mode === 'entreprise';
-    const docTypeLabel = tp(DOC_TYPE_PREVIEW_LABELS[doc.documentType] ?? 'docTypeQuote');
     const vb = (block: string) => !doc.hiddenBlocks.includes(block as BlockId);
     const hf = new Set(hiddenFields);
     const sf = (fieldId: string) => !hf.has(fieldId);
     const bv = (...fieldIds: string[]) => fieldIds.some(f => sf(f));
-    const catLabels: Record<string, string> = Object.fromEntries(
-      ALL_CATEGORY_OPTIONS.filter(c => c.value).map(c => [c.value, tp(c.labelKey.replace(/^preview\./, ''))])
-    );
-    const paymentLabels: Record<string, string> = { cheque: te('paiement.check'), virement: te('paiement.transfer'), especes: te('paiement.cash'), cb: te('paiement.card') };
 
-    const grouped: Record<string, typeof doc.items> = {};
-    const uncategorized: typeof doc.items = [];
-    for (const item of doc.items) {
-      if (item.category) { if (!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); }
-      else { uncategorized.push(item); }
-    }
-    const catOrder = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
-
-    const design = getDesign(doc.documentType);
-    const commonArgs = { doc, results, sf, bv, vb, currency: tc('currency'), design, lang: locale,
-      tc: (k: string) => tc(k),
-      tp: (k: string, vars?: Record<string, string | number>) => tp(k, vars as Record<string, string>),
-    };
-    let html: string;
-    if (doc.documentType === 'attachement') {
-      const { generateAttachementHTML } = await import('@/lib/generateDocumentHTML');
-      html = generateAttachementHTML(commonArgs);
-    } else if (doc.documentType === 'devis') {
-      const mod = await import('@/lib/generateDocumentHTML');
-      const fn = doc.previewTemplate === 'nordic'   ? mod.generateNordicHTML
-               : doc.previewTemplate === 'velours'  ? mod.generateVeloursHTML
-               : doc.previewTemplate === 'industrielle' ? mod.generateIndustrielleHTML
-               : mod.generateHaussmannHTML;
-      html = fn(commonArgs);
-    } else if (doc.documentType === 'bc') {
-      const { generateBonCommandeHTML } = await import('@/lib/generateBonCommandeHTML');
-      html = generateBonCommandeHTML(commonArgs);
-    } else if (doc.documentType === 'facture') {
-      const { generateFactureHTML } = await import('@/lib/generateDocumentHTML');
-      html = generateFactureHTML({
-        ...commonArgs,
-        isEnt, docTypeLabel, catLabels, paymentLabels, unitLabels,
-        grouped, uncategorized, catOrder,
-        te: (k: string) => te(k),
-        tu: (k: string) => tu(k),
-        customSections,
-        companyTagline: doc.companyTagline,
-        companyCapital: doc.companyCapital,
-        rcNumber: doc.rcNumber,
-        nisNumber: doc.nisNumber,
-        aiNumber: doc.aiNumber,
-        rib: doc.rib,
-        bankName: doc.bankName,
-        bankAgency: doc.bankAgency,
-        ccpNumber: doc.ccpNumber,
-        validityDays: doc.validityDays,
-        reference: doc.reference,
-        deliveryRef: doc.deliveryRef,
-        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
-      });
-    } else if (doc.documentType === 'intervention') {
-      const { generateInterventionHTML } = await import('@/lib/generateInterventionHTML');
-      html = generateInterventionHTML(commonArgs);
-    } else {
-      const { generateDocumentHTML } = await import('@/lib/generateDocumentHTML');
-      html = generateDocumentHTML({
-        ...commonArgs,
-        isEnt, docTypeLabel, catLabels, paymentLabels, unitLabels,
-        grouped, uncategorized, catOrder,
-        te: (k: string) => te(k),
-        tu: (k: string) => tu(k),
-        customSections,
-        companyTagline: doc.companyTagline,
-        companyCapital: doc.companyCapital,
-        rcNumber: doc.rcNumber,
-        nisNumber: doc.nisNumber,
-        aiNumber: doc.aiNumber,
-        rib: doc.rib,
-        bankName: doc.bankName,
-        bankAgency: doc.bankAgency,
-        ccpNumber: doc.ccpNumber,
-        validityDays: doc.validityDays,
-        reference: doc.reference,
-        tp: (k: string, vars?: Record<string, unknown>) => tp(k, vars as Record<string, string>),
-      });
-    }
+    // Single clean "Classique" template for ALL document types — matches the editor preview exactly.
+    const { generateClassiqueHTML } = await import('@/lib/generateClassiqueHTML');
+    const html = generateClassiqueHTML({ doc, results, sf, bv, vb, currency: tc('currency'), lang: locale });
 
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
