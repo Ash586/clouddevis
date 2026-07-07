@@ -81,7 +81,6 @@ function EditorContent() {
   const [previewZoom, setPreviewZoom] = useState<'fit' | number>('fit');
   const [previewFocus, setPreviewFocus] = useState<PreviewFocus>(null);
   const [mobileTab, setMobileTab] = useState<'editor' | 'preview' | 'totals'>('editor');
-  const [showGrid, setShowGrid] = useState(false);
   const [showReadyChecks, setShowReadyChecks] = useState(false);
   const [showAuditModal, setShowAuditModal] = useState(false);
   const [auditIssues, setAuditIssues] = useState<ComplianceIssue[]>([]);
@@ -809,7 +808,6 @@ function EditorContent() {
                   <button type="button" onClick={() => setPreviewZoom(0.75)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 0.75 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 75%">75%</button>
                   <button type="button" onClick={() => setPreviewZoom(1)} className={cn('min-h-7 rounded-lg px-2.5 text-[10px] font-bold transition', previewZoom === 1 ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]')} title="Zoom 100%">100%</button>
                 </div>
-                <button type="button" onClick={() => setShowGrid(g => !g)} className={cn('flex h-9 w-9 items-center justify-center rounded-xl transition', showGrid ? 'bg-[var(--green-glow)] text-[var(--green-3)] ring-1 ring-[var(--accent-ring)]' : 'text-[var(--sand-muted)] hover:bg-[var(--navy-4)] hover:text-[var(--sand)]')} title="Grille"><Grid3X3 size={15} /></button>
               </div>
             </div>
             {/* A4 scaled preview — mobile uses transform to fit width */}
@@ -818,7 +816,7 @@ function EditorContent() {
                 <div className="print-area-wrapper origin-top transition-transform duration-200"
                   style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
                   <div className="rounded-[6px] bg-white/5 p-2 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ring-1 ring-white/10 print:p-0 print:shadow-none print:ring-0">
-                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} showGrid={showGrid} onZoneClick={handlePreviewZoneClick} />
+                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} onZoneClick={handlePreviewZoneClick} />
                   </div>
                 </div>
               </div>

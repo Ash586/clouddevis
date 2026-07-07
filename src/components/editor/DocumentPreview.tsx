@@ -11,7 +11,6 @@ interface Props {
   customSections?: CustomSectionDef[];
   hiddenFields?: Set<string>;
   previewFocus?: PreviewFocus;
-  showGrid?: boolean;
   onZoneClick?: (focus: NonNullable<PreviewFocus>) => void;
 }
 
