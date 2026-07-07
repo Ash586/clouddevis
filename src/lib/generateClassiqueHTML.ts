@@ -152,8 +152,9 @@ table{width:100%;border-collapse:collapse}
       ${companyAddr ? `<div style="font-size:9px;color:#555;margin-bottom:2px;white-space:pre-line">${e(companyAddr)}</div>` : ''}
       ${companyPhone ? `<div style="font-size:9px;color:#555">Tél : ${e(companyPhone)}</div>` : ''}
       ${isEnt && comp?.taxIds?.nif ? `<div style="font-size:9px;color:#555">Id Fiscal : ${e(comp.taxIds.nif)}</div>` : ''}
-      ${doc.rib ? `<div style="font-size:9px;color:#555;margin-top:2px">RIB : ${e(doc.rib)}${doc.bankName ? ` — ${e(doc.bankName)}` : ''}${doc.bankAgency ? ` (${e(doc.bankAgency)})` : ''}</div>` : ''}
-      ${doc.ccpNumber ? `<div style="font-size:9px;color:#555">CCP : ${e(doc.ccpNumber)}</div>` : ''}
+      ${(doc.bankName || doc.bankAgency || doc.bankAgencyCode || doc.bankAddress) ? `<div style="font-size:9px;color:#555;margin-top:2px">Compte : ${e([doc.bankName, doc.bankAgency, doc.bankAgencyCode, doc.bankAddress].filter(Boolean).join(' '))}</div>` : ''}
+      ${doc.rib ? `<div style="font-size:9px;color:#555">RIB : ${e(doc.rib)}</div>` : ''}
+      ${doc.ccpNumber ? `<div style="font-size:9px;color:#555">CCP Banquaire : ${e(doc.ccpNumber)}</div>` : ''}
     </div>
     <div style="text-align:right;flex-shrink:0">
       ${logoPos !== 'left' && logoImg ? `<div style="margin-bottom:8px;display:flex;justify-content:${logoPos === 'center' ? 'center' : 'flex-end'}">${logoImg}</div>` : ''}

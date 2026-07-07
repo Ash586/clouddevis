@@ -94,6 +94,8 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
     rib: '',
     bankName: '',
     bankAgency: '',
+    bankAgencyCode: '',
+    bankAddress: '',
     ccpNumber: '',
     validityDays: 30,
     reference: '',

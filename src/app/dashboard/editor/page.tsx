@@ -112,6 +112,8 @@ function EditorContent() {
             rib: pick(prev.rib, ci?.rib),
             bankName: pick(prev.bankName, ci?.bankName),
             bankAgency: pick(prev.bankAgency, ci?.bankAgency),
+            bankAgencyCode: pick(prev.bankAgencyCode, ci?.bankAgencyCode),
+            bankAddress: pick(prev.bankAddress, ci?.bankAddress),
             ccpNumber: pick(prev.ccpNumber, ci?.ccpNumber),
             companyPhone: pick(prev.companyPhone, profilePhone),
           };
@@ -166,7 +168,6 @@ function EditorContent() {
       { id: 'prestations' as SectionId, icon: ListOrdered, label: te('sections.prestations').replace(/^\d+\.\s*/, '') },
       { id: 'client' as SectionId, icon: User, label: te('sections.client').replace(/^\d+\.\s*/, '') },
       { id: 'general' as SectionId, icon: FileText, label: te('sections.general').replace(/^\d+\.\s*/, '') },
-      ...(doc.documentType === 'devis' ? [{ id: 'devis' as SectionId, icon: FileText, label: te('sections.devis') }] : []),
       { id: 'design' as SectionId, icon: Palette, label: te('sections.design') },
       { id: 'paiement' as SectionId, icon: CreditCard, label: te('sections.paiement').replace(/^\d+\.\s*/, '') },
       { id: 'chantier' as SectionId, icon: MapPin, label: te('sections.chantier').replace(/^\d+\.\s*/, '') },
@@ -212,9 +213,10 @@ function EditorContent() {
       .then(data => {
         if (data.fields && typeof data.fields === 'object') {
           setFieldPrefs(data.fields as Record<string, Record<string, string[]>>);
-        } else {
-          setShowCustomizer(true);
         }
+        // No saved prefs → keep the sensible defaults visible. The customizer is
+        // available on-demand via the ⚙ button; never force it open (it used to
+        // reopen on every entry because closing it without saving persists nothing).
       })
       .catch(() => {});
   }, [docIdParam]);

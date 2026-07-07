@@ -1,5 +1,6 @@
 'use client';
 import { useSectionContext } from './SectionProps';
+import { DevisSection } from './DevisSection';
 
 export function GeneralSection() {
   const { doc, updateDoc, updateStampDuty, updateCustomField, hiddenFields, te } = useSectionContext();
@@ -55,6 +56,9 @@ export function GeneralSection() {
           <div><label className="block text-[8px] text-[var(--sand-muted)]">{te('general.stampMax')}</label>
             <input type="number" min="0" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.maxAmount} onFocus={(e) => e.target.select()} onChange={(e) => updateStampDuty({ maxAmount: parseFloat(e.target.value) || 0 })} /></div>
         </div></div>}
+
+      {/* Merged: "Informations complémentaires" (fiscal + banking) now lives inside Données Générales */}
+      <DevisSection />
     </div>
   );
 }

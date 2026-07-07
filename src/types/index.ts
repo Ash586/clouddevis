@@ -187,6 +187,8 @@ export interface DocumentState {
   rib?: string;
   bankName?: string;
   bankAgency?: string;
+  bankAgencyCode?: string;
+  bankAddress?: string;
   ccpNumber?: string;
   validityDays?: number;
   reference?: string;
@@ -460,8 +462,8 @@ export function categoryLabelKey(value: string): string | undefined {
 }
 
 export const DOC_TYPE_SECTION_ORDER: Record<DocumentType, string[]> = {
-  devis: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
-  facture: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
+  devis: ['design', 'general', 'client', 'prestations', 'notes', 'signature'],
+  facture: ['design', 'general', 'client', 'prestations', 'notes', 'signature'],
   proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
   bc: ['design', 'general', 'client', 'prestations', 'notes'],
   br: ['design', 'general', 'client', 'materiaux', 'notes'],
@@ -471,8 +473,8 @@ export const DOC_TYPE_SECTION_ORDER: Record<DocumentType, string[]> = {
 };
 
 export const DOC_TYPE_SECTIONS: Record<DocumentType, string[]> = {
-  devis: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
-  facture: ['design', 'general', 'devis', 'client', 'prestations', 'notes', 'signature'],
+  devis: ['design', 'general', 'client', 'prestations', 'notes', 'signature'],
+  facture: ['design', 'general', 'client', 'prestations', 'notes', 'signature'],
   proforma: ['design', 'general', 'client', 'prestations', 'remise', 'paiement', 'notes'],
   bc: ['design', 'general', 'client', 'prestations', 'notes'],
   br: ['design', 'general', 'client', 'materiaux', 'notes'],

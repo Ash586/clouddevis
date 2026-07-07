@@ -118,8 +118,13 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
             )}
             {companyPhone && <div style={{ fontSize: 9, color: C.muted }}>Tél : {companyPhone}</div>}
             {isEnt && comp?.taxIds?.nif && <div style={{ fontSize: 9, color: C.muted }}>Id Fiscal : {comp.taxIds.nif}</div>}
-            {doc.rib && <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>RIB : {doc.rib}{doc.bankName ? ` — ${doc.bankName}` : ''}{doc.bankAgency ? ` (${doc.bankAgency})` : ''}</div>}
-            {doc.ccpNumber && <div style={{ fontSize: 9, color: C.muted }}>CCP : {doc.ccpNumber}</div>}
+            {(doc.bankName || doc.bankAgency || doc.bankAgencyCode || doc.bankAddress) && (
+              <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>
+                Compte : {[doc.bankName, doc.bankAgency, doc.bankAgencyCode, doc.bankAddress].filter(Boolean).join(' ')}
+              </div>
+            )}
+            {doc.rib && <div style={{ fontSize: 9, color: C.muted }}>RIB : {doc.rib}</div>}
+            {doc.ccpNumber && <div style={{ fontSize: 9, color: C.muted }}>CCP Banquaire : {doc.ccpNumber}</div>}
           </div>
 
           {/* Right: logo + tax IDs */}

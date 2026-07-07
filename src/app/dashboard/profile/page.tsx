@@ -40,6 +40,8 @@ interface UserProfile {
     taxIds?: { nif?: string; nis?: string; rc?: string; ai?: string };
     bankName?: string;
     bankAgency?: string;
+    bankAgencyCode?: string;
+    bankAddress?: string;
     rib?: string;
     ccpNumber?: string;
     logo?: string;
@@ -184,6 +186,8 @@ export default function ProfilePage() {
   const [ai, setAi] = useState('');
   const [bankName, setBankName] = useState('');
   const [bankAgency, setBankAgency] = useState('');
+  const [bankAgencyCode, setBankAgencyCode] = useState('');
+  const [bankAddress, setBankAddress] = useState('');
   const [rib, setRib] = useState('');
   const [ccpNumber, setCcpNumber] = useState('');
 
@@ -228,6 +232,8 @@ export default function ProfilePage() {
       setAi(tax.ai || '');
       setBankName(ci.bankName || '');
       setBankAgency(ci.bankAgency || '');
+      setBankAgencyCode(ci.bankAgencyCode || '');
+      setBankAddress(ci.bankAddress || '');
       setRib(ci.rib || '');
       setCcpNumber(ci.ccpNumber || '');
     } catch {
@@ -252,6 +258,8 @@ export default function ProfilePage() {
           taxIds: { nif, rc, nis, ai },
           bankName,
           bankAgency,
+          bankAgencyCode,
+          bankAddress,
           rib,
           ccpNumber,
         };
@@ -439,8 +447,10 @@ export default function ProfilePage() {
                           <div>
                             <label className="block text-xs font-bold text-[var(--sand-muted)] mb-2">{t('bankDetails') || 'Coordonnées bancaires'}</label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              <Input label={t('bankName') || 'Banque / Compte'} placeholder="SOCIÉTÉ GÉNÉRALE" value={bankName} onChange={(e) => setBankName(e.target.value)} />
+                              <Input label={t('bankName') || 'Compte'} placeholder="SOCIÉTÉ GÉNÉRALE" value={bankName} onChange={(e) => setBankName(e.target.value)} />
                               <Input label={t('bankAgency') || 'Agence'} placeholder="Sidi Yahia-Hydra" value={bankAgency} onChange={(e) => setBankAgency(e.target.value)} />
+                              <Input label="Code d'agence" placeholder="CLE 09" value={bankAgencyCode} onChange={(e) => setBankAgencyCode(e.target.value)} />
+                              <Input label="Adresse" placeholder="45 Lot petit Provence" value={bankAddress} onChange={(e) => setBankAddress(e.target.value)} />
                               <Input label="RIB" placeholder="021 00001 1130036271 09" value={rib} onChange={(e) => setRib(e.target.value)} />
                               <Input label="CCP" placeholder="007 99999 0000391575 54" value={ccpNumber} onChange={(e) => setCcpNumber(e.target.value)} />
                             </div>
