@@ -73,6 +73,54 @@ function EditorContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionUser?.mode]);
 
+  // Auto-fill company + banking + fiscal info from the user's profile on a NEW
+  // document. Only empty fields are filled — never overwrite what the user typed
+  // or a restored draft. These fields (RC/NIF/NIS/AI/RIB/CCP/Banque) are required
+  // to download a devis/facture, so pulling them from the profile once means the
+  // user fills them a single time.
+  const companyPrefillApplied = useRef(false);
+  useEffect(() => {
+    if (companyPrefillApplied.current || docIdParam) return;
+    companyPrefillApplied.current = true;
+    fetch('/api/user/profile')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        const ci = data?.user?.companyInfo;
+        const profilePhone = data?.user?.phone as string | undefined;
+        if (!ci && !profilePhone) return;
+        const tax = (ci?.taxIds ?? {}) as { nif?: string; nis?: string; rc?: string; ai?: string };
+        setDoc(prev => {
+          const pick = (cur: string | undefined, next: string | undefined) => (cur && cur.trim() ? cur : (next ?? '') || cur || '');
+          const prevCompany = prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' };
+          const mergedCompany = ci ? {
+            ...prevCompany,
+            name: pick(prevCompany.name, ci.name),
+            address: pick(prevCompany.address, ci.address),
+            capital: pick(prevCompany.capital, ci.capital),
+            logo: prevCompany.logo || ci.logo,
+            signature: prevCompany.signature || ci.signature,
+            taxIds: {
+              nif: pick(prevCompany.taxIds?.nif, tax.nif),
+              rc: pick(prevCompany.taxIds?.rc, tax.rc),
+              nis: pick(prevCompany.taxIds?.nis, tax.nis),
+              ai: pick(prevCompany.taxIds?.ai, tax.ai),
+            },
+          } : prev.companyInfo;
+          return {
+            ...prev,
+            companyInfo: mergedCompany,
+            rib: pick(prev.rib, ci?.rib),
+            bankName: pick(prev.bankName, ci?.bankName),
+            bankAgency: pick(prev.bankAgency, ci?.bankAgency),
+            ccpNumber: pick(prev.ccpNumber, ci?.ccpNumber),
+            companyPhone: pick(prev.companyPhone, profilePhone),
+          };
+        });
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [fieldPrefs, setFieldPrefs] = useState<Record<string, Record<string, string[]>> | null>(null);
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [customSections, setCustomSections] = useState<CustomSectionDef[]>([]);
@@ -242,6 +290,26 @@ function EditorContent() {
   const router = useRouter();
 
   const handleDownload = async () => {
+    // DGI compliance gate: a devis/facture from an entreprise must carry the
+    // company's legal & banking identifiers. Block the download until they are
+    // filled (they auto-fill from the profile, so this is a one-time setup).
+    if (doc.mode === 'entreprise' && (doc.documentType === 'devis' || doc.documentType === 'facture')) {
+      const tax = doc.companyInfo?.taxIds;
+      const req: { label: string; value?: string }[] = [
+        { label: 'NIF (Id Fiscal)', value: tax?.nif },
+        { label: 'RC', value: tax?.rc },
+        { label: 'NIS', value: tax?.nis },
+        { label: 'AI', value: tax?.ai },
+        { label: 'Banque / Compte', value: doc.bankName },
+        { label: 'RIB', value: doc.rib },
+        { label: 'CCP', value: doc.ccpNumber },
+      ];
+      const missing = req.filter(f => !f.value || !f.value.trim()).map(f => f.label);
+      if (missing.length > 0) {
+        showToast(`Informations entreprise obligatoires manquantes : ${missing.join(', ')}. Complétez-les dans votre profil ou dans l'éditeur.`, 'error');
+        return;
+      }
+    }
     // Open window synchronously during user-gesture so popup blockers don't fire.
     // Write placeholder immediately so the window stays alive during async work.
     // Using location.replace(blobUrl) instead of document.write() because document.write()

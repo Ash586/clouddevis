@@ -6,6 +6,7 @@ import './rtl.css';
 import './landing.css';
 import { I18nClientProvider } from '@/contexts/I18nClientProvider';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ToastProvider } from '@/components/ui/toast';
 import { PageViewTracker } from '@/components/tracking/PageViewTracker';
 import { AppErrorBoundary } from '@/components/errors/AppErrorBoundary';
 import { SentryActionRecorder } from '@/components/errors/SentryActionRecorder';
@@ -61,7 +62,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider initialTheme="light">
           <I18nClientProvider initialLocale={locale}>
             <AppErrorBoundary>
-              {children}
+              <ToastProvider>
+                {children}
+              </ToastProvider>
               <SentryActionRecorder />
               <SentryUserContext />
             </AppErrorBoundary>

@@ -38,6 +38,10 @@ interface UserProfile {
     address?: string;
     capital?: string;
     taxIds?: { nif?: string; nis?: string; rc?: string; ai?: string };
+    bankName?: string;
+    bankAgency?: string;
+    rib?: string;
+    ccpNumber?: string;
     logo?: string;
     signature?: string;
   } | null;
@@ -178,6 +182,10 @@ export default function ProfilePage() {
   const [rc, setRc] = useState('');
   const [nis, setNis] = useState('');
   const [ai, setAi] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [bankAgency, setBankAgency] = useState('');
+  const [rib, setRib] = useState('');
+  const [ccpNumber, setCcpNumber] = useState('');
 
   // Preferences
   const [defaultDocType, setDefaultDocType] = useState('devis');
@@ -218,6 +226,10 @@ export default function ProfilePage() {
       setRc(tax.rc || '');
       setNis(tax.nis || '');
       setAi(tax.ai || '');
+      setBankName(ci.bankName || '');
+      setBankAgency(ci.bankAgency || '');
+      setRib(ci.rib || '');
+      setCcpNumber(ci.ccpNumber || '');
     } catch {
       showToast('Erreur lors du chargement du profil', 'error');
     } finally {
@@ -238,6 +250,10 @@ export default function ProfilePage() {
           address: companyAddress,
           capital: companyCapital,
           taxIds: { nif, rc, nis, ai },
+          bankName,
+          bankAgency,
+          rib,
+          ccpNumber,
         };
       }
       const res = await fetch('/api/user/profile', {
@@ -418,6 +434,15 @@ export default function ProfilePage() {
                                   value={ai} onChange={(e) => setAi(e.target.value)} />
                                 {ai && !validateAI(ai) && <span className="text-[9px] text-red-500">10 chiffres requis</span>}
                               </div>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--sand-muted)] mb-2">{t('bankDetails') || 'Coordonnées bancaires'}</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <Input label={t('bankName') || 'Banque / Compte'} placeholder="SOCIÉTÉ GÉNÉRALE" value={bankName} onChange={(e) => setBankName(e.target.value)} />
+                              <Input label={t('bankAgency') || 'Agence'} placeholder="Sidi Yahia-Hydra" value={bankAgency} onChange={(e) => setBankAgency(e.target.value)} />
+                              <Input label="RIB" placeholder="021 00001 1130036271 09" value={rib} onChange={(e) => setRib(e.target.value)} />
+                              <Input label="CCP" placeholder="007 99999 0000391575 54" value={ccpNumber} onChange={(e) => setCcpNumber(e.target.value)} />
                             </div>
                           </div>
                         </div>
