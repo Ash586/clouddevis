@@ -3,8 +3,8 @@ export const dynamic = 'force-static';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mentions Légales | CloudDevis',
-  description: 'Mentions légales du service CloudDevis.',
+  title: 'Mentions Légales | Rakmana',
+  description: 'Mentions légales du service Rakmana.',
 };
 
 export default function MentionsPage() {
@@ -18,10 +18,10 @@ export default function MentionsPage() {
       <div className="prose prose-slate prose-sm max-w-none space-y-8">
         <Section title="Éditeur du Service">
           <p>
-            <strong>CloudDevis</strong> est un service édité par :
+            <strong>Rakmana</strong> est un service édité par :
           </p>
           <ul className="list-none pl-0 space-y-1">
-            <li><strong>Dénomination</strong> : CloudDevis</li>
+            <li><strong>Dénomination</strong> : Rakmana</li>
             <li><strong>Forme juridique</strong> : Entreprise individuelle (EURL)</li>
             <li><strong>Siège social</strong> : Alger, Algérie</li>
             <li><strong>Email</strong> : <a href="mailto:support@clouddevis.com" className="text-blue-600 underline">support@clouddevis.com</a></li>
@@ -29,7 +29,7 @@ export default function MentionsPage() {
         </Section>
 
         <Section title="Directeur de la Publication">
-          <p>Le directeur de la publication est le gérant de CloudDevis.</p>
+          <p>Le directeur de la publication est le gérant de Rakmana.</p>
         </Section>
 
         <Section title="Hébergement">
@@ -47,7 +47,7 @@ export default function MentionsPage() {
 
         <Section title="Propriété Intellectuelle">
           <p>
-            L&apos;ensemble du Service CloudDevis, incluant son nom, son logo, son design,
+            L&apos;ensemble du Service Rakmana, incluant son nom, son logo, son design,
             son code source, ses interfaces et sa documentation, est protégé par les lois
             sur la propriété intellectuelle. Toute reproduction, représentation, modification
             ou exploitation non autorisée est interdite.

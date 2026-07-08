@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "CloudDevis",
+    "appName": "Rakmana",
     "loading": "Chargement…",
     "loadingEditor": "Chargement de l'éditeur…",
     "save": "Enregistrer",
@@ -300,7 +300,7 @@
     "statUnpaidSub": "Factures envoyées non payées",
     "statusBreakdown": "Répartition des statuts",
     "allTypes": "Tous",
-    "emptyTitle": "Bienvenue sur CloudDevis",
+    "emptyTitle": "Bienvenue sur Rakmana",
     "emptyDesc": "Commencez par créer votre premier document.",
     "noResults": "Aucun résultat",
     "noResultsDesc": "Aucun document ne correspond à votre recherche.",
@@ -701,7 +701,7 @@
     "signatureLine": "Fait à {city}, le {date}",
     "signatureLabel": "Cachet et signature",
     "signatureStamp": "Signature",
-    "footer": "Généré via CloudDevis.io",
+    "footer": "Généré via Rakmana",
     "interventionSections": {
       "equipement": "Équipement",
       "visite": "Visite",
@@ -981,7 +981,7 @@
     "supportAnswer": "Vous pouvez nous contacter par email à support@clouddevis.io. Les clients Basic et Pro bénéficient d'un support prioritaire."
   },
   "enterprise": {
-    "title": "CloudDevis Enterprise",
+    "title": "Rakmana Enterprise",
     "subtitle": "Solution sur mesure pour les grandes organisations",
     "benefit1Title": "Sur mesure",
     "benefit1Desc": "Personnalisation complète de la plateforme selon vos processus",
@@ -1017,7 +1017,7 @@
     "resetSuccess": "Mot de passe réinitialisé avec succès"
   },
   "admin": {
-    "title": "Administration CloudDevis",
+    "title": "Administration Rakmana",
     "error": "Une erreur est survenue",
     "noUsers": "Aucun utilisateur trouvé",
     "noLogs": "Aucun log trouvé",
@@ -1335,7 +1335,7 @@
       "superAffiliate": "Super Affiliate",
       "disclosure": "Votre commission est calculée uniquement après activation d'un abonnement payé.",
       "notPartner": "Vous n'êtes pas encore partenaire",
-      "notPartnerDesc": "Rejoignez le programme d'affiliation CloudDevis et gagnez des commissions.",
+      "notPartnerDesc": "Rejoignez le programme d'affiliation Rakmana et gagnez des commissions.",
       "becomePartner": "Devenir partenaire",
       "pendingApproval": "Demande en cours d'examen",
       "pendingApprovalDesc": "Votre demande de partenariat est en attente de validation par notre équipe.",
@@ -1344,7 +1344,7 @@
     },
     "apply": {
       "title": "Gagnez 20% sur chaque abonnement activé",
-      "subtitle": "Rejoignez le programme d'affiliation CloudDevis",
+      "subtitle": "Rejoignez le programme d'affiliation Rakmana",
       "fullName": "Nom complet",
       "wilaya": "Wilaya",
       "sector": "Secteur d'activité",
@@ -1352,7 +1352,7 @@
       "platformsPlaceholder": "Ex: Facebook, Instagram, YouTube, blog...",
       "audienceSize": "Taille d'audience (optionnel)",
       "audienceSizePlaceholder": "Ex: 5000",
-      "howPromote": "Comment allez-vous promouvoir CloudDevis ?",
+      "howPromote": "Comment allez-vous promouvoir Rakmana ?",
       "howPromotePlaceholder": "Décrivez votre stratégie de promotion...",
       "payoutMethod": "Mode de paiement souhaité",
       "payoutMethodPlaceholder": "Ex: CCP, BaridiMob",
@@ -1372,7 +1372,7 @@
       "disclosure": "Votre commission est calculée uniquement après activation d'un abonnement payé par l'utilisateur que vous avez parrainé. Le paiement minimum est de 2 000 DA."
     },
     "public": {
-      "heroBadge": "Programme d'affiliation CloudDevis",
+      "heroBadge": "Programme d'affiliation Rakmana",
       "heroTitle": "Gagnez 20% de commission sur chaque abonnement",
       "heroDesc": "Partagez votre lien de parrainage. Quand un utilisateur s'inscrit et souscrit un abonnement payant, vous touchez votre commission.",
       "ctaJoin": "Rejoindre le programme",
@@ -1395,7 +1395,7 @@
       "rule4": "Les commissions sont uniquement validées après activation d'un abonnement payant (hors essai gratuit).",
       "rule5": "Les Super Affiliates gagnent en plus 5% sur les ventes de leur équipe de parrainés.",
       "ctaFinal": "Prêt à gagner des commissions ?",
-      "ctaFinalDesc": "Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec CloudDevis.",
+      "ctaFinalDesc": "Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec Rakmana.",
       "ctaStart": "Commencer maintenant"
     }
   }

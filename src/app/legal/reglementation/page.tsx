@@ -3,7 +3,7 @@ export const dynamic = 'force-static';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Réglementation Algérienne | CloudDevis',
+  title: 'Réglementation Algérienne | Rakmana',
   description: 'Références légales et réglementaires applicables aux documents commerciaux en Algérie. Conformité D.E. 05-468, loi 04-02, code du timbre.',
 };
 
@@ -26,7 +26,7 @@ export default function ReglementationPage() {
         <div className="rounded-xl border border-green-200 bg-green-50 p-5 text-sm text-green-900">
           <p className="font-bold mb-1">✓ Conforme à la réglementation algérienne</p>
           <p className="text-green-800 text-xs leading-relaxed">
-            CloudDevis génère des documents conformes aux exigences du Décret Exécutif n°05-468,
+            Rakmana génère des documents conformes aux exigences du Décret Exécutif n°05-468,
             de la Loi n°04-02 et du Code du Timbre algérien. Les mentions obligatoires sont
             automatiquement incluses dans chaque document.
           </p>
@@ -137,7 +137,7 @@ export default function ReglementationPage() {
         <Section title="3. Mentions obligatoires par type de document">
           <p className="text-slate-600 text-sm mb-4">
             Le Décret Exécutif 05-468 impose des mentions spécifiques selon le type de document.
-            CloudDevis inclut automatiquement toutes les mentions requises.
+            Rakmana inclut automatiquement toutes les mentions requises.
           </p>
 
           <DocTypeTable
@@ -246,10 +246,10 @@ export default function ReglementationPage() {
         {/* ── 5. Timbre fiscal ─────────────────────────────── */}
         <Section title="5. Timbre Fiscal">
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm mb-4">
-            <p className="font-bold text-amber-900 mb-1">Calcul automatique dans CloudDevis</p>
+            <p className="font-bold text-amber-900 mb-1">Calcul automatique dans Rakmana</p>
             <p className="text-amber-800 text-xs">
               Le timbre est calculé automatiquement sur chaque facture dont le montant TTC
-              dépasse 10 000 DA. CloudDevis applique le taux légal de 1% avec les bornes
+              dépasse 10 000 DA. Rakmana applique le taux légal de 1% avec les bornes
               minimum (5 DA) et maximum (2 500 DA).
             </p>
           </div>
@@ -287,8 +287,8 @@ export default function ReglementationPage() {
           </div>
         </Section>
 
-        {/* ── 6. Correspondance CloudDevis ──────────────────── */}
-        <Section title="6. Comment CloudDevis assure la conformité">
+        {/* ── 6. Correspondance Rakmana ──────────────────── */}
+        <Section title="6. Comment Rakmana assure la conformité">
           <div className="grid gap-3 sm:grid-cols-2">
             <FeatureCard
               icon="19"

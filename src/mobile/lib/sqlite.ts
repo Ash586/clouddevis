@@ -1,4 +1,4 @@
-// CloudDevis Mobile — SQLite Helper
+// Rakmana Mobile — SQLite Helper
 // Offline-first local database using @capacitor-community/sqlite
 
 import { CapacitorSQLite, SQLiteDBConnection, SQLiteConnection } from '@capacitor-community/sqlite';

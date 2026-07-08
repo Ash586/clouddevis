@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Bottom Tab Navigation
+// Rakmana Mobile — Bottom Tab Navigation
 // 4 tabs: Accueil | Documents | Société | Réglages
 // ============================================================
 

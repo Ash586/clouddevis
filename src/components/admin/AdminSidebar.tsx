@@ -100,7 +100,7 @@ export function AdminSidebar() {
       <div style={{ padding: '18px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 17, fontWeight: 700, color: '#e8ebf0', letterSpacing: '-0.3px' }}>
-            ☁️ CloudDevis
+            ☁️ Rakmana
           </span>
           <span style={{ fontSize: 10, color: '#656a73', fontWeight: 500 }}>
             Admin

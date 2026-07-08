@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — DGI Compliance Audit
+// Rakmana — DGI Compliance Audit
 // Scans a document BEFORE save for the two most common ways an
 // invoice fails a DGI check: a missing/invalid client NIF, and a
 // Timbre Fiscal that doesn't match what Art. 220 CII requires for

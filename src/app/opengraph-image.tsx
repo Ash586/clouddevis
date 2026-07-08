@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'CloudDevis — Devis & Factures conformes DGI Algérie';
+export const alt = 'Rakmana — Devis & Factures conformes DGI Algérie';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -46,7 +46,7 @@ export default function Image() {
             CD
           </div>
           <span style={{ fontSize: 40, fontWeight: 800, color: '#E8DCC8' }}>
-            CloudDevis
+            Rakmana
           </span>
         </div>
         <h1

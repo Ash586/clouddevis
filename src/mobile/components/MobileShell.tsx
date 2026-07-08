@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — App Shell
+// Rakmana Mobile — App Shell
 // Complete app shell with tab routing, wizard overlay,
 // offline banner, and safe area management
 // ============================================================

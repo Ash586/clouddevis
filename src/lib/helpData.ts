@@ -17,7 +17,7 @@ export interface HelpCategory {
 }
 
 export const CATEGORIES: HelpCategory[] = [
-  { id: 'getting-started', title: 'Démarrage rapide', description: 'Premiers pas avec CloudDevis', icon: '🚀', color: '#1E40AF' },
+  { id: 'getting-started', title: 'Démarrage rapide', description: 'Premiers pas avec Rakmana', icon: '🚀', color: '#1E40AF' },
   { id: 'documents', title: 'Créer des documents', description: 'Devis, factures, proformas', icon: '📄', color: '#1A6B4F' },
   { id: 'billing', title: 'Facturation & paiement', description: 'Gestion des paiements', icon: '💰', color: '#C4A35A' },
   { id: 'legal', title: 'Conformité légale', description: 'NIF, RC, TVA, Timbre fiscal', icon: '⚖️', color: '#2E60B0' },
@@ -29,14 +29,14 @@ export const ARTICLES: HelpArticle[] = [
   // ═══════════ GETTING STARTED ═══════════
   {
     slug: 'bienvenue',
-    title: 'Bienvenue sur CloudDevis',
-    description: 'Découvrez CloudDevis et ses fonctionnalités principales.',
+    title: 'Bienvenue sur Rakmana',
+    description: 'Découvrez Rakmana et ses fonctionnalités principales.',
     readTime: '5 min',
     category: 'getting-started',
     tags: ['intro', 'bienvenue', 'fonctionnalités'],
-    content: `# Bienvenue sur CloudDevis
+    content: `# Bienvenue sur Rakmana
 
-CloudDevis est un outil de création de devis et factures conforme à la réglementation algérienne.
+Rakmana est un outil de création de devis et factures conforme à la réglementation algérienne.
 
 ## Fonctionnalités principales
 
@@ -63,7 +63,7 @@ CloudDevis est un outil de création de devis et factures conforme à la réglem
     readTime: '3 min',
     category: 'getting-started',
     tags: ['inscription', 'compte', 'register'],
-    content: `# Créer un compte CloudDevis
+    content: `# Créer un compte Rakmana
 
 ## Étape 1 : Accédez à la page d'inscription
 
@@ -260,7 +260,7 @@ Une facture légale en Algérie doit contenir :
 
 ## Calcul automatique
 
-CloudDevis calcule automatiquement :
+Rakmana calcule automatiquement :
 - TVA au taux sélectionné (9% ou 19%)
 - Timbre fiscal (1% avec min/max)
 - Total à payer
@@ -514,7 +514,7 @@ Un acompte est un paiement partiel effectué avant la livraison des services ou 
 
 ## Calcul automatique
 
-CloudDevis soustrait l'acompte du total :
+Rakmana soustrait l'acompte du total :
 - **Total HT**
 - **TVA**
 - **Timbre**
@@ -636,7 +636,7 @@ Timbre = 150 000 × 1% = 1 500 DA
 
 ## Gestion automatique
 
-CloudDevis calcule le timbre automatiquement :
+Rakmana calcule le timbre automatiquement :
 1. Vérifie si le montant dépasse 10 000 DA
 2. Applique le taux de 1%
 3. Respecte le minimum et maximum
@@ -683,7 +683,7 @@ Opérations exonérées de TVA.
 - TVA = 100 000 × 9% = 9 000 DA
 - TTC = 109 000 DA
 
-## Dans CloudDevis
+## Dans Rakmana
 
 1. Sélectionnez le taux dans **"Données Générales"**
 2. Le système applique le taux à toutes les lignes
@@ -739,7 +739,7 @@ Opérations exonérées de TVA.
 
 ## Validation
 
-CloudDevis valide automatiquement :
+Rakmana valide automatiquement :
 - NIF : 11 chiffres exactement
 - RC : Format alphanumérique
 - NIS : 10 chiffres exactement
@@ -800,7 +800,7 @@ Une facture non conforme peut entraîner :
 - Pénalités de retard
 - Amendes
 
-> **CloudDevis** génère des factures 100% conformes.
+> **Rakmana** génère des factures 100% conformes.
 
 ## 📌 Base légale
 
@@ -946,7 +946,7 @@ Utilisez un navigateur moderne :
   {
     slug: 'navigateurs-supportes',
     title: 'Navigateurs supportés',
-    description: 'Les navigateurs compatibles avec CloudDevis.',
+    description: 'Les navigateurs compatibles avec Rakmana.',
     readTime: '3 min',
     category: 'troubleshooting',
     tags: ['navigateur', 'compatible', 'chrome', 'firefox'],
@@ -1284,7 +1284,7 @@ Modifiez vos données personnelles à tout moment.
 
 ## Sauvegarde automatique
 
-CloudDevis effectue des sauvegardes :
+Rakmana effectue des sauvegardes :
 - **Quotidiennes** : Données complètes
 - **Hebdomadaires** : Archivage
 - **Mensuelles** : Conservation longue durée

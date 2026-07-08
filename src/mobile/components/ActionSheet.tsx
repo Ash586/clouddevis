@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — ActionSheet
+// Rakmana Mobile — ActionSheet
 // iOS-style bottom sheet for long press on documents
 // ============================================================
 

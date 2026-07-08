@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, ...card }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 32, height: 32, background: '#1d202a', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 10, color: '#e8ebf0' }}>CD</div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0' }}>CloudDevis — Admin Dashboard</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#e8ebf0' }}>Rakmana — Admin Dashboard</span>
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
           <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: '#282c38', color: '#a1a5ad', border: '0.5px solid rgba(255,255,255,0.08)' }}>Next.js 16 + PostgreSQL</span>

@@ -41,7 +41,7 @@ export default function EnterprisePage() {
         <Card className="p-8" style={{ background: 'var(--navy-2)', border: '0.5px solid rgba(15,39,71,0.08)' }}>
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🏢</div>
-            <h1 className="text-2xl font-black" style={{ color: 'var(--sand)' }}>{t('title') || 'CloudDevis Enterprise'}</h1>
+            <h1 className="text-2xl font-black" style={{ color: 'var(--sand)' }}>{t('title') || 'Rakmana Enterprise'}</h1>
             <p className="text-sm mt-2" style={{ color: 'var(--sand-muted)' }}>{t('subtitle') || 'Solution sur mesure pour les grandes organisations'}</p>
           </div>
 

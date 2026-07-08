@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — Sync Queue Store
+// Rakmana — Sync Queue Store
 // Manages offline operations that need to be synced when online
 // Uses Zustand + persist middleware
 // ============================================================

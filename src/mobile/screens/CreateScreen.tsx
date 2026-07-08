@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — FlashFacture: the single-canvas creator
+// Rakmana Mobile — FlashFacture: the single-canvas creator
 // Replaces the 4-step wizard. One living invoice (LivePaper) +
 // a persistent dock (CreateDock) + an action bar. Tapping a zone
 // on the paper morphs the dock — no screen transitions.
@@ -341,7 +341,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   // ── Success-sheet actions (post-save) ──
   const whatsappMessage = useCallback((s: NonNullable<typeof savedSheet>) =>
     `Bonjour ${s.clientName}, veuillez trouver ci-joint votre ${s.typeLabel.toLowerCase()} N°${s.number} ` +
-    `d'un montant de ${s.total.toLocaleString('fr-DZ')} DA. Merci de votre confiance — ${company?.name || 'CloudDevis'}.`,
+    `d'un montant de ${s.total.toLocaleString('fr-DZ')} DA. Merci de votre confiance — ${company?.name || 'Rakmana'}.`,
   [company?.name]);
 
   const markSent = useCallback((s: NonNullable<typeof savedSheet>) => {
@@ -395,7 +395,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         message:
           `Bonjour ${currentDoc.client?.name || ''}, veuillez trouver ci-joint votre ${label.toLowerCase()} ` +
           `N°${docNumber} d'un montant de ${totals.netAPayer.toLocaleString('fr-DZ')} DA. ` +
-          `Merci de votre confiance — ${company?.name || 'CloudDevis'}.`,
+          `Merci de votre confiance — ${company?.name || 'Rakmana'}.`,
       });
     }
   }, [guardReady, buildPdf, docNumber, currentDoc, totals, company?.name]);
@@ -436,7 +436,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       const body =
         `Bonjour ${currentDoc.client?.name || ''},\n\n` +
         `Veuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ` +
-        `${totals.netAPayer.toLocaleString('fr-DZ')} DA.\n\nCordialement,\n${company?.name || 'CloudDevis'}`;
+        `${totals.netAPayer.toLocaleString('fr-DZ')} DA.\n\nCordialement,\n${company?.name || 'Rakmana'}`;
       void notify('PDF téléchargé — joignez-le à l’email');
       window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_system');
     }

@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — DGI (Direction Générale des Impôts) Engine
+// Rakmana — DGI (Direction Générale des Impôts) Engine
 // Single source of truth for Algerian tax validation & calculation
 // ============================================================
 

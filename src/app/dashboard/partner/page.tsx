@@ -53,7 +53,7 @@ export default function PartnerDashboardPage() {
             <ShieldCheck className="w-8 h-8" style={{ color: 'var(--green-3)' }} />
           </div>
           <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--sand)' }}>Vous n&apos;êtes pas encore partenaire</h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez le programme d&apos;affiliation CloudDevis et gagnez des commissions.</p>
+          <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez le programme d&apos;affiliation Rakmana et gagnez des commissions.</p>
           <button type="button"             onClick={() => router.push('/dashboard/partner/apply')}
             className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white min-h-[44px]"
             style={{ background: 'var(--green-2, #1E40AF)' }}

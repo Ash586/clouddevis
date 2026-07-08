@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Document Row with Swipe-to-Action
+// Rakmana Mobile — Document Row with Swipe-to-Action
 // Swipe left reveals: Edit | Duplicate | Delete
 // Long press opens ActionSheet
 // ============================================================

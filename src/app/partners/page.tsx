@@ -13,7 +13,7 @@ export default function PartnersPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 no-underline" style={{ color: 'var(--sand)' }}>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: 'var(--navy-3, #1C2537)' }}>CD</div>
-            CloudDevis
+            Rakmana
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" className="text-sm font-semibold min-h-[44px] flex items-center px-4 no-underline" style={{ color: 'var(--sand-muted)' }}>Connexion</Link>
@@ -26,7 +26,7 @@ export default function PartnersPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold mb-6" style={{ background: 'rgba(30,64,175,0.1)', color: 'var(--green-3)', border: '1px solid rgba(30,64,175,0.2)' }}>
             <TrendingUp className="w-4 h-4" />
-            Programme d&apos;affiliation CloudDevis
+            Programme d&apos;affiliation Rakmana
           </div>
           <h1 className="text-3xl sm:text-5xl font-black mb-4 leading-tight" style={{ color: 'var(--sand)' }}>
             Gagnez <span style={{ color: 'var(--green-3)' }}>20%</span> de commission<br />sur chaque abonnement
@@ -118,7 +118,7 @@ export default function PartnersPage() {
       <section className="px-4 sm:px-6 pb-20">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--sand)' }}>Prêt à gagner des commissions ?</h2>
-          <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec CloudDevis.</p>
+          <p className="text-sm mb-6" style={{ color: 'var(--sand-muted)' }}>Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec Rakmana.</p>
           <button type="button"             onClick={() => router.push('/auth/register?intent=partner')}
             className="flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-white min-h-[44px] mx-auto transition-all active:scale-[0.98]"
             style={{ background: 'var(--green-2, #1E40AF)' }}
@@ -130,7 +130,7 @@ export default function PartnersPage() {
 
       <footer className="px-4 sm:px-6 py-8" style={{ borderTop: '1px solid rgba(15,39,71,0.06)' }}>
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-sm no-underline" style={{ color: 'var(--sand-muted)' }}>CloudDevis</Link>
+          <Link href="/" className="text-sm no-underline" style={{ color: 'var(--sand-muted)' }}>Rakmana</Link>
           <div className="flex gap-4">
             <Link href="/legal/privacy" className="text-xs no-underline" style={{ color: 'var(--sand-muted)' }}>Confidentialité</Link>
             <Link href="/legal/cgu" className="text-xs no-underline" style={{ color: 'var(--sand-muted)' }}>CGU</Link>

@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Home Header
+// Rakmana Mobile — Home Header
 // Logo left, user avatar right
 // ============================================================
 
@@ -34,7 +34,7 @@ export function HomeHeader({
           CD
         </div>
         <span className="heading text-lg text-[var(--sand)]">
-          CloudDevis
+          Rakmana
         </span>
       </div>
 

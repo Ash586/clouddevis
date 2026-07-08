@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Settings Screen
+// Rakmana Mobile — Settings Screen
 // App settings: language, TVA rate, theme, data management
 // ============================================================
 
@@ -274,7 +274,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         {/* ── App Version ──────────────────────────────────── */}
         <div className="text-center py-4">
           <p className="text-[11px] text-[var(--sand-muted)]">
-            CloudDevis v{APP_VERSION}
+            Rakmana v{APP_VERSION}
           </p>
           <p className="text-[10px] text-[var(--sand-muted)]/50 mt-1">
             Conformes DGI Algérie

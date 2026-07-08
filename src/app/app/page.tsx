@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Native app entry (/app)
+// Rakmana Mobile — Native app entry (/app)
 // The Capacitor webview loads THIS route: MobileShell rendered
 // full-bleed, no phone frame, no preview chrome. The old /mobile
 // route remains a browser-preview wrapper for development.

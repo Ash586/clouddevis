@@ -152,7 +152,7 @@ function RegisterForm() {
           <div className="flex items-center justify-center mb-3">
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--green-2)] to-[var(--teal)] rounded-xl flex items-center justify-center text-lg font-extrabold text-white shadow-lg shadow-[rgba(37,99,235,0.25)]">CD</div>
           </div>
-          <h1 className="text-xl font-bold text-[var(--sand)] m-0">CloudDevis</h1>
+          <h1 className="text-xl font-bold text-[var(--sand)] m-0">Rakmana</h1>
           <p className="text-[13px] text-[var(--sand-muted)] mt-1">Créez votre compte</p>
         </div>
 

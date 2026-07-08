@@ -12,7 +12,7 @@ interface SendEmailParams {
  */
 export async function sendEmail({ to, subject, html }: SendEmailParams): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || 'CloudDevis <noreply@clouddevis.io>';
+  const from = process.env.EMAIL_FROM || 'Rakmana <noreply@clouddevis.io>';
 
   if (!apiKey) {
     logger.warn('RESEND_API_KEY not configured — email not sent', { to, subject });

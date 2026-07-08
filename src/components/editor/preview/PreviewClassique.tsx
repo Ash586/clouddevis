@@ -389,7 +389,7 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
 
         {/* Footer line */}
         <div style={{ textAlign: 'center', fontSize: 7, color: C.light, marginTop: 12, borderTop: `0.5px solid ${C.rule}`, paddingTop: 4 }}>
-          Document généré par CloudDevis
+          Document généré par Rakmana
         </div>
       </div>
     </div>

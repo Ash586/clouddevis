@@ -58,7 +58,7 @@ function LoginForm() {
       <div className="w-full max-w-[380px] bg-[var(--navy-2)] border border-[rgba(15,39,71,0.08)] rounded-xl p-7 sm:p-6">
         <div className="text-center mb-6">
           <div className="w-11 h-11 bg-[var(--navy-3)] rounded-[10px] flex items-center justify-center mx-auto mb-3 text-lg font-extrabold text-[var(--sand)]">CD</div>
-          <h1 className="text-xl font-bold text-[var(--sand)] m-0">CloudDevis</h1>
+          <h1 className="text-xl font-bold text-[var(--sand)] m-0">Rakmana</h1>
           <p className="text-[13px] text-[var(--sand-muted)] mt-1">Connectez-vous à votre compte</p>
         </div>
 

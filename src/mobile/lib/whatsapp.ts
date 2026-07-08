@@ -1,4 +1,4 @@
-// CloudDevis Mobile — Share Helper
+// Rakmana Mobile — Share Helper
 // Cross-platform: native (Capacitor) → Web Share API (mobile browsers) →
 // download fallback (desktop browsers). Returns how it was delivered so the
 // caller can give the right follow-up (e.g. open WhatsApp / mailto on web).
@@ -105,5 +105,5 @@ Je me permets de vous rappeler que la facture ${docNumber} d'un montant de ${tot
 Merci de procéder au règlement dans les meilleurs délais.
 
 Cordialement,
-CloudDevis`;
+Rakmana`;
 }

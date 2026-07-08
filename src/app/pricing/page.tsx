@@ -229,8 +229,8 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
-              <span className="text-lg font-black text-blue-600 tracking-tight">CloudDevis</span>
-              <p className="text-xs text-slate-400 mt-1">&copy; {new Date().getFullYear()} CloudDevis. {tc('footer.allRightsReserved')}</p>
+              <span className="text-lg font-black text-blue-600 tracking-tight">Rakmana</span>
+              <p className="text-xs text-slate-400 mt-1">&copy; {new Date().getFullYear()} Rakmana. {tc('footer.allRightsReserved')}</p>
             </div>
             <div className="flex gap-6 text-xs text-slate-400">
               <span>{tc('footer.algerianCompliance')}</span>

@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Foreground Push Notification Toast
+// Rakmana Mobile — Foreground Push Notification Toast
 // Shown when a push arrives while the app is in the foreground.
 // Auto-dismisses after 4 s; tap to navigate to the document.
 // ============================================================

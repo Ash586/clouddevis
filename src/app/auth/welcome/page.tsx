@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis — Post-OAuth Onboarding
+// Rakmana — Post-OAuth Onboarding
 // First Google/GitHub login lands here: one screen, one choice —
 // Artisan or Entreprise — so each user only sees what they need.
 // The account already exists (mode defaults to ARTISAN); picking
@@ -93,7 +93,7 @@ function WelcomeContent() {
           <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[var(--green-2)] flex items-center justify-center">
             <span className="text-white font-bold text-lg">CD</span>
           </div>
-          <h1 className="text-xl font-bold text-[var(--sand)]">Bienvenue sur CloudDevis 👋</h1>
+          <h1 className="text-xl font-bold text-[var(--sand)]">Bienvenue sur Rakmana 👋</h1>
           <p className="text-sm text-[var(--sand-muted)] mt-1.5">
             Une dernière question pour adapter l’application à votre activité
           </p>

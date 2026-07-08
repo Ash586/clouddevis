@@ -3,8 +3,8 @@ export const dynamic = 'force-static';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Politique de Confidentialité | CloudDevis',
-  description: 'Politique de confidentialité et protection des données personnelles sur CloudDevis.',
+  title: 'Politique de Confidentialité | Rakmana',
+  description: 'Politique de confidentialité et protection des données personnelles sur Rakmana.',
 };
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       <div className="prose prose-slate prose-sm max-w-none space-y-8">
         <Section title="1. Introduction">
           <p>
-            CloudDevis accorde une importance capitale à la protection de vos données personnelles.
+            Rakmana accorde une importance capitale à la protection de vos données personnelles.
             La présente Politique de Confidentialité décrit comment nous collectons, utilisons,
             stockons et protégeons vos informations lorsque vous utilisez notre Service.
           </p>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
 
         <Section title="2. Responsable du Traitement">
           <p>
-            Le responsable du traitement des données est CloudDevis.
+            Le responsable du traitement des données est Rakmana.
             <br />
             Email : <a href="mailto:support@clouddevis.com" className="text-blue-600 underline">support@clouddevis.com</a>
           </p>
@@ -94,7 +94,7 @@ export default function PrivacyPage() {
 
         <Section title="6. Destinataires des Données">
           <p>
-            Vos données sont traitées par le personnel autorisé de CloudDevis. Nous pouvons
+            Vos données sont traitées par le personnel autorisé de Rakmana. Nous pouvons
             partager certaines données avec des sous-traitants tiers de confiance :
           </p>
           <ul className="list-disc pl-6 space-y-1">

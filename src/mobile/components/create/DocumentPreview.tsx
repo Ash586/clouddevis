@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Document Preview
+// Rakmana Mobile — Document Preview
 // A faithful, modern rendering of the actual Algerian invoice/
 // devis the user is about to download — company letterhead,
 // client "DOIT" block, objet, line-item table (code · remise ·

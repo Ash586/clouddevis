@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis — Offline Sync Provider (Web Dashboard)
+// Rakmana — Offline Sync Provider (Web Dashboard)
 // Mounts network detection + sync-queue replay for the web.
 // The mobile app has its own MobileShell wiring; this is the
 // web-dashboard equivalent.

@@ -1,4 +1,4 @@
-// CloudDevis Mobile — lightweight toast helper
+// Rakmana Mobile — lightweight toast helper
 // Native (Capacitor) → OS toast. Web → a visible DOM toast (NOT just a
 // console log, so feedback is visible when the app runs in a browser).
 

@@ -239,7 +239,7 @@ function AdminLoginForm() {
               lineHeight: 1.1,
             }}
           >
-            CloudDevis
+            Rakmana
           </h1>
           <div
             style={{
@@ -293,7 +293,7 @@ function AdminLoginForm() {
               Connexion sécurisée
             </h2>
             <p style={{ fontFamily: SORA, fontSize: 12.5, color: TEXT_2, margin: '5px 0 0', lineHeight: 1.45 }}>
-              Accès réservé à l&apos;équipe CloudDevis.
+              Accès réservé à l&apos;équipe Rakmana.
             </p>
           </div>
 

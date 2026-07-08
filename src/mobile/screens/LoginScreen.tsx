@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Login Screen
+// Rakmana Mobile — Login Screen
 // Dark navy theme · cookie-based session · CSRF via Origin header
 // ============================================================
 
@@ -67,7 +67,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         <div className="w-16 h-16 rounded-2xl bg-[var(--green-2)] flex items-center justify-center mb-4 shadow-lg">
           <FileText size={28} className="text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-[var(--sand)]">CloudDevis</h1>
+        <h1 className="text-2xl font-bold text-[var(--sand)]">Rakmana</h1>
         <p className="text-sm text-[var(--sand-muted)] mt-1">
           Connectez-vous à votre compte
         </p>
@@ -220,7 +220,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* Footer */}
       <p className="mt-8 text-[11px] text-[var(--sand-muted)]/50">
-        CloudDevis · Conforme DGI Algérie
+        Rakmana · Conforme DGI Algérie
       </p>
     </div>
   );

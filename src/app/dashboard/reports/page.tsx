@@ -122,7 +122,7 @@ export default function ReportsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `clouddevis-report-${period}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `rakmana-report-${period}-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

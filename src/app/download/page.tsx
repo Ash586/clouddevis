@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — App download page (/download)
+// Rakmana — App download page (/download)
 // Server component: renders a direct Android APK button and a
 // scan-to-download QR (generated server-side, zero client JS).
 // Drop the built APK at public/clouddevis.apk to serve it.
@@ -9,8 +9,8 @@ import Link from 'next/link';
 import QRCode from 'qrcode';
 
 export const metadata = {
-  title: 'Télécharger CloudDevis — Application Android',
-  description: 'Téléchargez l’application mobile CloudDevis pour créer vos devis, factures et bons de livraison depuis votre téléphone.',
+  title: 'Télécharger Rakmana — Application Android',
+  description: 'Téléchargez l’application mobile Rakmana pour créer vos devis, factures et bons de livraison depuis votre téléphone.',
 };
 
 // Direct-download link to the hosted APK on Google Drive.
@@ -29,7 +29,7 @@ export default async function DownloadPage() {
         {/* Brand */}
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 28 }}>
           <span style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--green-2)', color: '#fff', fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>CD</span>
-          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--sand)' }}>CloudDevis</span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--sand)' }}>Rakmana</span>
         </Link>
 
         <div style={{ background: 'var(--navy-2)', border: '1px solid rgba(15,39,71,0.08)', borderRadius: 20, padding: '32px 24px' }}>
@@ -73,7 +73,7 @@ export default async function DownloadPage() {
             <ol style={{ margin: 0, paddingInlineStart: 18, fontSize: 13, color: 'var(--sand)', lineHeight: 1.9 }}>
               <li>Téléchargez le fichier <code style={{ color: 'var(--green-3)' }}>.apk</code></li>
               <li>Ouvrez-le et autorisez l’installation depuis cette source</li>
-              <li>Ouvrez CloudDevis et connectez-vous</li>
+              <li>Ouvrez Rakmana et connectez-vous</li>
             </ol>
           </div>
 

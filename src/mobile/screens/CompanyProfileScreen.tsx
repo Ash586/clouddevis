@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Company Profile Screen
+// Rakmana Mobile — Company Profile Screen
 // Displays and edits company info: name, NIF, RC, NIS, AI, logo
 // ============================================================
 

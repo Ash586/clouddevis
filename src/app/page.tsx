@@ -6,9 +6,9 @@ import { PLANS, formatPrice } from '@/lib/pricing';
 
 const FAQ_ITEMS = [
    { q: 'Le Timbre Fiscal est-il géré automatiquement ?', a: "Oui : le Timbre Fiscal est ajouté dès que le montant atteint 10 000 DA sur une facture (les devis ne sont pas concernés)." },
-   { q: 'Puis-je essayer CloudDevis gratuitement ?', a: "Oui : avec le plan gratuit vous pouvez créer jusqu’à 5 documents par mois, suffit pour tester." },
+   { q: 'Puis-je essayer Rakmana gratuitement ?', a: "Oui : avec le plan gratuit vous pouvez créer jusqu’à 5 documents par mois, suffit pour tester." },
    { q: 'Mes données sont-elles sécurisées ?', a: "Vos données sont protégées par un chiffrement HTTPS et stockées dans votre compte privé – aucun accès tiers." },
-   { q: 'CloudDevis fonctionne-t-il sur mobile ?', a: "Oui : le site s’adapte à tous les écrans, vous pouvez créer ou consulter vos documents où que vous soyez, sans installer d’application." },
+   { q: 'Rakmana fonctionne-t-il sur mobile ?', a: "Oui : le site s’adapte à tous les écrans, vous pouvez créer ou consulter vos documents où que vous soyez, sans installer d’application." },
    { q: 'Comment fonctionne la TVA sur les documents ?', a: "La TVA (9 % ou 19 %) est recalculée à chaque ligne ; vous voyez immédiatement le total HT et TTC, fini les erreurs de calcul." },
    { q: 'Comment payer l’abonnement Pro en Algérie ?', a: "Vous pouvez payer par carte bancaire, virement bancaire ou via les portefeuilles locaux disponibles lors de la souscription ; les options exactes s’affichent dans la page de paiement." },
 ];
@@ -24,7 +24,7 @@ export default function HomePage() {
               <div className="nav-inner">
                 <Link href="/" className="logo">
                   <div className="logo-dot"></div>
-                  CloudDevis
+                  Rakmana
                 </Link>
                 <ul className="nav-links">
                   <li><a href="#features">Fonctionnalités</a></li>
@@ -53,7 +53,7 @@ export default function HomePage() {
                      Vos devis & factures conformes en 2 minutes – zéro erreur, zéro stress
                    </h1>
                    <p className="hero-sub">
-                     Arrêtez de perdre du temps et de l’argent à cause de devis non conformes : CloudDevis vérifie NIF, RC, TVA et Timbre Fiscal pour vous, dès la première saisie.
+                     Arrêtez de perdre du temps et de l’argent à cause de devis non conformes : Rakmana vérifie NIF, RC, TVA et Timbre Fiscal pour vous, dès la première saisie.
                    </p>
                    <div className="hero-ctas">
                      <Link href="/auth/register" className="btn btn-primary btn-lg" data-plausible="CTA Click" data-event-location="hero" data-event-label="Créer mon devis conforme maintenant">
@@ -199,11 +199,11 @@ export default function HomePage() {
                   <div className="section-eyebrow">Conformité légale native</div>
                   <h2 className="section-title">Arrêtez de risquer<br />des redressements fiscaux</h2>
                   <p className="section-sub">
-                    CloudDevis est conçu dès le premier jour pour répondre aux exigences de la <strong>Direction Générale des Impôts</strong> algérienne. Chaque champ obligatoire est validé, chaque calcul est vérifié.
+                    Rakmana est conçu dès le premier jour pour répondre aux exigences de la <strong>Direction Générale des Impôts</strong> algérienne. Chaque champ obligatoire est validé, chaque calcul est vérifié.
                   </p>
                   <div className="compliance-warning">
                     <span style={{ fontSize: 20, flexShrink: 0 }}>⚠️</span>
-                    <p>Une facture sans Timbre Fiscal ou avec un NIF incorrect peut entraîner une amende de <strong>50 000 DA à 500 000 DA</strong>. CloudDevis vous protège automatiquement.</p>
+                    <p>Une facture sans Timbre Fiscal ou avec un NIF incorrect peut entraîner une amende de <strong>50 000 DA à 500 000 DA</strong>. Rakmana vous protège automatiquement.</p>
                   </div>
                 </div>
               </div>
@@ -309,9 +309,9 @@ export default function HomePage() {
               </div>
               <div className="testimonials-grid">
                 {[
-                  { avatar: 'AM', color: 'av-a', name: 'Ahmed M.', role: 'Entrepreneur BTP · Alger', text: "Avant CloudDevis, je passais 2 heures à faire mes factures sur Word. Maintenant c\u2019est 5 minutes, et mon comptable est enfin satisfait de la conformité." },
-                  { avatar: 'SB', color: 'av-b', name: 'Samira B.', role: "Architecte d\u2019intérieur · Oran", text: "Le calcul automatique du Timbre Fiscal m\u2019a sauvé d\u2019un redressement. Je ne savais pas que c\u2019était obligatoire sur tous mes devis. Merci CloudDevis !" },
-                  { avatar: 'KT', color: 'av-c', name: 'Karim T.', role: 'Comptable indépendant · Constantine', text: "Je gère les devis de 3 artisans depuis CloudDevis. L\u2019interface en arabe est impeccable et mes clients reçoivent des documents parfaitement présentés." },
+                  { avatar: 'AM', color: 'av-a', name: 'Ahmed M.', role: 'Entrepreneur BTP · Alger', text: "Avant Rakmana, je passais 2 heures à faire mes factures sur Word. Maintenant c\u2019est 5 minutes, et mon comptable est enfin satisfait de la conformité." },
+                  { avatar: 'SB', color: 'av-b', name: 'Samira B.', role: "Architecte d\u2019intérieur · Oran", text: "Le calcul automatique du Timbre Fiscal m\u2019a sauvé d\u2019un redressement. Je ne savais pas que c\u2019était obligatoire sur tous mes devis. Merci Rakmana !" },
+                  { avatar: 'KT', color: 'av-c', name: 'Karim T.', role: 'Comptable indépendant · Constantine', text: "Je gère les devis de 3 artisans depuis Rakmana. L\u2019interface en arabe est impeccable et mes clients reçoivent des documents parfaitement présentés." },
                 ].map((t, i) => (
                   <div key={i} className="tcard animate-on-scroll">
                     <div className="tcard-stars">{'⭐'.repeat(5).split('').map((s, j) => <span key={j}>{s}</span>)}</div>
@@ -403,7 +403,7 @@ export default function HomePage() {
             <div className="container">
               <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
                 <div className="section-eyebrow">Application mobile</div>
-                <h2 className="section-title">Emportez CloudDevis dans votre poche</h2>
+                <h2 className="section-title">Emportez Rakmana dans votre poche</h2>
                 <p className="section-sub" style={{ marginBottom: 28 }}>
                   Créez et envoyez vos devis, factures et bons de livraison depuis votre téléphone —
                   même hors ligne. Vos documents se synchronisent dès le retour du réseau.
@@ -468,7 +468,7 @@ export default function HomePage() {
                 <div className="footer-brand">
                   <Link href="/" className="logo">
                     <div className="logo-dot"></div>
-                    CloudDevis
+                    Rakmana
                   </Link>
                   <p>La première plateforme SaaS algérienne de génération de devis et factures conformes à la réglementation DGI. Simple, rapide, légal.</p>
                   <div className="footer-social">
@@ -504,7 +504,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="footer-bottom">
-                <p>© 2026 CloudDevis. Tous droits réservés. 🇩🇿 Made in Algeria.</p>
+                <p>© 2026 Rakmana. Tous droits réservés. 🇩🇿 Made in Algeria.</p>
                 <LangSwitcher />
               </div>
             </div>

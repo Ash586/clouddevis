@@ -3,8 +3,8 @@ export const dynamic = 'force-static';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'CGU - Conditions Générales d\'Utilisation | CloudDevis',
-  description: 'Conditions générales d\'utilisation du service CloudDevis de création de devis et factures.',
+  title: 'CGU - Conditions Générales d\'Utilisation | Rakmana',
+  description: 'Conditions générales d\'utilisation du service Rakmana de création de devis et factures.',
 };
 
 export default function CguPage() {
@@ -19,7 +19,7 @@ export default function CguPage() {
         <Section title="1. Objet">
           <p>
             Les présentes Conditions Générales d&apos;Utilisation (ci-après « CGU ») régissent l&apos;accès et
-            l&apos;utilisation du service CloudDevis, une plateforme en ligne de création, gestion et
+            l&apos;utilisation du service Rakmana, une plateforme en ligne de création, gestion et
             édition de devis, factures, bons de commande et documents commerciaux (ci-après le « Service »).
           </p>
           <p>
@@ -30,7 +30,7 @@ export default function CguPage() {
 
         <Section title="2. Définitions">
           <ul className="list-disc pl-6 space-y-2">
-            <li><strong>« Éditeur »</strong> : CloudDevis, société éditrice du Service.</li>
+            <li><strong>« Éditeur »</strong> : Rakmana, société éditrice du Service.</li>
             <li><strong>« Utilisateur »</strong> : toute personne physique ou morale utilisant le Service.</li>
             <li><strong>« Compte »</strong> : espace personnel créé par l&apos;Utilisateur pour accéder au Service.</li>
             <li><strong>« Documents »</strong> : devis, factures, proformas, bons de commande, bons de réception et tout document généré via le Service.</li>
@@ -45,7 +45,7 @@ export default function CguPage() {
           </p>
           <p>
             Le Service est accessible 24h/24 et 7j/7, sauf en cas de maintenance programmée ou d&apos;événements
-            indépendants de la volonté de l&apos;Éditeur. CloudDevis s&apos;efforce de maintenir une disponibilité
+            indépendants de la volonté de l&apos;Éditeur. Rakmana s&apos;efforce de maintenir une disponibilité
             maximale mais ne peut garantir une disponibilité sans interruption.
           </p>
         </Section>
@@ -59,14 +59,14 @@ export default function CguPage() {
             <li>Fournir des informations personnelles exactes (nom, email).</li>
             <li>Maintenir la confidentialité de ses identifiants de connexion.</li>
             <li>Ne pas partager son compte avec des tiers.</li>
-            <li>Informer immédiatement CloudDevis de toute utilisation non autorisée.</li>
+            <li>Informer immédiatement Rakmana de toute utilisation non autorisée.</li>
           </ul>
         </Section>
 
         <Section title="5. Abonnements et Paiement">
           <p>
             Les formules d&apos;abonnement sont détaillées sur la page Tarifs. Les paiements sont traités
-            via notre partenaire de paiement sécurisé. L&apos;Utilisateur autorise CloudDevis à prélever
+            via notre partenaire de paiement sécurisé. L&apos;Utilisateur autorise Rakmana à prélever
             le montant de l&apos;abonnement selon la périodicité choisie (mensuelle ou annuelle).
           </p>
           <p>
@@ -79,12 +79,12 @@ export default function CguPage() {
         <Section title="6. Propriété Intellectuelle">
           <p>
             Le Service, son code source, son design, ses marques et tout élément graphique sont
-            la propriété exclusive de CloudDevis. L&apos;Utilisateur bénéficie d&apos;une licence
+            la propriété exclusive de Rakmana. L&apos;Utilisateur bénéficie d&apos;une licence
             non-exclusive, non-transférable pour utiliser le Service conformément aux présentes CGU.
           </p>
           <p>
             Les Documents créés par l&apos;Utilisateur restent sa propriété intellectuelle exclusive.
-            CloudDevis ne revendique aucun droit sur le contenu des documents générés.
+            Rakmana ne revendique aucun droit sur le contenu des documents générés.
           </p>
         </Section>
 
@@ -95,15 +95,15 @@ export default function CguPage() {
             vous consentez à cette politique.
           </p>
           <p>
-            CloudDevis met en œuvre toutes les mesures techniques et organisationnelles
+            Rakmana met en œuvre toutes les mesures techniques et organisationnelles
             nécessaires pour protéger les données des Utilisateurs conformément au RGPD.
           </p>
         </Section>
 
         <Section title="8. Responsabilité">
           <p>
-            CloudDevis s&apos;engage à fournir un Service conforme aux spécifications décrites.
-            La responsabilité de CloudDevis ne saurait être engagée en cas de :
+            Rakmana s&apos;engage à fournir un Service conforme aux spécifications décrites.
+            La responsabilité de Rakmana ne saurait être engagée en cas de :
           </p>
           <ul className="list-disc pl-6 space-y-1">
             <li>Utilisation non conforme du Service par l&apos;Utilisateur.</li>
@@ -115,19 +115,19 @@ export default function CguPage() {
 
         <Section title="9. Conservation et Sauvegarde">
           <p>
-            CloudDevis conserve les Documents et données de l&apos;Utilisateur pendant toute la durée
+            Rakmana conserve les Documents et données de l&apos;Utilisateur pendant toute la durée
             de l&apos;abonnement et jusqu&apos;à 12 mois après sa résiliation. Au-delà, les données
             sont définitivement supprimées.
           </p>
           <p>
-            L&apos;Utilisateur est encouragé à exporter régulièrement ses documents. CloudDevis
+            L&apos;Utilisateur est encouragé à exporter régulièrement ses documents. Rakmana
             met à disposition des fonctionnalités d&apos;export PDF et de sauvegarde manuelle.
           </p>
         </Section>
 
         <Section title="10. Modification des CGU">
           <p>
-            CloudDevis se réserve le droit de modifier les présentes CGU à tout moment.
+            Rakmana se réserve le droit de modifier les présentes CGU à tout moment.
             Les Utilisateurs seront informés par email des modifications substantielles.
             L&apos;utilisation continue du Service après modification vaut acceptation des nouvelles CGU.
           </p>

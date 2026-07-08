@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — TypeScript Interfaces
+// Rakmana Mobile — TypeScript Interfaces
 // All data types for the mobile invoicing app
 // ============================================================
 

@@ -1,6 +1,6 @@
 'use client';
 
-// CloudDevis Mobile — pull-to-refresh hook
+// Rakmana Mobile — pull-to-refresh hook
 // Touch-driven: pull down from the top of a scroll container past a
 // threshold to trigger an async refresh. Returns the live pull distance
 // (for a spinner) and the touch handlers to spread on the scroll element.

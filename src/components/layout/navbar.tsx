@@ -196,7 +196,7 @@ export function Navbar() {
           <div className="flex items-center gap-3 sm:gap-5 min-w-0">
             <Link href={user ? '/dashboard' : '/'} className="flex items-center gap-2 sm:gap-2.5 no-underline shrink-0">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center font-sora font-extrabold text-white text-sm">C</div>
-              <span className="text-lg sm:text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight hidden sm:inline">CloudDevis</span>
+              <span className="text-lg sm:text-xl font-sora font-extrabold text-[var(--sand)] tracking-tight hidden sm:inline">Rakmana</span>
             </Link>
           </div>
 

@@ -1,4 +1,5 @@
 import type { LineItem, DocumentState, CalculationResult } from '@/types';
+import { BRAND_NAME } from '@/lib/brand';
 
 /**
  * Single clean "Classique" HTML generator — black text on white paper.
@@ -287,7 +288,7 @@ table{width:100%;border-collapse:collapse}
       </div>
     </div>` : ''}
 
-    <div style="text-align:center;font-size:7px;color:#888;margin-top:12px;border-top:0.5px solid #ccc;padding-top:4px">Document généré par CloudDevis</div>
+    <div style="text-align:center;font-size:7px;color:#888;margin-top:12px;border-top:0.5px solid #ccc;padding-top:4px">Document généré par ${e(BRAND_NAME)}</div>
   </div>
 
 </div>

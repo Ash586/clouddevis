@@ -21,23 +21,23 @@ const cormorantGaramond = Cormorant_Garamond({ subsets: ['latin'], display: 'swa
 
 export const metadata: Metadata = {
   title: {
-    default: 'CloudDevis — Devis & Factures conformes',
-    template: '%s | CloudDevis',
+    default: 'Rakmana — Devis & Factures conformes',
+    template: '%s | Rakmana',
   },
   description: 'Générez vos devis et factures conformes à la réglementation algérienne. NIF, RC, NIS, AI, TVA 9/19% et Timbre fiscal automatique.',
   keywords: ['devis', 'facture', 'algérie', 'artisan', 'PME', 'TVA', 'timbre fiscal', 'NIF', 'RC', 'NIS'],
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'CloudDevis — Devis & Factures conformes',
+    title: 'Rakmana — Devis & Factures conformes',
     description: 'Générez vos devis et factures conformes à la réglementation algérienne.',
     url: 'https://clouddevis.vercel.app',
-    siteName: 'CloudDevis',
+    siteName: 'Rakmana',
     locale: 'fr_DZ',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CloudDevis — Devis & Factures conformes',
+    title: 'Rakmana — Devis & Factures conformes',
     description: 'Générez vos devis et factures conformes à la réglementation algérienne.',
   },
   robots: { index: true, follow: true },
@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>JavaScript requis</h2>
             <p style={{ fontSize: '0.875rem', opacity: 0.7 }}>
               Pour une expérience optimale, veuillez activer JavaScript dans votre navigateur.
-              <br />CloudDevis nécessite JavaScript pour le rendu en temps réel de vos documents.
+              <br />Rakmana nécessite JavaScript pour le rendu en temps réel de vos documents.
             </p>
           </div>
         </noscript>

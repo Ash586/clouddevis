@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — ConfirmSheet
+// Rakmana Mobile — ConfirmSheet
 // iOS-style bottom-sheet confirmation for destructive actions
 // (delete client, delete document, …). Modeled on ActionSheet.
 // ============================================================

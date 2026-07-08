@@ -1,4 +1,4 @@
-// CloudDevis Mobile — shared formatting helpers
+// Rakmana Mobile — shared formatting helpers
 
 export function formatAmount(amount: number): string {
   return (

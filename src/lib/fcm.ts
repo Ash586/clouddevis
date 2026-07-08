@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — Firebase Cloud Messaging (server-side)
+// Rakmana — Firebase Cloud Messaging (server-side)
 // Sends push notifications to Android via FCM HTTP v1 API.
 //
 // Required env vars:

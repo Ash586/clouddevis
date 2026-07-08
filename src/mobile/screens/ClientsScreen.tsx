@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Clients Screen
+// Rakmana Mobile — Clients Screen
 // Client management: list, search, add, edit, delete
 // ============================================================
 

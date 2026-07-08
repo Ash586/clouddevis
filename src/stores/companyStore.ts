@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — Company Store
+// Rakmana Mobile — Company Store
 // Company profile management with offline persistence
 // ============================================================
 

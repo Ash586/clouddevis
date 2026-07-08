@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — User Store
+// Rakmana Mobile — User Store
 // Holds the account persona (artisan | entreprise) so mobile
 // screens can adapt what they show. Server is the source of
 // truth: useAuthGuard writes the mode on every session check.

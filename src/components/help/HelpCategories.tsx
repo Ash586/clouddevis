@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 const CATEGORIES = [
-  { id: 'getting-started', title: 'Démarrage rapide', desc: 'Premiers pas avec CloudDevis', icon: '🚀', color: '#1E40AF', articles: 4 },
+  { id: 'getting-started', title: 'Démarrage rapide', desc: 'Premiers pas avec Rakmana', icon: '🚀', color: '#1E40AF', articles: 4 },
   { id: 'documents', title: 'Créer des documents', desc: 'Devis, factures, proformas', icon: '📄', color: '#1A6B4F', articles: 6 },
   { id: 'billing', title: 'Facturation & paiement', desc: 'Gestion des paiements', icon: '💰', color: '#C4A35A', articles: 5 },
   { id: 'legal', title: 'Conformité légale', desc: 'NIF, RC, TVA, Timbre fiscal', icon: '⚖️', color: '#2E60B0', articles: 5 },

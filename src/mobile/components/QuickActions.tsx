@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Quick Action Buttons
+// Rakmana Mobile — Quick Action Buttons
 // 3 buttons: Nouveau devis (primary), Facture, Dupliquer
 // ============================================================
 

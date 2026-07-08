@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — FlashFacture: Live Invoice Paper
+// Rakmana Mobile — FlashFacture: Live Invoice Paper
 // The document IS the form. This read-zone renders the real
 // invoice that grows as the user edits via the dock below.
 // Tapping any zone asks the parent to morph the dock — it never

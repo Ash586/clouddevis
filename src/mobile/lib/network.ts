@@ -1,4 +1,4 @@
-// CloudDevis Mobile — Network Status & Offline Sync
+// Rakmana Mobile — Network Status & Offline Sync
 // Detect online/offline and sync pending data
 
 import { Network } from '@capacitor/network';

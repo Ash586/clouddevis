@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — Dashboard Stats Hook
+// Rakmana Mobile — Dashboard Stats Hook
 // Fetches /api/dashboard once on mount (after auth).
 // Falls back to computing from savedDocuments on error.
 // ============================================================

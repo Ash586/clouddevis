@@ -14,7 +14,7 @@ const REPORTS = [
   {
     slug: 'dashboard-architecture-2026',
     title: 'Dashboard Architecture — 2026',
-    description: '2026 industry baseline for dashboard rendering, state management, UX, and performance — cross-referenced against a live audit of CloudDevis today.',
+    description: '2026 industry baseline for dashboard rendering, state management, UX, and performance — cross-referenced against a live audit of Rakmana today.',
   },
 ];
 

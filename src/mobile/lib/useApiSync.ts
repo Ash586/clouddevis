@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — API Bootstrap Hook
+// Rakmana Mobile — API Bootstrap Hook
 // Call once at app root (MobileShell) to:
 //   1. Wire reconnect → flush sync queue
 //   2. On first online, pull fresh data from server into stores

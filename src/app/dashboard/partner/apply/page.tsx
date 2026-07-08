@@ -95,7 +95,7 @@ export default function PartnerApplyPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold" style={{ color: textColor }}>Gagnez 20% sur chaque abonnement activé</h1>
-              <p className="text-sm" style={{ color: mutedColor }}>Rejoignez le programme d&apos;affiliation CloudDevis</p>
+              <p className="text-sm" style={{ color: mutedColor }}>Rejoignez le programme d&apos;affiliation Rakmana</p>
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function PartnerApplyPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold mb-1.5" style={{ color: mutedColor }}>Comment allez-vous promouvoir CloudDevis ?</label>
+              <label className="block text-[11px] font-semibold mb-1.5" style={{ color: mutedColor }}>Comment allez-vous promouvoir Rakmana ?</label>
               <textarea
                 required
                 className="w-full rounded-lg px-3.5 py-2.5 text-sm outline-none min-h-[44px]"

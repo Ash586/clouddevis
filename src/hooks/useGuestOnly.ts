@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis — Guest-only guard
+// Rakmana — Guest-only guard
 // Login/Register are for logged-OUT visitors. If an authenticated
 // user lands here (e.g. clicks a marketing "Commencer" CTA while
 // their session is still open), bounce them to the dashboard instead

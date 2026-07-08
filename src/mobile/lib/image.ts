@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — Client-side image compression
+// Rakmana Mobile — Client-side image compression
 // Company logos / signatures are stored as Base64 data URLs in
 // the profile JSON — uncompressed photos bloat the DB and slow
 // every sync. Downscale + re-encode until the payload fits.

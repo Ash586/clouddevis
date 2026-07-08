@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis — Network Detection Hook
+// Rakmana — Network Detection Hook
 // Wraps Capacitor Network plugin in a React hook
 // Provides isOnline + connectionType + auto-reconnection
 // ============================================================

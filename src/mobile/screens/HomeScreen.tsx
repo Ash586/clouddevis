@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Home Screen
+// Rakmana Mobile — Home Screen
 // Composed layout: Header → Stats → Quick Actions → Recent Docs
 // Stats fetched from /api/dashboard; falls back to local store.
 // ============================================================

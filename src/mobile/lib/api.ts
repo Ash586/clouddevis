@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — API Client
+// Rakmana Mobile — API Client
 // Thin typed wrapper around the Next.js REST API.
 // Capacitor webview loads from the same origin as the server,
 // so relative paths work in both prod (Vercel) and dev (localhost).

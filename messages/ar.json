@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "CloudDevis",
+    "appName": "Rakmana",
     "loading": "جاري التحميل…",
     "loadingEditor": "جاري تحميل المحرر…",
     "save": "حفظ",
@@ -300,7 +300,7 @@
     "statUnpaidSub": "فواتير مُرسَلة غير مدفوعة",
     "statusBreakdown": "توزيع الحالات",
     "allTypes": "الكل",
-    "emptyTitle": "مرحباً بك في CloudDevis",
+    "emptyTitle": "مرحباً بك في Rakmana",
     "emptyDesc": "ابدأ بإنشاء أول مستند لك.",
     "noResults": "لا توجد نتائج",
     "noResultsDesc": "لا توجد مستندات تطابق بحثك.",
@@ -701,7 +701,7 @@
     "signatureLine": "حرر في {city}، بتاريخ {date}",
     "signatureLabel": "الخاتم والتوقيع",
     "signatureStamp": "التوقيع",
-    "footer": "تم الإنشاء عبر CloudDevis.io",
+    "footer": "تم الإنشاء عبر Rakmana",
     "interventionSections": {
       "equipement": "المعدات",
       "visite": "الزيارة",
@@ -981,7 +981,7 @@
     "supportAnswer": "يمكنك التواصل معنا عبر البريد الإلكتروني على support@clouddevis.io. يحصل عملاء Basic و Pro على دعم أولوي."
   },
   "enterprise": {
-    "title": "CloudDevis للمؤسسات",
+    "title": "Rakmana للمؤسسات",
     "subtitle": "حل مخصص للمؤسسات الكبيرة",
     "benefit1Title": "مخصص",
     "benefit1Desc": "تخصيص كامل للمنصة وفقاً لعملياتك",
@@ -1017,7 +1017,7 @@
     "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح"
   },
   "admin": {
-    "title": "إدارة CloudDevis",
+    "title": "إدارة Rakmana",
     "error": "حدث خطأ",
     "noUsers": "لم يتم العثور على مستخدمين",
     "noLogs": "لم يتم العثور على سجلات",
@@ -1352,7 +1352,7 @@
       "platformsPlaceholder": "مثال: فيسبوك، إنستغرام، يوتيوب...",
       "audienceSize": "حجم الجمهور (اختياري)",
       "audienceSizePlaceholder": "مثال: 5000",
-      "howPromote": "كيف ستقوم بالترويج لـ CloudDevis؟",
+      "howPromote": "كيف ستقوم بالترويج لـ Rakmana؟",
       "howPromotePlaceholder": "صف استراتيجية الترويج الخاصة بك...",
       "payoutMethod": "طريقة الدفع المفضلة",
       "payoutMethodPlaceholder": "مثال: CCP، بريدي موب",
@@ -1395,7 +1395,7 @@
       "rule4": "العمولات تُ Validate فقط بعد تفعيل اشتراك مدفوع (عدا الفترة التجريبية).",
       "rule5": "الشركاء المميزون يحصلون additionally على 5% من مبيعات فريقهم.",
       "ctaFinal": "مستعد لكسب العمولات؟",
-      "ctaFinalDesc": "انضم إلى مئات الشركاء الذين يحققونAlready إيرادات مع CloudDevis.",
+      "ctaFinalDesc": "انضم إلى مئات الشركاء الذين يحققونAlready إيرادات مع Rakmana.",
       "ctaStart": "ابدأ الآن"
     }
   }

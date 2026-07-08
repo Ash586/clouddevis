@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis — Landing nav CTA (auth-aware)
+// Rakmana — Landing nav CTA (auth-aware)
 // Anonymous visitors see "Se connecter" + "Commencer gratuitement".
 // A logged-in visitor who lands on the marketing page instead sees a
 // single "Accéder à mon tableau de bord" button — no reason to invite

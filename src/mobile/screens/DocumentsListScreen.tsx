@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Documents List Screen
+// Rakmana Mobile — Documents List Screen
 // Filters: All | DEVIS | FACTURE | Payé | En attente | Ce mois
 // Swipe-to-action on each row
 // Long press opens ActionSheet

@@ -1,4 +1,4 @@
-// CloudDevis Mobile — Main Entry Point
+// Rakmana Mobile — Main Entry Point
 // Re-export all mobile modules
 
 // ── Types & Schemas ──────────────────────────────────────────

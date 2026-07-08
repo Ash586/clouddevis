@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "CloudDevis",
+    "appName": "Rakmana",
     "loading": "Loading…",
     "loadingEditor": "Loading editor…",
     "save": "Save",
@@ -300,7 +300,7 @@
     "statUnpaidSub": "Sent invoices awaiting payment",
     "statusBreakdown": "Status breakdown",
     "allTypes": "All",
-    "emptyTitle": "Welcome to CloudDevis",
+    "emptyTitle": "Welcome to Rakmana",
     "emptyDesc": "Start by creating your first document.",
     "noResults": "No results",
     "noResultsDesc": "No documents match your search.",
@@ -701,7 +701,7 @@
     "signatureLine": "Done at {city}, on {date}",
     "signatureLabel": "Stamp and signature",
     "signatureStamp": "Signature",
-    "footer": "Generated via CloudDevis.io",
+    "footer": "Generated via Rakmana",
     "interventionSections": {
       "equipement": "Equipment",
       "visite": "Visit",
@@ -981,7 +981,7 @@
     "supportAnswer": "You can reach us by email at support@clouddevis.io. Basic and Pro customers benefit from priority support."
   },
   "enterprise": {
-    "title": "CloudDevis Enterprise",
+    "title": "Rakmana Enterprise",
     "subtitle": "Tailored solution for large organizations",
     "benefit1Title": "Custom fit",
     "benefit1Desc": "Complete customization of the platform to your processes",
@@ -1017,7 +1017,7 @@
     "resetSuccess": "Password reset successfully"
   },
   "admin": {
-    "title": "CloudDevis Administration",
+    "title": "Rakmana Administration",
     "error": "An error occurred",
     "noUsers": "No users found",
     "noLogs": "No logs found",
@@ -1335,7 +1335,7 @@
       "superAffiliate": "Super Affiliate",
       "disclosure": "Your commission is only calculated after activation of a paid subscription.",
       "notPartner": "You are not yet a partner",
-      "notPartnerDesc": "Join the CloudDevis affiliate program and earn commissions.",
+      "notPartnerDesc": "Join the Rakmana affiliate program and earn commissions.",
       "becomePartner": "Become a partner",
       "pendingApproval": "Application under review",
       "pendingApprovalDesc": "Your partnership application is awaiting review by our team.",
@@ -1344,7 +1344,7 @@
     },
     "apply": {
       "title": "Earn 20% on each activated subscription",
-      "subtitle": "Join the CloudDevis affiliate program",
+      "subtitle": "Join the Rakmana affiliate program",
       "fullName": "Full name",
       "wilaya": "Wilaya",
       "sector": "Industry",
@@ -1352,7 +1352,7 @@
       "platformsPlaceholder": "e.g. Facebook, Instagram, YouTube, blog...",
       "audienceSize": "Audience size (optional)",
       "audienceSizePlaceholder": "e.g. 5000",
-      "howPromote": "How will you promote CloudDevis?",
+      "howPromote": "How will you promote Rakmana?",
       "howPromotePlaceholder": "Describe your promotion strategy...",
       "payoutMethod": "Preferred payout method",
       "payoutMethodPlaceholder": "e.g. CCP, BaridiMob",
@@ -1372,7 +1372,7 @@
       "disclosure": "Your commission is only calculated after activation of a paid subscription by the user you referred. Minimum payout is 2,000 DA."
     },
     "public": {
-      "heroBadge": "CloudDevis Affiliate Program",
+      "heroBadge": "Rakmana Affiliate Program",
       "heroTitle": "Earn 20% commission on every subscription",
       "heroDesc": "Share your referral link. When a user signs up and subscribes to a paid plan, you earn your commission.",
       "ctaJoin": "Join the program",
@@ -1395,7 +1395,7 @@
       "rule4": "Commissions are only validated after activation of a paid subscription (excluding free trial).",
       "rule5": "Super Affiliates additionally earn 5% on sales from their team of referrals.",
       "ctaFinal": "Ready to earn commissions?",
-      "ctaFinalDesc": "Join hundreds of partners already earning revenue with CloudDevis.",
+      "ctaFinalDesc": "Join hundreds of partners already earning revenue with Rakmana.",
       "ctaStart": "Start now"
     }
   }

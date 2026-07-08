@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — Haptic feedback wrapper
+// Rakmana Mobile — Haptic feedback wrapper
 // Native haptics on device via @capacitor/haptics; silent no-op
 // on the web (plugin throws "not implemented" — we swallow it).
 // Keep calls fire-and-forget: haptics must never block the UI.

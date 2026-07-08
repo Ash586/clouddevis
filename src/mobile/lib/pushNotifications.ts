@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis Mobile — Push Notifications Service
+// Rakmana Mobile — Push Notifications Service
 // Wraps @capacitor/push-notifications with:
 //   - Permission request (Android 13+ POST_NOTIFICATIONS)
 //   - FCM token registration → /api/user/push-token
@@ -93,7 +93,7 @@ export async function initPushNotifications(opts: {
   PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
     const payload = extractPayload(notification);
     onForeground?.(
-      notification.title ?? 'CloudDevis',
+      notification.title ?? 'Rakmana',
       notification.body ?? '',
       payload,
     );

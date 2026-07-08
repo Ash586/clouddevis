@@ -53,7 +53,7 @@ async function postHandler(req: Request) {
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://clouddevis.vercel.app'}/auth/reset-password#token=${token}`;
 
     // Send reset email
-    const appName = 'CloudDevis';
+    const appName = 'Rakmana';
     await sendEmail({
       to: user.email,
       subject: `Réinitialisation de votre mot de passe ${appName}`,

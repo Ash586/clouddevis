@@ -12,7 +12,7 @@ interface TourStep {
 const TOUR_STEPS: TourStep[] = [
   {
     target: '.tour-step-1',
-    title: 'مرحباً بك في CloudDevis',
+    title: 'مرحباً بك في Rakmana',
     content: 'سوق أول فاتورة خلال دقائق. اضغط هنا للبدء.',
     position: 'bottom',
   },

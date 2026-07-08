@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Preview Page
+// Rakmana Mobile — Preview Page
 // Renders the mobile app in a phone frame for browser preview
 // ============================================================
 
@@ -31,7 +31,7 @@ export default function MobilePreviewPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-2xl font-bold text-[var(--sand)]">
-            CloudDevis <span className="text-[#1D4ED8]">Mobile</span>
+            Rakmana <span className="text-[#1D4ED8]">Mobile</span>
           </h1>
           <p className="text-sm text-[var(--sand-muted)] mt-1">
             Aperçu de l&apos;application mobile

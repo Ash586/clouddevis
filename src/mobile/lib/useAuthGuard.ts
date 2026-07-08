@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — Auth Guard Hook
+// Rakmana Mobile — Auth Guard Hook
 // Checks session on app start, exposes login/logout actions.
 // ============================================================
 

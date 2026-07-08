@@ -17,7 +17,7 @@ interface MobileMenuProps {
   title?: string;
 }
 
-export function MobileMenu({ items, title = 'CloudDevis' }: MobileMenuProps) {
+export function MobileMenu({ items, title = 'Rakmana' }: MobileMenuProps) {
   const { isOpen, toggle, close } = useMobileMenu();
   const isMobile = useIsMobile();
 

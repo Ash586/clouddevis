@@ -1,5 +1,5 @@
 // ============================================================
-// CloudDevis — Web Sync Processor
+// Rakmana — Web Sync Processor
 // Replays queued mutations against the REST API when back online.
 // Entity → endpoint mapping must stay in sync with API routes.
 // ============================================================

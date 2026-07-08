@@ -3,7 +3,7 @@ export type HelpLang = 'fr' | 'ar' | 'en';
 export const HELP_T = {
   fr: {
     // Header
-    title: 'Centre d\'aide CloudDevis',
+    title: 'Centre d\'aide Rakmana',
     subtitle: 'Trouvez des réponses à vos questions, consultez nos tutoriels et guides complets.',
     searchPlaceholder: 'Rechercher un article...',
 
@@ -20,7 +20,7 @@ export const HELP_T = {
 
     // Category titles
     catGettingStarted: 'Démarrage rapide',
-    catGettingStartedDesc: 'Premiers pas avec CloudDevis',
+    catGettingStartedDesc: 'Premiers pas avec Rakmana',
     catDocuments: 'Créer des documents',
     catDocumentsDesc: 'Devis, factures, proformas',
     catBilling: 'Facturation & paiement',
@@ -53,7 +53,7 @@ export const HELP_T = {
 
     // Categories data
     categories: {
-      'getting-started': { title: 'Démarrage rapide', desc: 'Premiers pas avec CloudDevis', icon: '🚀' },
+      'getting-started': { title: 'Démarrage rapide', desc: 'Premiers pas avec Rakmana', icon: '🚀' },
       'documents': { title: 'Créer des documents', desc: 'Devis, factures, proformas', icon: '📄' },
       'billing': { title: 'Facturation & paiement', desc: 'Gestion des paiements', icon: '💰' },
       'legal': { title: 'Conformité légale', desc: 'NIF, RC, TVA, Timbre fiscal', icon: '⚖️' },
@@ -66,10 +66,10 @@ export const HELP_T = {
       general: {
         title: 'Général',
         items: [
-          { q: 'Qu\'est-ce que CloudDevis ?', a: 'CloudDevis est un outil en ligne de création de devis et factures conforme à la réglementation algérienne.' },
-          { q: 'Puis-je utiliser CloudDevis gratuitement ?', a: 'Oui ! La version gratuite permet de créer 5 documents par mois avec toutes les fonctionnalités de base.' },
-          { q: 'CloudDevis est-il sécurisé ?', a: 'Oui. Nous utilisons HTTPS, le chiffrement TLS 1.3 et des cookies sécurisés.' },
-          { q: 'Fonctionne-t-il sur mobile ?', a: 'Oui, CloudDevis est entièrement responsive sur tous les appareils.' },
+          { q: 'Qu\'est-ce que Rakmana ?', a: 'Rakmana est un outil en ligne de création de devis et factures conforme à la réglementation algérienne.' },
+          { q: 'Puis-je utiliser Rakmana gratuitement ?', a: 'Oui ! La version gratuite permet de créer 5 documents par mois avec toutes les fonctionnalités de base.' },
+          { q: 'Rakmana est-il sécurisé ?', a: 'Oui. Nous utilisons HTTPS, le chiffrement TLS 1.3 et des cookies sécurisés.' },
+          { q: 'Fonctionne-t-il sur mobile ?', a: 'Oui, Rakmana est entièrement responsive sur tous les appareils.' },
         ],
       },
       documents: {
@@ -85,7 +85,7 @@ export const HELP_T = {
         items: [
           { q: 'Comment fonctionne le Timbre Fiscal ?', a: '1% du montant TTC, applicable aux factures > 10 000 DA. Min 5 DA, Max 2 500 DA. Les devis en sont exclus.' },
           { q: 'Quel taux de TVA appliquer ?', a: '19% (normal) ou 9% (réduit). Sélectionnez le taux dans les paramètres.' },
-          { q: 'Ma facture est-elle conforme ?', a: 'Oui, si elle contient toutes les mentions obligatoires. CloudDevis génère des factures 100% conformes.' },
+          { q: 'Ma facture est-elle conforme ?', a: 'Oui, si elle contient toutes les mentions obligatoires. Rakmana génère des factures 100% conformes.' },
         ],
       },
       compte: {
@@ -109,7 +109,7 @@ export const HELP_T = {
 
   ar: {
     // Header
-    title: 'مركز مساعدة CloudDevis',
+    title: 'مركز مساعدة Rakmana',
     subtitle: 'ابحث عن إجابات لأسئلتك، واستعرض دروسنا التعليمية والأدلة الشاملة.',
     searchPlaceholder: 'ابحث عن مقال...',
 
@@ -126,7 +126,7 @@ export const HELP_T = {
 
     // Category titles
     catGettingStarted: 'البدء السريع',
-    catGettingStartedDesc: 'الخطوات الأولى مع CloudDevis',
+    catGettingStartedDesc: 'الخطوات الأولى مع Rakmana',
     catDocuments: 'إنشاء الوثائق',
     catDocumentsDesc: 'عروض أسعار، فواتير، برومو',
     catBilling: 'الفواتير والدفع',
@@ -159,7 +159,7 @@ export const HELP_T = {
 
     // Categories data
     categories: {
-      'getting-started': { title: 'البدء السريع', desc: 'الخطوات الأولى مع CloudDevis', icon: '🚀' },
+      'getting-started': { title: 'البدء السريع', desc: 'الخطوات الأولى مع Rakmana', icon: '🚀' },
       'documents': { title: 'إنشاء الوثائق', desc: 'عروض أسعار، فواتير، برومو', icon: '📄' },
       'billing': { title: 'الفواتير والدفع', desc: 'إدارة المدفوعات', icon: '💰' },
       'legal': { title: 'الامتثال القانوني', desc: 'NIF, RC, TVA, الطابع الضريبي', icon: '⚖️' },
@@ -172,10 +172,10 @@ export const HELP_T = {
       general: {
         title: 'عام',
         items: [
-          { q: 'ما هو CloudDevis؟', a: 'CloudDevis هو أداة إلكترونية لإنشاء عروض أسعار وفواتير متوافقة مع التنظيم الجزائري.' },
-          { q: 'هل يمكنني استخدام CloudDevis مجاناً؟', a: 'نعم! النسخة المجانية تسمح بإنشاء 5 وثائق شهرياً مع جميع الميزات الأساسية.' },
-          { q: 'هل CloudDevis آمن؟', a: 'نعم. نستخدم HTTPS وتشفير TLS 1.3 وملفات تعريف ارتباط آمنة.' },
-          { q: 'هل يعمل على الهاتف؟', a: 'نعم، CloudDevis متجاوب بالكامل على جميع الأجهزة.' },
+          { q: 'ما هو Rakmana؟', a: 'Rakmana هو أداة إلكترونية لإنشاء عروض أسعار وفواتير متوافقة مع التنظيم الجزائري.' },
+          { q: 'هل يمكنني استخدام Rakmana مجاناً؟', a: 'نعم! النسخة المجانية تسمح بإنشاء 5 وثائق شهرياً مع جميع الميزات الأساسية.' },
+          { q: 'هل Rakmana آمن؟', a: 'نعم. نستخدم HTTPS وتشفير TLS 1.3 وملفات تعريف ارتباط آمنة.' },
+          { q: 'هل يعمل على الهاتف؟', a: 'نعم، Rakmana متجاوب بالكامل على جميع الأجهزة.' },
         ],
       },
       documents: {
@@ -191,7 +191,7 @@ export const HELP_T = {
         items: [
           { q: 'كيف يعمل الطابع الضريبي؟', a: '1% من المبلغ الشامل، يُطبق على الفواتير التي تزيد عن 10,000 دج. الحد الأدنى 5 دج، الأقصى 2,500 دج.' },
           { q: 'ما معدل TVA المطبق؟', a: '19% (عادي) أو 9% (مخفض). حدد المعدل في إعدادات الوثيقة.' },
-          { q: 'هل فاتوري متوافقة قانونياً؟', a: 'نعم، إذا كانت تحتوي على جميع الإلزامات. CloudDevis ينشئ فواتير متوافقة 100%.' },
+          { q: 'هل فاتوري متوافقة قانونياً؟', a: 'نعم، إذا كانت تحتوي على جميع الإلزامات. Rakmana ينشئ فواتير متوافقة 100%.' },
         ],
       },
       compte: {
@@ -215,7 +215,7 @@ export const HELP_T = {
 
   en: {
     // Header
-    title: 'CloudDevis Help Center',
+    title: 'Rakmana Help Center',
     subtitle: 'Find answers to your questions, browse tutorials and comprehensive guides.',
     searchPlaceholder: 'Search for an article...',
 
@@ -232,7 +232,7 @@ export const HELP_T = {
 
     // Category titles
     catGettingStarted: 'Getting Started',
-    catGettingStartedDesc: 'First steps with CloudDevis',
+    catGettingStartedDesc: 'First steps with Rakmana',
     catDocuments: 'Creating Documents',
     catDocumentsDesc: 'Quotes, invoices, proformas',
     catBilling: 'Billing & Payments',
@@ -265,7 +265,7 @@ export const HELP_T = {
 
     // Categories data
     categories: {
-      'getting-started': { title: 'Getting Started', desc: 'First steps with CloudDevis', icon: '🚀' },
+      'getting-started': { title: 'Getting Started', desc: 'First steps with Rakmana', icon: '🚀' },
       'documents': { title: 'Creating Documents', desc: 'Quotes, invoices, proformas', icon: '📄' },
       'billing': { title: 'Billing & Payments', desc: 'Payment management', icon: '💰' },
       'legal': { title: 'Legal Compliance', desc: 'NIF, RC, VAT, Stamp Duty', icon: '⚖️' },
@@ -278,10 +278,10 @@ export const HELP_T = {
       general: {
         title: 'General',
         items: [
-          { q: 'What is CloudDevis?', a: 'CloudDevis is an online tool for creating quotes and invoices compliant with Algerian regulations.' },
-          { q: 'Can I use CloudDevis for free?', a: 'Yes! The free plan allows creating 5 documents per month with all basic features.' },
-          { q: 'Is CloudDevis secure?', a: 'Yes. We use HTTPS, TLS 1.3 encryption, and secure cookies.' },
-          { q: 'Does it work on mobile?', a: 'Yes, CloudDevis is fully responsive on all devices.' },
+          { q: 'What is Rakmana?', a: 'Rakmana is an online tool for creating quotes and invoices compliant with Algerian regulations.' },
+          { q: 'Can I use Rakmana for free?', a: 'Yes! The free plan allows creating 5 documents per month with all basic features.' },
+          { q: 'Is Rakmana secure?', a: 'Yes. We use HTTPS, TLS 1.3 encryption, and secure cookies.' },
+          { q: 'Does it work on mobile?', a: 'Yes, Rakmana is fully responsive on all devices.' },
         ],
       },
       documents: {
@@ -297,7 +297,7 @@ export const HELP_T = {
         items: [
           { q: 'How does Stamp Duty work?', a: '1% of TTC amount, applicable to invoices > 10,000 DA. Min 5 DA, Max 2,500 DA. Quotes are excluded.' },
           { q: 'Which VAT rate to apply?', a: '19% (standard) or 9% (reduced). Select the rate in document settings.' },
-          { q: 'Is my invoice legally compliant?', a: 'Yes, if it contains all mandatory mentions. CloudDevis generates 100% compliant invoices.' },
+          { q: 'Is my invoice legally compliant?', a: 'Yes, if it contains all mandatory mentions. Rakmana generates 100% compliant invoices.' },
         ],
       },
       compte: {

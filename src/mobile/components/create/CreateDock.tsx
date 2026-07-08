@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================================
-// CloudDevis Mobile — FlashFacture: the persistent dock
+// Rakmana Mobile — FlashFacture: the persistent dock
 // One thumb-anchored container that swaps CONTENT (never stacks
 // sheet-on-sheet) between four modes: add · line · client · details.
 // Every action maps 1:1 onto the document store setters.
