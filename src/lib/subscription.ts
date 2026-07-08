@@ -32,6 +32,17 @@ export function freeTierBlocksToday(subscriptionStatus: string, todayCount: numb
   return todayCount >= FREE_TIER_DAILY_LIMIT;
 }
 
+/**
+ * Whether generated PDFs should carry the "Créé avec Rakmana.co" brand watermark.
+ * True only for plans that lack the `export:pdf:clean` feature (i.e. the free tier).
+ * Inert while subscriptions are disabled (returns false), so no watermark shows now.
+ */
+export function shouldWatermarkPdf(subscriptionStatus: string): boolean {
+  if (!SUBSCRIPTIONS_ENABLED) return false;
+  const planId = getPlanByStatus(subscriptionStatus).id;
+  return !hasFeature(planId, 'export:pdf:clean');
+}
+
 export function getPlanFromUser(user: SessionUser): { id: PlanId; limits: PlanLimit } {
   const plan = getPlanByStatus(user.subscriptionStatus);
   return { id: plan.id, limits: plan.limits };
