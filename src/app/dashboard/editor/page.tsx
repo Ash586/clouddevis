@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -395,10 +395,12 @@ function EditorContent() {
 
   // Show save success notification (brief, non-obtrusive)
   const lastSaveRef = useRef(false);
+  const saveErroredRef = useRef(false);
   useEffect(() => {
     if (!saving && lastSaveRef.current) {
-      // Document just finished saving successfully
-      showToast(tc('saved') || 'Enregistré', 'success');
+      // Document just finished saving — only celebrate if it didn't error.
+      if (!saveErroredRef.current) showToast(tc('saved') || 'Enregistré', 'success');
+      saveErroredRef.current = false;
       lastSaveRef.current = false;
     }
     if (saving) {
@@ -406,13 +408,24 @@ function EditorContent() {
     }
   }, [saving, showToast, tc]);
 
+  // Manual save (button / Ctrl+S): surface server errors (e.g. free-tier DAILY_LIMIT) as a toast.
+  const handleManualSave = useCallback(async () => {
+    try {
+      await saveDoc();
+    } catch (e) {
+      saveErroredRef.current = true;
+      const err = e as Error & { code?: string };
+      showToast(err.message || (te('saveError') || 'Erreur d\'enregistrement.'), 'error');
+    }
+  }, [saveDoc, showToast, te]);
+
 
   // Keyboard shortcuts: Ctrl+S = save, Ctrl+P = print/download, Ctrl+Z = undo, Ctrl+Shift+Z = redo
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
-        saveDoc();
+        handleManualSave();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
@@ -433,7 +446,7 @@ function EditorContent() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [saveDoc, handleDownload, handleUndo, handleRedo]);
+  }, [handleManualSave, handleDownload, handleUndo, handleRedo]);
 
   const saveDocRef = useRef<() => Promise<unknown>>(saveDoc);
   saveDocRef.current = saveDoc;
@@ -679,7 +692,7 @@ function EditorContent() {
                 <ShieldCheck size={14} />
                 <span>Auditer</span>
               </Button>
-              <Button size="sm" variant="secondary" onClick={saveDoc} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+              <Button size="sm" variant="secondary" onClick={handleManualSave} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 <span>{tc('save')}</span>
               </Button>
@@ -702,7 +715,7 @@ function EditorContent() {
         <div className="lg:hidden no-print shrink-0 border-t border-[var(--border-2)] shadow-[0_-1px_2px_rgba(15,39,71,0.06)] bg-[var(--navy-2)]" style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}>
           {/* Action row */}
           <div className="flex items-center gap-1.5 px-2 py-1">
-            <button type="button" onClick={saveDoc} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
+            <button type="button" onClick={handleManualSave} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 py-2 min-h-[44px] rounded-xl bg-[var(--green-2)] text-white text-[11px] font-bold transition active:scale-[0.97] disabled:opacity-50">
               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>{tc('save')}</span>
             </button>

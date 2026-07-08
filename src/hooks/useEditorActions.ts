@@ -159,7 +159,14 @@ export function useEditorActions(deps: EditorActionsDeps) {
       const method = currentDocId ? 'PUT' : 'POST';
       const url = currentDocId ? `/api/documents/${currentDocId}` : '/api/documents';
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(currentDoc) });
-      if (!res.ok) { const body = await res.text(); throw new Error(`Save failed (${res.status}): ${body}`); }
+      if (!res.ok) {
+        let payload: { error?: string; code?: string } | null = null;
+        try { payload = await res.json(); } catch { /* non-JSON body */ }
+        const err = new Error(payload?.error || `Save failed (${res.status})`) as Error & { code?: string; status?: number };
+        err.code = payload?.code;
+        err.status = res.status;
+        throw err;
+      }
       const data = await res.json();
       if (method === 'POST') {
         track(DOC_EVENTS.DOCUMENT_CREATED, { type: currentDoc.documentType, mode: currentDoc.mode });

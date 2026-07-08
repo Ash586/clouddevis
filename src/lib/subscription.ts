@@ -5,6 +5,33 @@ import { hasFeature, SUBSCRIPTIONS_ENABLED, type FeatureId } from './features';
 
 export const TRIAL_DAYS = 7;
 
+/** Free-tier beta cap: max documents a FREE user may create per calendar day. */
+export const FREE_TIER_DAILY_LIMIT = 2;
+
+/**
+ * Bounds (in UTC instants) of "today" on the Algeria calendar (Africa/Algiers is
+ * UTC+1 year-round, no DST). Used so the free-tier daily counter — and the
+ * "come back tomorrow" reset — align with the user's local midnight, not UTC.
+ */
+export function algiersDayWindow(now: Date): { gte: Date; lt: Date } {
+  const DZ_OFFSET_MS = 60 * 60 * 1000; // UTC+1
+  const dz = new Date(now.getTime() + DZ_OFFSET_MS);
+  const dzMidnightAsUtc = Date.UTC(dz.getUTCFullYear(), dz.getUTCMonth(), dz.getUTCDate());
+  const gte = new Date(dzMidnightAsUtc - DZ_OFFSET_MS);
+  const lt = new Date(gte.getTime() + 24 * 60 * 60 * 1000);
+  return { gte, lt };
+}
+
+/**
+ * Whether a FREE user has hit the daily beta cap. Inert while subscriptions are
+ * disabled (returns false), so it changes nothing until the master switch is on.
+ */
+export function freeTierBlocksToday(subscriptionStatus: string, todayCount: number): boolean {
+  if (!SUBSCRIPTIONS_ENABLED) return false;
+  if (subscriptionStatus !== 'FREE') return false;
+  return todayCount >= FREE_TIER_DAILY_LIMIT;
+}
+
 export function getPlanFromUser(user: SessionUser): { id: PlanId; limits: PlanLimit } {
   const plan = getPlanByStatus(user.subscriptionStatus);
   return { id: plan.id, limits: plan.limits };

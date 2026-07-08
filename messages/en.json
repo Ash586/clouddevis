@@ -763,6 +763,18 @@
     "planProExport": "Data export",
     "subscribeSoon": "Subscribe — Coming soon"
   },
+  "feedback": {
+    "open": "Send feedback",
+    "title": "Your feedback helps us",
+    "subtitle": "An idea or a bug? Tell us everything — we read every message.",
+    "suggestion": "Suggestion",
+    "bug": "Report a bug",
+    "placeholder": "Describe your idea or the problem you ran into…",
+    "emailOptional": "Email (optional, so we can reply)",
+    "send": "Send",
+    "sent": "Thanks! Your feedback was sent ✓",
+    "error": "Failed to send. Please try again."
+  },
   "subscription": {
     "trialBanner": "Trial period — 7 days to try everything",
     "subscribe": "Subscribe",

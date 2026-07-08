@@ -6,7 +6,7 @@ import { sendPush, invoiceApprovedPush, devisAcceptedPush, paymentReceivedPush }
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
 import { generateDocNumber } from '@/lib/dgi';
-import { TRIAL_DAYS, canCreateDocument, getDocLimit } from '@/lib/subscription';
+import { TRIAL_DAYS, canCreateDocument, getDocLimit, FREE_TIER_DAILY_LIMIT, algiersDayWindow, freeTierBlocksToday } from '@/lib/subscription';
 import { SUBSCRIPTIONS_ENABLED } from '@/lib/features';
 import { validateDocumentBody } from '@/lib/validation';
 import { getLang } from '@/lib/api-i18n';
@@ -179,6 +179,24 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
     if (!canCreateDocument(sessionUser, user.docCountThisMonth)) {
       const limit = getDocLimit(sessionUser);
       return NextResponse.json({ error: `Limite mensuelle de documents atteinte (${limit}). Passez à un forfait supérieur.`, limit }, { status: 403 });
+    }
+
+    // Free-tier beta cap: max FREE_TIER_DAILY_LIMIT documents per Algeria-calendar day.
+    // Inert while SUBSCRIPTIONS_ENABLED is false (freeTierBlocksToday returns false).
+    if (SUBSCRIPTIONS_ENABLED && user.subscriptionStatus === 'FREE') {
+      const { gte, lt } = algiersDayWindow(now);
+      const todayCount = await prisma.document.count({
+        where: { userId: session.userId, createdAt: { gte, lt } },
+      });
+      if (freeTierBlocksToday(user.subscriptionStatus, todayCount)) {
+        const lang = getLang(req);
+        const msg = lang === 'ar'
+          ? `لقد وصلت إلى الحد الأقصى للباقة المجانية (${FREE_TIER_DAILY_LIMIT} وثائق/يوم). يرجى العودة غداً.`
+          : lang === 'en'
+          ? `You've reached the free plan limit (${FREE_TIER_DAILY_LIMIT} documents/day). Please come back tomorrow.`
+          : `Vous avez atteint la limite de l'offre gratuite (${FREE_TIER_DAILY_LIMIT} documents/jour). Revenez demain.`;
+        return NextResponse.json({ error: msg, code: 'DAILY_LIMIT', limit: FREE_TIER_DAILY_LIMIT }, { status: 403 });
+      }
     }
 
     const body = await req.json();

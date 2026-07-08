@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { OfflineSyncProvider } from '@/components/layout/OfflineSyncProvider';
+import { FeedbackFab } from '@/components/feedback/FeedbackFab';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -29,5 +30,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return <OfflineSyncProvider>{children}</OfflineSyncProvider>;
+  return (
+    <OfflineSyncProvider>
+      {children}
+      <FeedbackFab />
+    </OfflineSyncProvider>
+  );
 }

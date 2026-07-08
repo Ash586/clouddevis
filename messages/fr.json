@@ -763,6 +763,18 @@
     "planProExport": "Export de données",
     "subscribeSoon": "Souscrire — Bientôt disponible"
   },
+  "feedback": {
+    "open": "Envoyer un retour",
+    "title": "Votre avis nous aide",
+    "subtitle": "Une idée ou un bug ? Dites-nous tout — nous lisons chaque message.",
+    "suggestion": "Suggestion",
+    "bug": "Signaler un bug",
+    "placeholder": "Décrivez votre idée ou le problème rencontré…",
+    "emailOptional": "Email (optionnel, pour vous répondre)",
+    "send": "Envoyer",
+    "sent": "Merci ! Votre retour a bien été envoyé ✓",
+    "error": "Échec de l'envoi. Réessayez."
+  },
   "subscription": {
     "trialBanner": "Période d'essai — 7 jours pour tout essayer",
     "subscribe": "Souscrire",
