@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
 import { generateDocNumber } from '@/lib/dgi';
 import { TRIAL_DAYS, canCreateDocument, getDocLimit } from '@/lib/subscription';
+import { SUBSCRIPTIONS_ENABLED } from '@/lib/features';
 import { validateDocumentBody } from '@/lib/validation';
 import { getLang } from '@/lib/api-i18n';
 import { buildEditorMeta } from '@/lib/editorMeta';
@@ -163,9 +164,9 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
       user.docCountThisMonth = 0;
     }
 
-    // Check trial expiration
+    // Check trial expiration (skipped entirely while subscriptions are disabled)
     const isTrial = user.subscriptionStatus === 'TRIAL';
-    if (isTrial && user.trialStartAt) {
+    if (SUBSCRIPTIONS_ENABLED && isTrial && user.trialStartAt) {
       const daysSinceTrial = Math.floor((now.getTime() - user.trialStartAt.getTime()) / 86400000);
       if (daysSinceTrial >= TRIAL_DAYS) {
         await prisma.user.update({ where: { id: session.userId }, data: { subscriptionStatus: 'FREE' } });

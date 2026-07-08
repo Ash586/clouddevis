@@ -1,5 +1,14 @@
 import type { PlanId } from './pricing';
 
+/**
+ * Master switch for subscriptions & the trial gate.
+ *
+ * `false` → the whole app is free: no paywall, no trial expiry, no plan limits,
+ * every feature unlocked. Used while the product is still under development.
+ * Flip back to `true` to re-enable subscriptions and plan-based gating.
+ */
+export const SUBSCRIPTIONS_ENABLED = false;
+
 export type FeatureId =
   | 'documents:unlimited'
   | 'documents:50'
@@ -59,6 +68,7 @@ export const PLAN_FEATURES: Record<PlanId, FeatureId[]> = {
 };
 
 export function hasFeature(planId: PlanId, feature: FeatureId): boolean {
+  if (!SUBSCRIPTIONS_ENABLED) return true;
   return PLAN_FEATURES[planId]?.includes(feature) ?? false;
 }
 

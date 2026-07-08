@@ -1,7 +1,7 @@
 import type { SessionUser } from './auth';
 import type { PlanId, PlanLimit } from './pricing';
 import { getPlanByStatus, PLANS } from './pricing';
-import { hasFeature, type FeatureId } from './features';
+import { hasFeature, SUBSCRIPTIONS_ENABLED, type FeatureId } from './features';
 
 export const TRIAL_DAYS = 7;
 
@@ -16,24 +16,28 @@ export function userHasFeature(user: SessionUser, feature: FeatureId): boolean {
 }
 
 export function getDocLimit(user: SessionUser): number | 'unlimited' {
+  if (!SUBSCRIPTIONS_ENABLED) return 'unlimited';
   if (user.subscriptionStatus === 'TRIAL') return 'unlimited';
   const plan = getPlanByStatus(user.subscriptionStatus);
   return plan.limits.docsPerMonth;
 }
 
 export function getTeamMemberLimit(user: SessionUser): number {
+  if (!SUBSCRIPTIONS_ENABLED) return Number.MAX_SAFE_INTEGER;
   if (user.subscriptionStatus === 'TRIAL') return 5;
   const plan = getPlanByStatus(user.subscriptionStatus);
   return plan.limits.teamMembers;
 }
 
 export function getStorageLimitMB(user: SessionUser): number {
+  if (!SUBSCRIPTIONS_ENABLED) return Number.MAX_SAFE_INTEGER;
   if (user.subscriptionStatus === 'TRIAL') return 10240;
   const plan = getPlanByStatus(user.subscriptionStatus);
   return plan.limits.storageMB;
 }
 
 export function canCreateDocument(user: SessionUser, currentMonthCount: number): boolean {
+  if (!SUBSCRIPTIONS_ENABLED) return true;
   if (user.subscriptionStatus === 'TRIAL') return true;
   if (user.subscriptionStatus === 'EXPIRED') return false;
   const limit = getDocLimit(user);

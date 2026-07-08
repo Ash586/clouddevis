@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
 import { useUser } from '@/hooks/useUser';
+import { SUBSCRIPTIONS_ENABLED } from '@/lib/features';
 import { PLANS, PLAN_ORDER, formatPrice } from '@/lib/pricing';
 
 export function TrialGate({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,9 @@ export function TrialGate({ children }: { children: React.ReactNode }) {
     }
     setSubscribing(null);
   };
+
+  // Subscriptions disabled during development → everyone has full free access.
+  if (!SUBSCRIPTIONS_ENABLED) return <>{children}</>;
 
   if (loading) return null;
   if (!user) return <>{children}</>;
