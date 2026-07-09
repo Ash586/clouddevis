@@ -65,8 +65,8 @@ function EditorContent() {
   // account's mode (JWT carries it lowercase). Existing docs keep their own
   // mode; a manual in-editor toggle is never overridden (applied once).
   const { user: sessionUser } = useUser();
-  // Free/beta PDFs carry a "Créé avec Rakmana.co" watermark. Independent of the
-  // subscription master switch — TRIAL and FREE users are watermarked during beta.
+  // Free-tier PDFs carry a "Créé avec Rakmana.co" watermark. Inert while
+  // subscriptions are disabled (shouldWatermarkPdf returns false).
   const brandWatermark = shouldWatermarkPdf(sessionUser?.subscriptionStatus ?? 'FREE');
   const sessionModeApplied = useRef(false);
   useEffect(() => {
