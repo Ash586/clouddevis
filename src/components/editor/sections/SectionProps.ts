@@ -11,6 +11,7 @@ export interface SectionProps {
   doc: DocumentState;
   setDoc: React.Dispatch<React.SetStateAction<DocumentState>>;
   mode: UserMode;
+  setMode: (mode: UserMode) => void;
   hiddenFields: Set<string>;
   customSections: CustomSectionDef[];
   sectionOrder: string[];

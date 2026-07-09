@@ -17,7 +17,7 @@ const MODES = [
 ];
 
 export function ModeSection() {
-  const { mode, setDoc, hiddenFields } = useSectionContext();
+  const { mode, setMode, hiddenFields } = useSectionContext();
 
   if (hiddenFields.has('businessMode')) return null;
 
@@ -30,20 +30,7 @@ export function ModeSection() {
             <button
               key={m.value}
               type="button"
-              onClick={() =>
-                setDoc(prev => ({
-                  ...prev,
-                  mode: m.value,
-                  companyInfo:
-                    m.value === 'entreprise'
-                      ? prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }
-                      : undefined,
-                  artisanInfo:
-                    m.value === 'artisan'
-                      ? prev.artisanInfo ?? { name: '', address: '', phone: '' }
-                      : undefined,
-                }))
-              }
+              onClick={() => setMode(m.value)}
               className={`text-left p-2.5 rounded-xl border-2 transition ${
                 active
                   ? 'border-[var(--green-2)] bg-[rgba(37,99,235,0.06)]'

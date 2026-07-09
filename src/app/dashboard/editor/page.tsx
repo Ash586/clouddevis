@@ -15,7 +15,7 @@ import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
-import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, getCategoryOptions } from '@/types';
+import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, getCategoryOptions, ENTREPRISE_ONLY_FIELDS } from '@/types';
 import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
 import { cn } from '@/lib/utils';
@@ -254,8 +254,11 @@ function EditorContent() {
   // are hidden by default. Artisans also hide company-bureaucracy fields.
   // BY DEFAULT only — saved user prefs always win, and everything stays
   // re-enableable from the customizer.
+  // NB: entreprise-only fields (fiscal IDs, capital) are force-hidden in Artisan
+  // mode below and gated by `mode` in the form/PDF, so they don't need listing
+  // here. This list only trims company-bank bureaucracy from a default devis.
   const REAL_DOC_HIDDEN_DEFAULTS: Record<string, string[]> = {
-    devis: ['companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'rib', 'bankName', 'bankAgency', 'ccpNumber'],
+    devis: ['companyCapital', 'rib', 'bankName', 'bankAgency', 'ccpNumber'],
     client: ['clientNis', 'clientRc', 'clientAi'],
     general: ['stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
     paiement: ['paymentIban'],
@@ -292,6 +295,11 @@ function EditorContent() {
         }
       }
     }
+  }
+  // Hard guarantee: entreprise-only fields (fiscal IDs, capital, company name/
+  // address) are never shown or emitted in Artisan mode, regardless of saved prefs.
+  if (mode === 'artisan') {
+    for (const f of ENTREPRISE_ONLY_FIELDS) hiddenFields.add(f);
   }
 
   const router = useRouter();
@@ -559,7 +567,7 @@ function EditorContent() {
       isDragging: dragSectionId === id,
     };
     const sectionProps = {
-      doc, setDoc, mode, hiddenFields,
+      doc, setDoc, mode, setMode, hiddenFields,
       customSections, sectionOrder: doc.sectionOrder, results,
       addingItem, setAddingItem, newItem, setNewItem,
       handleAddItem, handleRemoveItem, moveItem, startNewItem,
@@ -668,12 +676,7 @@ function EditorContent() {
           <div className="hidden sm:flex items-center bg-[var(--navy-3)] rounded-lg p-0.5 border border-[rgba(15,39,71,0.1)] shrink-0">
             {(['artisan', 'entreprise'] as const).map(m => (
               <button key={m} type="button"
-                onClick={() => setDoc(prev => ({
-                  ...prev,
-                  mode: m,
-                  companyInfo: m === 'entreprise' ? (prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }) : undefined,
-                  artisanInfo: m === 'artisan' ? (prev.artisanInfo ?? { name: '', address: '', phone: '' }) : undefined,
-                }))}
+                onClick={() => setMode(m)}
                 title={m === 'artisan' ? 'Mode Artisan — nom + téléphone' : 'Mode Entreprise — RC, NIF, NIS, AI sur PDF'}
                 className={`flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded-md transition ${mode === m ? 'bg-[var(--green-2)] text-white shadow-sm' : 'text-[var(--sand-muted)] hover:text-[var(--sand)]'}`}>
                 <span>{m === 'artisan' ? '🔨' : '🏢'}</span>

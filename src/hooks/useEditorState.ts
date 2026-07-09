@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { DocumentState, LineItem, UserMode, WizardStep, DocumentType } from '@/types';
-import { DEFAULT_SECTION_ORDER } from '@/types';
+import { DEFAULT_SECTION_ORDER, modeSwitchPatch } from '@/types';
 import { calculateDocument, generateDocumentNumber, formatDateISO, generateId } from '@/lib/calculations';
 import { parseEditorMeta } from '@/lib/editorMeta';
 
@@ -150,19 +150,7 @@ export function useEditorState(initialMode?: UserMode, initialDocId?: string, in
   const [mode, setModeState] = useState<UserMode>(initialMode ?? 'artisan');
   const setMode = useCallback((newMode: UserMode) => {
     setModeState(newMode);
-    setDoc(prev => {
-      if (prev.mode === newMode) return prev;
-      return {
-        ...prev,
-        mode: newMode,
-        companyInfo: newMode === 'entreprise'
-          ? prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }
-          : undefined,
-        artisanInfo: newMode === 'artisan'
-          ? prev.artisanInfo ?? { name: '', address: '', phone: '' }
-          : undefined,
-      };
-    });
+    setDoc(prev => (prev.mode === newMode ? prev : { ...prev, ...modeSwitchPatch(prev, newMode) }));
   }, [setDoc]);
   const [saving, setSaving] = useState(false);
   const [docId, setDocId] = useState<string | null>(initialDocId ?? null);

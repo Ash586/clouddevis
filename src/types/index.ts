@@ -11,6 +11,50 @@ export type PaymentMode = 'cheque' | 'virement' | 'especes' | 'cb';
 export type Language = 'fr' | 'ar' | 'en';
 export type UserMode = 'artisan' | 'entreprise';
 export type WizardStep = 1 | 2 | 3;
+
+/**
+ * Fields that only make sense for a company (Entreprise): the fiscal IDs, the
+ * share capital, and the registered company name/address. In Artisan mode these
+ * are hidden from the form, the Customize modal, and never emitted to the PDF.
+ * Bank fields (RIB/CCP/Banque) are intentionally NOT here — an artisan may hold
+ * a CCP, so those stay available in both modes.
+ */
+export const ENTREPRISE_ONLY_FIELDS = [
+  'companyName', 'companyAddress', 'nif', 'nis', 'ai', 'rc', 'companyCapital',
+] as const;
+
+/** Artisan-exclusive customizer fields. The artisan's own name/address/phone is
+ *  a render block (gated by mode in ClientSection), not a toggleable field, so
+ *  this list is currently empty — kept for symmetry and future use. */
+export const ARTISAN_ONLY_FIELDS: string[] = [];
+
+/** Whether a customizer/form field id is allowed to appear in the given mode. */
+export function fieldAllowedInMode(fieldId: string, mode: UserMode): boolean {
+  if (mode === 'artisan') return !ENTREPRISE_ONLY_FIELDS.includes(fieldId as typeof ENTREPRISE_ONLY_FIELDS[number]);
+  return !ARTISAN_ONLY_FIELDS.includes(fieldId);
+}
+
+/**
+ * The document-state patch to apply when switching business mode. Initialises the
+ * struct the new mode needs, drops the other mode's struct, and clears the stray
+ * top-level `companyCapital` so entreprise data can't leak into an Artisan PDF.
+ * Shared by every mode toggle so the behaviour stays identical everywhere.
+ */
+export function modeSwitchPatch(
+  prev: DocumentState,
+  mode: UserMode,
+): Pick<DocumentState, 'mode' | 'companyInfo' | 'artisanInfo' | 'companyCapital'> {
+  return {
+    mode,
+    companyInfo: mode === 'entreprise'
+      ? (prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' })
+      : undefined,
+    artisanInfo: mode === 'artisan'
+      ? (prev.artisanInfo ?? { name: '', address: '', phone: '' })
+      : undefined,
+    companyCapital: mode === 'artisan' ? '' : prev.companyCapital,
+  };
+}
 export type UnitMeasure = 'u' | 'h' | 'j' | 'm2' | 'm3' | 'ml' | 'kg' | 'forfait';
 
 export interface FieldVisibility {

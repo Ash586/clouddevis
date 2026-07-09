@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, FileText, Building2, User, MapPin, Package, ClipboardList, Percent, BadgeCheck, Receipt, CircleDollarSign, ScrollText, Pen, Briefcase, Plus } from 'lucide-react';
 import { SectionCreatorForm } from '@/components/editor/SectionCreatorForm';
 import type { DocumentState, CustomSectionDef, DocumentType } from '@/types';
-import { SECTION_FIELDS, DOC_TYPE_SECTIONS, DEFAULT_SECTION_ORDER } from '@/types';
+import { SECTION_FIELDS, DOC_TYPE_SECTIONS, DEFAULT_SECTION_ORDER, fieldAllowedInMode } from '@/types';
 import { DOC_TYPE_EDITOR_LABELS } from './EditorConstants';
 
 interface CustomizationModalProps {
@@ -120,10 +120,15 @@ export function CustomizationModal({
   const relevantSections = DOC_TYPE_SECTIONS[doc.documentType] ?? DEFAULT_SECTION_ORDER;
   const ALL_SECTIONS = [...relevantSections, ...customSections.map(s => s.id).filter(id => !relevantSections.includes(id))];
 
-  const filteredGroups = CUSTOMIZER_GROUPS.filter(group => {
-    if (group.onlyFor && !group.onlyFor.includes(doc.documentType)) return false;
-    return relevantSections.includes(group.section);
-  });
+  // Drop fields that don't apply to the current mode (e.g. fiscal IDs / capital /
+  // company name in Artisan mode), then drop any group left with no fields.
+  const filteredGroups = CUSTOMIZER_GROUPS
+    .filter(group => {
+      if (group.onlyFor && !group.onlyFor.includes(doc.documentType)) return false;
+      return relevantSections.includes(group.section);
+    })
+    .map(group => ({ ...group, fields: group.fields.filter(f => fieldAllowedInMode(f, doc.mode)) }))
+    .filter(group => group.fields.length > 0);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
