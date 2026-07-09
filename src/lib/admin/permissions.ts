@@ -9,6 +9,7 @@ export type Permission =
   | 'logs:read'
   | 'system:read' | 'system:write' | 'system:backup'
   | 'settings:read' | 'settings:write'
+  | 'feedback:read' | 'feedback:write'
   | 'admins:manage';
 
 const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
@@ -22,6 +23,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'logs:read',
     'system:read',
     'settings:read',
+    'feedback:read',
   ],
   EDITOR: [
     'users:read', 'users:write', 'users:suspend',
@@ -32,6 +34,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'logs:read',
     'system:read',
     'settings:read',
+    'feedback:read', 'feedback:write',
   ],
   ADMIN: [
     'users:read', 'users:write', 'users:delete', 'users:suspend',
@@ -42,6 +45,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'logs:read',
     'system:read', 'system:write', 'system:backup',
     'settings:read', 'settings:write',
+    'feedback:read', 'feedback:write',
     'admins:manage',
   ],
 };

@@ -12,6 +12,7 @@ import {
   Activity,
   Settings,
   BookOpen,
+  MessageSquare,
 } from 'lucide-react';
 
 interface NavItemConfig {
@@ -27,6 +28,7 @@ const NAV_ITEMS: NavItemConfig[] = [
   { key: 'analytics', href: '/admin/analytics', icon: BarChart3 },
   { key: 'subscriptions', href: '/admin/subscriptions', icon: CreditCard },
   { key: 'partners', href: '/admin/partners', icon: Handshake },
+  { key: 'feedback', href: '/admin/feedback', icon: MessageSquare },
   { key: 'reports', href: '/admin/reports', icon: FileText },
   { key: 'logs', href: '/admin/logs', icon: Activity },
   { key: 'docs', href: '/admin/docs', icon: BookOpen },
