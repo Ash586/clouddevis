@@ -11,11 +11,10 @@ interface Props {
   customSections?: CustomSectionDef[];
   hiddenFields?: Set<string>;
   previewFocus?: PreviewFocus;
-  brandWatermark?: boolean;
   onZoneClick?: (focus: NonNullable<PreviewFocus>) => void;
 }
 
-export function DocumentPreview({ doc, results, hiddenFields, previewFocus = null, brandWatermark = false, onZoneClick }: Props) {
+export function DocumentPreview({ doc, results, hiddenFields, previewFocus = null, onZoneClick }: Props) {
   const hf = new Set(hiddenFields ?? []);
   const sf = (fieldId: string) => !hf.has(fieldId);
   const bv = (...fieldIds: string[]) => fieldIds.some(f => sf(f));
@@ -29,7 +28,6 @@ export function DocumentPreview({ doc, results, hiddenFields, previewFocus = nul
       bv={bv}
       vb={vb}
       highlight={previewFocus}
-      brandWatermark={brandWatermark}
       onZoneClick={onZoneClick}
     />
   );

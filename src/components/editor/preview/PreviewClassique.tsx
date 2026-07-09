@@ -2,7 +2,6 @@
 import React from 'react';
 import type { DocumentState, CalculationResult } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
-import { BRAND_NAME } from '@/lib/brand';
 
 const C = {
   text:    '#111111',
@@ -46,11 +45,10 @@ interface Props {
   bv: (...fs: string[]) => boolean;
   vb: (b: string) => boolean;
   highlight?: PreviewFocus;
-  brandWatermark?: boolean;
   onZoneClick?: (focus: NonNullable<PreviewFocus>) => void;
 }
 
-export function PreviewClassique({ doc, results, sf, bv, vb, highlight, brandWatermark = false, onZoneClick }: Props) {
+export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneClick }: Props) {
   const isEnt = doc.mode === 'entreprise';
   const comp = doc.companyInfo;
   const art  = doc.artisanInfo;
@@ -96,13 +94,6 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, brandWat
       className="w-[21cm] min-h-[29.7cm] bg-white flex flex-col shadow-md print:shadow-none"
       style={{ fontFamily: "'Arial', 'Helvetica', sans-serif", color: C.text, fontSize: 11, padding: '1.2cm 1.5cm', position: 'relative' }}
     >
-      {brandWatermark && (
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center', gap: '26px 46px', transform: 'rotate(-30deg) scale(1.4)', opacity: 0.07 }}>
-          {Array.from({ length: 60 }).map((_, i) => (
-            <span key={i} style={{ fontSize: 20, fontWeight: 800, color: C.text, whiteSpace: 'nowrap', letterSpacing: '0.5px' }}>Créé avec {BRAND_NAME}.co</span>
-          ))}
-        </div>
-      )}
       {/* ── HEADER ── */}
       <div
         onClick={onZoneClick ? () => onZoneClick('header') : undefined}

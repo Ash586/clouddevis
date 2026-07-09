@@ -40,9 +40,8 @@ export function generateClassiqueHTML(params: {
   vb: (block: string) => boolean;
   currency?: string;
   lang?: string;
-  brandWatermark?: boolean;
 }): string {
-  const { doc, results, sf, bv, vb, lang = 'fr', brandWatermark = false } = params;
+  const { doc, results, sf, bv, vb, lang = 'fr' } = params;
   const isAr = lang === 'ar';
   const dir = isAr ? ' dir="rtl"' : '';
   const arFont = isAr ? "'Noto Naskh Arabic'," : '';
@@ -141,13 +140,9 @@ ${isAr ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 body{font-family:${arFont}Arial,Helvetica,sans-serif;color:#111;font-size:11px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .page{width:210mm;min-height:297mm;margin:0 auto;padding:1.2cm 1.5cm;display:flex;flex-direction:column;background:#fff;position:relative}
 table{width:100%;border-collapse:collapse}
-.wm{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:26px 46px;transform:rotate(-30deg) scale(1.4);opacity:0.07}
-.wm span{font-size:20px;font-weight:800;color:#111;white-space:nowrap;letter-spacing:0.5px}
 </style></head>
 <body>
 <div class="page">
-${brandWatermark ? `<div class="wm" aria-hidden="true">${Array(60).fill(`<span>Créé avec ${e(BRAND_NAME)}.co</span>`).join('')}</div>` : ''}
-
   <!-- HEADER -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px">
     <div style="flex:1">

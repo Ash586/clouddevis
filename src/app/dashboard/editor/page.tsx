@@ -15,7 +15,6 @@ import { useEditorUndo } from '@/hooks/useEditorUndo';
 import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/components/ui/toast';
 import { formatCurrency, generateDocumentNumber } from '@/lib/calculations';
-import { shouldWatermarkPdf } from '@/lib/subscription';
 import { DEFAULT_SECTION_ORDER, SECTION_FIELDS, DOC_TYPE_DEFAULT_FIELDS, DOC_TYPE_SECTIONS, getCategoryOptions } from '@/types';
 import type { UserMode, BlockId, SectionId, LineItem, CustomSectionDef } from '@/types';
 import type { PreviewFocus } from '@/components/editor/DocumentPreview';
@@ -65,9 +64,6 @@ function EditorContent() {
   // account's mode (JWT carries it lowercase). Existing docs keep their own
   // mode; a manual in-editor toggle is never overridden (applied once).
   const { user: sessionUser } = useUser();
-  // Free-tier PDFs carry a "Créé avec Rakmana.co" watermark. Inert while
-  // subscriptions are disabled (shouldWatermarkPdf returns false).
-  const brandWatermark = shouldWatermarkPdf(sessionUser?.subscriptionStatus ?? 'FREE');
   const sessionModeApplied = useRef(false);
   useEffect(() => {
     if (sessionModeApplied.current || modeParam || docIdParam || !sessionUser?.mode) return;
@@ -337,7 +333,7 @@ function EditorContent() {
 
     // Single clean "Classique" template for ALL document types — matches the editor preview exactly.
     const { generateClassiqueHTML } = await import('@/lib/generateClassiqueHTML');
-    const html = generateClassiqueHTML({ doc, results, sf, bv, vb, currency: tc('currency'), lang: locale, brandWatermark });
+    const html = generateClassiqueHTML({ doc, results, sf, bv, vb, currency: tc('currency'), lang: locale });
 
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -903,7 +899,7 @@ function EditorContent() {
                 <div className="print-area-wrapper origin-top transition-transform duration-200"
                   style={{ transform: `scale(${mobileTab === 'preview' ? Math.min(computedScale, (typeof window !== 'undefined' ? window.innerWidth - 32 : 350) / 794) : computedScale})` }}>
                   <div className="rounded-[6px] bg-white/5 p-2 shadow-[0_30px_90px_rgba(0,0,0,0.35)] ring-1 ring-white/10 print:p-0 print:shadow-none print:ring-0">
-                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} brandWatermark={brandWatermark} onZoneClick={handlePreviewZoneClick} />
+                    <DocumentPreview doc={doc} results={results} customSections={customSections} hiddenFields={hiddenFields} previewFocus={previewFocus} onZoneClick={handlePreviewZoneClick} />
                   </div>
                 </div>
               </div>
