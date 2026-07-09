@@ -13,25 +13,23 @@ export type UserMode = 'artisan' | 'entreprise';
 export type WizardStep = 1 | 2 | 3;
 
 /**
- * Fields that only make sense for a company (Entreprise): the fiscal IDs, the
- * share capital, and the registered company name/address. In Artisan mode these
- * are hidden from the form, the Customize modal, and never emitted to the PDF.
- * Bank fields (RIB/CCP/Banque) are intentionally NOT here — an artisan may hold
- * a CCP, so those stay available in both modes.
+ * Fields that only make sense for a company (Entreprise): the registered company
+ * name/address, the RC (Registre de Commerce), and the share capital.
+ * NIF, NIS, AI are intentionally NOT here — they are legally required for both
+ * Artisans and Entreprises in Algeria. Bank fields (RIB/CCP/Banque) are also
+ * shared since an artisan may hold a CCP.
  */
 export const ENTREPRISE_ONLY_FIELDS = [
-  'companyName', 'companyAddress', 'nif', 'nis', 'ai', 'rc', 'companyCapital',
+  'companyName', 'companyAddress', 'rc', 'companyCapital',
 ] as const;
 
-/** Artisan-exclusive customizer fields. The artisan's own name/address/phone is
- *  a render block (gated by mode in ClientSection), not a toggleable field, so
- *  this list is currently empty — kept for symmetry and future use. */
-export const ARTISAN_ONLY_FIELDS: string[] = [];
+/** Artisan-exclusive fields: the N° Carte d'Artisan replaces the RC for artisans. */
+export const ARTISAN_ONLY_FIELDS = ['carteArtisan'] as const;
 
 /** Whether a customizer/form field id is allowed to appear in the given mode. */
 export function fieldAllowedInMode(fieldId: string, mode: UserMode): boolean {
   if (mode === 'artisan') return !ENTREPRISE_ONLY_FIELDS.includes(fieldId as typeof ENTREPRISE_ONLY_FIELDS[number]);
-  return !ARTISAN_ONLY_FIELDS.includes(fieldId);
+  return !ARTISAN_ONLY_FIELDS.includes(fieldId as typeof ARTISAN_ONLY_FIELDS[number]);
 }
 
 /**
@@ -50,7 +48,7 @@ export function modeSwitchPatch(
       ? (prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' })
       : undefined,
     artisanInfo: mode === 'artisan'
-      ? (prev.artisanInfo ?? { name: '', address: '', phone: '' })
+      ? (prev.artisanInfo ?? { name: '', address: '', phone: '', carteArtisan: '' })
       : undefined,
     companyCapital: mode === 'artisan' ? '' : prev.companyCapital,
   };
@@ -82,6 +80,7 @@ export interface ArtisanInfo {
   name: string;
   address: string;
   phone: string;
+  carteArtisan?: string;
 }
 
 export interface ClientInfo {
