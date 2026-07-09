@@ -38,6 +38,9 @@ export function freeTierBlocksToday(subscriptionStatus: string, todayCount: numb
  * Independent of SUBSCRIPTIONS_ENABLED — watermark is beta branding, not a paywall.
  */
 export function shouldWatermarkPdf(subscriptionStatus: string): boolean {
+  // TRIAL maps to the standard plan (which has pdf:clean) but during beta every
+  // user is on TRIAL — treat it the same as FREE for watermark purposes.
+  if (subscriptionStatus === 'TRIAL' || subscriptionStatus === 'FREE') return true;
   const planId = getPlanByStatus(subscriptionStatus).id;
   return !hasFeature(planId, 'export:pdf:clean');
 }
