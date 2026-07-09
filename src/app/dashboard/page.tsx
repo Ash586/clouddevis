@@ -8,6 +8,7 @@ import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
 import { ClientsPanel } from '@/components/dashboard/panels/ClientsPanel';
 import { DocumentsPanel } from '@/components/dashboard/panels/DocumentsPanel';
 import type { DashboardStats } from '@/components/dashboard/dashboardConstants';
+import { useAutoTour } from '@/contexts/TourProvider';
 
 const DEFAULT_STATS: DashboardStats = {
   totalDocs: 0, monthDocs: 0, totalTTC: '0', totalClients: 0,
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   const [userMode, setUserMode] = useState('');
   const [companyInfo, setCompanyInfo] = useState<{ name?: string } | null>(null);
   const [stats, setStats] = useState<DashboardStats>(DEFAULT_STATS);
+  const [loaded, setLoaded] = useState(false);
 
   const lastFetchRef = useRef(0);
 
@@ -35,9 +37,14 @@ export default function DashboardPage() {
       setUserMode(data.user?.mode || '');
       setCompanyInfo(data.user?.companyInfo || null);
       setStats(data.stats || DEFAULT_STATS);
+      setLoaded(true);
       lastFetchRef.current = Date.now();
     } catch { /* silent */ }
   }, []);
+
+  // Auto-start the dashboard tour once for a genuinely new user: data has
+  // loaded, they're on the overview tab, and they have zero documents.
+  useAutoTour('dashboard', loaded && tab === '' && stats.totalDocs === 0);
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void fetchData(); }, [fetchData]);

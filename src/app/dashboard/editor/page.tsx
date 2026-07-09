@@ -26,8 +26,9 @@ import {
   MapPin, Package, Percent, Shield, ShieldCheck, ShieldAlert, StickyNote, Maximize, Eye,
   Grid3X3, MoreHorizontal,
   ChevronDown, MonitorCheck,
-  Receipt, ClipboardList, FileStack, Wrench,
+  Receipt, ClipboardList, FileStack, Wrench, HelpCircle,
 } from 'lucide-react';
+import { useTour, useAutoTour } from '@/contexts/TourProvider';
 import { DOC_TYPE_EDITOR_LABELS, DOC_TYPE_PREVIEW_LABELS, normalizeDocTypeParam, sectionFocusMap, previewFocusToSectionId } from '@/components/editor/EditorConstants';
 import { ENABLED_DOC_TYPES } from '@/lib/config';
 import { CustomSectionRenderer } from '@/components/editor/sections/CustomSectionRenderer';
@@ -64,6 +65,10 @@ function EditorContent() {
   // account's mode (JWT carries it lowercase). Existing docs keep their own
   // mode; a manual in-editor toggle is never overridden (applied once).
   const { user: sessionUser } = useUser();
+  // Product tour: manual launch via the "?" button, auto-start once for a
+  // brand-new empty document (first-time users creating their first doc).
+  const { startTour } = useTour();
+  useAutoTour('editor', !docIdParam && doc.items.length === 0);
   const sessionModeApplied = useRef(false);
   useEffect(() => {
     if (sessionModeApplied.current || modeParam || docIdParam || !sessionUser?.mode) return;
@@ -627,7 +632,7 @@ function EditorContent() {
           <button type="button" onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={18} className="rotate-180" />
           </button>
-          <div className="relative shrink-0">
+          <div className="relative shrink-0" data-tour="doc-type">
             <button type="button" onClick={() => setShowTypeMenu(v => !v)}
               className="flex items-center gap-2 pl-3 pr-2.5 py-2 bg-[var(--green-glow)] text-[var(--green-3)] rounded-xl text-xs font-black uppercase tracking-wider transition hover:brightness-110 ring-1 ring-[var(--accent-ring)]">
               {doc.documentType === 'devis' ? <FileText size={15} /> : doc.documentType === 'facture' ? <Receipt size={15} /> : doc.documentType === 'proforma' ? <ClipboardList size={15} /> : doc.documentType === 'bc' ? <FileStack size={15} /> : doc.documentType === 'br' ? <Package size={15} /> : doc.documentType === 'intervention' ? <Wrench size={15} /> : <FileText size={15} />}
@@ -681,6 +686,7 @@ function EditorContent() {
           <div className="flex items-center gap-1 ms-auto">
             <button type="button" onClick={handleUndo} disabled={!canUndo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
             <button type="button" onClick={handleRedo} disabled={!canRedo} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)"><Redo2 size={16} /></button>
+            <button type="button" onClick={() => startTour('editor')} className="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[var(--navy-4)] transition" title={te('tourHelp')} aria-label={te('tourHelp')}><HelpCircle size={16} /></button>
             <div className="hidden lg:flex items-center gap-1">
               {!docIdParam && (
                 <button type="button" onClick={() => setShowCustomizer(true)} className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={te('customize')}>
@@ -692,11 +698,11 @@ function EditorContent() {
                 <ShieldCheck size={14} />
                 <span>Auditer</span>
               </Button>
-              <Button size="sm" variant="secondary" onClick={handleManualSave} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+              <Button data-tour="save-btn" size="sm" variant="secondary" onClick={handleManualSave} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 <span>{tc('save')}</span>
               </Button>
-              <Button size="sm" onClick={handleDownload} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
+              <Button data-tour="download-pdf-btn" size="sm" onClick={handleDownload} disabled={saving} className="h-9 text-xs gap-1.5 px-3.5">
                 <Download size={14} />
                 <span>{te('downloadPdf')}</span>
               </Button>
@@ -746,7 +752,7 @@ function EditorContent() {
         <div className="flex-1 flex overflow-hidden min-h-0">
 
           {/* ──── LEFT RAIL (always visible on lg+) ──── */}
-          <nav className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[var(--border-2)] w-[72px] shrink-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          <nav data-tour="section-nav" className="hidden lg:flex flex-col items-center gap-1 py-2.5 px-1.5 bg-[var(--navy-2)] border-r border-[var(--border-2)] w-[72px] shrink-0 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
             {sectionNavItems.map(item => {
               const active = activeSection === item.id;
               return (
@@ -804,7 +810,7 @@ function EditorContent() {
                   <AlertTriangle size={11} />{te('sections.prestations').replace(/^\d+\.\s*/, '')}
                 </button>
               )}
-              <div className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[var(--accent-ring)]">
+              <div data-tour="totals-bar" className="shrink-0 flex items-baseline gap-1.5 rounded-xl bg-[var(--green-glow)] px-3 py-1.5 ring-1 ring-[var(--accent-ring)]">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--green-3)]/80">{te('paiement.netToPay') || 'Net'}</span>
                 <span className="font-black text-[var(--green-3)] text-sm whitespace-nowrap">{formatCurrency(results.netAPayer, tc('currency'))}</span>
               </div>

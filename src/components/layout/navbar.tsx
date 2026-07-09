@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/hooks/useUser';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { SectionTabs } from '@/components/layout/SectionTabs';
+import { useTour } from '@/contexts/TourProvider';
+import { tourIdForPath } from '@/lib/tour/tours';
 import { ENABLED_DOC_TYPES } from '@/lib/config';
 import {
   Menu, X, Home, LayoutDashboard, FileText, Users, ChevronDown, User, Bell, LogOut,
   FileStack, CreditCard, UsersRound, Plus, PenLine, Receipt, ClipboardList, Wrench,
-  FilePen, ScrollText, Truck,
+  FilePen, ScrollText, Truck, HelpCircle,
 } from 'lucide-react';
 
 const LANG_LABELS: Record<string, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
@@ -53,6 +55,9 @@ export function Navbar() {
   const s = useTranslations('sidebar');
   const tc = useTranslations('common');
   const router = useRouter();
+  const pathname = usePathname();
+  const { startTour } = useTour();
+  const pageTourId = tourIdForPath(pathname);
   const { lang, setLang } = useLanguage();
   const { user, loading, refresh } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -96,7 +101,7 @@ export function Navbar() {
 
   // ── User pill + dropdown (ported from the removed Sidebar) ──
   const userPill = user && (
-    <div className="relative">
+    <div className="relative" data-tour="user-pill">
       <button type="button" onClick={() => setUserDropdownOpen(!userDropdownOpen)}
         className="flex items-center gap-2 pl-1.5 pr-2.5 py-1.5 rounded-xl bg-[rgba(15,39,71,0.06)] border border-[rgba(15,39,71,0.1)] hover:bg-[rgba(15,39,71,0.1)] transition-all min-h-[44px]">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[var(--green)] to-[var(--teal)] flex items-center justify-center text-white text-xs font-black shrink-0 shadow-sm">
@@ -217,7 +222,16 @@ export function Navbar() {
                 {LANG_LABELS[lang]}
               </button>
 
-              {user && <NotificationBell />}
+              {user && pageTourId && (
+                <button type="button" onClick={() => startTour(pageTourId)}
+                  title={t('tourHelp')}
+                  aria-label={t('tourHelp')}
+                  className="hidden md:flex items-center justify-center p-2 text-[var(--sand-muted)] hover:text-[var(--green-3)] rounded-lg min-h-[36px] min-w-[36px] transition-colors">
+                  <HelpCircle size={18} />
+                </button>
+              )}
+
+              {user && <span data-tour="notif-bell" className="inline-flex"><NotificationBell /></span>}
 
               <button type="button" onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-[var(--sand-muted)] hover:text-[var(--sand)] rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center">
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}

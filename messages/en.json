@@ -72,7 +72,8 @@
     "pricing": "Pricing",
     "langFr": "Français",
     "langAr": "العربية",
-    "langEn": "English"
+    "langEn": "English",
+    "tourHelp": "Guided tour"
   },
   "sidebar": {
     "stats": "Overview",
@@ -336,6 +337,7 @@
     "documentTypeIntervention": "Intervention",
     "documentTypeAttachement": "Attachement",
     "downloadPdf": "Download / Print PDF",
+    "tourHelp": "Guided tour",
     "saving": "Saving…",
     "editMode": "Edit mode",
     "hideBlock": "Hide this block in preview",
@@ -762,6 +764,27 @@
     "planProStats": "Advanced statistics",
     "planProExport": "Data export",
     "subscribeSoon": "Subscribe — Coming soon"
+  },
+  "tour": {
+    "next": "Next",
+    "prev": "Back",
+    "done": "Done",
+    "dash": {
+      "create": { "title": "Create your first document", "body": "Pick a type — quote, invoice… — to get started in seconds." },
+      "kpi": { "title": "Your metrics", "body": "Revenue, unpaid invoices, documents and clients at a glance." },
+      "tabs": { "title": "Navigate", "body": "Switch between Overview, Clients and Documents." },
+      "notif": { "title": "Notifications", "body": "Support replies to your suggestions show up here." },
+      "account": { "title": "Your account", "body": "Profile, subscription and team — all here." }
+    },
+    "ed": {
+      "type": { "title": "Document type", "body": "Quote, invoice, purchase order… choose here." },
+      "nav": { "title": "Sections", "body": "Move between your document's sections." },
+      "items": { "title": "Add your items", "body": "Enter services with quantity and price — totals compute automatically." },
+      "totals": { "title": "Automatic totals", "body": "VAT and fiscal stamp are calculated automatically per regulation." },
+      "preview": { "title": "Live preview", "body": "Your document updates in real time on the side." },
+      "save": { "title": "Save", "body": "Save your work (Ctrl+S)." },
+      "pdf": { "title": "Export to PDF", "body": "Download or print your document (Ctrl+P)." }
+    }
   },
   "feedback": {
     "open": "Send feedback",

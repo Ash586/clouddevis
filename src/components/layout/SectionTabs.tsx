@@ -43,7 +43,7 @@ export function SectionTabs({ clientCount = 0 }: Props) {
   };
 
   return (
-    <div className="hidden md:block border-t border-[rgba(15,39,71,0.06)] bg-[var(--navy)]/60">
+    <div data-tour="section-tabs" className="hidden md:block border-t border-[rgba(15,39,71,0.06)] bg-[var(--navy)]/60">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
         <nav className="flex items-center gap-1 -mb-px overflow-x-auto no-scrollbar" aria-label="Sections">
           {tabs.map((tab) => {

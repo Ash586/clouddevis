@@ -72,7 +72,8 @@
     "pricing": "Tarifs",
     "langFr": "Français",
     "langAr": "العربية",
-    "langEn": "English"
+    "langEn": "English",
+    "tourHelp": "Visite guidée"
   },
   "sidebar": {
     "stats": "Vue d'ensemble",
@@ -336,6 +337,7 @@
     "documentTypeIntervention": "Intervention",
     "documentTypeAttachement": "Attachement",
     "downloadPdf": "Télécharger / Imprimer PDF",
+    "tourHelp": "Visite guidée",
     "saving": "Enregistrement…",
     "editMode": "Mode édition",
     "hideBlock": "Masquer ce bloc dans l'aperçu",
@@ -762,6 +764,27 @@
     "planProStats": "Statistiques avancées",
     "planProExport": "Export de données",
     "subscribeSoon": "Souscrire — Bientôt disponible"
+  },
+  "tour": {
+    "next": "Suivant",
+    "prev": "Précédent",
+    "done": "Terminer",
+    "dash": {
+      "create": { "title": "Créez votre premier document", "body": "Choisissez un type — devis, facture… — pour démarrer en quelques secondes." },
+      "kpi": { "title": "Vos indicateurs", "body": "Chiffre d'affaires, factures impayées, documents et clients d'un coup d'œil." },
+      "tabs": { "title": "Naviguez", "body": "Basculez entre Vue d'ensemble, Clients et Documents." },
+      "notif": { "title": "Notifications", "body": "Les réponses du support à vos suggestions apparaissent ici." },
+      "account": { "title": "Votre compte", "body": "Profil, abonnement et équipe — tout est ici." }
+    },
+    "ed": {
+      "type": { "title": "Type de document", "body": "Devis, facture, bon de commande… choisissez ici." },
+      "nav": { "title": "Sections", "body": "Naviguez entre les sections de votre document." },
+      "items": { "title": "Ajoutez vos prestations", "body": "Saisissez vos articles avec quantité et prix — les totaux se calculent seuls." },
+      "totals": { "title": "Totaux automatiques", "body": "TVA et timbre fiscal sont calculés automatiquement selon la réglementation." },
+      "preview": { "title": "Aperçu en direct", "body": "Votre document se met à jour en temps réel à droite." },
+      "save": { "title": "Enregistrez", "body": "Sauvegardez votre travail (Ctrl+S)." },
+      "pdf": { "title": "Exportez en PDF", "body": "Téléchargez ou imprimez votre document (Ctrl+P)." }
+    }
   },
   "feedback": {
     "open": "Envoyer un retour",

@@ -35,7 +35,7 @@ function QuickCreateSection() {
   const t = useTranslations('dashboard');
   const router = useRouter();
   return (
-    <Card className="p-5 border-[rgba(15,39,71,0.06)]">
+    <Card data-tour="quick-create-grid" className="p-5 border-[rgba(15,39,71,0.06)]">
       <h2 className="text-[11px] font-bold text-[var(--sand-muted)] uppercase tracking-wider mb-4">
         {t('quickCreate')}
       </h2>

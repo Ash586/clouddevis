@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { OfflineSyncProvider } from '@/components/layout/OfflineSyncProvider';
 import { FeedbackFab } from '@/components/feedback/FeedbackFab';
+import { TourProvider } from '@/contexts/TourProvider';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -32,8 +33,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <OfflineSyncProvider>
-      {children}
-      <FeedbackFab />
+      <TourProvider>
+        {children}
+        <FeedbackFab />
+      </TourProvider>
     </OfflineSyncProvider>
   );
 }

@@ -13,7 +13,7 @@ export function DashboardKpiRow({ stats }: Props) {
   const sentCount = stats.statusBreakdown?.SENT || 0;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    <div data-tour="kpi-row" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
       {/* Hero: CA Total */}
       <div className="col-span-2 lg:col-span-1">
         <div className="relative overflow-hidden rounded-2xl p-5 h-full bg-gradient-to-br from-[var(--green-2)] to-[var(--green)] shadow-lg shadow-[rgba(37,99,235,0.2)]">
