@@ -3,6 +3,7 @@
 import { ClientCombobox } from '@/components/editor/ClientCombobox';
 import { validateNIF, validateNIS, validateRC, validateAI } from '@/lib/validation';
 import { useSectionContext } from './SectionProps';
+import type { PaymentMode } from '@/types';
 
 const inputCls = 'w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]';
 const labelCls = 'block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5';
@@ -93,6 +94,15 @@ export function ClientSection() {
             <input type="text" placeholder="007 99999 0000391575 54" className={`${inputCls} font-mono`} value={doc.ccpNumber ?? ''} onChange={(e) => updateDoc('ccpNumber', e.target.value)} />
           </div>
         </div>
+      </div>
+
+      {/* ── Mode de Paiement ── */}
+      <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+        <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('paiement.method')}</h4>
+        {!hiddenFields.has('paymentMethod') && <select className={inputCls} value={doc.paymentMode} onChange={(e) => updateDoc('paymentMode', e.target.value as PaymentMode)}>
+          <option value="cheque">{te('paiement.check')}</option><option value="virement">{te('paiement.transfer')}</option>
+          <option value="especes">{te('paiement.cash')}</option><option value="cb">{te('paiement.card')}</option>
+        </select>}
       </div>
 
       {mode === 'artisan' && doc.artisanInfo && <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
