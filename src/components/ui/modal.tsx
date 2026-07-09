@@ -16,6 +16,13 @@ export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
   const triggerRef = useRef<Element | null>(null);
   const titleId = useId();
 
+  // Keep the latest onClose in a ref so the focus-trap effect below depends only
+  // on `open`. Otherwise an inline onClose (recreated every parent render) would
+  // re-run the effect on each keystroke, and its cleanup would steal focus from
+  // the field being typed in — capping input at a single character.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   const sizes = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' };
 
   const focusableSelector = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -40,7 +47,7 @@ export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
     triggerRef.current = document.activeElement;
     const timer = setTimeout(() => dialogRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus(), 50);
     document.body.style.overflow = 'hidden';
-    const escHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const escHandler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCloseRef.current(); };
     document.addEventListener('keydown', escHandler);
     document.addEventListener('keydown', trapFocus);
     return () => {
@@ -50,7 +57,7 @@ export function Modal({ open, onClose, title, children, size = 'sm' }: Props) {
       document.removeEventListener('keydown', trapFocus);
       (triggerRef.current as HTMLElement)?.focus();
     };
-  }, [open, onClose, trapFocus]);
+  }, [open, trapFocus]);
 
   if (!open) return null;
 
