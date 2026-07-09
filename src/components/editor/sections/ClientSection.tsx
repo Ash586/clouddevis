@@ -1,10 +1,12 @@
 'use client';
 
 import { ClientCombobox } from '@/components/editor/ClientCombobox';
+import { validateNIF, validateNIS, validateRC, validateAI } from '@/lib/validation';
 import { useSectionContext } from './SectionProps';
 import type { PaymentMode } from '@/types';
 
 const inputCls = 'w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]';
+const labelCls = 'block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5';
 
 export function ClientSection() {
   const { doc, mode, updateDoc, updateClientInfo, updateArtisanInfo, hiddenFields, te } = useSectionContext();
@@ -17,6 +19,41 @@ export function ClientSection() {
 
       {!hiddenFields.has('clientEmail') && <div className="flex items-center gap-2 pt-1">
         <input type="text" placeholder={te('client.companyEmail')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.clientInfo.email ?? ''} onChange={(e) => updateClientInfo({ email: e.target.value })} /></div>}
+
+      {/* ── Identifiants fiscaux client ── */}
+      <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+        <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">{te('client.taxIds') || 'Identifiants fiscaux client'}</h4>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className={labelCls}>NIF</label>
+            <input type="text" placeholder="00000000000" maxLength={11}
+              className={doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />
+            {doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
+          </div>
+          <div>
+            <label className={labelCls}>NIS</label>
+            <input type="text" placeholder="0000000000" maxLength={10}
+              className={doc.clientInfo.nis && !validateNIS(doc.clientInfo.nis) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={doc.clientInfo.nis ?? ''} onChange={(e) => updateClientInfo({ nis: e.target.value })} />
+            {doc.clientInfo.nis && !validateNIS(doc.clientInfo.nis) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
+          </div>
+          <div>
+            <label className={labelCls}>AI</label>
+            <input type="text" placeholder="0000000000" maxLength={10}
+              className={doc.clientInfo.ai && !validateAI(doc.clientInfo.ai) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={doc.clientInfo.ai ?? ''} onChange={(e) => updateClientInfo({ ai: e.target.value })} />
+            {doc.clientInfo.ai && !validateAI(doc.clientInfo.ai) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
+          </div>
+          <div>
+            <label className={labelCls}>RC</label>
+            <input type="text" placeholder="16/00-0000000"
+              className={doc.clientInfo.rc && !validateRC(doc.clientInfo.rc) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={doc.clientInfo.rc ?? ''} onChange={(e) => updateClientInfo({ rc: e.target.value })} />
+            {doc.clientInfo.rc && !validateRC(doc.clientInfo.rc) && <span className="text-[8px] text-red-500">Format RC invalide</span>}
+          </div>
+        </div>
+      </div>
 
       {/* ── TAUX TVA ── */}
       <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">

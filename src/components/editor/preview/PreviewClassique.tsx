@@ -197,6 +197,15 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
             )}
           </div>
 
+          {/* Client tax IDs */}
+          {(cli.nif || cli.nis || cli.rc || cli.ai) && (
+            <div style={{ textAlign: 'right', fontSize: 9, color: C.muted, lineHeight: 1.7 }}>
+              {sf('clientNif') && cli.nif && <div><strong>IF :</strong> {cli.nif}</div>}
+              {sf('clientNis') && cli.nis && <div><strong>NIS :</strong> {cli.nis}</div>}
+              {sf('clientRc') && cli.rc && <div><strong>RC :</strong> {cli.rc}</div>}
+              {sf('clientAi') && cli.ai && <div><strong>AI :</strong> {cli.ai}</div>}
+            </div>
+          )}
         </div>
       )}
 
