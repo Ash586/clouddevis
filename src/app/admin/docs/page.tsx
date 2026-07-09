@@ -3,7 +3,7 @@
 import { FileText, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-const card = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '18px 20px' };
+const card = { background: '#ffffff', border: '0.5px solid rgba(15,23,42,0.08)', borderRadius: 10, padding: '18px 20px' };
 
 const REPORTS = [
   {
@@ -23,7 +23,7 @@ export default function AdminDocsPage() {
 
   return (
     <div style={{ padding: '24px 28px', maxWidth: 760 }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#e8ebf0', margin: '0 0 4px' }}>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>
         {t('nav.docs')}
       </h1>
       <p style={{ fontSize: 13, color: '#8a8f98', margin: '0 0 24px' }}>
@@ -39,16 +39,16 @@ export default function AdminDocsPage() {
             rel="noopener noreferrer"
             style={{ ...card, display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none', transition: 'border-color 0.15s' }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(74,158,255,0.4)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(15,23,42,0.08)'; }}
           >
             <span style={{ width: 38, height: 38, borderRadius: 9, background: 'rgba(74,158,255,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <FileText size={18} color="#4a9eff" />
+              <FileText size={18} color="#2563eb" />
             </span>
             <span style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#e8ebf0' }}>{r.title}</span>
+              <span style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#111827' }}>{r.title}</span>
               <span style={{ display: 'block', fontSize: 12, color: '#8a8f98', marginTop: 2, lineHeight: 1.5 }}>{r.description}</span>
             </span>
-            <ExternalLink size={15} color="#656a73" style={{ flexShrink: 0 }} />
+            <ExternalLink size={15} color="#94a3b8" style={{ flexShrink: 0 }} />
           </a>
         ))}
       </div>

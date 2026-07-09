@@ -1,147 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg: #0b0d12;
-  --bg2: #14171e;
-  --bg3: #1d202a;
-  --bg4: #282c38;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.04);
-  --text: #e8ebf0;
-  --text2: #a1a5ad;
-  --text3: #656a73;
-  --blue: #4a9eff;
-  --blue-bg: rgba(74,158,255,0.10);
-  --blue-bdr: rgba(74,158,255,0.20);
-  --green: #4ade80;
-  --green-bg: rgba(74,222,128,0.10);
-  --green-bdr: rgba(74,222,128,0.20);
-  --amber: #fbbf24;
-  --amber-bg: rgba(251,191,36,0.10);
-  --amber-bdr: rgba(251,191,36,0.20);
-  --red: #f87171;
-  --red-bg: rgba(248,113,113,0.10);
-  --red-bdr: rgba(248,113,113,0.20);
-  --purple: #a78bfa;
-  --purple-bg: rgba(167,139,250,0.10);
-  --purple-bdr: rgba(167,139,250,0.20);
+  /* ── Admin light palette ── */
+  --bg:      #f4f5f7;  /* page background */
+  --bg2:     #ffffff;  /* card / panel surface */
+  --bg3:     #eef1f5;  /* raised / active */
+  --bg4:     #e3e7ee;  /* stronger fill */
+  --border:  rgba(15,23,42,0.08);
+  --border2: rgba(15,23,42,0.05);
+  --text:    #111827;  /* primary text */
+  --text2:   #4b5563;  /* secondary text */
+  --text3:   #94a3b8;  /* muted text */
+  --blue:    #2563eb;
+  --blue-bg: rgba(37,99,235,0.08);
+  --blue-bdr: rgba(37,99,235,0.20);
+  --green:   #16a34a;
+  --green-bg: rgba(22,163,74,0.10);
+  --green-bdr: rgba(22,163,74,0.22);
+  --amber:   #d97706;
+  --amber-bg: rgba(217,119,6,0.10);
+  --amber-bdr: rgba(217,119,6,0.22);
+  --red:     #dc2626;
+  --red-bg:  rgba(220,38,38,0.10);
+  --red-bdr: rgba(220,38,38,0.22);
+  --purple:  #7c3aed;
+  --purple-bg: rgba(124,58,237,0.10);
+  --purple-bdr: rgba(124,58,237,0.20);
   --r: 10px;
   --rsm: 6px;
 }
 
-/* ── Dark theme overrides for all admin pages ── */
-/* Using #admin-layout for maximum specificity */
-
-/* Card / container backgrounds */
-#admin-layout .bg-white { background: var(--bg2) !important; }
-#admin-layout .bg-slate-50 { background: var(--bg3) !important; }
-#admin-layout .bg-slate-100 { background: var(--bg4) !important; }
-
-/* All blue backgrounds → neutral dark */
-#admin-layout .bg-blue-50 { background: var(--bg4) !important; }
-#admin-layout .bg-blue-100 { background: var(--bg3) !important; }
-#admin-layout .bg-blue-500 { background: var(--text3) !important; }
-#admin-layout .bg-blue-600 { background: var(--bg3) !important; }
-
-/* Hover overrides */
-#admin-layout .hover\:bg-blue-50:hover { background: var(--bg4) !important; }
-#admin-layout .hover\:bg-blue-100:hover { background: var(--bg3) !important; }
-#admin-layout .hover\:bg-blue-700:hover { background: var(--bg4) !important; }
-#admin-layout .hover\:text-blue-600:hover { color: var(--text) !important; }
-
-/* Spinner borders */
-#admin-layout .border-blue-500 { border-color: var(--text3) !important; }
-#admin-layout .border-blue-600 { border-color: var(--text3) !important; }
-
-/* Focus rings & borders → neutral */
-#admin-layout .focus\:ring-blue-500\/30:focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
-#admin-layout .focus\:ring-blue-500:focus { --tw-ring-color: rgba(255,255,255,0.06) !important; }
-#admin-layout .focus\:border-blue-500:focus { border-color: var(--border) !important; }
-
-/* Generic borders */
-#admin-layout .border-slate-200 { border-color: var(--border) !important; }
-#admin-layout .border-slate-100 { border-color: var(--border2) !important; }
-#admin-layout .border-emerald-100 { border-color: var(--green-bdr) !important; }
-#admin-layout .border-blue-100 { border-color: var(--border2) !important; }
-#admin-layout .border-amber-100 { border-color: var(--amber-bdr) !important; }
-
-/* Slate text → dark theme */
-#admin-layout .text-slate-900 { color: var(--text) !important; }
-#admin-layout .text-slate-800 { color: var(--text) !important; }
-#admin-layout .text-slate-700 { color: var(--text) !important; }
-#admin-layout .text-slate-600 { color: var(--text2) !important; }
-#admin-layout .text-slate-500 { color: var(--text2) !important; }
-#admin-layout .text-slate-400 { color: var(--text3) !important; }
-
-/* Colored text → readable neutral */
-#admin-layout .text-blue-500 { color: var(--text) !important; }
-#admin-layout .text-blue-600 { color: var(--text) !important; }
-#admin-layout .text-blue-700 { color: var(--text) !important; }
-#admin-layout .text-indigo-600 { color: var(--text) !important; }
-#admin-layout .text-cyan-600 { color: var(--text) !important; }
-
-/* Semantic colors (keep green/amber/red for status) */
-#admin-layout .text-emerald-500 { color: var(--green) !important; }
-#admin-layout .text-emerald-600 { color: var(--green) !important; }
-#admin-layout .text-amber-500 { color: var(--amber) !important; }
-#admin-layout .text-amber-600 { color: var(--amber) !important; }
-#admin-layout .text-red-600 { color: var(--red) !important; }
-
-/* Colored backgrounds (keep green/amber/red for status pills) */
-#admin-layout .bg-emerald-50 { background: var(--green-bg) !important; }
-#admin-layout .bg-amber-50 { background: var(--amber-bg) !important; }
-#admin-layout .bg-red-50 { background: var(--red-bg) !important; }
-
-/* Select/option text color */
-#admin-layout select { color: var(--text) !important; }
-#admin-layout option { color: var(--text) !important; }
-
-/* Rounded corners */
+/* ── Structural normalisation only — colors come from native Tailwind /
+      inline light values. No dark-theme flipping. ── */
 #admin-layout .rounded-2xl { border-radius: var(--r) !important; }
 #admin-layout .rounded-xl { border-radius: var(--rsm) !important; }
-
-/* Monospace font */
 #admin-layout .font-mono { font-family: 'IBM Plex Mono', monospace !important; }
-
-/* Border bottom in tables/lists */
-#admin-layout .border-b { border-bottom-color: var(--border2) !important; }
-
-/* Compound selectors for compound Tailwind classes */
-#admin-layout .bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
-#admin-layout .flex.gap-1.bg-white.border.border-slate-200.rounded-2xl { background: var(--bg2) !important; border-color: var(--border) !important; }
-#admin-layout .bg-slate-100.text-slate-900 { background: var(--bg3) !important; color: var(--text) !important; }
-#admin-layout .bg-slate-50.rounded-xl { background: var(--bg3) !important; }
-
-/* ═══════════════════════════════════════
-   LIGHT THEME FOR ADMIN
-═════════════════════════════════════ */
-:root[data-theme="light"] #admin-layout {
-  --bg:      #F5F1E8;
-  --bg2:     #FFFFFF;
-  --bg3:     #ECE5D4;
-  --bg4:     #E0D8C8;
-  --border:  #D4CCB8;
-  --border2: #ECE5D4;
-  --text:    #1A1A1A;
-  --text2:   #4A4A4A;
-  --text3:   #868E96;
-  --stamp-red: #E8542E;
-  /* Keep semantic status colors */
-  --blue:    #1864AB;
-  --green:   #1AA74E;
-  --amber:   #E67700;
-  --red:     #C92A2A;
-}
-
-/* Light theme — override the dark overrides */
-:root[data-theme="light"] #admin-layout .bg-white { background: var(--bg2) !important; }
-:root[data-theme="light"] #admin-layout .bg-slate-50 { background: var(--bg3) !important; }
-:root[data-theme="light"] #admin-layout .bg-slate-100 { background: var(--bg4) !important; }
-:root[data-theme="light"] #admin-layout .text-slate-900 { color: var(--text) !important; }
-:root[data-theme="light"] #admin-layout .text-slate-800 { color: var(--text) !important; }
-:root[data-theme="light"] #admin-layout .text-slate-700 { color: var(--text) !important; }
-:root[data-theme="light"] #admin-layout .text-slate-600 { color: var(--text2) !important; }
-:root[data-theme="light"] #admin-layout .text-slate-500 { color: var(--text2) !important; }
-:root[data-theme="light"] #admin-layout .border-slate-200 { border-color: var(--border) !important; }
-:root[data-theme="light"] #admin-layout select { color: var(--text) !important; }
-:root[data-theme="light"] #admin-layout option { color: var(--text) !important; }

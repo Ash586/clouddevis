@@ -56,18 +56,18 @@ export default function AdminEnterpriseRequestDetailPage() {
     setSaving(false);
   };
 
-  if (loading) return <div className="min-h-screen bg-[#0f1117] p-6 text-slate-500">Chargement...</div>;
-  if (!request) return <div className="min-h-screen bg-[#0f1117] p-6 text-red-400">Demande introuvable</div>;
+  if (loading) return <div className="min-h-screen bg-[#f4f5f7] p-6 text-slate-500">Chargement...</div>;
+  if (!request) return <div className="min-h-screen bg-[#f4f5f7] p-6 text-red-600">Demande introuvable</div>;
 
   return (
-    <div className="min-h-screen bg-[#0f1117] p-6 max-w-3xl mx-auto space-y-6">
-        <button type="button" onClick={() => router.back()} className="text-xs text-slate-400 hover:text-white transition">&larr; Retour</button>
+    <div className="min-h-screen bg-[#f4f5f7] p-6 max-w-3xl mx-auto space-y-6">
+        <button type="button" onClick={() => router.back()} className="text-xs text-slate-500 hover:text-slate-900 transition">&larr; Retour</button>
 
-        <Card className="p-6 bg-slate-900/50 border-slate-800">
+        <Card className="p-6 bg-white border-slate-200">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-xl font-black text-white">{request.companyName}</h1>
-              <p className="text-sm text-slate-400 mt-1">{request.user.name} • {request.user.email}</p>
+              <h1 className="text-xl font-black text-slate-900">{request.companyName}</h1>
+              <p className="text-sm text-slate-500 mt-1">{request.user.name} • {request.user.email}</p>
             </div>
             <Badge variant={request.status === 'APPROVED' ? 'success' : request.status === 'REJECTED' ? 'danger' : request.status === 'CONTACTED' ? 'info' : 'warning'}>
               {request.status}
@@ -75,21 +75,21 @@ export default function AdminEnterpriseRequestDetailPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm mb-6">
-            <div><span className="text-slate-500">Employés:</span> <span className="text-white font-medium">{request.employees}</span></div>
-            <div><span className="text-slate-500">Téléphone:</span> <span className="text-white font-medium">{request.phone || '—'}</span></div>
-            <div><span className="text-slate-500">Date:</span> <span className="text-white font-medium">{new Date(request.createdAt).toLocaleDateString('fr-FR')}</span></div>
-            <div><span className="text-slate-500">Traité par:</span> <span className="text-white font-medium">{request.handledBy?.name || '—'}</span></div>
+            <div><span className="text-slate-500">Employés:</span> <span className="text-slate-900 font-medium">{request.employees}</span></div>
+            <div><span className="text-slate-500">Téléphone:</span> <span className="text-slate-900 font-medium">{request.phone || '—'}</span></div>
+            <div><span className="text-slate-500">Date:</span> <span className="text-slate-900 font-medium">{new Date(request.createdAt).toLocaleDateString('fr-FR')}</span></div>
+            <div><span className="text-slate-500">Traité par:</span> <span className="text-slate-900 font-medium">{request.handledBy?.name || '—'}</span></div>
           </div>
 
           <div className="mb-6">
             <h3 className="text-xs font-bold text-slate-500 uppercase mb-2">Besoins</h3>
-            <p className="text-sm text-slate-300 bg-slate-800/50 rounded-lg p-3">{request.needs}</p>
+            <p className="text-sm text-slate-700 bg-slate-50 rounded-lg p-3">{request.needs}</p>
           </div>
 
           <div className="mb-6">
             <h3 className="text-xs font-bold text-slate-500 uppercase mb-2">Notes internes</h3>
             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+              className="w-full bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
           </div>
 
           <div className="flex flex-wrap gap-2">

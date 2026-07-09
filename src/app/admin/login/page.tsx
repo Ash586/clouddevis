@@ -5,18 +5,18 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Mail, Lock, Eye, EyeOff, Loader2, CornerDownLeft, AlertTriangle } from 'lucide-react';
 
 /* ── Midnight Slate tokens (mirrors admin.css) ── */
-const BG = '#0b0d12';
-const SURFACE = '#14171e';
-const SURFACE_2 = '#1d202a';
-const SURFACE_3 = '#282c38';
-const ACCENT = '#4a9eff';
-const TEXT = '#e8ebf0';
-const TEXT_2 = '#a1a5ad';
-const TEXT_3 = '#656a73';
-const BORDER = 'rgba(255,255,255,0.08)';
-const RED = '#f87171';
-const AMBER = '#fbbf24';
-const GREEN = '#4ade80';
+const BG = '#f4f5f7';
+const SURFACE = '#ffffff';
+const SURFACE_2 = '#eef1f5';
+const SURFACE_3 = '#e3e7ee';
+const ACCENT = '#2563eb';
+const TEXT = '#111827';
+const TEXT_2 = '#4b5563';
+const TEXT_3 = '#94a3b8';
+const BORDER = 'rgba(15,23,42,0.08)';
+const RED = '#dc2626';
+const AMBER = '#d97706';
+const GREEN = '#16a34a';
 
 const SORA = "'Sora', system-ui, -apple-system, sans-serif";
 const MONO = "'IBM Plex Mono', ui-monospace, 'SF Mono', monospace";
@@ -178,7 +178,7 @@ function AdminLoginForm() {
           pointerEvents: 'none',
           opacity: 0.45,
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+            'linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)',
           backgroundSize: '44px 44px',
           maskImage: 'radial-gradient(ellipse 80% 60% at 50% 38%, #000 0%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 38%, #000 0%, transparent 100%)',
@@ -206,7 +206,7 @@ function AdminLoginForm() {
               justifyContent: 'center',
               background: SURFACE,
               border: `1px solid ${BORDER}`,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.4)',
+              boxShadow: 'inset 0 1px 0 rgba(15,23,42,0.06), 0 8px 24px rgba(0,0,0,0.4)',
               marginBottom: 18,
               position: 'relative',
             }}
@@ -276,7 +276,7 @@ function AdminLoginForm() {
             padding: 28,
             background: `linear-gradient(180deg, ${SURFACE} 0%, #11141b 100%)`,
             border: `1px solid ${BORDER}`,
-            boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 64px rgba(0,0,0,0.55)',
+            boxShadow: '0 1px 0 rgba(15,23,42,0.05) inset, 0 24px 64px rgba(0,0,0,0.55)',
           }}
         >
           <div style={{ marginBottom: 22 }}>
@@ -454,7 +454,7 @@ function AdminLoginForm() {
                     cursor: loading ? 'default' : 'pointer',
                     transition: 'color .15s ease, background .15s ease',
                   }}
-                  onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.color = TEXT; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
+                  onMouseEnter={(e) => { if (!loading) { e.currentTarget.style.color = TEXT; e.currentTarget.style.background = 'rgba(15,23,42,0.06)'; } }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_3; e.currentTarget.style.background = 'transparent'; }}
                 >
                   {showPassword ? <EyeOff style={{ width: 16, height: 16 }} /> : <Eye style={{ width: 16, height: 16 }} />}
@@ -504,8 +504,8 @@ function AdminLoginForm() {
                 border: '1px solid rgba(74,158,255,0.5)',
                 background: loading
                   ? 'linear-gradient(180deg, #3a7fd0 0%, #2f6cb8 100%)'
-                  : 'linear-gradient(180deg, #5aa8ff 0%, #4a9eff 100%)',
-                boxShadow: loading ? 'none' : '0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 22px rgba(74,158,255,0.28)',
+                  : 'linear-gradient(180deg, #5aa8ff 0%, #2563eb 100%)',
+                boxShadow: loading ? 'none' : '0 1px 0 rgba(15,23,42,0.20) inset, 0 8px 22px rgba(74,158,255,0.28)',
                 cursor: loading ? 'default' : 'pointer',
                 opacity: loading ? 0.85 : 1,
               }}
@@ -587,9 +587,9 @@ function AdminLoginForm() {
             }}
           />
           <span>Connexion chiffrée</span>
-          <span style={{ color: 'rgba(255,255,255,0.14)' }}>·</span>
+          <span style={{ color: 'rgba(15,23,42,0.12)' }}>·</span>
           <span>Session 12 h</span>
-          <span style={{ color: 'rgba(255,255,255,0.14)' }}>·</span>
+          <span style={{ color: 'rgba(15,23,42,0.12)' }}>·</span>
           <span>Journalisée</span>
         </div>
       </div>

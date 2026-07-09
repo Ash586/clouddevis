@@ -92,7 +92,7 @@ export default function AdminUserDetailPage() {
     PRO: 'bg-emerald-50 text-emerald-600',
     MAX: 'bg-purple-50 text-purple-600',
     ENTERPRISE: 'bg-red-50 text-red-600',
-    EXPIRED: 'bg-slate-50 text-slate-400',
+    EXPIRED: 'bg-slate-50 text-slate-500',
     FREE: 'bg-slate-50 text-slate-600',
   };
 
@@ -100,7 +100,7 @@ export default function AdminUserDetailPage() {
 
   if (!user) return (
     <div className="text-center py-20">
-      <p className="text-slate-400">{t('error')}</p>
+      <p className="text-slate-500">{t('error')}</p>
       <button type="button" onClick={() => router.push('/admin/users')} className="mt-4 text-blue-600 font-bold text-sm hover:underline">
         {t('nav.users')}
       </button>
@@ -116,11 +116,11 @@ export default function AdminUserDetailPage() {
         </button>
         <div>
           <h1 className="text-2xl font-black text-slate-900">{t('nav.userDetail')}</h1>
-          <p className="text-sm text-slate-400">{user.name} — {user.email}</p>
+          <p className="text-sm text-slate-500">{user.name} — {user.email}</p>
         </div>
         <div className="ms-auto flex gap-2">
           <button type="button" onClick={handleSuspendToggle} disabled={actionLoading}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-50 ${user.suspended ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-900 transition disabled:opacity-50 ${user.suspended ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}`}>
             {actionLoading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : user.suspended ? (
@@ -146,30 +146,30 @@ export default function AdminUserDetailPage() {
           <h2 className="text-sm font-bold text-slate-900 mb-4">{t('users.detail')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-              <Mail className="w-4 h-4 text-slate-400" />
+              <Mail className="w-4 h-4 text-slate-500" />
               <div>
-                <p className="text-xs text-slate-400 font-semibold">{t('table.email')}</p>
+                <p className="text-xs text-slate-500 font-semibold">{t('table.email')}</p>
                 <p className="text-sm font-semibold text-slate-800">{user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-              <Globe className="w-4 h-4 text-slate-400" />
+              <Globe className="w-4 h-4 text-slate-500" />
               <div>
-                <p className="text-xs text-slate-400 font-semibold">{t('table.country')}</p>
+                <p className="text-xs text-slate-500 font-semibold">{t('table.country')}</p>
                 <p className="text-sm font-semibold text-slate-800 capitalize">{user.country}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-              <UserCheck className="w-4 h-4 text-slate-400" />
+              <UserCheck className="w-4 h-4 text-slate-500" />
               <div>
-                <p className="text-xs text-slate-400 font-semibold">{t('users.role')}</p>
+                <p className="text-xs text-slate-500 font-semibold">{t('users.role')}</p>
                 <p className="text-sm font-semibold text-slate-800 capitalize">{user.mode}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
               <div className={`w-4 h-4 rounded-full ${user.suspended ? 'bg-red-500' : 'bg-emerald-500'}`} />
               <div>
-                <p className="text-xs text-slate-400 font-semibold">{t('table.status')}</p>
+                <p className="text-xs text-slate-500 font-semibold">{t('table.status')}</p>
                 <p className="text-sm font-semibold text-slate-800">
                   {user.suspended ? t('users.suspended') : t('users.active')}
                   {user.suspendedAt && ` — ${new Date(user.suspendedAt).toLocaleDateString()}`}
@@ -181,11 +181,11 @@ export default function AdminUserDetailPage() {
           {/* Sector & Dates */}
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <p className="text-xs text-slate-400 font-semibold mb-1">Secteur</p>
+              <p className="text-xs text-slate-500 font-semibold mb-1">Secteur</p>
               <p className="text-sm font-semibold text-slate-800">{user.sector || '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-semibold mb-1">{t('table.date')}</p>
+              <p className="text-xs text-slate-500 font-semibold mb-1">{t('table.date')}</p>
               <p className="text-sm font-semibold text-slate-800">{user.createdAt}</p>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function AdminUserDetailPage() {
                 </div>
                 <div>
                   <p className="text-lg font-black text-slate-900">{stat.value}</p>
-                  <p className="text-xs text-slate-400 font-semibold">{stat.label}</p>
+                  <p className="text-xs text-slate-500 font-semibold">{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -219,27 +219,27 @@ export default function AdminUserDetailPage() {
         <h2 className="text-sm font-bold text-slate-900 mb-4">{t('subscriptions.detail')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div className="p-3 rounded-xl bg-slate-50">
-            <p className="text-xs text-slate-400 font-semibold mb-1">{t('subscriptions.status')}</p>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{t('subscriptions.status')}</p>
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${statusColors[user.subscriptionStatus] || 'bg-slate-50 text-slate-600'}`}>
               {user.subscriptionStatus}
             </span>
           </div>
           <div className="p-3 rounded-xl bg-slate-50">
-            <p className="text-xs text-slate-400 font-semibold mb-1">{t('subscriptions.trialEnd')}</p>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{t('subscriptions.trialEnd')}</p>
             <p className="text-sm font-semibold text-slate-800 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <Calendar className="w-3.5 h-3.5 text-slate-500" />
               {user.trialStartAt ? new Date(user.trialStartAt).toLocaleDateString() : '—'}
             </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50">
-            <p className="text-xs text-slate-400 font-semibold mb-1">{t('subscriptions.endDate')}</p>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{t('subscriptions.endDate')}</p>
             <p className="text-sm font-semibold text-slate-800 flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
               {user.subscriptionEndAt ? new Date(user.subscriptionEndAt).toLocaleDateString() : '—'}
             </p>
           </div>
           <div className="p-3 rounded-xl bg-slate-50">
-            <p className="text-xs text-slate-400 font-semibold mb-1">{t('subscriptions.changePlan')}</p>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{t('subscriptions.changePlan')}</p>
             <select
               value={user.subscriptionStatus}
               onChange={e => handleSubscriptionChange(e.target.value)}

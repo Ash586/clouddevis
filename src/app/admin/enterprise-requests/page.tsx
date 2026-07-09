@@ -39,13 +39,13 @@ export default function AdminEnterpriseRequestsPage() {
   const filtered = filter === 'ALL' ? requests : requests.filter(r => r.status === filter);
 
   return (
-    <div className="min-h-screen bg-[#0f1117] p-6 max-w-5xl mx-auto">
-      <h1 className="text-xl font-black text-white mb-4">Demandes Enterprise</h1>
+    <div className="min-h-screen bg-[#f4f5f7] p-6 max-w-5xl mx-auto">
+      <h1 className="text-xl font-black text-slate-900 mb-4">Demandes Enterprise</h1>
 
         <div className="flex gap-2 mb-6">
           {['ALL', 'PENDING', 'CONTACTED', 'APPROVED', 'REJECTED'].map(s => (
             <button type="button" key={s} onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${filter === s ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${filter === s ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:text-slate-900'}`}>
               {s === 'ALL' ? 'Tous' : s}
             </button>
           ))}
@@ -54,18 +54,18 @@ export default function AdminEnterpriseRequestsPage() {
         {loading ? (
           <div className="animate-pulse text-sm text-slate-500">Chargement...</div>
         ) : filtered.length === 0 ? (
-          <Card className="p-8 text-center bg-slate-900/50 border-slate-800">
+          <Card className="p-8 text-center bg-white border-slate-200">
             <p className="text-sm text-slate-500">Aucune demande</p>
           </Card>
         ) : (
           <div className="space-y-3">
             {filtered.map(r => (
               <Link key={r.id} href={`/admin/enterprise-requests/${r.id}`}>
-                <Card className="p-4 bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition cursor-pointer">
+                <Card className="p-4 bg-white border-slate-200 hover:bg-slate-50 transition cursor-pointer">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-white">{r.companyName}</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">{r.user.name} • {r.user.email}</p>
+                      <h3 className="text-sm font-bold text-slate-900">{r.companyName}</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">{r.user.name} • {r.user.email}</p>
                       <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{r.needs}</p>
                     </div>
                     <div className="text-right shrink-0">

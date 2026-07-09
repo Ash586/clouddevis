@@ -60,15 +60,15 @@ function NavItem({ item, pathname, router, t }: {
         border: 'none',
         cursor: 'pointer',
         transition: 'all 0.15s',
-        background: isActive ? '#1d202a' : 'transparent',
-        color: '#e8ebf0',
+        background: isActive ? '#eef1f5' : 'transparent',
+        color: '#111827',
         borderWidth: isActive ? 0.5 : 0,
         borderStyle: 'solid',
-        borderColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+        borderColor: isActive ? 'rgba(15,23,42,0.08)' : 'transparent',
       }}
       onMouseEnter={e => {
         if (!isActive) {
-          e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+          e.currentTarget.style.background = 'rgba(15,23,42,0.05)';
         }
       }}
       onMouseLeave={e => {
@@ -93,18 +93,18 @@ export function AdminSidebar() {
       style={{
         width: 200,
         flexShrink: 0,
-        borderRight: '0.5px solid rgba(255,255,255,0.06)',
-        background: '#14171e',
+        borderRight: '0.5px solid rgba(15,23,42,0.07)',
+        background: '#ffffff',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <div style={{ padding: '18px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ padding: '18px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 17, fontWeight: 700, color: '#e8ebf0', letterSpacing: '-0.3px' }}>
+          <span style={{ fontSize: 17, fontWeight: 700, color: '#111827', letterSpacing: '-0.3px' }}>
             ☁️ Rakmana
           </span>
-          <span style={{ fontSize: 10, color: '#656a73', fontWeight: 500 }}>
+          <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
             Admin
           </span>
         </div>

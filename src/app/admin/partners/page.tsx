@@ -97,7 +97,7 @@ export default function AdminPartnersPage() {
 
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
             value={search}
@@ -106,7 +106,7 @@ export default function AdminPartnersPage() {
             className="w-full pl-9 pr-8 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
           />
           {search && (
-            <button type="button" onClick={() => { setSearch(''); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+            <button type="button" onClick={() => { setSearch(''); setPage(1); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
               <XCircle className="w-4 h-4" />
             </button>
           )}
@@ -141,7 +141,7 @@ export default function AdminPartnersPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-slate-400 text-xs font-semibold">
+              <tr className="border-b text-left text-slate-500 text-xs font-semibold">
                 <th className="pb-2">Partenaire</th>
                 <th className="pb-2">Code</th>
                 <th className="pb-2">Niveau</th>
@@ -156,7 +156,7 @@ export default function AdminPartnersPage() {
                 <tr key={p.id} className="border-b border-slate-50">
                   <td className="py-2.5">
                     <div className="font-semibold text-slate-800">{p.user.name}</div>
-                    <div className="text-xs text-slate-400">{p.user.email}</div>
+                    <div className="text-xs text-slate-500">{p.user.email}</div>
                   </td>
                   <td className="py-2.5 font-mono text-xs">{p.code}</td>
                   <td className="py-2.5">
@@ -170,7 +170,7 @@ export default function AdminPartnersPage() {
                     </span>
                   </td>
                   <td className="py-2.5 text-slate-600">{p.referralCount}</td>
-                  <td className="py-2.5 text-slate-400 text-xs">{p.appliedAt}</td>
+                  <td className="py-2.5 text-slate-500 text-xs">{p.appliedAt}</td>
                   <td className="py-2.5">
                     <div className="flex gap-1 flex-wrap">
                       {p.status === 'PENDING' && (

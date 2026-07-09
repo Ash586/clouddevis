@@ -2,9 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { LogOut, Bell, Menu, X, Sun, Moon } from 'lucide-react';
+import { LogOut, Bell, Menu, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface AdminNavbarProps {
   onMenuToggle?: () => void;
@@ -28,7 +27,6 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { theme, toggleTheme } = useTheme();
 
   const pageTitle = Object.entries(PAGE_TITLES).find(([path]) =>
     pathname === path || (path !== '/admin' && pathname.startsWith(path))
@@ -46,8 +44,8 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
         top: 0,
         zIndex: 10,
         padding: '14px 28px',
-        borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-        background: 'rgba(11,13,18,0.9)',
+        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        background: 'rgba(255,255,255,0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         display: 'flex',
@@ -62,14 +60,14 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: '#a1a5ad',
+              color: '#4b5563',
               padding: 4,
             }}
           >
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         )}
-        <h1 style={{ fontSize: 16, fontWeight: 500, color: '#e8ebf0', margin: 0 }}>
+        <h1 style={{ fontSize: 16, fontWeight: 500, color: '#111827', margin: 0 }}>
           {pageTitle}
         </h1>
       </div>
@@ -86,29 +84,12 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
         >
           <Bell size={16} />
         </button>
-        <button type="button"           className="theme-toggle"
-          onClick={toggleTheme}
-          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--text2)',
-            padding: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-          }}
-        >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
         <button type="button"           onClick={handleLogout}
           style={{
             background: 'transparent',
-            border: '0.5px solid rgba(255,255,255,0.08)',
+            border: '0.5px solid rgba(15,23,42,0.08)',
             cursor: 'pointer',
-            color: '#a1a5ad',
+            color: '#4b5563',
             padding: '6px 12px',
             borderRadius: 7,
             fontSize: 12,
@@ -120,13 +101,13 @@ export function AdminNavbar({ onMenuToggle, menuOpen }: AdminNavbarProps) {
           }}
           onMouseEnter={e => {
             e.currentTarget.style.background = 'rgba(248,113,113,0.1)';
-            e.currentTarget.style.color = '#f87171';
+            e.currentTarget.style.color = '#dc2626';
             e.currentTarget.style.borderColor = 'rgba(248,113,113,0.2)';
           }}
           onMouseLeave={e => {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = '#a1a5ad';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+            e.currentTarget.style.color = '#4b5563';
+            e.currentTarget.style.borderColor = 'rgba(15,23,42,0.08)';
           }}
         >
           <LogOut size={13} />

@@ -12,7 +12,7 @@ export function AdminMetricCard({ value, label, trend, trendColor, color }: Admi
   return (
     <div
       style={{
-        background: '#282c38',
+        background: '#e3e7ee',
         borderRadius: 7,
         padding: '9px 11px',
       }}
@@ -20,7 +20,7 @@ export function AdminMetricCard({ value, label, trend, trendColor, color }: Admi
       <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 2, color }}>
         {value}
       </div>
-      <div style={{ fontSize: 9.5, color: '#656a73' }}>
+      <div style={{ fontSize: 9.5, color: '#94a3b8' }}>
         {label}
       </div>
       {trend && (

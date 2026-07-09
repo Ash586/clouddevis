@@ -55,7 +55,7 @@ export default function AdminSystemPage() {
   }, []);
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!data) return <div className="text-center py-20 text-slate-400">{t('error')}</div>;
+  if (!data) return <div className="text-center py-20 text-slate-500">{t('error')}</div>;
 
   const formatUptime = (seconds: number) => {
     const d = Math.floor(seconds / 86400);
@@ -111,7 +111,7 @@ export default function AdminSystemPage() {
               <m.icon className={`w-5 h-5 ${m.color}`} />
             </div>
             <p className="text-lg font-black text-slate-900">{m.value}</p>
-            <p className="text-xs text-slate-400 font-semibold mt-1">{m.label}</p>
+            <p className="text-xs text-slate-500 font-semibold mt-1">{m.label}</p>
           </Card>
         ))}
       </div>
@@ -123,7 +123,7 @@ export default function AdminSystemPage() {
           {counts.map(c => (
             <div key={c.label} className="text-center">
               <p className={`text-2xl font-black ${c.color}`}>{c.value.toLocaleString()}</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">{c.label}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-1">{c.label}</p>
             </div>
           ))}
         </div>
@@ -136,7 +136,7 @@ export default function AdminSystemPage() {
           {extraCounts.map(c => (
             <div key={c.label} className="text-center">
               <p className={`text-lg font-black ${c.color}`}>{c.value.toLocaleString()}</p>
-              <p className="text-xs text-slate-400 font-semibold mt-1">{c.label}</p>
+              <p className="text-xs text-slate-500 font-semibold mt-1">{c.label}</p>
             </div>
           ))}
         </div>
@@ -170,7 +170,7 @@ export default function AdminSystemPage() {
         <Card className="p-5">
           <h2 className="text-sm font-bold text-slate-900 mb-4">Pages les plus visitées</h2>
           {data.activity.topPages.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-4">Aucune donnée</p>
+            <p className="text-sm text-slate-500 text-center py-4">Aucune donnée</p>
           ) : (
             <div className="space-y-2">
               {data.activity.topPages.map(p => {
@@ -179,7 +179,7 @@ export default function AdminSystemPage() {
                   <div key={p.path}>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="font-semibold text-slate-700 font-mono text-xs">{p.path}</span>
-                      <span className="text-slate-400">{p.count}</span>
+                      <span className="text-slate-500">{p.count}</span>
                     </div>
                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(p.count / maxCount) * 100}%` }} />
@@ -201,14 +201,14 @@ export default function AdminSystemPage() {
               <AlertTriangle className="w-5 h-5 text-red-600" />
               <div>
                 <p className="text-lg font-black text-red-600">{data.activity.errorCount}</p>
-                <p className="text-xs text-slate-400 font-semibold">Erreurs</p>
+                <p className="text-xs text-slate-500 font-semibold">Erreurs</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50">
               <LogIn className="w-5 h-5 text-emerald-600" />
               <div>
                 <p className="text-lg font-black text-emerald-600">{data.activity.loginCount}</p>
-                <p className="text-xs text-slate-400 font-semibold">Connexions</p>
+                <p className="text-xs text-slate-500 font-semibold">Connexions</p>
               </div>
             </div>
           </div>
@@ -235,11 +235,11 @@ export default function AdminSystemPage() {
       {/* Started At */}
       <Card className="p-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-400">Démarré le</span>
+          <span className="text-slate-500">Démarré le</span>
           <span className="font-semibold text-slate-800">{new Date(data.startedAt).toLocaleString()}</span>
         </div>
         <div className="flex items-center justify-between text-sm mt-2">
-          <span className="text-slate-400">Platforme</span>
+          <span className="text-slate-500">Platforme</span>
           <span className="font-semibold text-slate-800">{data.platform}</span>
         </div>
       </Card>
@@ -264,12 +264,12 @@ export default function AdminSystemPage() {
                   {b.status === 'completed' ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />}
                   <span className="font-semibold">{b.type}</span>
                 </div>
-                <span className="text-xs text-slate-400">{new Date(b.startedAt).toLocaleString()}</span>
+                <span className="text-xs text-slate-500">{new Date(b.startedAt).toLocaleString()}</span>
               </div>
             ))}
           </div>
         )}
-        {!showBackups && <p className="text-xs text-slate-400">Aucune sauvegarde récente. Cliquez pour effectuer une sauvegarde manuelle.</p>}
+        {!showBackups && <p className="text-xs text-slate-500">Aucune sauvegarde récente. Cliquez pour effectuer une sauvegarde manuelle.</p>}
       </Card>
     </div>
   );

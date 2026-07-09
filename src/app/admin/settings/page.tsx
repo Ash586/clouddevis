@@ -32,17 +32,17 @@ export default function AdminSettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: '#a1a5ad', display: 'block', marginBottom: 6 };
-  const inputStyle: React.CSSProperties = { background: '#282c38', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '9px 12px', fontSize: 13, color: '#e8ebf0', outline: 'none', width: '100%', boxSizing: 'border-box' };
-  const cardStyle: React.CSSProperties = { background: '#14171e', border: '0.5px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: 20 };
+  const labelStyle: React.CSSProperties = { fontSize: 12, fontWeight: 600, color: '#4b5563', display: 'block', marginBottom: 6 };
+  const inputStyle: React.CSSProperties = { background: '#e3e7ee', border: '0.5px solid rgba(15,23,42,0.08)', borderRadius: 6, padding: '9px 12px', fontSize: 13, color: '#111827', outline: 'none', width: '100%', boxSizing: 'border-box' };
+  const cardStyle: React.CSSProperties = { background: '#ffffff', border: '0.5px solid rgba(15,23,42,0.08)', borderRadius: 10, padding: 20 };
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8ebf0', marginBottom: 20 }}>{t('nav.settings')}</h1>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', marginBottom: 20 }}>{t('nav.settings')}</h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={cardStyle}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#e8ebf0', margin: '0 0 16px' }}>{t('settings.general')}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>{t('settings.general')}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={labelStyle}>{t('settings.siteName')}</label>
@@ -69,7 +69,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div style={cardStyle}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#e8ebf0', margin: '0 0 16px' }}>{t('settings.limits')}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>{t('settings.limits')}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div>
               <label style={labelStyle}>{t('settings.trialDays')}</label>
@@ -87,16 +87,16 @@ export default function AdminSettingsPage() {
         </div>
 
         <div style={cardStyle}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#e8ebf0', margin: '0 0 16px' }}>{t('settings.featuresStatus')}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 16px' }}>{t('settings.featuresStatus')}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 13, color: '#e8ebf0' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 13, color: '#111827' }}>
               <input type="checkbox" checked={settings.maintenance} onChange={e => setSettings({ ...settings, maintenance: e.target.checked })}
-                style={{ accentColor: '#e8ebf0', width: 16, height: 16 }} />
+                style={{ accentColor: '#111827', width: 16, height: 16 }} />
               {t('settings.maintenanceMode')}
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 13, color: '#e8ebf0' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 13, color: '#111827' }}>
               <input type="checkbox" checked={settings.registrationOpen} onChange={e => setSettings({ ...settings, registrationOpen: e.target.checked })}
-                style={{ accentColor: '#e8ebf0', width: 16, height: 16 }} />
+                style={{ accentColor: '#111827', width: 16, height: 16 }} />
               {t('settings.registrationOpen')}
             </label>
           </div>
@@ -106,10 +106,10 @@ export default function AdminSettingsPage() {
           <button type="button" onClick={handleSave} disabled={saving}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '11px 24px', borderRadius: 6,
-              fontSize: 13, fontWeight: 700, border: '0.5px solid rgba(255,255,255,0.08)',
+              fontSize: 13, fontWeight: 700, border: '0.5px solid rgba(15,23,42,0.08)',
               cursor: saving ? 'default' : 'pointer',
-              background: saved ? 'rgba(74,222,128,0.10)' : '#1d202a',
-              color: saved ? '#4ade80' : '#e8ebf0',
+              background: saved ? 'rgba(74,222,128,0.10)' : '#eef1f5',
+              color: saved ? '#16a34a' : '#111827',
               opacity: saving ? 0.5 : 1,
             }}>
             {saving ? (
