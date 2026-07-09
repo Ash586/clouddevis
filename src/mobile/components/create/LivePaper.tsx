@@ -127,7 +127,7 @@ export function LivePaper({
               </span>
               <span className="flex-1 min-w-0">
                 <span className="block text-sm font-semibold text-[var(--sand)] truncate">{client.name}</span>
-                {client.nif && <span className="block text-[10px] text-[var(--sand-muted)]">NIF {client.nif}</span>}
+              
               </span>
               <Pencil size={15} className="text-[var(--sand-muted)] shrink-0" />
             </>

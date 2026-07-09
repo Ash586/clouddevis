@@ -39,7 +39,7 @@ const CUSTOMIZER_GROUPS: Array<{
   {
     id: 'clientSection', icon: <User size={16} />, labelKey: 'sections.client',
     color: 'bg-[var(--navy-3)] text-[var(--green-3)] border-[var(--green-3)]/20',
-    fields: ['clientName', 'clientAddress', 'clientNif', 'clientNis', 'clientRc', 'clientAi', 'clientPhone', 'clientEmail', 'clientForme'],
+    fields: ['clientName', 'clientAddress', 'clientPhone', 'clientEmail', 'clientForme'],
     section: 'client',
   },
   {

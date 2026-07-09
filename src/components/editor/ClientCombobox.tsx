@@ -132,7 +132,7 @@ export function ClientCombobox({ value, onSelect, placeholder }: Props) {
                 <div className="text-[11px] font-bold text-[var(--sand)] truncate">{client.name}</div>
                 <div className="flex items-center gap-2 text-[9px] text-[var(--sand-muted)]">
                   {client.phone && <span>{client.phone}</span>}
-                  {client.nif && <span>NIF: {client.nif}</span>}
+                
                 </div>
               </div>
               <Check size={12} className={cn('shrink-0', value === client.name ? 'text-[var(--green-3)]' : 'text-transparent')} />
