@@ -34,7 +34,6 @@ export type FeatureId =
 export const PLAN_FEATURES: Record<PlanId, FeatureId[]> = {
   free: [
     'documents:5',
-    'export:pdf:clean',
   ],
   standard: [
     'documents:unlimited',
