@@ -131,11 +131,12 @@ interface DevisFRTemplateProps {
 export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
   const c = data.company;
   const cl = data.client;
-  const rc = c.rc || data.rcNumber;
+  const isArtisan = data.mode === 'artisan';
+  const rc = isArtisan ? '' : (c.rc || data.rcNumber);
   const nis = c.nis || data.nisNumber;
   const ai = c.ai || data.aiNumber;
   const activity = c.activity || data.companyTagline;
-  const capital = c.capital || data.companyCapital;
+  const capital = isArtisan ? '' : (c.capital || data.companyCapital);
   const rib = c.rib || data.rib;
   const ccp = c.ccp || data.ccpNumber;
   const bank = c.bankName || data.bankName;
@@ -145,6 +146,7 @@ export function DevisFRTemplate({ data }: DevisFRTemplateProps) {
     c.nif && `NIF : ${c.nif}`,
     nis && `NIS : ${nis}`,
     ai && `AI : ${ai}`,
+    isArtisan && c.carteArtisan && `Carte Artisan : ${c.carteArtisan}`,
   ]);
   const contact = joinDot([
     c.phone && `Tél : ${c.phone}`,

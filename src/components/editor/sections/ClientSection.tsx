@@ -26,10 +26,10 @@ export function ClientSection() {
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className={labelCls}>NIF</label>
-            <input type="text" placeholder="00000000000" maxLength={11}
+            <input type="text" placeholder="00000000000" maxLength={15}
               className={doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
               value={doc.clientInfo.nif ?? ''} onChange={(e) => updateClientInfo({ nif: e.target.value })} />
-            {doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
+            {doc.clientInfo.nif && !validateNIF(doc.clientInfo.nif) && <span className="text-[8px] text-red-500">11 ou 15 chiffres requis</span>}
           </div>
           <div>
             <label className={labelCls}>NIS</label>
@@ -76,6 +76,12 @@ export function ClientSection() {
         <input type="text" placeholder={te('client.yourName')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.name} onChange={(e) => updateArtisanInfo({ name: e.target.value })} />
         <input type="text" placeholder={te('client.yourAddress')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.address} onChange={(e) => updateArtisanInfo({ address: e.target.value })} />
         <input type="text" placeholder={te('client.yourPhone')} className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.artisanInfo.phone ?? ''} onChange={(e) => updateArtisanInfo({ phone: e.target.value })} />
+        <div>
+          <label className={labelCls}>{te('fields.carteArtisan') || "N° Carte d'Artisan"}</label>
+          <input type="text" placeholder="Ex: 056/04/2024/12345"
+            className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]"
+            value={doc.artisanInfo.carteArtisan ?? ''} onChange={(e) => updateArtisanInfo({ carteArtisan: e.target.value })} />
+        </div>
       </div>}
     </div>
   );

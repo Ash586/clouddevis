@@ -56,7 +56,7 @@ export function createEmptyDoc(mode: UserMode, initialType?: DocumentType): Docu
   const base: DocumentState = {
     mode,
     clientInfo: { name: '', address: '', phone: '', email: '', ai: '' },
-    artisanInfo: mode === 'artisan' ? { name: '', address: '', phone: '', carteArtisan: '' } : undefined,
+    artisanInfo: mode === 'artisan' ? { name: '', address: '', phone: '', carteArtisan: '', nif: '', nis: '', ai: '' } : undefined,
     companyInfo: mode === 'entreprise'
       ? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }
       : undefined,

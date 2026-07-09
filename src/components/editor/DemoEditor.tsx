@@ -99,7 +99,7 @@ export function DemoEditor({ onDownload }: Props) {
       companyInfo: newMode === 'entreprise'
         ? { name: t('defaults.companyName'), address: t('defaults.companyAddress'), taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' }
         : undefined,
-      artisanInfo: newMode === 'artisan' ? { name: t('defaults.companyName'), address: t('defaults.companyAddress'), phone: '' } : undefined,
+      artisanInfo: newMode === 'artisan' ? { name: t('defaults.companyName'), address: t('defaults.companyAddress'), phone: '', nif: '', nis: '', ai: '', carteArtisan: '' } : undefined,
       tvaRate: newMode === 'artisan' ? 0 : 19,
     }));
   };

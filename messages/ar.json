@@ -432,6 +432,7 @@
       "clientPhone": "هاتف العميل",
       "clientEmail": "البريد الإلكتروني للعميل",
       "clientForme": "الشكل القانوني",
+      "carteArtisan": "رقم بطاقة الحرفي",
       "chantierAddress": "عنوان موقع العمل",
       "chantierType": "نوع موقع العمل",
       "chantierCondition": "حالة موقع العمل",

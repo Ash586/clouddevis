@@ -45,7 +45,7 @@ const CUSTOMIZER_GROUPS: Array<{
   {
     id: 'devisInfo', icon: <FileText size={16} />, labelKey: 'customizer.devisInfo',
     color: 'bg-[var(--navy-3)] text-cyan-400 border-cyan-400/20',
-    fields: ['companyName', 'companyAddress', 'nif', 'nis', 'ai', 'rc', 'bankName', 'bankAgency', 'bankAgencyCode', 'bankAddress', 'rib', 'ccpNumber', 'companyTagline', 'companyCapital', 'reference', 'validityDays', 'showWatermark'],
+    fields: ['companyName', 'companyAddress', 'rc', 'bankName', 'bankAgency', 'bankAgencyCode', 'bankAddress', 'rib', 'ccpNumber', 'companyTagline', 'companyCapital', 'reference', 'validityDays', 'showWatermark'],
     section: 'devis', onlyFor: ['devis'] as DocumentType[],
   },
   {
@@ -80,7 +80,7 @@ const CUSTOMIZER_GROUPS: Array<{
   {
     id: 'fiscalite', icon: <Receipt size={16} />, labelKey: 'customizer.fiscalite',
     color: 'bg-[var(--navy-3)] text-red-400 border-red-400/20',
-    fields: ['vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
+    fields: ['nif', 'nis', 'ai', 'vatRate', 'stampRate', 'stampMin', 'stampMax', 'retenueSource', 'tvaArticle'],
     section: 'general',
   },
   {

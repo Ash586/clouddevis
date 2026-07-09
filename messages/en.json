@@ -432,6 +432,7 @@
       "clientPhone": "Client phone",
       "clientEmail": "Client email",
       "clientForme": "Legal form",
+      "carteArtisan": "Artisan Card No.",
       "chantierAddress": "Worksite address",
       "chantierType": "Worksite type",
       "chantierCondition": "Worksite condition",

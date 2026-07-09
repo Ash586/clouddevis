@@ -48,7 +48,7 @@ export function modeSwitchPatch(
       ? (prev.companyInfo ?? { name: '', address: '', taxIds: { nif: '', rc: '', nis: '', ai: '' }, capital: '' })
       : undefined,
     artisanInfo: mode === 'artisan'
-      ? (prev.artisanInfo ?? { name: '', address: '', phone: '', carteArtisan: '' })
+      ? (prev.artisanInfo ?? { name: '', address: '', phone: '', carteArtisan: '', nif: '', nis: '', ai: '' })
       : undefined,
     companyCapital: mode === 'artisan' ? '' : prev.companyCapital,
   };
@@ -81,6 +81,9 @@ export interface ArtisanInfo {
   address: string;
   phone: string;
   carteArtisan?: string;
+  nif?: string;
+  nis?: string;
+  ai?: string;
 }
 
 export interface ClientInfo {

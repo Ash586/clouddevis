@@ -7,8 +7,11 @@ const inputCls = 'w-full bg-[var(--navy-3)] border p-2 rounded-lg text-[11px] ou
 const labelCls = 'block text-[9px] font-bold text-[var(--sand-muted)] mb-0.5';
 
 export function GeneralSection() {
-  const { doc, mode, updateDoc, updateStampDuty, updateCustomField, updateTaxIds, updateCompanyInfo, hiddenFields, te } = useSectionContext();
-  const tax = doc.companyInfo?.taxIds ?? { nif: '', nis: '', rc: '', ai: '' };
+  const { doc, mode, updateDoc, updateStampDuty, updateCustomField, updateTaxIds, updateCompanyInfo, updateArtisanInfo, hiddenFields, te } = useSectionContext();
+  const isEnt = mode === 'entreprise';
+  const tax = isEnt
+    ? (doc.companyInfo?.taxIds ?? { nif: '', nis: '', rc: '', ai: '' })
+    : { nif: doc.artisanInfo?.nif ?? '', nis: doc.artisanInfo?.nis ?? '', rc: '', ai: doc.artisanInfo?.ai ?? '' };
 
   return (
     <div className="space-y-2">
@@ -67,42 +70,40 @@ export function GeneralSection() {
         <input type="text" placeholder={te('client.companyAddress')} className={inputCls} value={doc.companyInfo.address} onChange={(e) => updateCompanyInfo({ address: e.target.value })} />
       </div>}
 
-      {/* ── Identifiants fiscaux (entreprise) ── */}
-      {mode === 'entreprise' && (
-        <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
-          <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">Identifiants fiscaux</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className={labelCls}>NIF (Id Fiscal)</label>
-              <input type="text" placeholder="00000000000" maxLength={11}
-                className={tax.nif && !validateNIF(tax.nif) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
-                value={tax.nif} onChange={(e) => updateTaxIds({ nif: e.target.value })} />
-              {tax.nif && !validateNIF(tax.nif) && <span className="text-[8px] text-red-500">11 chiffres requis</span>}
-            </div>
-            <div>
-              <label className={labelCls}>NIS</label>
-              <input type="text" placeholder="0000000000" maxLength={10}
-                className={tax.nis && !validateNIS(tax.nis) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
-                value={tax.nis} onChange={(e) => updateTaxIds({ nis: e.target.value })} />
-              {tax.nis && !validateNIS(tax.nis) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
-            </div>
-            <div>
-              <label className={labelCls}>AI</label>
-              <input type="text" placeholder="0000000000" maxLength={10}
-                className={tax.ai && !validateAI(tax.ai) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
-                value={tax.ai} onChange={(e) => updateTaxIds({ ai: e.target.value })} />
-              {tax.ai && !validateAI(tax.ai) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
-            </div>
-            <div>
-              <label className={labelCls}>RC</label>
-              <input type="text" placeholder="16/00-0000000"
-                className={tax.rc && !validateRC(tax.rc) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
-                value={tax.rc} onChange={(e) => updateTaxIds({ rc: e.target.value })} />
-              {tax.rc && !validateRC(tax.rc) && <span className="text-[8px] text-red-500">Format RC invalide</span>}
-            </div>
+      {/* ── Identifiants fiscaux ── */}
+      <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">
+        <h4 className="text-[10px] font-bold text-[var(--sand-muted)] uppercase tracking-wider">Identifiants fiscaux</h4>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className={labelCls}>NIF (Id Fiscal)</label>
+            <input type="text" placeholder={isEnt ? "000000000000000" : "00000000000"} maxLength={15}
+              className={tax.nif && !validateNIF(tax.nif) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={tax.nif} onChange={(e) => isEnt ? updateTaxIds({ nif: e.target.value }) : updateArtisanInfo({ nif: e.target.value })} />
+            {tax.nif && !validateNIF(tax.nif) && <span className="text-[8px] text-red-500">11 ou 15 chiffres requis</span>}
+          </div>
+          <div>
+            <label className={labelCls}>NIS</label>
+            <input type="text" placeholder="0000000000" maxLength={10}
+              className={tax.nis && !validateNIS(tax.nis) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={tax.nis} onChange={(e) => isEnt ? updateTaxIds({ nis: e.target.value }) : updateArtisanInfo({ nis: e.target.value })} />
+            {tax.nis && !validateNIS(tax.nis) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
+          </div>
+          {isEnt && <div>
+            <label className={labelCls}>RC</label>
+            <input type="text" placeholder="16/00-0000000"
+              className={tax.rc && !validateRC(tax.rc) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={tax.rc} onChange={(e) => updateTaxIds({ rc: e.target.value })} />
+            {tax.rc && !validateRC(tax.rc) && <span className="text-[8px] text-red-500">Format RC invalide</span>}
+          </div>}
+          <div>
+            <label className={labelCls}>AI</label>
+            <input type="text" placeholder="0000000000" maxLength={10}
+              className={tax.ai && !validateAI(tax.ai) ? `${inputCls} border-red-300 focus:ring-red-500` : inputCls}
+              value={tax.ai} onChange={(e) => isEnt ? updateTaxIds({ ai: e.target.value }) : updateArtisanInfo({ ai: e.target.value })} />
+            {tax.ai && !validateAI(tax.ai) && <span className="text-[8px] text-red-500">10 chiffres requis</span>}
           </div>
         </div>
-      )}
+      </div>
 
       {/* ── Coordonnées Bancaires ── */}
       <div className="border-t border-[rgba(245,237,214,0.06)] pt-2 space-y-2">

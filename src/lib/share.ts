@@ -55,6 +55,7 @@ function documentToPDFData(doc: Document): PDFDocumentData {
     totalTTC: doc.totalTTC,
     totalInWords: '', // Will be filled by the caller or use dgi.ts
     language: doc.language,
+    mode: doc.mode,
   };
 }
 

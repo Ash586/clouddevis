@@ -432,6 +432,7 @@
       "clientPhone": "Téléphone client",
       "clientEmail": "Email client",
       "clientForme": "Forme juridique",
+      "carteArtisan": "N° Carte d'Artisan",
       "chantierAddress": "Adresse chantier",
       "chantierType": "Type chantier",
       "chantierCondition": "État chantier",

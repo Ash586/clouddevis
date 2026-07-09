@@ -66,7 +66,8 @@ export function generateClassiqueHTML(params: {
   const companyName = isEnt && comp ? comp.name : art?.name ?? '';
   const companyAddr = isEnt && comp ? comp.address : art?.address ?? '';
   const companyPhone = doc.companyPhone ?? (art?.phone ?? '');
-  const taxIds = isEnt && comp ? comp.taxIds : null;
+  const taxIds = isEnt && comp ? comp.taxIds : art ? { nif: art.nif ?? '', nis: art.nis ?? '', rc: '', ai: art.ai ?? '' } : null;
+  const carteArtisan = !isEnt && art?.carteArtisan ? art.carteArtisan : '';
 
   // Group items
   const grouped: Record<string, LineItem[]> = {};
@@ -151,7 +152,7 @@ table{width:100%;border-collapse:collapse}
       ${doc.companyTagline ? `<div style="font-size:9px;color:#555;margin-bottom:4px;letter-spacing:0.04em">${e(doc.companyTagline)}</div>` : ''}
       ${companyAddr ? `<div style="font-size:9px;color:#555;margin-bottom:2px;white-space:pre-line">${e(companyAddr)}</div>` : ''}
       ${companyPhone ? `<div style="font-size:9px;color:#555">Tél : ${e(companyPhone)}</div>` : ''}
-      ${isEnt && comp?.taxIds?.nif ? `<div style="font-size:9px;color:#555">Id Fiscal : ${e(comp.taxIds.nif)}</div>` : ''}
+      ${taxIds?.nif ? `<div style="font-size:9px;color:#555">Id Fiscal : ${e(taxIds.nif)}</div>` : ''}
       ${(doc.bankName || doc.bankAgency || doc.bankAgencyCode || doc.bankAddress) ? `<div style="font-size:9px;color:#555;margin-top:2px">Compte : ${e([doc.bankName, doc.bankAgency, doc.bankAgencyCode, doc.bankAddress].filter(Boolean).join(' '))}</div>` : ''}
       ${doc.rib ? `<div style="font-size:9px;color:#555">RIB : ${e(doc.rib)}</div>` : ''}
       ${doc.ccpNumber ? `<div style="font-size:9px;color:#555">CCP Banquaire : ${e(doc.ccpNumber)}</div>` : ''}
@@ -162,7 +163,8 @@ table{width:100%;border-collapse:collapse}
         ${taxIds.rc ? `<div><strong>RC :</strong> ${e(taxIds.rc)}</div>` : ''}
         ${taxIds.ai ? `<div><strong>AI :</strong> ${e(taxIds.ai)}</div>` : ''}
         ${taxIds.nis ? `<div><strong>NIS :</strong> ${e(taxIds.nis)}</div>` : ''}
-        ${comp?.capital ? `<div><strong>Capital :</strong> ${e(comp.capital)}</div>` : ''}
+        ${carteArtisan ? `<div><strong>Carte Artisan :</strong> ${e(carteArtisan)}</div>` : ''}
+        ${isEnt && comp?.capital ? `<div><strong>Capital :</strong> ${e(comp.capital)}</div>` : ''}
       </div>` : ''}
       ${art?.phone && !isEnt ? `<div style="font-size:9px;color:#555">Tél : ${e(art.phone)}</div>` : ''}
     </div>

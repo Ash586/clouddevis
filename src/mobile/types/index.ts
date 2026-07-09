@@ -113,6 +113,7 @@ export interface Document {
   status: DocumentStatus;
   language: Language;
   paymentMode: PaymentMode;
+  mode?: UserMode;
 
   // Optional
   objet?: string;        // OBJET — purpose/subject of the document

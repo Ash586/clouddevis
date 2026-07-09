@@ -80,7 +80,8 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
   const companyName = isEnt && comp ? comp.name : art?.name ?? '';
   const companyAddr = isEnt && comp ? comp.address : art?.address ?? '';
   const companyPhone = doc.companyPhone ?? (art?.phone ?? '');
-  const taxIds = isEnt && comp ? comp.taxIds : null;
+  const taxIds = isEnt && comp ? comp.taxIds : art ? { nif: art.nif ?? '', nis: art.nis ?? '', rc: '', ai: art.ai ?? '' } : null;
+  const carteArtisan = !isEnt && art?.carteArtisan ? art.carteArtisan : '';
 
   /* ── Logo element ── */
   const LogoEl = logoUrl ? (
@@ -117,7 +118,7 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
               <div style={{ fontSize: 9, color: C.muted, marginBottom: 2, whiteSpace: 'pre-line' }}>{companyAddr}</div>
             )}
             {companyPhone && <div style={{ fontSize: 9, color: C.muted }}>Tél : {companyPhone}</div>}
-            {isEnt && comp?.taxIds?.nif && <div style={{ fontSize: 9, color: C.muted }}>Id Fiscal : {comp.taxIds.nif}</div>}
+            {taxIds?.nif && <div style={{ fontSize: 9, color: C.muted }}>Id Fiscal : {taxIds.nif}</div>}
             {(doc.bankName || doc.bankAgency || doc.bankAgencyCode || doc.bankAddress) && (
               <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>
                 Compte : {[doc.bankName, doc.bankAgency, doc.bankAgencyCode, doc.bankAddress].filter(Boolean).join(' ')}
@@ -139,7 +140,8 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, onZoneCl
                 {taxIds.rc  && <div><strong>RC :</strong> {taxIds.rc}</div>}
                 {taxIds.ai  && <div><strong>AI :</strong> {taxIds.ai}</div>}
                 {taxIds.nis && <div><strong>NIS :</strong> {taxIds.nis}</div>}
-                {comp?.capital && <div><strong>Capital :</strong> {comp.capital}</div>}
+                {carteArtisan && <div><strong>Carte Artisan :</strong> {carteArtisan}</div>}
+                {isEnt && comp?.capital && <div><strong>Capital :</strong> {comp.capital}</div>}
               </div>
             )}
             {art?.phone && !isEnt && (

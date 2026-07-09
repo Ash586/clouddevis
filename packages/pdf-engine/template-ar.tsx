@@ -327,6 +327,11 @@ interface TemplateARProps {
 }
 
 export function TemplateAR({ data }: TemplateARProps) {
+  const isArtisan = data.mode === 'artisan';
+  const rc = isArtisan ? '' : (data.company.rc || data.rcNumber || '');
+  const nis = data.company.nis || data.nisNumber || '';
+  const ai = data.company.ai || data.aiNumber || '';
+  const capital = isArtisan ? '' : (data.company.capital || data.companyCapital || '');
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -338,11 +343,14 @@ export function TemplateAR({ data }: TemplateARProps) {
           <View style={styles.headerRight}>
             <Text style={styles.companyName}>{data.company.name}</Text>
             <Text style={styles.companyAddress}>{data.company.address}</Text>
-            {data.company.capital && (
-              <Text style={styles.companyAddress}>الرأس المال: {data.company.capital}</Text>
+            {capital && (
+              <Text style={styles.companyAddress}>الرأس المال: {capital}</Text>
             )}
             <Text style={styles.companyTaxIds}>
-              م.ت.و: {data.company.nif} | س.ت: {data.company.rc} | م.إ.ح: {data.company.nis}
+              {isArtisan && data.company.carteArtisan
+                ? `م.ت.و: ${data.company.nif} | بطاقة حرفي: ${data.company.carteArtisan} | م.إ.ح: ${nis}`
+                : `م.ت.و: ${data.company.nif} | س.ت: ${rc} | م.إ.ح: ${nis}${ai ? ` | م.ب.إ: ${ai}` : ''}`
+              }
             </Text>
           </View>
         </View>

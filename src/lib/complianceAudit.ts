@@ -6,7 +6,7 @@
 // the document's total and payment mode.
 // ============================================================
 
-import { validateNIF, shouldApplyTimbre, TIMBRE_FISCAL_AMOUNT, TIMBRE_FISCAL_THRESHOLD } from '@/lib/dgi';
+import { validateNIF, validateNIS, validateAI, validateRC, shouldApplyTimbre, TIMBRE_FISCAL_AMOUNT, TIMBRE_FISCAL_THRESHOLD } from '@/lib/dgi';
 import type { DocumentState, CalculationResult, SectionId } from '@/types';
 
 export type ComplianceSeverity = 'error' | 'warning';
@@ -62,6 +62,52 @@ export function auditDocument(doc: DocumentState, results: CalculationResult): C
       message: `Un timbre fiscal est appliqué alors qu'il ne devrait pas l'être pour ce document (type exempté, paiement par chèque/virement, ou montant sous le seuil de ${TIMBRE_FISCAL_THRESHOLD.toLocaleString('fr-DZ')} DA).`,
       section: 'general',
     });
+  }
+
+  // ── Check 3: Mode-specific fiscal IDs ─────────────────────────
+  if (doc.mode === 'artisan') {
+    const art = doc.artisanInfo;
+    if (art) {
+      if (!art.nif?.trim()) {
+        issues.push({ id: 'artisan-nif-missing', severity: 'warning', message: 'Le NIF de l\'artisan est manquant — requis pour la conformité DGI.', section: 'general' });
+      } else if (!validateNIF(art.nif)) {
+        issues.push({ id: 'artisan-nif-invalid', severity: 'error', message: `Le NIF de l'artisan "${art.nif}" est invalide — 11 ou 15 chiffres requis.`, section: 'general' });
+      }
+      if (!art.nis?.trim()) {
+        issues.push({ id: 'artisan-nis-missing', severity: 'warning', message: 'Le NIS de l\'artisan est manquant — requis pour la conformité DGI.', section: 'general' });
+      } else if (!validateNIS(art.nis)) {
+        issues.push({ id: 'artisan-nis-invalid', severity: 'error', message: `Le NIS de l'artisan "${art.nis}" est invalide — 10 chiffres requis.`, section: 'general' });
+      }
+      if (art.ai && !validateAI(art.ai)) {
+        issues.push({ id: 'artisan-ai-invalid', severity: 'error', message: `L'AI de l'artisan "${art.ai}" est invalide — 10 chiffres requis.`, section: 'general' });
+      }
+      if (!art.carteArtisan?.trim()) {
+        issues.push({ id: 'artisan-carte-missing', severity: 'warning', message: 'Le N° Carte d\'Artisan est manquant — recommandé pour les documents officiels.', section: 'client' });
+      }
+    }
+  } else if (doc.mode === 'entreprise') {
+    const comp = doc.companyInfo;
+    if (comp) {
+      const tax = comp.taxIds;
+      if (!tax.nif?.trim()) {
+        issues.push({ id: 'entreprise-nif-missing', severity: 'warning', message: 'Le NIF de l\'entreprise est manquant — requis pour la conformité DGI.', section: 'general' });
+      } else if (!validateNIF(tax.nif)) {
+        issues.push({ id: 'entreprise-nif-invalid', severity: 'error', message: `Le NIF de l'entreprise "${tax.nif}" est invalide — 15 chiffres requis.`, section: 'general' });
+      }
+      if (!tax.nis?.trim()) {
+        issues.push({ id: 'entreprise-nis-missing', severity: 'warning', message: 'Le NIS de l\'entreprise est manquant — requis pour la conformité DGI.', section: 'general' });
+      } else if (!validateNIS(tax.nis)) {
+        issues.push({ id: 'entreprise-nis-invalid', severity: 'error', message: `Le NIS de l'entreprise "${tax.nis}" est invalide — 10 chiffres requis.`, section: 'general' });
+      }
+      if (!tax.rc?.trim()) {
+        issues.push({ id: 'entreprise-rc-missing', severity: 'warning', message: 'Le RC de l\'entreprise est manquant — requis pour les sociétés.', section: 'general' });
+      } else if (!validateRC(tax.rc)) {
+        issues.push({ id: 'entreprise-rc-invalid', severity: 'error', message: `Le RC de l'entreprise "${tax.rc}" est invalide.`, section: 'general' });
+      }
+      if (tax.ai && !validateAI(tax.ai)) {
+        issues.push({ id: 'entreprise-ai-invalid', severity: 'error', message: `L'AI de l'entreprise "${tax.ai}" est invalide — 10 chiffres requis.`, section: 'general' });
+      }
+    }
   }
 
   return issues;

@@ -78,6 +78,7 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
       ? numberToArabicWords(doc.totalTTC + doc.timbreAmount - (doc.acompte || 0))
       : numberToFrenchWords(doc.totalTTC + doc.timbreAmount - (doc.acompte || 0)),
     language: doc.language,
+    mode: doc.mode,
     companyTagline: doc.companyTagline,
     companyCapital: doc.companyCapital,
     rcNumber: doc.rcNumber,

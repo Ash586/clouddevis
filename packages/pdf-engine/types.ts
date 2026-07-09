@@ -21,6 +21,7 @@ export interface PDFCompany {
   ccp?: string;
   bankName?: string;
   signature?: string;   // Base64 data URL
+  carteArtisan?: string; // N° Carte d'Artisan (artisan mode only)
 }
 
 /** Client data for PDF */
@@ -83,6 +84,7 @@ export interface PDFDocumentData {
 
   // Settings
   language: 'FR' | 'AR' | 'EN';
+  mode?: 'artisan' | 'entreprise';
 
   // DEVIS-specific fields
   companyTagline?: string;
