@@ -97,7 +97,7 @@ export function PreviewClassique({ doc, results, sf, bv, vb, highlight, brandWat
       style={{ fontFamily: "'Arial', 'Helvetica', sans-serif", color: C.text, fontSize: 11, padding: '1.2cm 1.5cm', position: 'relative' }}
     >
       {brandWatermark && (
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center', gap: '26px 46px', transform: 'rotate(-30deg) scale(1.4)', opacity: 0.07 }}>
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center', gap: '26px 46px', transform: 'rotate(-30deg) scale(1.4)', opacity: 0.12 }}>
           {Array.from({ length: 60 }).map((_, i) => (
             <span key={i} style={{ fontSize: 20, fontWeight: 800, color: C.text, whiteSpace: 'nowrap', letterSpacing: '0.5px' }}>Créé avec {BRAND_NAME}.co</span>
           ))}
