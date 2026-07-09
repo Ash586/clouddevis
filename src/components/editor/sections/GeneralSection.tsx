@@ -44,9 +44,6 @@ export function GeneralSection() {
           </div>
         </>}
       </div>
-      {!hiddenFields.has('vatRate') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.vatRate')}</label>
-        <select className="w-full border p-2 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.tvaRate} onChange={(e) => updateDoc('tvaRate', Number(e.target.value))}>
-          <option value="19">{te('general.vat19')}</option><option value="9">{te('general.vat9')}</option><option value="0">{te('general.vat0')}</option></select></div>}
       {!hiddenFields.has('stampRate') && <div><label className="block text-[10px] font-bold text-[var(--sand-muted)] mb-0.5">{te('general.stampDuty')}</label>
         <div className="grid grid-cols-3 gap-2">
           <div><label className="block text-[8px] text-[var(--sand-muted)]">{te('general.stampRate')}</label>
@@ -57,7 +54,7 @@ export function GeneralSection() {
             <input type="number" min="0" className="w-full border p-1.5 rounded-lg text-[11px] outline-none focus:ring-2 focus:ring-[var(--green-2)]" value={doc.stampDuty.maxAmount} onFocus={(e) => e.target.select()} onChange={(e) => updateStampDuty({ maxAmount: parseFloat(e.target.value) || 0 })} /></div>
         </div></div>}
 
-      {/* Merged: "Informations complémentaires" (fiscal + banking) now lives inside Données Générales */}
+      {/* Informations complémentaires (Activité, Devise, Capital, Référence, Validité) */}
       <DevisSection />
     </div>
   );

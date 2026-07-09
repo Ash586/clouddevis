@@ -39,13 +39,13 @@ const CUSTOMIZER_GROUPS: Array<{
   {
     id: 'clientSection', icon: <User size={16} />, labelKey: 'sections.client',
     color: 'bg-[var(--navy-3)] text-[var(--green-3)] border-[var(--green-3)]/20',
-    fields: ['clientName', 'clientAddress', 'clientPhone', 'clientEmail', 'clientForme'],
+    fields: ['clientName', 'clientAddress', 'clientPhone', 'clientEmail', 'clientForme', 'vatRate', 'nif', 'nis', 'ai', 'rc', 'bankName', 'bankAgency', 'bankAgencyCode', 'bankAddress', 'rib', 'ccpNumber'],
     section: 'client',
   },
   {
     id: 'devisInfo', icon: <FileText size={16} />, labelKey: 'customizer.devisInfo',
     color: 'bg-[var(--navy-3)] text-cyan-400 border-cyan-400/20',
-    fields: ['companyTagline', 'companyCapital', 'rcNumber', 'nisNumber', 'aiNumber', 'reference', 'rib', 'bankName', 'bankAgency', 'ccpNumber', 'validityDays', 'showWatermark'],
+    fields: ['companyTagline', 'companyCapital', 'reference', 'validityDays', 'showWatermark'],
     section: 'devis', onlyFor: ['devis'] as DocumentType[],
   },
   {
