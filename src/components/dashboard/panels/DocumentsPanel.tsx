@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { cn } from '@/lib/utils';
 
-type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED';
+type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
 
 interface Doc {
   id: string;
@@ -18,6 +18,11 @@ interface Doc {
   total: string;
   date: string;
   status: string;
+  netAPayer?: number;
+  amountPaid?: number;
+  remaining?: number;
+  isPaid?: boolean;
+  overdue?: boolean;
 }
 
 interface TypeInfo {
@@ -56,7 +61,10 @@ const STATUS_COLORS: Record<string, string> = {
   PAID: 'bg-emerald-400/10 text-emerald-400',
 };
 
-const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
+const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED', 'SENT', 'PAID'];
+
+const CURRENCY = 'DA';
+const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
 const STALE_MS = 2 * 60 * 1000;
 
@@ -80,6 +88,9 @@ export function DocumentsPanel() {
   const [typeBreakdown, setTypeBreakdown] = useState<Record<string, TypeInfo>>({});
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doc | null>(null);
+  const [payTarget, setPayTarget] = useState<Doc | null>(null);
+  const [payAmount, setPayAmount] = useState('');
+  const [paySaving, setPaySaving] = useState(false);
 
   const totalRevenue = Object.values(typeBreakdown).reduce((sum, ti) => sum + ti.total, 0);
   const lastFetchRef = useRef(0);
@@ -132,6 +143,27 @@ export function DocumentsPanel() {
     });
     setStatusDropdownOpen(null);
     fetchData();
+  };
+
+  const patchPayment = async (id: string, payload: Record<string, unknown>) => {
+    setPaySaving(true);
+    try {
+      await fetch('/api/documents', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...payload }),
+      });
+      setPayTarget(null);
+      setPayAmount('');
+      await fetchData();
+    } finally {
+      setPaySaving(false);
+    }
+  };
+
+  const openPayModal = (doc: Doc) => {
+    setPayTarget(doc);
+    setPayAmount(String(doc.remaining ?? doc.netAPayer ?? ''));
   };
 
   const handleDuplicate = async (sourceId: string) => {
@@ -204,6 +236,8 @@ export function DocumentsPanel() {
                 <option value="ACCEPTED">{tc('accepted')}</option>
                 <option value="PROGRESS">{tc('progress')}</option>
                 <option value="DELIVERED">{tc('delivered')}</option>
+                <option value="SENT">{tc('sent')}</option>
+                <option value="PAID">{tc('paid')}</option>
               </select>
             </div>
           </div>
@@ -296,8 +330,19 @@ export function DocumentsPanel() {
                     </span>
                   </td>
                   <td className="py-3 px-3 text-[var(--sand-2)]">{doc.client || '—'}</td>
-                  <td className="py-3 px-3 text-end font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
-                  <td className="py-3 px-3 text-[var(--sand-muted)]">{doc.date}</td>
+                  <td className="py-3 px-3 text-end font-bold text-[var(--sand)]">
+                    {doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span>
+                    {doc.type === 'FACTURE' && !doc.isPaid && (doc.remaining ?? 0) > 0 && (
+                      <div className="text-[10px] font-semibold text-amber-500 mt-0.5">{t('remaining')}: {fmt(doc.remaining ?? 0)} {CURRENCY}</div>
+                    )}
+                    {doc.type === 'FACTURE' && doc.isPaid && (
+                      <div className="text-[10px] font-semibold text-emerald-500 mt-0.5">✓ {tc('paid')}</div>
+                    )}
+                  </td>
+                  <td className="py-3 px-3 text-[var(--sand-muted)]">
+                    {doc.date}
+                    {doc.overdue && <div className="text-[10px] font-bold text-red-500 mt-0.5">⚠ {t('overdue')}</div>}
+                  </td>
                   <td className="py-3 px-3 relative">
                     <button
                       type="button"
@@ -326,6 +371,11 @@ export function DocumentsPanel() {
                   </td>
                   <td className="py-3 px-3 text-end">
                     <div className="flex items-center justify-end gap-1">
+                      {doc.type === 'FACTURE' && (
+                        <button type="button" onClick={() => openPayModal(doc)} className={cn('p-1.5 rounded-lg transition', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </button>
+                      )}
                       <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-1.5 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition" title={t('edit')}>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                       </button>
@@ -375,9 +425,23 @@ export function DocumentsPanel() {
                 </span>
                 <span className="font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></span>
               </div>
+              {doc.type === 'FACTURE' && !doc.isPaid && (doc.remaining ?? 0) > 0 && (
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-semibold text-amber-500">{t('remaining')}: {fmt(doc.remaining ?? 0)} {CURRENCY}</span>
+                  {doc.overdue && <span className="font-bold text-red-500">⚠ {t('overdue')}</span>}
+                </div>
+              )}
+              {doc.type === 'FACTURE' && doc.isPaid && (
+                <div className="text-[11px] font-semibold text-emerald-500">✓ {tc('paid')}</div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-xs text-[var(--sand-muted)]">{doc.date}</span>
                 <div className="flex items-center gap-1">
+                  {doc.type === 'FACTURE' && (
+                    <button type="button" onClick={() => openPayModal(doc)} className={cn('p-2 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                  )}
                   <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   </button>
@@ -406,6 +470,64 @@ export function DocumentsPanel() {
           </div>
         )}
       </div>
+
+      {/* Payment Modal */}
+      <Modal open={!!payTarget} onClose={() => setPayTarget(null)} title={t('recordPayment')} size="md">
+        {payTarget && (() => {
+          const net = payTarget.netAPayer ?? 0;
+          const paid = payTarget.amountPaid ?? 0;
+          const remaining = payTarget.remaining ?? Math.max(0, net - paid);
+          const pct = net > 0 ? Math.min(100, Math.round((paid / net) * 100)) : 0;
+          return (
+            <div className="text-start space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[var(--sand-muted)]">{payTarget.number} · {payTarget.client || '—'}</span>
+                <span className="font-bold text-[var(--sand)]">{fmt(net)} {CURRENCY}</span>
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-[11px] mb-1">
+                  <span className="text-emerald-500 font-semibold">{t('paidAmount')}: {fmt(paid)} {CURRENCY}</span>
+                  <span className="text-amber-500 font-semibold">{t('remaining')}: {fmt(remaining)} {CURRENCY}</span>
+                </div>
+                <div className="h-2 rounded-full bg-[var(--navy-3)] overflow-hidden">
+                  <div className="h-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+              {!payTarget.isPaid && (
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('paymentAmount')}</label>
+                  <input
+                    type="number" min="0" value={payAmount}
+                    onChange={e => setPayAmount(e.target.value)}
+                    onFocus={e => e.target.select()}
+                    className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]"
+                  />
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {!payTarget.isPaid && (
+                  <>
+                    <Button className="flex-1 min-w-[120px]" disabled={paySaving || !(parseFloat(payAmount) > 0)}
+                      onClick={() => patchPayment(payTarget.id, { payment: parseFloat(payAmount) || 0 })}>
+                      {paySaving ? '…' : t('addPayment')}
+                    </Button>
+                    <Button variant="secondary" className="flex-1 min-w-[120px]" disabled={paySaving}
+                      onClick={() => patchPayment(payTarget.id, { markPaid: true })}>
+                      {t('markPaid')}
+                    </Button>
+                  </>
+                )}
+                {payTarget.isPaid && (
+                  <Button variant="outline" className="flex-1" disabled={paySaving}
+                    onClick={() => patchPayment(payTarget.id, { markUnpaid: true })}>
+                    {t('markUnpaid')}
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title={tc('yesDelete')}>

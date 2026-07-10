@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { sendPush, invoiceApprovedPush, devisAcceptedPush, paymentReceivedPush } from '@/lib/fcm';
 import { logger } from '@/lib/logger';
 import { calculateDocument } from '@/lib/calculations';
+import { isOverdue } from '@/lib/payments';
 import { generateDocNumber } from '@/lib/dgi';
 import { TRIAL_DAYS, canCreateDocument, getDocLimit, FREE_TIER_DAILY_LIMIT, algiersDayWindow, freeTierBlocksToday } from '@/lib/subscription';
 import { SUBSCRIPTIONS_ENABLED } from '@/lib/features';
@@ -97,6 +98,10 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
           type: true,
           status: true,
           totalTTC: true,
+          netAPayer: true,
+          amountPaid: true,
+          paidAt: true,
+          dueDate: true,
           timbreFiscal: true,
           acompte: true,
           date: true,
@@ -126,18 +131,33 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
       typeBreakdown[row.type] = { count: row._count.type, total: row._sum.totalTTC || 0 };
     }
 
+    const nowMs = Date.now();
     return NextResponse.json({
-      documents: docs.map(d => ({
-        id: d.id, number: d.number, type: d.type, status: d.status,
-        client: d.client?.name || '',
-        clientNif: d.client?.nif || null,
-        total: d.totalTTC,
-        timbreAmount: d.timbreFiscal ?? 0,
-        acompte: d.acompte ?? 0,
-        date: d.date.toLocaleDateString('fr-DZ'),
-        dateISO: d.date.toISOString(),
-        createdAt: d.createdAt.toLocaleDateString('fr-DZ'),
-      })),
+      documents: docs.map(d => {
+        const netAPayer = d.netAPayer ?? 0;
+        const amountPaid = d.amountPaid ?? 0;
+        const remaining = Math.max(0, netAPayer - amountPaid);
+        const isPaid = d.status === 'PAID' || (netAPayer > 0 && remaining <= 0.01);
+        const overdue = isOverdue({ type: d.type, status: d.status, remaining, dueDate: d.dueDate, date: d.date }, nowMs);
+        return {
+          id: d.id, number: d.number, type: d.type, status: d.status,
+          client: d.client?.name || '',
+          clientNif: d.client?.nif || null,
+          total: d.totalTTC,
+          netAPayer,
+          amountPaid,
+          remaining,
+          isPaid,
+          overdue,
+          paidAt: d.paidAt ? d.paidAt.toISOString() : null,
+          dueDate: d.dueDate ? d.dueDate.toISOString() : null,
+          timbreAmount: d.timbreFiscal ?? 0,
+          acompte: d.acompte ?? 0,
+          date: d.date.toLocaleDateString('fr-DZ'),
+          dateISO: d.date.toISOString(),
+          createdAt: d.createdAt.toLocaleDateString('fr-DZ'),
+        };
+      }),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       statusBreakdown,
       typeBreakdown,
@@ -306,28 +326,60 @@ export const POST = withApiErrorHandling(withAuth(async (req, session) => {
   }
 }), { component: 'invoice', severity: 'high', userImpact: 'blocking' });
 
-const VALID_STATUSES = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED'];
+const VALID_STATUSES = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED', 'SENT', 'PAID'];
+type DocStatusValue = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
 
 export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
   try {
     const body = await req.json();
-    const { id, status } = body;
-    if (!id || !status) return NextResponse.json({ error: 'id and status required' }, { status: 400 });
+    const { id, status } = body as { id?: string; status?: string };
+    // A payment op carries `payment` (add this amount) or `markPaid`/`markUnpaid`.
+    const paymentAmount = typeof body.payment === 'number' ? body.payment : undefined;
+    const markPaid = body.markPaid === true;
+    const markUnpaid = body.markUnpaid === true;
+    const isPaymentOp = paymentAmount !== undefined || markPaid || markUnpaid;
 
-    const upperStatus = String(status).toUpperCase();
-    if (!VALID_STATUSES.includes(upperStatus)) {
+    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+    if (!status && !isPaymentOp) return NextResponse.json({ error: 'status or payment required' }, { status: 400 });
+
+    const upperStatus = status ? String(status).toUpperCase() : undefined;
+    if (upperStatus && !VALID_STATUSES.includes(upperStatus)) {
       return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
     }
 
     const doc = await prisma.document.findFirst({
       where: { id, userId: session.userId },
-      select: { id: true, number: true, type: true, totalTTC: true, userId: true },
+      select: { id: true, number: true, type: true, totalTTC: true, netAPayer: true, amountPaid: true, status: true, userId: true },
     });
     if (!doc) return NextResponse.json({ error: 'Document non trouvé' }, { status: 404 });
 
+    // Build the update: payment ops recompute amountPaid/paidAt/status;
+    // a plain status change is applied as-is (with PAID keeping paidAt/amountPaid in sync).
+    const data: {
+      status?: DocStatusValue;
+      amountPaid?: number;
+      paidAt?: Date | null;
+    } = {};
+
+    const net = doc.netAPayer || doc.totalTTC || 0;
+    if (isPaymentOp) {
+      let paid = doc.amountPaid || 0;
+      if (markUnpaid) paid = 0;
+      else if (markPaid) paid = net;
+      else if (paymentAmount !== undefined) paid = Math.max(0, Math.min(net, paid + paymentAmount));
+      data.amountPaid = paid;
+      const fullyPaid = net > 0 && paid >= net - 0.01;
+      data.status = fullyPaid ? 'PAID' : (doc.status === 'PAID' ? 'SENT' : (doc.status as DocStatusValue));
+      data.paidAt = fullyPaid ? new Date() : null;
+    } else if (upperStatus) {
+      data.status = upperStatus as DocStatusValue;
+      if (upperStatus === 'PAID') { data.amountPaid = net; data.paidAt = new Date(); }
+      else if (doc.status === 'PAID') { data.paidAt = null; } // leaving PAID clears the settled timestamp
+    }
+
     const updated = await prisma.document.update({
       where: { id },
-      data: { status: upperStatus as 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' },
+      data,
     });
 
     // Fire push notification when status reaches a notable milestone
@@ -336,15 +388,16 @@ export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
       select: { fcmToken: true },
     });
     const fcmToken = user?.fcmToken ?? null;
+    const finalStatus = updated.status;
     if (fcmToken) {
       const docNumber = doc.number ?? '';
       const docId = doc.id;
       let pushPayload = null;
-      if (upperStatus === 'ACCEPTED') {
+      if (finalStatus === 'ACCEPTED') {
         pushPayload = doc.type === 'DEVIS'
           ? devisAcceptedPush(fcmToken, docNumber, docId)
           : invoiceApprovedPush(fcmToken, docNumber, docId);
-      } else if (upperStatus === 'DELIVERED') {
+      } else if (finalStatus === 'PAID' && doc.status !== 'PAID') {
         pushPayload = paymentReceivedPush(
           fcmToken,
           docNumber,
@@ -355,7 +408,15 @@ export const PATCH = withApiErrorHandling(withAuth(async (req, session) => {
       if (pushPayload) void sendPush(pushPayload);
     }
 
-    return NextResponse.json({ id: updated.id, status: updated.status });
+    const netFinal = updated.netAPayer || updated.totalTTC || 0;
+    return NextResponse.json({
+      id: updated.id,
+      status: updated.status,
+      amountPaid: updated.amountPaid,
+      remaining: Math.max(0, netFinal - (updated.amountPaid || 0)),
+      isPaid: updated.status === 'PAID',
+      paidAt: updated.paidAt ? updated.paidAt.toISOString() : null,
+    });
   } catch (error) {
     logger.error('PATCH /api/documents error', { error: String(error) });
     throw error;

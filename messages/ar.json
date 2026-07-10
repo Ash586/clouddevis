@@ -877,7 +877,15 @@
     "edit": "تعديل",
     "duplicate": "تكرار",
     "next": "التالي",
-    "deleteConfirm": "حذف المستند"
+    "deleteConfirm": "حذف المستند",
+    "remaining": "المتبقّي",
+    "overdue": "متأخّرة",
+    "recordPayment": "تحصيل",
+    "paidAmount": "المدفوع",
+    "paymentAmount": "المبلغ المُستلَم",
+    "addPayment": "تسجيل الدفعة",
+    "markPaid": "تعليم كمدفوعة",
+    "markUnpaid": "تعليم كغير مدفوعة"
   },
   "reports": {
     "title": "التقارير والتحليلات",

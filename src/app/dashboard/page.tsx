@@ -46,6 +46,15 @@ export default function DashboardPage() {
   // loaded, they're on the overview tab, and they have zero documents.
   useAutoTour('dashboard', loaded && tab === '' && stats.totalDocs === 0);
 
+  // Fire-and-forget: generate in-app reminders for overdue unpaid invoices.
+  // The endpoint dedupes within a 7-day cooldown, so calling on each load is safe.
+  const remindedRef = useRef(false);
+  useEffect(() => {
+    if (remindedRef.current) return;
+    remindedRef.current = true;
+    fetch('/api/reminders/overdue', { method: 'POST' }).catch(() => {});
+  }, []);
+
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void fetchData(); }, [fetchData]);
 

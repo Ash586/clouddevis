@@ -218,6 +218,8 @@ model Document {
   totalTTC      Float          @default(0)
   acompte       Float          @default(0)
   netAPayer     Float          @default(0)
+  amountPaid    Float          @default(0)   // NEW — total recorded payments (partial or full)
+  paidAt        DateTime?                     // NEW — set when the invoice is fully paid
   totalInWords  String         @default("")
   notes         String?
   customFields  Json           @default("{}")

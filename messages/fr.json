@@ -920,7 +920,15 @@
     "edit": "Modifier",
     "duplicate": "Dupliquer",
     "next": "Suivant",
-    "deleteConfirm": "Supprimer le document"
+    "deleteConfirm": "Supprimer le document",
+    "remaining": "Reste",
+    "overdue": "En retard",
+    "recordPayment": "Encaissement",
+    "paidAmount": "Payé",
+    "paymentAmount": "Montant reçu",
+    "addPayment": "Enregistrer le paiement",
+    "markPaid": "Marquer payé",
+    "markUnpaid": "Marquer impayé"
   },
   "reports": {
     "title": "Rapports & Statistiques",
