@@ -928,7 +928,14 @@
     "paymentAmount": "Montant reçu",
     "addPayment": "Enregistrer le paiement",
     "markPaid": "Marquer payé",
-    "markUnpaid": "Marquer impayé"
+    "markUnpaid": "Marquer impayé",
+    "sendEmail": "Envoyer par email",
+    "recipient": "Destinataire",
+    "message": "Message",
+    "messagePlaceholder": "Bonjour, veuillez trouver votre document ci-joint…",
+    "sendNow": "Envoyer",
+    "sent": "Envoyé",
+    "optional": "optionnel"
   },
   "reports": {
     "title": "Rapports & Statistiques",

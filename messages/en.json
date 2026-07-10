@@ -885,7 +885,14 @@
     "paymentAmount": "Amount received",
     "addPayment": "Record payment",
     "markPaid": "Mark paid",
-    "markUnpaid": "Mark unpaid"
+    "markUnpaid": "Mark unpaid",
+    "sendEmail": "Send by email",
+    "recipient": "Recipient",
+    "message": "Message",
+    "messagePlaceholder": "Hello, please find your document attached…",
+    "sendNow": "Send",
+    "sent": "Sent",
+    "optional": "optional"
   },
   "reports": {
     "title": "Reports & Analytics",

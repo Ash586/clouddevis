@@ -23,7 +23,10 @@ interface Doc {
   remaining?: number;
   isPaid?: boolean;
   overdue?: boolean;
+  clientEmail?: string | null;
 }
+
+const EMAILABLE_TYPES = ['FACTURE', 'DEVIS', 'PROFORMA'];
 
 interface TypeInfo {
   count: number;
@@ -91,6 +94,12 @@ export function DocumentsPanel() {
   const [payTarget, setPayTarget] = useState<Doc | null>(null);
   const [payAmount, setPayAmount] = useState('');
   const [paySaving, setPaySaving] = useState(false);
+  const [sendTarget, setSendTarget] = useState<Doc | null>(null);
+  const [sendTo, setSendTo] = useState('');
+  const [sendMsg, setSendMsg] = useState('');
+  const [sendSaving, setSendSaving] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [sendOk, setSendOk] = useState(false);
 
   const totalRevenue = Object.values(typeBreakdown).reduce((sum, ti) => sum + ti.total, 0);
   const lastFetchRef = useRef(0);
@@ -164,6 +173,36 @@ export function DocumentsPanel() {
   const openPayModal = (doc: Doc) => {
     setPayTarget(doc);
     setPayAmount(String(doc.remaining ?? doc.netAPayer ?? ''));
+  };
+
+  const openSendModal = (doc: Doc) => {
+    setSendTarget(doc);
+    setSendTo(doc.clientEmail ?? '');
+    setSendMsg('');
+    setSendError(null);
+    setSendOk(false);
+  };
+
+  const handleSend = async () => {
+    if (!sendTarget) return;
+    setSendSaving(true);
+    setSendError(null);
+    try {
+      const res = await fetch(`/api/documents/${sendTarget.id}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: sendTo.trim(), message: sendMsg.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Échec');
+      setSendOk(true);
+      await fetchData();
+      setTimeout(() => setSendTarget(null), 1200);
+    } catch (e) {
+      setSendError(e instanceof Error ? e.message : 'Échec');
+    } finally {
+      setSendSaving(false);
+    }
   };
 
   const handleDuplicate = async (sourceId: string) => {
@@ -371,6 +410,11 @@ export function DocumentsPanel() {
                   </td>
                   <td className="py-3 px-3 text-end">
                     <div className="flex items-center justify-end gap-1">
+                      {EMAILABLE_TYPES.includes(doc.type) && (
+                        <button type="button" onClick={() => openSendModal(doc)} className="p-1.5 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.1)] rounded-lg transition" title={t('sendEmail')}>
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </button>
+                      )}
                       {doc.type === 'FACTURE' && (
                         <button type="button" onClick={() => openPayModal(doc)} className={cn('p-1.5 rounded-lg transition', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -437,6 +481,11 @@ export function DocumentsPanel() {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-[var(--sand-muted)]">{doc.date}</span>
                 <div className="flex items-center gap-1">
+                  {EMAILABLE_TYPES.includes(doc.type) && (
+                    <button type="button" onClick={() => openSendModal(doc)} className="p-2 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.1)] rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center" title={t('sendEmail')}>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    </button>
+                  )}
                   {doc.type === 'FACTURE' && (
                     <button type="button" onClick={() => openPayModal(doc)} className={cn('p-2 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -527,6 +576,35 @@ export function DocumentsPanel() {
             </div>
           );
         })()}
+      </Modal>
+
+      {/* Send by Email Modal */}
+      <Modal open={!!sendTarget} onClose={() => setSendTarget(null)} title={t('sendEmail')} size="md">
+        {sendTarget && (
+          <div className="text-start space-y-3">
+            <p className="text-xs text-[var(--sand-muted)]">{sendTarget.number} · {sendTarget.client || '—'}</p>
+            <div>
+              <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('recipient')}</label>
+              <input
+                type="email" value={sendTo} onChange={e => setSendTo(e.target.value)}
+                placeholder="client@example.com"
+                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] px-3.5 py-2.5 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide mb-1">{t('message')} <span className="normal-case font-normal">({t('optional')})</span></label>
+              <textarea
+                value={sendMsg} onChange={e => setSendMsg(e.target.value)} maxLength={2000}
+                placeholder={t('messagePlaceholder')}
+                className="w-full h-24 resize-none rounded-xl border border-[rgba(15,39,71,0.1)] bg-[var(--navy-3)] p-3 text-sm text-[var(--sand)] focus:outline-none focus:ring-2 focus:ring-[var(--green-glow)]"
+              />
+            </div>
+            {sendError && <p className="text-xs text-red-500">{sendError}</p>}
+            <Button className="w-full" disabled={sendSaving || sendOk || !sendTo.trim()} onClick={handleSend}>
+              {sendOk ? `✓ ${t('sent')}` : sendSaving ? '…' : t('sendNow')}
+            </Button>
+          </div>
+        )}
       </Modal>
 
       {/* Delete Confirmation Modal */}

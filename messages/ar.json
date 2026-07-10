@@ -885,7 +885,14 @@
     "paymentAmount": "المبلغ المُستلَم",
     "addPayment": "تسجيل الدفعة",
     "markPaid": "تعليم كمدفوعة",
-    "markUnpaid": "تعليم كغير مدفوعة"
+    "markUnpaid": "تعليم كغير مدفوعة",
+    "sendEmail": "إرسال بالبريد",
+    "recipient": "المُستلِم",
+    "message": "رسالة",
+    "messagePlaceholder": "مرحبًا، تجدون وثيقتكم مرفقة…",
+    "sendNow": "إرسال",
+    "sent": "أُرسِل",
+    "optional": "اختياري"
   },
   "reports": {
     "title": "التقارير والتحليلات",
