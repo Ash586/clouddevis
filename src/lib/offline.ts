@@ -26,6 +26,8 @@ export interface AppSettings {
   currency: string;
   autoSync: boolean;
   theme: 'light' | 'dark' | 'system';
+  /** Lock the app with biometric after returning from background (>5 min). */
+  biometricEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -34,6 +36,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   currency: 'DA',
   autoSync: true,
   theme: 'light',
+  biometricEnabled: false,
 };
 
 // ── Preferences API ──────────────────────────────────────────

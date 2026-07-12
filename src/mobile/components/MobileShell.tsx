@@ -29,6 +29,8 @@ import { UpdateBanner } from './UpdateBanner';
 import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
 import { OnboardingScreen } from './OnboardingScreen';
+import { BiometricLockScreen } from './BiometricLockScreen';
+import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DocumentsListScreen } from '../screens/DocumentsListScreen';
 import { CompanyProfileScreen } from '../screens/CompanyProfileScreen';
@@ -68,6 +70,9 @@ interface MobileShellProps {
 export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showBiometricLock, setShowBiometricLock] = useState(false);
+  const [biometryInfo, setBiometryInfo] = useState<BiometryInfo>({ available: false, type: '' });
+  const backgroundedAtRef = useRef<number | null>(null);
   const [showWizard, setShowWizard] = useState(false);
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
@@ -185,6 +190,39 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       },
     });
     return () => { void teardownPushNotifications(); };
+  }, [authState]);
+
+  // ── Biometric: check availability after auth, lock on resume ─
+  useEffect(() => {
+    if (authState !== 'authenticated') return;
+    void checkBiometry().then(setBiometryInfo);
+  }, [authState]);
+
+  useEffect(() => {
+    if (authState !== 'authenticated') return;
+    let handle: Awaited<ReturnType<typeof App.addListener>> | null = null;
+
+    App.addListener('appStateChange', async ({ isActive }) => {
+      if (!isActive) {
+        backgroundedAtRef.current = Date.now();
+        return;
+      }
+      // App came to foreground
+      const bgAt = backgroundedAtRef.current;
+      backgroundedAtRef.current = null;
+      if (!bgAt) return;
+      const elapsed = Date.now() - bgAt;
+      if (elapsed < 5 * 60 * 1000) return; // < 5 min — no lock
+      // Check settings + biometry
+      const s = await getSettings();
+      if (s.biometricEnabled && biometryInfo.available) {
+        setShowBiometricLock(true);
+      }
+    }).then((h) => { handle = h; });
+
+    return () => { handle?.remove(); };
+  // biometryInfo.available intentionally excluded — checked async at foreground time
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState]);
 
   // ── Show onboarding on first login ever ───────────────────
@@ -401,6 +439,18 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
 
       {/* Bottom tab bar */}
       <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />
+
+      {/* ── Biometric lock overlay ────────────────────────────── */}
+      {showBiometricLock && (
+        <BiometricLockScreen
+          biometryType={biometryInfo.type}
+          onUnlock={() => setShowBiometricLock(false)}
+          onLogout={async () => {
+            setShowBiometricLock(false);
+            await handleLogout();
+          }}
+        />
+      )}
 
       {/* ── Create overlay (FlashFacture single-canvas) ──────── */}
       <AnimatePresence>

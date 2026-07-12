@@ -6,7 +6,8 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint } from 'lucide-react';
+import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -36,9 +37,11 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     currency: 'DA',
     autoSync: true,
     theme: 'light',
+    biometricEnabled: false,
   });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
+  const [biometryInfo, setBiometryInfo] = useState<BiometryInfo>({ available: false, type: '' });
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -62,6 +65,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   // ── Load settings on mount ──
   useEffect(() => {
     getSettings().then(setLocalSettings);
+    void checkBiometry().then(setBiometryInfo);
   }, []);
 
   // ── Account persona (artisan | entreprise) ──
@@ -232,6 +236,40 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
                 )}
               />
             </div>
+          </button>
+        </div>
+
+        {/* ── Biometric Lock ───────────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)]">
+          <button type="button"
+            onClick={() => biometryInfo.available && handleSettingChange('biometricEnabled', !settings.biometricEnabled)}
+            disabled={!biometryInfo.available}
+            className="w-full px-4 py-3 flex items-center gap-3 disabled:opacity-50"
+          >
+            <Fingerprint size={18} className="text-[var(--sand-muted)]" />
+            <div className="flex-1 text-start">
+              <span className="text-sm font-semibold text-[var(--sand)]">{t('settings.biometric')}</span>
+              <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">
+                {biometryInfo.available ? t('settings.biometricHint') : t('settings.biometricUnavailable')}
+              </p>
+            </div>
+            {biometryInfo.available && (
+              <div
+                className={cn(
+                  'w-12 h-7 rounded-full transition-colors relative flex-shrink-0',
+                  settings.biometricEnabled ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-3)]',
+                )}
+              >
+                <div
+                  className={cn(
+                    'absolute top-1 w-5 h-5 rounded-full bg-white transition-transform',
+                    settings.biometricEnabled
+                      ? dir === 'rtl' ? 'right-6' : 'left-6'
+                      : dir === 'rtl' ? 'right-1' : 'left-1',
+                  )}
+                />
+              </div>
+            )}
           </button>
         </div>
 
