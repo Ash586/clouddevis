@@ -4,6 +4,7 @@ import { FileText, Users, TrendingUp, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/userStore';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import type { DashboardStats } from '@/mobile/lib/useDashboardStats';
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -69,39 +70,39 @@ interface StatCardsProps {
 }
 
 export function StatCards({ stats, loading }: StatCardsProps) {
-  // Privacy mode masks the revenue figure (showing the app to a client).
   const privacyMode = useUserStore((s) => s.privacyMode);
+  const { t } = useMobileI18n();
   const cards: Omit<CardProps, 'loading'>[] = [
     {
       icon: <FileText size={16} strokeWidth={2} className="text-[var(--green-3)]" />,
       iconBg: 'bg-[var(--blue-bg)]',
-      label: 'Ce mois',
+      label: t('stats.thisMonth'),
       value: String(stats.monthDocs),
-      sub: 'documents créés',
+      sub: t('stats.docsCreated'),
       delay: 0.04,
     },
     {
       icon: <TrendingUp size={16} strokeWidth={2} className="text-emerald-400" />,
       iconBg: 'bg-[rgba(16,185,129,0.12)]',
-      label: "Chiffre d'affaires",
+      label: t('stats.revenue'),
       value: privacyMode ? '••••' : formatDA(stats.totalTTC),
-      sub: 'DA total TTC',
+      sub: t('stats.revenueSub'),
       delay: 0.08,
     },
     {
       icon: <Users size={16} strokeWidth={2} className="text-sky-400" />,
       iconBg: 'bg-[rgba(56,189,248,0.12)]',
-      label: 'Clients',
+      label: t('stats.clients'),
       value: String(stats.totalClients),
-      sub: 'enregistrés',
+      sub: t('stats.clientsSub'),
       delay: 0.12,
     },
     {
       icon: <Clock size={16} strokeWidth={2} className="text-amber-400" />,
       iconBg: 'bg-[rgba(251,191,36,0.12)]',
-      label: 'Brouillons',
+      label: t('stats.drafts'),
       value: String(stats.draftCount),
-      sub: 'en attente',
+      sub: t('stats.draftsSub'),
       delay: 0.16,
     },
   ];

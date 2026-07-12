@@ -17,6 +17,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { updateDocumentStatus } from '@/mobile/lib/api';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
@@ -33,15 +34,6 @@ interface Filter {
   id: FilterId;
   label: string;
 }
-
-const FILTERS: Filter[] = [
-  { id: 'all', label: 'Tout' },
-  { id: 'devis', label: 'Devis' },
-  { id: 'facture', label: 'Facture' },
-  { id: 'paid', label: 'Payé' },
-  { id: 'pending', label: 'En attente' },
-  { id: 'thisMonth', label: 'Ce mois' },
-];
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -86,6 +78,17 @@ export function DocumentsListScreen({
   onEditDocument,
   onDuplicateDocument,
 }: DocumentsListScreenProps) {
+  const { t } = useMobileI18n();
+
+  const FILTERS: Filter[] = [
+    { id: 'all',       label: t('docs.filterAll')     },
+    { id: 'devis',     label: t('docs.filterDevis')   },
+    { id: 'facture',   label: t('docs.filterFacture') },
+    { id: 'paid',      label: t('docs.filterPaid')    },
+    { id: 'pending',   label: t('docs.filterPending') },
+    { id: 'thisMonth', label: t('docs.filterMonth')   },
+  ];
+
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -262,7 +265,7 @@ export function DocumentsListScreen({
       <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-xl font-bold text-[var(--sand)]">Documents</h1>
+            <h1 className="text-xl font-bold text-[var(--sand)]">{t('docs.title')}</h1>
             <p className="text-xs text-[var(--sand-muted)] mt-0.5">
               {savedDocuments.length} document{savedDocuments.length !== 1 ? 's' : ''}
             </p>
@@ -307,7 +310,7 @@ export function DocumentsListScreen({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Rechercher un client, NIF, numéro..."
+                  placeholder={t('docs.searchPlaceholder')}
                   className={cn(
                     'w-full ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 py-2.5 rounded-xl text-sm',
                     'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
@@ -388,16 +391,10 @@ export function DocumentsListScreen({
               <Files size={28} className="text-[var(--sand-muted)]" />
             </div>
             <p className="text-sm font-semibold text-[var(--sand-muted)]">
-              {searchQuery
-                ? 'Aucun résultat'
-                : activeFilter === 'all'
-                  ? 'Aucun document'
-                  : `Aucun document "${FILTERS.find((f) => f.id === activeFilter)?.label}"`}
+              {t('docs.empty')}
             </p>
             <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px]">
-              {searchQuery
-                ? 'Essayez un autre terme de recherche'
-                : 'Créez votre premier document en appuyant sur le bouton +'}
+              {t('docs.emptyHint')}
             </p>
           </motion.div>
         ) : (

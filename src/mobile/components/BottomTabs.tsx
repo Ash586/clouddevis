@@ -9,20 +9,21 @@
 
 import { Home, Files, Building, Settings, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 
 export type TabId = 'home' | 'documents' | 'company' | 'settings';
 
 interface Tab {
   id: TabId;
-  label: string;
+  labelKey: 'nav.home' | 'nav.documents' | 'nav.company' | 'nav.settings';
   icon: LucideIcon;
 }
 
 const TABS: Tab[] = [
-  { id: 'home',      label: 'Accueil',   icon: Home     },
-  { id: 'documents', label: 'Documents', icon: Files    },
-  { id: 'company',   label: 'Société',   icon: Building },
-  { id: 'settings',  label: 'Réglages',  icon: Settings },
+  { id: 'home',      labelKey: 'nav.home',      icon: Home     },
+  { id: 'documents', labelKey: 'nav.documents', icon: Files    },
+  { id: 'company',   labelKey: 'nav.company',   icon: Building },
+  { id: 'settings',  labelKey: 'nav.settings',  icon: Settings },
 ];
 
 interface BottomTabsProps {
@@ -31,6 +32,7 @@ interface BottomTabsProps {
 }
 
 export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
+  const { t } = useMobileI18n();
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto"
@@ -44,6 +46,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
+          const label = t(tab.labelKey);
 
           return (
             <button
@@ -55,7 +58,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
                 'transition-colors duration-150',
                 'active:scale-95 transform',
               )}
-              aria-label={tab.label}
+              aria-label={label}
               aria-current={isActive ? 'page' : undefined}
             >
               {/* Active indicator pill (top) */}
@@ -85,7 +88,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
                 className="text-[10.5px] font-semibold leading-tight truncate transition-colors duration-150"
                 style={{ color: isActive ? 'var(--green-2)' : 'var(--sand-muted)' }}
               >
-                {tab.label}
+                {label}
               </span>
             </button>
           );

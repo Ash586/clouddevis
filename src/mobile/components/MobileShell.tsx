@@ -16,6 +16,10 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { processWebSyncItem } from '@/lib/webSync';
 import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
+import { useMobileI18n } from '@/mobile/lib/i18n';
+import { useUserStore } from '@/stores/userStore';
+import { getSettings } from '@/lib/offline';
+import type { MobileLocale } from '@/stores/userStore';
 import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
 import { App } from '@capacitor/app';
 import { BottomTabs, type TabId } from './BottomTabs';
@@ -181,6 +185,19 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     return () => { void teardownPushNotifications(); };
   }, [authState]);
 
+  // ── Sync saved language setting → userStore locale (once on mount) ──
+  const setLocale = useUserStore((s) => s.setLocale);
+  useEffect(() => {
+    getSettings().then((s) => {
+      const map: Record<string, MobileLocale> = { FR: 'fr', AR: 'ar', EN: 'en' };
+      const loc = map[s.language ?? 'FR'] ?? 'fr';
+      setLocale(loc);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { dir } = useMobileI18n();
+
   // ── Duplicate guard (reactive — re-renders FAB when first doc saved) ─
   const hasSavedDocs = useDocumentStore((s) => s.savedDocuments.length > 0);
 
@@ -319,12 +336,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
 
   return (
     <div
+      dir={dir}
       className={cn(
         'relative min-h-screen bg-[var(--navy)]',
         'max-w-lg mx-auto',
       )}
       style={{
-        // Safe area insets for notch/home indicator
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
       }}

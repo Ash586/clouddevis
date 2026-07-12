@@ -2,8 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, FileText, Receipt, Copy, X } from 'lucide-react';
+import { Plus, FileText, Receipt, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 
 interface FABProps {
   onNewDevis: () => void;
@@ -14,6 +15,7 @@ interface FABProps {
 
 export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = false }: FABProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useMobileI18n();
 
   const toggle = useCallback(() => setOpen((o) => !o), []);
 
@@ -35,7 +37,7 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = fals
   const actions = [
     {
       id: 'facture',
-      label: 'Facture',
+      label: t('fab.facture'),
       icon: Receipt,
       color: 'bg-blue-500',
       onPress: handleFacture,
@@ -43,7 +45,7 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = fals
     },
     {
       id: 'devis',
-      label: 'Devis',
+      label: t('fab.devis'),
       icon: FileText,
       color: 'bg-emerald-500',
       onPress: handleDevis,
@@ -51,7 +53,7 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = fals
     },
     {
       id: 'duplicate',
-      label: 'Dupliquer',
+      label: t('fab.duplicate'),
       icon: Copy,
       color: 'bg-amber-500',
       onPress: handleDuplicate,
