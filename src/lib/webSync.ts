@@ -5,6 +5,7 @@
 // ============================================================
 
 import type { SyncQueueItem } from '@/stores/syncStore';
+import { useDocumentStore } from '@/stores/documentStore';
 
 const ENTITY_PATHS: Record<string, string> = {
   document: '/api/documents',
@@ -50,5 +51,24 @@ export async function processWebSyncItem(item: SyncQueueItem): Promise<boolean> 
     return true;
   }
 
-  return res.ok;
+  if (!res.ok) return false;
+
+  // After a successful CREATE, reconcile the local temp ID with the server ID.
+  // The API returns { id, number } — if the server assigned a different ID,
+  // update the local document so future UPDATE/DELETE ops use the correct ID.
+  if (isCreate && item.entity === 'document') {
+    try {
+      const body = await res.json() as { id?: string; number?: string };
+      if (body.id && body.id !== item.entityId) {
+        useDocumentStore.getState().confirmDocSynced(item.entityId, {
+          id: body.id,
+          number: body.number ?? '',
+        });
+      }
+    } catch {
+      // Non-fatal: ID reconciliation failed, next refreshAllData() will correct it
+    }
+  }
+
+  return true;
 }
