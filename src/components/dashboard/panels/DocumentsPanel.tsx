@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
+import { PullToRefresh } from '@/components/mobile/PullToRefresh';
 import { cn } from '@/lib/utils';
 
 type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
@@ -229,8 +230,9 @@ export function DocumentsPanel() {
 
   return (
     <>
-      <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
-        <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
+      <PullToRefresh onRefresh={fetchData}>
+        <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+          <h1 className="text-xl sm:text-2xl font-black text-[var(--sand)]">{t('title')}</h1>
 
         {/* Filters */}
         <Card className="space-y-4">
@@ -532,7 +534,8 @@ export function DocumentsPanel() {
             </Button>
           </div>
         )}
-      </div>
+        </div>
+      </PullToRefresh>
 
       {/* Payment Modal */}
       <Modal open={!!payTarget} onClose={() => setPayTarget(null)} title={t('recordPayment')} size="md">
