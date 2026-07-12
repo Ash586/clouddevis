@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LandingAnimations, LandingFAQ, LangSwitcher } from '@/components/landing/LandingPageClient';
 import { StickyMobileCTA } from '@/components/landing/StickyMobileCTA';
+import { MobileNav } from '@/components/landing/MobileNav';
 import { NavAuthCta } from '@/components/landing/NavAuthCta';
 import { PLANS, formatPrice } from '@/lib/pricing';
 
@@ -32,7 +33,10 @@ export default function HomePage() {
                   <li><a href="#download">Application</a></li>
                   <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <NavAuthCta />
+                <div className="flex items-center gap-2">
+                  <NavAuthCta />
+                  <MobileNav />
+                </div>
               </div>
             </div>
           </nav>

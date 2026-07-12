@@ -1293,6 +1293,12 @@
   .landing-body .steps-grid { grid-template-columns: 1fr 1fr; }
   .landing-body .testimonials-grid { grid-template-columns: 1fr 1fr; }
   .landing-body .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+  /* On mobile, show featured card first with emphasis */
+  .landing-body .pricing-grid .price-card.featured {
+    order: -1;
+    border-width: 1px;
+    box-shadow: 0 8px 32px rgba(30,64,175,0.15);
+  }
   .landing-body .faq-grid { grid-template-columns: 1fr; }
   .landing-body .footer-grid { grid-template-columns: 1fr 1fr; }
   .landing-body .steps-grid::before { display: none; }
@@ -1305,15 +1311,61 @@
   .landing-body .hero { padding: 48px 0 40px; }
   .landing-body .hero-sub { font-size: 15px; margin-bottom: 24px; }
   .landing-body .hero-ctas { margin-bottom: 20px; }
+  /* Mobile: full-width CTA button */
+  .landing-body .hero-ctas .btn { width: 100%; justify-content: center; min-height: 48px; }
   .landing-body .stats-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
   .landing-body .stat-item::before { display: none; }
   .landing-body .bento-grid { grid-template-columns: 1fr; }
   .landing-body .bento-span2, .landing-body .bento-span3 { grid-column: span 1; }
+  /* Bento: horizontal scroll on mobile */
+  .landing-body .bento-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 12px;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 8px;
+  }
+  .landing-body .bento-grid .bento-card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+    min-width: 240px;
+  }
   .landing-body .steps-grid { grid-template-columns: 1fr; }
-  .landing-body .testimonials-grid { grid-template-columns: 1fr; }
+  /* Testimonials: horizontal scroll on mobile */
+  .landing-body .testimonials-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .landing-body .testimonials-grid::-webkit-scrollbar { display: none; }
+  .landing-body .testimonials-grid .tcard {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+    min-width: 260px;
+  }
   .landing-body .compliance-fields { grid-template-columns: 1fr; }
+  /* Mobile: larger touch targets for field tags */
+  .landing-body .field-tag { padding: 16px; min-height: 56px; }
+  .landing-body .field-icon { width: 36px; height: 36px; font-size: 16px; }
   .landing-body .footer-grid { grid-template-columns: 1fr; }
+  /* Mobile: larger touch targets for footer links */
+  .landing-body .footer-col a { padding: 8px 0; display: block; min-height: 40px; display: flex; align-items: center; }
   .landing-body .cta-card { padding: 48px 24px; }
+  /* Mobile: full-width CTA buttons */
+  .landing-body .cta-buttons { flex-direction: column; }
+  .landing-body .cta-buttons .btn { width: 100%; justify-content: center; min-height: 48px; }
   .landing-body .hero-visual-mobile { padding: 0 8px; margin-top: 8px; }
   .landing-body .hero-visual-mobile .doc-preview-compact {
     padding: 16px;
@@ -1353,6 +1405,37 @@
   }
   /* Footer: add bottom padding for sticky CTA */
   .landing-body footer { padding-bottom: 80px; }
+}
+
+/* ═══════════════════════════════════════
+   SMALL PHONES (< 380px)
+═══════════════════════════════════════ */
+@media (max-width: 380px) {
+  .landing-body .container { padding: 0 16px; }
+  .landing-body .hero { padding: 36px 0 32px; }
+  .landing-body .hero-title { font-size: 26px; letter-spacing: -1px; }
+  .landing-body .hero-sub { font-size: 14px; margin-bottom: 20px; }
+  .landing-body .hero-eyebrow { gap: 6px; margin-bottom: 18px; }
+  .landing-body .badge { font-size: 10.5px; padding: 4px 10px; }
+  .landing-body .btn-lg { padding: 12px 20px; font-size: 14px; }
+  .landing-body .section-title { font-size: 22px; letter-spacing: -0.5px; }
+  .landing-body .section-sub { font-size: 14px; }
+  .landing-body .pricing { padding: 48px 0; }
+  .landing-body .price-card { padding: 24px 18px; }
+  .landing-body .price-amount { font-size: 32px; }
+  .landing-body .testimonials { padding: 48px 0; }
+  .landing-body .tcard { padding: 20px 16px; }
+  .landing-body .tcard-text { font-size: 13px; }
+  .landing-body .how { padding: 48px 0; }
+  .landing-body .step-card { padding: 16px 12px; }
+  .landing-body .bento-card { padding: 20px 16px; }
+  .landing-body .card-title { font-size: 14px; }
+  .landing-body .card-desc { font-size: 12.5px; }
+  .landing-body .faq { padding: 48px 0; }
+  .landing-body .cta-section { padding: 48px 0 80px; }
+  .landing-body .cta-card { padding: 32px 16px; }
+  .landing-body .cta-title { font-size: 20px; }
+  .landing-body .cta-sub { font-size: 13px; }
 }
 
 /* ═══════════════════════════════════════
