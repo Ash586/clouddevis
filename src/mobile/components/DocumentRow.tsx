@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { useSyncStore } from '@/stores/syncStore';
 import { formatAmount, formatDate } from '@/mobile/lib/format';
 import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
 
@@ -69,6 +68,8 @@ interface DocumentRowProps {
   onDelete?: (doc: Document) => void;
   onLongPress?: (doc: Document) => void;
   index?: number;
+  /** Pre-computed by the parent (single store subscription for the whole list). */
+  isPendingSync?: boolean;
   /** Play a brief left-reveal animation on mount to teach the swipe gesture. */
   hintOnMount?: boolean;
   /** Called after the hint animation completes so the parent can persist the flag. */
@@ -84,6 +85,7 @@ export function DocumentRow({
   onDelete,
   onLongPress,
   index = 0,
+  isPendingSync = false,
   hintOnMount = false,
   onHintComplete,
 }: DocumentRowProps) {
@@ -107,11 +109,6 @@ export function DocumentRow({
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Check if this document is pending sync
-  const isPendingSync = useSyncStore((s) =>
-    s.queue.some((item) => item.entityId === doc.id && item.entity === 'document'),
-  );
 
   // Transform x for action button opacity
   const editOpacity = useTransform(x, [-150, -80, -40], [1, 1, 0]);

@@ -9,10 +9,11 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, FilePlus, Files, X } from 'lucide-react';
+import { Search, FilePlus, Files, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
-import { Loader2 } from 'lucide-react';
+import { useSyncStore } from '@/stores/syncStore';
+import { useShallow } from 'zustand/react/shallow';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { updateDocumentStatus } from '@/mobile/lib/api';
@@ -103,6 +104,19 @@ export function DocumentsListScreen({
   }, []);
 
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
+
+  // ── Single sync-queue subscription for the whole list (P1 perf fix) ─
+  // useShallow prevents re-render when unrelated queue items change.
+  // Each DocumentRow receives a pre-computed boolean instead of running
+  // its own .some() against the full queue on every store update.
+  const pendingDocIds = useSyncStore(
+    useShallow((s) =>
+      s.queue
+        .filter((item) => item.entity === 'document')
+        .map((item) => item.entityId),
+    ),
+  );
+  const pendingSet = useMemo(() => new Set(pendingDocIds), [pendingDocIds]);
   const deleteDocument = useDocumentStore((s) => s.deleteDocument);
   const duplicateDocument = useDocumentStore((s) => s.duplicateDocument);
 
@@ -401,6 +415,7 @@ export function DocumentsListScreen({
                 onDuplicate={handleDuplicate}
                 onDelete={handleDelete}
                 onLongPress={handleLongPress}
+                isPendingSync={pendingSet.has(doc.id)}
                 hintOnMount={i === 0 && showSwipeHint}
                 onHintComplete={i === 0 ? () => {
                   setShowSwipeHint(false);
