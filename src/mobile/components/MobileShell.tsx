@@ -20,6 +20,7 @@ import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/p
 import { BottomTabs, type TabId } from './BottomTabs';
 import { FAB } from './FAB';
 import { OfflineBanner } from './OfflineBanner';
+import { UpdateBanner } from './UpdateBanner';
 import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -28,7 +29,18 @@ import { CompanyProfileScreen } from '../screens/CompanyProfileScreen';
 import { ClientsScreen } from '../screens/ClientsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { CreateScreen } from '../screens/CreateScreen';
+import { APP_VERSION } from '@/mobile/constants';
 import type { Document } from '@/mobile/types';
+
+// ── Semver compare (major.minor.patch) ────────────────────────
+function isOutdated(current: string, minimum: string): boolean {
+  const parse = (v: string) => v.split('.').map(Number);
+  const [cMaj, cMin, cPat] = parse(current);
+  const [mMaj, mMin, mPat] = parse(minimum);
+  if (cMaj !== mMaj) return cMaj < mMaj;
+  if (cMin !== mMin) return cMin < mMin;
+  return cPat < mPat;
+}
 
 // ── Company sub-views ────────────────────────────────────────
 type CompanyView = 'profile' | 'clients';
@@ -55,6 +67,30 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [pushToast, setPushToast] = useState<PushToastData | null>(null);
   const [hasUnread, setHasUnread] = useState(false);
   const toastIdRef = useRef(0);
+
+  // ── Update check ──────────────────────────────────────────
+  const [updateInfo, setUpdateInfo] = useState<{
+    visible: boolean;
+    version: string;
+    apkUrl: string;
+    releaseNotes: string;
+  }>({ visible: false, version: '', apkUrl: '', releaseNotes: '' });
+
+  useEffect(() => {
+    fetch('/api/mobile/version')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.minVersion && isOutdated(APP_VERSION, data.minVersion)) {
+          setUpdateInfo({
+            visible: true,
+            version: data.minVersion,
+            apkUrl: data.apkUrl ?? '',
+            releaseNotes: data.releaseNotes ?? '',
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // ── Auth: check session on mount, expose login/logout ─────
   const { authState, userName, onUnauthorized, login, logout } = useAuthGuard();
@@ -239,6 +275,15 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
       }}
     >
+      {/* APK update banner */}
+      <UpdateBanner
+        visible={updateInfo.visible}
+        newVersion={updateInfo.version}
+        releaseNotes={updateInfo.releaseNotes}
+        apkUrl={updateInfo.apkUrl}
+        onDismiss={() => setUpdateInfo((u) => ({ ...u, visible: false }))}
+      />
+
       {/* Foreground push notification toast */}
       <PushToast
         toast={pushToast}

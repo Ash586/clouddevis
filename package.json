@@ -19,7 +19,9 @@
     "mobile:sync": "npx cap sync",
     "mobile:android": "npx cap open android",
     "mobile:ios": "npx cap open ios",
-    "mobile:dev": "npx cap sync && npx cap open android"
+    "mobile:dev": "npx cap sync && npx cap open android",
+    "mobile:dev-device": "node scripts/cap-dev.mjs dev && npx cap open android",
+    "mobile:prod": "node scripts/cap-dev.mjs prod"
   },
   "dependencies": {
     "@capacitor-community/sqlite": "^8.1.0",
