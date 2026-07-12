@@ -116,10 +116,17 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       const hasDraft = store.currentDoc.items.length > 0 || !!store.currentDoc.client?.name;
       if (prefilled) {
         void notify('Document dupliqué — vérifiez et enregistrez');
+        // Prefilled doc already has items — suppress the smart-morph so the
+        // user isn't immediately hijacked into client mode on open.
+        clientPromptShown.current = true;
       } else if (hasDraft) {
         void notify('Brouillon restauré ✓');
+        // Same: draft was already in progress; the user knows what they're doing.
+        // Smart-morph should only trigger for brand-new item additions.
+        clientPromptShown.current = true;
       } else {
         resetDocument();
+        clientPromptShown.current = false;
       }
       pdfRef.current = null;
       return;
@@ -188,10 +195,17 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   }, [editingDocId, onExit, resetDocument, currentDoc]);
 
   // ── Smart-morph: first item added while no client → ask "pour qui ?" once.
-  // Deferred a beat so the new line's landing animation finishes first. ──
+  // Deferred a beat so the new line's landing animation finishes first.
+  // Reset when all items are cleared so the prompt can fire again on the
+  // next new item (user started over within the same session). ──
   useEffect(() => {
-    if (editingDocId || clientPromptShown.current) return;
-    if (currentDoc.items.length >= 1 && !currentDoc.client?.name) {
+    if (editingDocId) return;
+    if (currentDoc.items.length === 0) {
+      clientPromptShown.current = false;
+      return;
+    }
+    if (clientPromptShown.current) return;
+    if (!currentDoc.client?.name) {
       clientPromptShown.current = true;
       const t = setTimeout(() => setDockMode('client'), 350);
       return () => clearTimeout(t);
