@@ -23,6 +23,10 @@ type TranslationKeys =
   | 'settings.cancel' | 'settings.deleteAll' | 'settings.logout' | 'settings.loggingOut'
   | 'settings.saved' | 'settings.cleared' | 'settings.modeEntreprise'
   | 'settings.modeArtisan' | 'settings.modeError' | 'settings.version'
+  | 'settings.support' | 'settings.supportHint'
+  | 'settings.deleteAccount' | 'settings.deleteAccountConfirmTitle'
+  | 'settings.deleteAccountConfirmBody' | 'settings.deleteAccountError'
+  | 'settings.deleteAccounting'
   | 'fab.facture' | 'fab.devis' | 'fab.duplicate'
   | 'common.artisan' | 'common.entreprise';
 
@@ -77,6 +81,13 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.modeArtisan': 'Mode Artisan activé ✓',
     'settings.modeError': 'Impossible de changer le mode',
     'settings.version': 'Conformes DGI Algérie',
+    'settings.support': 'Support & aide',
+    'settings.supportHint': 'Contacter l\'équipe Rakmana',
+    'settings.deleteAccount': 'Supprimer mon compte',
+    'settings.deleteAccountConfirmTitle': 'Supprimer définitivement votre compte ?',
+    'settings.deleteAccountConfirmBody': 'Cette action est irréversible. Toutes vos données (documents, clients, société) seront supprimées du serveur.',
+    'settings.deleteAccountError': 'Erreur lors de la suppression',
+    'settings.deleteAccounting': 'Suppression…',
     'fab.facture': 'Facture',
     'fab.devis': 'Devis',
     'fab.duplicate': 'Dupliquer',
@@ -132,6 +143,13 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.modeArtisan': 'تم تفعيل وضع الحرفي ✓',
     'settings.modeError': 'تعذّر تغيير الوضع',
     'settings.version': 'متوافق مع المديرية العامة للضرائب',
+    'settings.support': 'الدعم والمساعدة',
+    'settings.supportHint': 'تواصل مع فريق رقمنة',
+    'settings.deleteAccount': 'حذف حسابي',
+    'settings.deleteAccountConfirmTitle': 'حذف حسابك نهائياً؟',
+    'settings.deleteAccountConfirmBody': 'هذا الإجراء لا يمكن التراجع عنه. ستُحذف جميع بياناتك (وثائق، عملاء، شركة) من الخادم.',
+    'settings.deleteAccountError': 'خطأ أثناء الحذف',
+    'settings.deleteAccounting': 'جاري الحذف…',
     'fab.facture': 'فاتورة',
     'fab.devis': 'عرض سعر',
     'fab.duplicate': 'نسخ',
@@ -187,6 +205,13 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.modeArtisan': 'Artisan mode enabled ✓',
     'settings.modeError': 'Failed to change mode',
     'settings.version': 'DGI Algeria compliant',
+    'settings.support': 'Support & help',
+    'settings.supportHint': 'Contact the Rakmana team',
+    'settings.deleteAccount': 'Delete my account',
+    'settings.deleteAccountConfirmTitle': 'Permanently delete your account?',
+    'settings.deleteAccountConfirmBody': 'This action is irreversible. All your data (documents, clients, company) will be deleted from the server.',
+    'settings.deleteAccountError': 'Error during deletion',
+    'settings.deleteAccounting': 'Deleting…',
     'fab.facture': 'Invoice',
     'fab.devis': 'Quote',
     'fab.duplicate': 'Duplicate',

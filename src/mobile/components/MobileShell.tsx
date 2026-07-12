@@ -28,6 +28,7 @@ import { OfflineBanner } from './OfflineBanner';
 import { UpdateBanner } from './UpdateBanner';
 import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
+import { OnboardingScreen } from './OnboardingScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DocumentsListScreen } from '../screens/DocumentsListScreen';
 import { CompanyProfileScreen } from '../screens/CompanyProfileScreen';
@@ -66,6 +67,7 @@ interface MobileShellProps {
 
 export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [editingDocId, setEditingDocId] = useState<string | null>(null);
   const [companyView, setCompanyView] = useState<CompanyView>('profile');
@@ -183,6 +185,16 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       },
     });
     return () => { void teardownPushNotifications(); };
+  }, [authState]);
+
+  // ── Show onboarding on first login ever ───────────────────
+  useEffect(() => {
+    if (authState !== 'authenticated') return;
+    try {
+      if (!localStorage.getItem('rakmana_onboarded')) {
+        setShowOnboarding(true);
+      }
+    } catch { /* private browsing */ }
   }, [authState]);
 
   // ── Sync saved language setting → userStore locale (once on mount) ──
@@ -332,6 +344,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   // ── Login screen ──────────────────────────────────────────
   if (authState === 'unauthenticated') {
     return <LoginScreen onLogin={login} />;
+  }
+
+  // ── First-run onboarding ───────────────────────────────────
+  if (showOnboarding) {
+    return <OnboardingScreen onDone={() => setShowOnboarding(false)} />;
   }
 
   return (

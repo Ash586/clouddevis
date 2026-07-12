@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   getSettings,
@@ -38,6 +38,8 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     theme: 'light',
   });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const { t, dir } = useMobileI18n();
@@ -102,6 +104,25 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     useCompanyStore.getState().clearCompany();
     setShowClearConfirm(false);
     void notify(getMobileT(useUserStore.getState().locale)('settings.cleared'));
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const res = await fetch('/api/user/delete', { method: 'DELETE', credentials: 'include' });
+      if (!res.ok) throw new Error();
+      // Clear all local data then trigger logout
+      await clearAllOfflineData();
+      useDocumentStore.getState().resetDocument();
+      useClientStore.getState().clearAll();
+      useCompanyStore.getState().clearCompany();
+      await onLogout?.();
+    } catch {
+      void notify(getMobileT(useUserStore.getState().locale)('settings.deleteAccountError'));
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteAccountConfirm(false);
+    }
   };
 
   return (
@@ -269,6 +290,66 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
               <Trash2 size={18} className="text-red-400" />
               <span className="text-sm font-semibold text-red-400 flex-1 text-start">
                 {t('settings.clearData')}
+              </span>
+              <ChevronRight size={16} className={cn('text-red-400/50', dir === 'rtl' && 'rotate-180')} />
+            </button>
+          )}
+        </div>
+
+        {/* ── Support ──────────────────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
+          <a
+            href="mailto:support@rakmana.app"
+            className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
+          >
+            <HeadphonesIcon size={18} className="text-[var(--sand-muted)]" />
+            <div className="flex-1">
+              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
+                {t('settings.support')}
+              </span>
+              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
+                {t('settings.supportHint')}
+              </span>
+            </div>
+            <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
+          </a>
+        </div>
+
+        {/* ── Delete Account ────────────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
+          {showDeleteAccountConfirm ? (
+            <div className="p-4">
+              <p className="text-sm font-semibold text-red-400 mb-2">
+                {t('settings.deleteAccountConfirmTitle')}
+              </p>
+              <p className="text-xs text-[var(--sand-muted)] mb-4">
+                {t('settings.deleteAccountConfirmBody')}
+              </p>
+              <div className="flex gap-2">
+                <button type="button"
+                  onClick={() => setShowDeleteAccountConfirm(false)}
+                  disabled={deletingAccount}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] disabled:opacity-50"
+                >
+                  {t('settings.cancel')}
+                </button>
+                <button type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-red-500 text-white disabled:opacity-50"
+                >
+                  {deletingAccount ? t('settings.deleteAccounting') : t('settings.deleteAccount')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button"
+              onClick={() => setShowDeleteAccountConfirm(true)}
+              className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
+            >
+              <UserX size={18} className="text-red-400" />
+              <span className="text-sm font-semibold text-red-400 flex-1 text-start">
+                {t('settings.deleteAccount')}
               </span>
               <ChevronRight size={16} className={cn('text-red-400/50', dir === 'rtl' && 'rotate-180')} />
             </button>
