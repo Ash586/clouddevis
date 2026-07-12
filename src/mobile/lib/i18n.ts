@@ -12,6 +12,7 @@ type TranslationKeys =
   | 'nav.home' | 'nav.documents' | 'nav.company' | 'nav.settings'
   | 'stats.thisMonth' | 'stats.docsCreated' | 'stats.revenue' | 'stats.revenueSub'
   | 'stats.clients' | 'stats.clientsSub' | 'stats.drafts' | 'stats.draftsSub'
+  | 'stats.unpaid' | 'stats.unpaidSub'
   | 'docs.title' | 'docs.empty' | 'docs.emptyHint' | 'docs.searchPlaceholder'
   | 'docs.filterAll' | 'docs.filterDevis' | 'docs.filterFacture'
   | 'docs.filterPaid' | 'docs.filterPending' | 'docs.filterMonth'
@@ -41,6 +42,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'stats.clientsSub': 'enregistrés',
     'stats.drafts': 'Brouillons',
     'stats.draftsSub': 'en attente',
+    'stats.unpaid': 'Impayés',
+    'stats.unpaidSub': 'factures en attente',
     'docs.title': 'Mes documents',
     'docs.empty': 'Aucun document',
     'docs.emptyHint': 'Créez votre premier document',
@@ -94,6 +97,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'stats.clientsSub': 'مسجلون',
     'stats.drafts': 'المسودات',
     'stats.draftsSub': 'في الانتظار',
+    'stats.unpaid': 'غير مدفوعة',
+    'stats.unpaidSub': 'فواتير في الانتظار',
     'docs.title': 'وثائقي',
     'docs.empty': 'لا توجد وثائق',
     'docs.emptyHint': 'أنشئ وثيقتك الأولى',
@@ -147,6 +152,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'stats.clientsSub': 'registered',
     'stats.drafts': 'Drafts',
     'stats.draftsSub': 'pending',
+    'stats.unpaid': 'Unpaid',
+    'stats.unpaidSub': 'invoices pending',
     'docs.title': 'My documents',
     'docs.empty': 'No documents',
     'docs.emptyHint': 'Create your first document',

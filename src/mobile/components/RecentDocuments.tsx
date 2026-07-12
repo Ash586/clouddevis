@@ -17,8 +17,10 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/userStore';
+import { useSyncStatusStore } from '@/stores/syncStatusStore';
 import { Badge } from '@/components/ui/badge';
 import { formatAmount } from '@/mobile/lib/format';
+import { DocumentListSkeleton } from './DocumentRowSkeleton';
 import type { Document, DocumentType } from '@/mobile/types';
 
 // ── Document type → icon mapping ──────────────────────────────
@@ -67,19 +69,24 @@ const itemVariants = {
 
 export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDocumentsProps) {
   const privacyMode = useUserStore((s) => s.privacyMode);
+  const initialSyncDone = useSyncStatusStore((s) => s.initialSyncDone);
   const recentDocs = [...documents]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
+  if (!initialSyncDone && recentDocs.length === 0) {
+    return (
+      <div className="px-5">
+        <h3 className="text-base font-bold text-[var(--sand)] mb-3">Récents</h3>
+        <DocumentListSkeleton count={3} />
+      </div>
+    );
+  }
+
   if (recentDocs.length === 0) {
     return (
       <div className="px-5">
-        <h3
-          className="text-base font-bold text-[var(--sand)] mb-3"
-         
-        >
-          Récents
-        </h3>
+        <h3 className="text-base font-bold text-[var(--sand)] mb-3">Récents</h3>
         <div
           className={cn(
             'rounded-2xl p-8 text-center',
@@ -87,9 +94,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
           )}
         >
           <FileText size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
-          <p className="text-sm text-[var(--sand-muted)]">
-            Aucun document récent
-          </p>
+          <p className="text-sm text-[var(--sand-muted)]">Aucun document récent</p>
           <p className="text-xs text-[var(--sand-muted)] mt-1 opacity-60">
             Créez votre premier devis pour commencer
           </p>

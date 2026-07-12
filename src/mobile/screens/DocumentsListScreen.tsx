@@ -15,6 +15,8 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
 import { useShallow } from 'zustand/react/shallow';
 import { DocumentRow } from '@/mobile/components/DocumentRow';
+import { DocumentListSkeleton } from '@/mobile/components/DocumentRowSkeleton';
+import { useSyncStatusStore } from '@/stores/syncStatusStore';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { updateDocumentStatus } from '@/mobile/lib/api';
 import { useMobileI18n } from '@/mobile/lib/i18n';
@@ -107,6 +109,9 @@ export function DocumentsListScreen({
   }, []);
 
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
+  const initialSyncDone = useSyncStatusStore((s) => s.initialSyncDone);
+  // Show skeleton only on first load when store is empty AND sync hasn't finished yet
+  const showSkeleton = !initialSyncDone && savedDocuments.length === 0;
 
   // ── Single sync-queue subscription for the whole list (P1 perf fix) ─
   // useShallow prevents re-render when unrelated queue items change.
@@ -381,7 +386,9 @@ export function DocumentsListScreen({
           </div>
         )}
         <div style={{ transform: `translateY(${pull}px)`, transition: pull === 0 ? 'transform 0.25s' : undefined }}>
-        {filteredDocs.length === 0 ? (
+        {showSkeleton ? (
+          <DocumentListSkeleton count={6} />
+        ) : filteredDocs.length === 0 ? (
           <motion.div
             className="flex flex-col items-center justify-center py-20"
             initial={{ opacity: 0, y: 20 }}

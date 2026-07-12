@@ -28,6 +28,8 @@ export interface DashboardStats {
   draftCount: number;
   /** ACCEPTED + DELIVERED docs (approx. "payés/livrés") */
   deliveredCount: number;
+  /** Factures with status SENT — awaiting payment */
+  unpaidCount: number;
 }
 
 // ── Fallback: compute from local savedDocuments ───────────────
@@ -46,7 +48,8 @@ function computeLocalStats(): DashboardStats {
     totalTTC: docs.reduce((s, d) => s + (d.totalTTC ?? 0), 0),
     totalClients: 0,
     draftCount: docs.filter((d) => d.status === 'DRAFT').length,
-    deliveredCount: docs.filter((d) => d.status === 'SENT').length,
+    deliveredCount: docs.filter((d) => d.status === 'PAID').length,
+    unpaidCount: docs.filter((d) => d.status === 'SENT').length,
   };
 }
 
@@ -65,6 +68,7 @@ const DEFAULT_STATS: DashboardStats = {
   totalClients: 0,
   draftCount: 0,
   deliveredCount: 0,
+  unpaidCount: 0,
 };
 
 export function useDashboardStats(enabled = true): UseDashboardStatsResult {
@@ -89,6 +93,7 @@ export function useDashboardStats(enabled = true): UseDashboardStatsResult {
         deliveredCount:
           (s.statusBreakdown?.DELIVERED ?? 0) +
           (s.statusBreakdown?.ACCEPTED ?? 0),
+        unpaidCount: s.statusBreakdown?.SENT ?? 0,
       });
     } catch {
       // Fall back to local store computation

@@ -11,6 +11,7 @@ import { useEffect, useRef } from 'react';
 import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
+import { useSyncStatusStore } from '@/stores/syncStatusStore';
 import { processWebSyncItem } from '@/lib/webSync';
 import { onReconnect, checkNetworkStatus } from './network';
 import { fetchAllClients, fetchDocuments, ApiError, type ApiDocumentListItem } from './api';
@@ -158,8 +159,10 @@ export function useApiSync({ enabled, onUnauthorized }: UseApiSyncOptions): void
       }
     });
 
-    // Bootstrap immediately
-    refreshAllData().catch(handleApiError);
+    // Bootstrap immediately — mark done regardless of outcome so skeleton clears
+    refreshAllData()
+      .catch(handleApiError)
+      .finally(() => useSyncStatusStore.getState().markSyncDone());
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Users, TrendingUp, Clock } from 'lucide-react';
+import { FileText, Users, TrendingUp, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/userStore';
@@ -98,11 +98,11 @@ export function StatCards({ stats, loading }: StatCardsProps) {
       delay: 0.12,
     },
     {
-      icon: <Clock size={16} strokeWidth={2} className="text-amber-400" />,
-      iconBg: 'bg-[rgba(251,191,36,0.12)]',
-      label: t('stats.drafts'),
-      value: String(stats.draftCount),
-      sub: t('stats.draftsSub'),
+      icon: <AlertCircle size={16} strokeWidth={2} className="text-red-400" />,
+      iconBg: 'bg-[rgba(239,68,68,0.12)]',
+      label: t('stats.unpaid'),
+      value: String(stats.unpaidCount),
+      sub: t('stats.unpaidSub'),
       delay: 0.16,
     },
   ];
