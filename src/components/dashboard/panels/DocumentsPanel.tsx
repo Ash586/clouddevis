@@ -441,33 +441,33 @@ export function DocumentsPanel() {
         <div className="md:hidden space-y-3">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="p-3 space-y-3 animate-pulse">
+              <Card key={i} className="p-4 space-y-3 animate-pulse">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1.5"><div className="h-4 w-24 bg-[var(--navy-3)] rounded" /><div className="h-3 w-20 bg-[var(--navy-4)] rounded" /></div>
                   <div className="h-5 w-16 bg-[var(--navy-3)] rounded-full" />
                 </div>
                 <div className="flex items-center justify-between"><div className="h-4 w-16 bg-[var(--navy-3)] rounded-full" /><div className="h-4 w-20 bg-[var(--navy-3)] rounded" /></div>
-                <div className="flex items-center justify-between"><div className="h-3 w-20 bg-[var(--navy-4)] rounded" /><div className="flex gap-1"><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /><div className="h-8 w-8 bg-[var(--navy-3)] rounded-lg" /></div></div>
+                <div className="flex items-center justify-between"><div className="h-3 w-20 bg-[var(--navy-4)] rounded" /><div className="flex gap-2"><div className="h-10 w-10 bg-[var(--navy-3)] rounded-lg" /><div className="h-10 w-10 bg-[var(--navy-3)] rounded-lg" /><div className="h-10 w-10 bg-[var(--navy-3)] rounded-lg" /></div></div>
               </Card>
             ))
           ) : docs.length === 0 ? (
             <Card className="py-8 text-center text-[var(--sand-muted)]">{t('noDocs')}</Card>
           ) : docs.map(doc => (
-            <Card key={doc.id} className="space-y-3 p-3">
+            <Card key={doc.id} className="space-y-3 p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-bold text-[var(--sand)]">{doc.number}</p>
-                  <p className="text-xs text-[var(--sand-muted)]">{doc.client || '—'}</p>
+                  <p className="font-bold text-[var(--sand)] text-[15px]">{doc.number}</p>
+                  <p className="text-xs text-[var(--sand-muted)] mt-0.5">{doc.client || '—'}</p>
                 </div>
-                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', STATUS_COLORS[doc.status] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
+                <span className={cn('inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold', STATUS_COLORS[doc.status] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
                   {tc(doc.status?.toLowerCase()) || doc.status}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
+                <span className={cn('inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold', TYPE_COLORS[doc.type] || 'bg-[var(--navy-4)] text-[var(--sand-2)]')}>
                   {TYPE_LABELS[doc.type] || doc.type}
                 </span>
-                <span className="font-bold text-[var(--sand)]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></span>
+                <span className="font-bold text-[var(--sand)] text-[15px]">{doc.total} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></span>
               </div>
               {doc.type === 'FACTURE' && !doc.isPaid && (doc.remaining ?? 0) > 0 && (
                 <div className="flex items-center justify-between text-[11px]">
@@ -478,26 +478,26 @@ export function DocumentsPanel() {
               {doc.type === 'FACTURE' && doc.isPaid && (
                 <div className="text-[11px] font-semibold text-emerald-500">✓ {tc('paid')}</div>
               )}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pt-1">
                 <span className="text-xs text-[var(--sand-muted)]">{doc.date}</span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {EMAILABLE_TYPES.includes(doc.type) && (
-                    <button type="button" onClick={() => openSendModal(doc)} className="p-2 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.1)] rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center" title={t('sendEmail')}>
+                    <button type="button" onClick={() => openSendModal(doc)} className="p-2.5 text-[var(--sand-muted)] hover:text-[var(--green-3)] hover:bg-[rgba(37,99,235,0.1)] rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center" title={t('sendEmail')}>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     </button>
                   )}
                   {doc.type === 'FACTURE' && (
-                    <button type="button" onClick={() => openPayModal(doc)} className={cn('p-2 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
+                    <button type="button" onClick={() => openPayModal(doc)} className={cn('p-2.5 rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center', doc.isPaid ? 'text-emerald-500 hover:bg-emerald-400/10' : 'text-[var(--sand-muted)] hover:text-emerald-500 hover:bg-emerald-400/10')} title={t('recordPayment')}>
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </button>
                   )}
-                  <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                  <button type="button" onClick={() => router.push(`/dashboard/editor?id=${doc.id}`)} className="p-2.5 text-[var(--sand-muted)] hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   </button>
-                  <button type="button" onClick={() => handleDuplicate(doc.id)} className="p-2 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                  <button type="button" onClick={() => handleDuplicate(doc.id)} className="p-2.5 text-[var(--sand-muted)] hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                   </button>
-                  <button type="button" onClick={() => setDeleteTarget(doc)} className="p-2 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition min-w-[36px] min-h-[36px] flex items-center justify-center">
+                  <button type="button" onClick={() => setDeleteTarget(doc)} className="p-2.5 text-[var(--sand-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </div>

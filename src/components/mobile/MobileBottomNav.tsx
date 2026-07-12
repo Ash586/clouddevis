@@ -1,20 +1,21 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Home, FileText, Plus, Users, User } from 'lucide-react';
 
 interface NavItem {
   label: string;
+  tabKey: string;
   href: string;
   icon: React.ReactNode;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Accueil', href: '/dashboard', icon: <Home size={22} /> },
-  { label: 'Documents', href: '/dashboard/documents', icon: <FileText size={22} /> },
-  { label: 'Nouveau', href: '__new__', icon: <Plus size={22} /> },
-  { label: 'Clients', href: '/dashboard/clients', icon: <Users size={22} /> },
-  { label: 'Profil', href: '/dashboard/profile', icon: <User size={22} /> },
+  { label: 'Accueil', tabKey: '', href: '/dashboard', icon: <Home size={22} /> },
+  { label: 'Documents', tabKey: 'documents', href: '/dashboard?tab=documents', icon: <FileText size={22} /> },
+  { label: 'Nouveau', tabKey: '__new__', href: '__new__', icon: <Plus size={22} /> },
+  { label: 'Clients', tabKey: 'clients', href: '/dashboard?tab=clients', icon: <Users size={22} /> },
+  { label: 'Profil', tabKey: 'profile', href: '/dashboard/profile', icon: <User size={22} /> },
 ];
 
 interface MobileBottomNavProps {
@@ -23,20 +24,27 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
-  const isActive = (href: string) => {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    return pathname.startsWith(href);
+  const activeTab = searchParams?.get('tab') || '';
+
+  const isActive = (item: NavItem) => {
+    if (item.tabKey === '__new__') return false;
+    if (item.tabKey === '') return pathname === '/dashboard' && !activeTab;
+    if (item.tabKey === 'profile') return pathname === '/dashboard/profile';
+    return activeTab === item.tabKey;
   };
 
   return (
-    <nav className="mobile-bottom-nav md:hidden">
-      <div className="flex items-stretch justify-around h-16 px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 backdrop-blur-lg border-t border-[rgba(15,39,71,0.08)]" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="flex items-stretch justify-around h-16 px-1">
         {NAV_ITEMS.map((item) => {
-          if (item.href === '__new__') {
+          if (item.tabKey === '__new__') {
             return (
-              <button type="button"                 key="new"
+              <button
+                type="button"
+                key="new"
                 onClick={onNewDoc}
                 className="flex flex-col items-center justify-center gap-0.5 w-16 h-full relative"
                 aria-label="Nouveau document"
@@ -48,9 +56,11 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
             );
           }
 
-          const active = isActive(item.href);
+          const active = isActive(item);
           return (
-            <button type="button"               key={item.href}
+            <button
+              type="button"
+              key={item.tabKey}
               onClick={() => router.push(item.href)}
               className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-0"
               aria-label={item.label}

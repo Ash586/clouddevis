@@ -44,7 +44,7 @@ export function SectionTabs({ clientCount = 0 }: Props) {
   };
 
   return (
-    <div data-tour="section-tabs" className="hidden md:block border-t border-[rgba(15,39,71,0.06)] bg-[var(--navy)]/60">
+    <div data-tour="section-tabs" className="border-t border-[rgba(15,39,71,0.06)] bg-[var(--navy)]/60">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
         <nav className="flex items-center gap-1 -mb-px overflow-x-auto no-scrollbar" aria-label="Sections">
           {tabs.map((tab) => {
@@ -55,14 +55,14 @@ export function SectionTabs({ clientCount = 0 }: Props) {
                 type="button"
                 onClick={() => router.push(tab.href)}
                 aria-current={active ? 'page' : undefined}
-                className={`group flex items-center gap-2 px-3 py-2.5 border-b-2 text-sm font-bold whitespace-nowrap transition-all min-h-[44px] ${
+                className={`group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2.5 border-b-2 text-xs sm:text-sm font-bold whitespace-nowrap transition-all min-h-[44px] ${
                   active
                     ? 'border-[var(--green-3)] text-[var(--green-3)]'
                     : 'border-transparent text-[var(--sand-muted)] hover:text-[var(--sand)] hover:border-[rgba(15,39,71,0.2)]'
                 }`}
               >
                 <tab.icon size={16} className="shrink-0" />
-                <span>{t(tab.labelKey)}</span>
+                <span className="hidden sm:inline">{t(tab.labelKey)}</span>
                 {tab.badge != null && tab.badge > 0 && (
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                     active ? 'bg-[var(--green-glow)] text-[var(--green-3)]' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]'

@@ -8,6 +8,7 @@ import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
 import { ClientsPanel } from '@/components/dashboard/panels/ClientsPanel';
 import { DocumentsPanel } from '@/components/dashboard/panels/DocumentsPanel';
 import { FiscalPanel } from '@/components/dashboard/panels/FiscalPanel';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import type { DashboardStats } from '@/components/dashboard/dashboardConstants';
 import { useAutoTour } from '@/contexts/TourProvider';
 
@@ -67,10 +68,14 @@ export default function DashboardPage() {
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [fetchData]);
 
+  const handleNewDoc = useCallback(() => {
+    window.location.href = '/dashboard/editor';
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pb-20 md:pb-0">
         <TrialGate>
           {tab === 'clients' ? (
             <ClientsPanel />
@@ -88,6 +93,7 @@ export default function DashboardPage() {
           )}
         </TrialGate>
       </div>
+      <MobileBottomNav onNewDoc={handleNewDoc} />
     </div>
   );
 }
