@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X, Sparkles } from 'lucide-react';
+import { Download, X, Sparkles, Loader2 } from 'lucide-react';
+import { downloadAndInstallAPK } from '@/mobile/lib/appUpdate';
 
 interface UpdateBannerProps {
   visible: boolean;
@@ -12,9 +14,19 @@ interface UpdateBannerProps {
 }
 
 export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDismiss }: UpdateBannerProps) {
-  const handleDownload = () => {
-    if (apkUrl) window.open(apkUrl, '_blank');
-    onDismiss();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!apkUrl || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadAndInstallAPK(apkUrl);
+    } catch {
+      // Silent — user can retry
+    } finally {
+      setDownloading(false);
+      onDismiss();
+    }
   };
 
   return (
@@ -43,10 +55,15 @@ export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDism
                 <button
                   type="button"
                   onClick={handleDownload}
-                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-[var(--green-2)] text-[12px] font-bold active:scale-95 transition-transform"
+                  disabled={downloading}
+                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-[var(--green-2)] text-[12px] font-bold active:scale-95 transition-transform disabled:opacity-60"
                 >
-                  <Download size={13} />
-                  Télécharger
+                  {downloading ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Download size={13} />
+                  )}
+                  {downloading ? 'Téléchargement…' : 'Télécharger'}
                 </button>
               </div>
               <button

@@ -19,7 +19,7 @@ import { updateDocumentStatus } from '@/mobile/lib/api';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { ActionSheet } from '@/mobile/components/ActionSheet';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
-import { generatePDFBase64FromDoc, printDocument } from '@/mobile/lib/pdf';
+import { generatePDFBase64FromDoc, printDocument, downloadDocument } from '@/mobile/lib/pdf';
 import { shareDocument } from '@/mobile/lib/whatsapp';
 import { notify } from '@/mobile/lib/toast';
 import type { Document } from '@/mobile/types';
@@ -212,10 +212,17 @@ export function DocumentsListScreen({
           }
           break;
         case 'download':
+          try {
+            const pdf = await generatePDFBase64FromDoc(doc);
+            await downloadDocument(pdf, `${doc.number}.pdf`);
+          } catch {
+            void notify('Génération du PDF impossible');
+          }
+          break;
         case 'print':
           try {
             const pdf = await generatePDFBase64FromDoc(doc);
-            printDocument(pdf);
+            await printDocument(pdf);
           } catch {
             void notify('Génération du PDF impossible');
           }

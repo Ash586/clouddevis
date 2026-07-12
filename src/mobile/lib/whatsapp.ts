@@ -15,6 +15,25 @@ function base64ToBlob(base64: string, type = 'application/pdf'): Blob {
 }
 
 /**
+ * Convert an Algerian phone number to international format for WhatsApp.
+ * - 0555123456 → 213555123456
+ * - +213555123456 → 213555123456
+ * - 213555123456 → 213555123456 (unchanged)
+ */
+function formatPhoneForWhatsApp(phone: string): string {
+  let cleaned = phone.replace(/[\s\-+()]/g, '');
+  // Algerian local numbers starting with 0 → replace with 213
+  if (cleaned.startsWith('0')) {
+    cleaned = '213' + cleaned.slice(1);
+  }
+  // Ensure country code 213 is present
+  if (!cleaned.startsWith('213')) {
+    cleaned = '213' + cleaned;
+  }
+  return cleaned;
+}
+
+/**
  * Share a document PDF through the best channel available on this platform.
  */
 export async function shareDocument(options: {
@@ -64,7 +83,9 @@ export async function shareDocument(options: {
 }
 
 /**
- * Open WhatsApp directly with a pre-filled message
+ * Open WhatsApp directly with a pre-filled message.
+ * On native (Capacitor), uses the Browser plugin or intent.
+ * On web, opens wa.me in a new tab.
  */
 export async function openWhatsApp(options: {
   phone?: string;
@@ -75,15 +96,24 @@ export async function openWhatsApp(options: {
 
   let url: string;
   if (phone) {
-    // Clean phone number: remove spaces, dashes, plus
-    const cleanPhone = phone.replace(/[\s\-+()]/g, '');
+    const cleanPhone = formatPhoneForWhatsApp(phone);
     url = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
   } else {
     url = `https://wa.me/?text=${encodedMessage}`;
   }
 
-  // Use Capacitor Browser or window.open
-  window.open(url, '_system');
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (Capacitor.isNativePlatform()) {
+      const { Browser } = await import('@capacitor/browser');
+      await Browser.open({ url });
+      return;
+    }
+  } catch {
+    // Browser plugin not available — fall through to window.open
+  }
+
+  window.open(url, '_blank');
 }
 
 /**

@@ -34,10 +34,10 @@ let initialized = false;
 // ── Helpers ───────────────────────────────────────────────────
 
 function extractPayload(notification: PushNotificationSchema): NotificationPayload {
-  const data = notification.data as Record<string, string> | undefined;
+  const data = (notification.data ?? {}) as Record<string, string>;
   return {
-    documentId: data?.documentId,
-    type: data?.type,
+    documentId: data.documentId,
+    type: data.type,
     ...data,
   };
 }
@@ -72,41 +72,55 @@ export async function initPushNotifications(opts: {
   onTap = opts.onTap ?? null;
   onForeground = opts.onForeground ?? null;
 
-  // ── 1. Request permission ──
-  const permResult = await PushNotifications.requestPermissions();
-  if (permResult.receive !== 'granted') return false;
+  try {
+    // ── 1. Request permission ──
+    const permResult = await PushNotifications.requestPermissions();
+    if (permResult.receive !== 'granted') return false;
 
-  // ── 2. Register with FCM ──
-  await PushNotifications.register();
+    // ── 2. Register with FCM ──
+    await PushNotifications.register();
 
-  // ── 3. FCM token received → send to server ──
-  PushNotifications.addListener('registration', (token: Token) => {
-    void registerToken(token.value);
-  });
+    // ── 3. FCM token received → send to server ──
+    PushNotifications.addListener('registration', (token: Token) => {
+      void registerToken(token.value);
+    });
 
-  // ── 4. Registration error ──
-  PushNotifications.addListener('registrationError', () => {
-    // Silently ignore — graceful degradation
-  });
+    // ── 4. Registration error ──
+    PushNotifications.addListener('registrationError', () => {
+      // Silently ignore — graceful degradation
+    });
 
-  // ── 5. Foreground notification received ──
-  PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-    const payload = extractPayload(notification);
-    onForeground?.(
-      notification.title ?? 'Rakmana',
-      notification.body ?? '',
-      payload,
-    );
-  });
+    // ── 5. Foreground notification received ──
+    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+      try {
+        const payload = extractPayload(notification);
+        onForeground?.(
+          notification.title ?? 'Rakmana',
+          notification.body ?? '',
+          payload,
+        );
+      } catch {
+        // Malformed notification payload — ignore
+      }
+    });
 
-  // ── 6. User tapped a notification ──
-  PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
-    const payload = extractPayload(action.notification);
-    onTap?.(payload);
-  });
+    // ── 6. User tapped a notification ──
+    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+      try {
+        const payload = extractPayload(action.notification);
+        onTap?.(payload);
+      } catch {
+        // Malformed notification payload — ignore
+      }
+    });
 
-  initialized = true;
-  return true;
+    initialized = true;
+    return true;
+  } catch {
+    // Capacitor plugin not available, FCM not configured, or
+    // any other native error — graceful degradation (no push)
+    return false;
+  }
 }
 
 /**
@@ -114,7 +128,11 @@ export async function initPushNotifications(opts: {
  */
 export async function teardownPushNotifications(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
-  await PushNotifications.removeAllListeners();
+  try {
+    await PushNotifications.removeAllListeners();
+  } catch {
+    // Ignore teardown errors
+  }
   initialized = false;
   onTap = null;
   onForeground = null;

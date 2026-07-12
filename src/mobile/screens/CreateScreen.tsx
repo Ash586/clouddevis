@@ -364,10 +364,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     onExit?.();
   }, [savedSheet, whatsappMessage, markSent, onExit]);
 
-  const handleSheetDownload = useCallback(() => {
+  const handleSheetDownload = useCallback(async () => {
     const s = savedSheet;
     if (!s || !savedPdfRef.current) return;
-    downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
+    await downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
     void notify('PDF téléchargé ✓');
   }, [savedSheet]);
 
@@ -406,7 +406,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setBusy(true);
     const pdf = await buildPdf();
     setBusy(false);
-    if (pdf) { downloadDocument(pdf, `${docNumber}.pdf`); void notify('PDF téléchargé ✓'); }
+    if (pdf) { await downloadDocument(pdf, `${docNumber}.pdf`); void notify('PDF téléchargé ✓'); }
   }, [guardReady, buildPdf, docNumber]);
 
   const handlePrint = useCallback(async () => {
@@ -415,7 +415,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setBusy(true);
     const pdf = await buildPdf();
     setBusy(false);
-    if (pdf) printDocument(pdf);
+    if (pdf) await printDocument(pdf);
   }, [guardReady, buildPdf]);
 
   const handleEmail = useCallback(async () => {

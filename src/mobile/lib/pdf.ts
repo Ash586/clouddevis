@@ -211,10 +211,28 @@ export async function generatePDFBase64(options: {
 
 /**
  * Trigger a download of a base64-encoded PDF.
- * Works in the browser and in the Android WebView (hands off to the
- * system download manager via an anchor with the `download` attribute).
+ * On native (Capacitor): writes to cache then opens the OS share sheet,
+ * which gives the user "Save to Downloads" and other options.
+ * On browser: uses the anchor download attribute.
  */
-export function downloadDocument(base64: string, fileName: string): void {
+export async function downloadDocument(base64: string, fileName: string): Promise<void> {
+  const name = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+
+  // Native (Capacitor) — write to cache then share sheet
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (Capacitor.isNativePlatform()) {
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      const { Share } = await import('@capacitor/share');
+      const { uri } = await Filesystem.writeFile({ path: name, data: base64, directory: Directory.Cache });
+      await Share.share({ title: name, files: [uri], dialogTitle: 'Enregistrer le PDF' });
+      return;
+    }
+  } catch {
+    // fall through to browser download
+  }
+
+  // Browser fallback — anchor download
   try {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
@@ -225,7 +243,7 @@ export function downloadDocument(base64: string, fileName: string): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -237,8 +255,10 @@ export function downloadDocument(base64: string, fileName: string): void {
 
 /**
  * Open PDF in a new window for printing (browser fallback).
+ * On native (Capacitor): uses Share sheet so the user can pick a print app.
+ * On browser: opens in a new tab.
  */
-export function printDocument(base64OrHtml: string): void {
+export async function printDocument(base64OrHtml: string): Promise<void> {
   // If it looks like HTML (starts with <), treat as legacy
   if (base64OrHtml.trimStart().startsWith('<')) {
     const blob = new Blob([base64OrHtml], { type: 'text/html' });
@@ -248,7 +268,21 @@ export function printDocument(base64OrHtml: string): void {
     return;
   }
 
-  // Otherwise, decode base64 PDF and open
+  // Native (Capacitor) — write to cache then open share sheet for printing
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (Capacitor.isNativePlatform()) {
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      const { Share } = await import('@capacitor/share');
+      const { uri } = await Filesystem.writeFile({ path: 'document.pdf', data: base64OrHtml, directory: Directory.Cache });
+      await Share.share({ title: 'Imprimer', files: [uri], dialogTitle: 'Imprimer le document' });
+      return;
+    }
+  } catch {
+    // fall through to browser
+  }
+
+  // Browser fallback
   try {
     const binary = atob(base64OrHtml);
     const bytes = new Uint8Array(binary.length);

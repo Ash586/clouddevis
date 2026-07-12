@@ -14,7 +14,7 @@ export const metadata = {
 };
 
 // Google Drive link to the APK file.
-const APK_URL = 'https://drive.google.com/file/d/1QARVNJOWlU4tjnfrsJ2DQKYSCccitBEp/view?usp=sharing';
+const APK_URL = 'https://drive.google.com/file/d/1EmJs-zed0jwnTuJ2mTLj-F-_n8zljM85/view?usp=drive_link';
 
 export default async function DownloadPage() {
   const qrSvg = await QRCode.toString(APK_URL, {
