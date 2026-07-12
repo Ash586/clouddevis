@@ -7,7 +7,7 @@
 // Long press opens ActionSheet
 // ============================================================
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, FilePlus, Files, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -91,6 +91,16 @@ export function DocumentsListScreen({
   const [actionSheetDoc, setActionSheetDoc] = useState<Document | null>(null);
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [docToDelete, setDocToDelete] = useState<Document | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+
+  // Show swipe hint on first ever visit — localStorage persists across sessions
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('rakmana_swipe_hinted')) {
+        setShowSwipeHint(true);
+      }
+    } catch { /* private browsing — ignore */ }
+  }, []);
 
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
   const deleteDocument = useDocumentStore((s) => s.deleteDocument);
@@ -391,6 +401,11 @@ export function DocumentsListScreen({
                 onDuplicate={handleDuplicate}
                 onDelete={handleDelete}
                 onLongPress={handleLongPress}
+                hintOnMount={i === 0 && showSwipeHint}
+                onHintComplete={i === 0 ? () => {
+                  setShowSwipeHint(false);
+                  try { localStorage.setItem('rakmana_swipe_hinted', '1'); } catch { /* ignore */ }
+                } : undefined}
               />
             ))}
           </motion.div>

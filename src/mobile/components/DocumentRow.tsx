@@ -6,8 +6,9 @@
 // Long press opens ActionSheet
 // ============================================================
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
 import {
   FileText,
   Receipt,
@@ -68,6 +69,10 @@ interface DocumentRowProps {
   onDelete?: (doc: Document) => void;
   onLongPress?: (doc: Document) => void;
   index?: number;
+  /** Play a brief left-reveal animation on mount to teach the swipe gesture. */
+  hintOnMount?: boolean;
+  /** Called after the hint animation completes so the parent can persist the flag. */
+  onHintComplete?: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────
@@ -79,11 +84,29 @@ export function DocumentRow({
   onDelete,
   onLongPress,
   index = 0,
+  hintOnMount = false,
+  onHintComplete,
 }: DocumentRowProps) {
   const [swiped, setSwiped] = useState(false);
+  const [hintDone, setHintDone] = useState(false);
   const x = useMotionValue(0);
   const rowRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Swipe hint: slide left → pause → snap back, once on mount ──
+  useEffect(() => {
+    if (!hintOnMount) return;
+    // Wait for the row entrance animation to finish before starting the hint
+    const t = setTimeout(async () => {
+      await animate(x, -68, { duration: 0.35, ease: 'easeOut' });
+      await new Promise((r) => setTimeout(r, 480));
+      await animate(x, 0, { type: 'spring', stiffness: 350, damping: 28 });
+      setHintDone(true);
+      onHintComplete?.();
+    }, 700 + index * 60);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Check if this document is pending sync
   const isPendingSync = useSyncStore((s) =>
@@ -103,18 +126,11 @@ export function DocumentRow({
   const handleDragEnd = () => {
     const currentX = x.get();
     if (currentX < SWIPE_THRESHOLD) {
-      animate(x, -ACTION_WIDTH * 3, {
-        type: 'spring',
-        stiffness: 400,
-        damping: 30,
-      });
+      animate(x, -ACTION_WIDTH * 3, { type: 'spring', stiffness: 400, damping: 30 });
       setSwiped(true);
+      setHintDone(true); // user discovered the gesture — hide the indicator
     } else {
-      animate(x, 0, {
-        type: 'spring',
-        stiffness: 400,
-        damping: 30,
-      });
+      animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
       setSwiped(false);
     }
   };
@@ -255,6 +271,18 @@ export function DocumentRow({
             {formatAmount(doc.totalTTC)}
           </span>
         </div>
+
+        {/* ── Swipe hint indicator — visible until user has swiped ── */}
+        {!hintDone && !swiped && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: hintOnMount ? 0.45 : 0.25 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
+          >
+            <ChevronLeft size={14} className="text-[var(--sand-muted)]" />
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );
