@@ -2,6 +2,8 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { useHaptics } from '@/hooks/useHaptics';
+import { ImpactStyle } from '@capacitor/haptics';
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -14,10 +16,13 @@ export function PullToRefresh({ onRefresh, children, threshold = 80 }: PullToRef
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { impact } = useHaptics();
+  const hapticFired = useRef(false);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (containerRef.current?.scrollTop ?? 0 > 0) return;
     startY.current = e.touches[0].clientY;
+    hapticFired.current = false;
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -25,9 +30,14 @@ export function PullToRefresh({ onRefresh, children, threshold = 80 }: PullToRef
     if (containerRef.current?.scrollTop ?? 0 > 0) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 0) {
-      setPull(Math.min(diff * 0.5, threshold + 20));
+      const newPull = Math.min(diff * 0.5, threshold + 20);
+      if (newPull >= threshold && !hapticFired.current) {
+        impact(ImpactStyle.Medium);
+        hapticFired.current = true;
+      }
+      setPull(newPull);
     }
-  }, [refreshing, threshold]);
+  }, [refreshing, threshold, impact]);
 
   const handleTouchEnd = useCallback(async () => {
     if (pull >= threshold && !refreshing) {

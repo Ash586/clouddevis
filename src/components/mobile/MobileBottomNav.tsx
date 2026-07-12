@@ -2,6 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Home, FileText, Plus, Users, User } from 'lucide-react';
+import { useHaptics } from '@/hooks/useHaptics';
+import { ImpactStyle } from '@capacitor/haptics';
 
 interface NavItem {
   label: string;
@@ -26,6 +28,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { impact } = useHaptics();
 
   const activeTab = searchParams?.get('tab') || '';
 
@@ -34,6 +37,15 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
     if (item.tabKey === '') return pathname === '/dashboard' && !activeTab;
     if (item.tabKey === 'profile') return pathname === '/dashboard/profile';
     return activeTab === item.tabKey;
+  };
+
+  const handleTabClick = (item: NavItem) => {
+    impact(ImpactStyle.Light);
+    if (item.tabKey === '__new__') {
+      onNewDoc?.();
+    } else {
+      router.push(item.href);
+    }
   };
 
   return (
@@ -45,7 +57,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
               <button
                 type="button"
                 key="new"
-                onClick={onNewDoc}
+                onClick={() => handleTabClick(item)}
                 className="flex flex-col items-center justify-center gap-0.5 w-16 h-full relative"
                 aria-label="Nouveau document"
               >
@@ -61,7 +73,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
             <button
               type="button"
               key={item.tabKey}
-              onClick={() => router.push(item.href)}
+              onClick={() => handleTabClick(item)}
               className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full min-w-0"
               aria-label={item.label}
             >

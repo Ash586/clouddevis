@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
+import { useHaptics } from '@/hooks/useHaptics';
+import { NotificationType } from '@capacitor/haptics';
 
 interface ClientDoc {
   number: string;
@@ -39,6 +41,7 @@ const EMPTY_FORM = { name: '', address: '', phone: '', email: '', nif: '', nis: 
 export function ClientsPanel() {
   const t = useTranslations('clients');
   const router = useRouter();
+  const { notification } = useHaptics();
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,6 +136,7 @@ export function ClientsPanel() {
     if (res.ok) {
       setDeleteTarget(null);
       fetchClients();
+      notification(NotificationType.Success);
     }
   }
 

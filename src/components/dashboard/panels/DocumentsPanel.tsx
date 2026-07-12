@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { PullToRefresh } from '@/components/mobile/PullToRefresh';
 import { cn } from '@/lib/utils';
+import { useHaptics } from '@/hooks/useHaptics';
+import { NotificationType } from '@capacitor/haptics';
 
 type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
 
@@ -77,6 +79,7 @@ export function DocumentsPanel() {
   const tc = useTranslations('common');
   const router = useRouter();
   const sp = useSearchParams();
+  const { notification } = useHaptics();
 
   const [docs, setDocs] = useState<Doc[]>([]);
   const [loading, setLoading] = useState(true);
@@ -222,6 +225,7 @@ export function DocumentsPanel() {
     await fetch(`/api/documents/${id}`, { method: 'DELETE' });
     setDeleteTarget(null);
     fetchData();
+    notification(NotificationType.Success);
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
