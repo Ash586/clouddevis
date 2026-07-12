@@ -85,6 +85,7 @@
     "intervention": "استمارة تدخل",
     "attachement": "ملحق الأشغال",
     "clients": "العملاء",
+    "fiscal": "جبائي",
     "newDocument": "مستند جديد",
     "allDocuments": "جميع المستندات",
     "templates": "القوالب",
@@ -1438,5 +1439,24 @@
       "ctaFinalDesc": "انضم إلى مئات الشركاء الذين يحققونAlready إيرادات مع Rakmana.",
       "ctaStart": "ابدأ الآن"
     }
+  },
+  "fiscal": {
+    "title": "الالتزامات الجبائية",
+    "subtitle": "متابعة DGI — التصريحات والعتبات",
+    "totalRevenue": "رقم الأعمال",
+    "invoiceCount": "{count} فواتير",
+    "tvaCollected": "TVA المحصّلة",
+    "timbrePaid": "الطابع : {amount}",
+    "taxRegime": "النظام الجبائي",
+    "regimeReel": "النظام الحقيقي",
+    "regimeForfaitaire": "النظام الجزافي (IFU)",
+    "ifuThreshold": "عتبة IFU : {amount} دج",
+    "ifuProgressTitle": "التقدم نحو عتبة IFU",
+    "ifuRemaining": "متبقي {amount} قبل الانتقال للنظام الحقيقي",
+    "ifuExceeded": "تجاوزت عتبة IFU — أنت في النظام الحقيقي",
+    "monthlyRevenue": "رقم الأعمال الشهري",
+    "g50Title": "روزنامة G50",
+    "nextDeadline": "الأجل القادم",
+    "daysLeft": "{days} أيام متبقية"
   }
 }

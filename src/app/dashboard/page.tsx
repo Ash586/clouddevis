@@ -7,6 +7,7 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { UnifiedDashboard } from '@/components/dashboard/UnifiedDashboard';
 import { ClientsPanel } from '@/components/dashboard/panels/ClientsPanel';
 import { DocumentsPanel } from '@/components/dashboard/panels/DocumentsPanel';
+import { FiscalPanel } from '@/components/dashboard/panels/FiscalPanel';
 import type { DashboardStats } from '@/components/dashboard/dashboardConstants';
 import { useAutoTour } from '@/contexts/TourProvider';
 
@@ -75,6 +76,8 @@ export default function DashboardPage() {
             <ClientsPanel />
           ) : tab === 'documents' ? (
             <DocumentsPanel />
+          ) : tab === 'fiscal' ? (
+            <FiscalPanel />
           ) : (
             <UnifiedDashboard
               userName={userName}

@@ -85,6 +85,7 @@
     "intervention": "Intervention Sheet",
     "attachement": "Work Attachment",
     "clients": "Clients",
+    "fiscal": "Fiscal",
     "newDocument": "New document",
     "allDocuments": "All documents",
     "templates": "Templates",
@@ -1438,5 +1439,24 @@
       "ctaFinalDesc": "Join hundreds of partners already earning revenue with Rakmana.",
       "ctaStart": "Start now"
     }
+  },
+  "fiscal": {
+    "title": "Tax Obligations",
+    "subtitle": "DGI Tracking — Declarations & Thresholds",
+    "totalRevenue": "Total Revenue",
+    "invoiceCount": "{count} invoices",
+    "tvaCollected": "VAT Collected",
+    "timbrePaid": "Stamp duty: {amount}",
+    "taxRegime": "Tax Regime",
+    "regimeReel": "Real Regime",
+    "regimeForfaitaire": "Lump-sum (IFU)",
+    "ifuThreshold": "IFU threshold: {amount} DA",
+    "ifuProgressTitle": "IFU Threshold Progress",
+    "ifuRemaining": "{amount} remaining before switching to real regime",
+    "ifuExceeded": "IFU threshold exceeded — you are on the real regime",
+    "monthlyRevenue": "Monthly Revenue",
+    "g50Title": "G50 Calendar",
+    "nextDeadline": "Next Deadline",
+    "daysLeft": "{days} days left"
   }
 }

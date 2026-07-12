@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { LayoutDashboard, Users, FileText, type LucideIcon } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Landmark, type LucideIcon } from 'lucide-react';
 
 interface Props {
   clientCount?: number;
@@ -31,6 +31,7 @@ export function SectionTabs({ clientCount = 0 }: Props) {
     { labelKey: 'stats',     tabKey: '',          href: '/dashboard',                icon: LayoutDashboard },
     { labelKey: 'clients',   tabKey: 'clients',   href: '/dashboard?tab=clients',   icon: Users,    badge: clientCount, pathPrefix: '/dashboard/clients' },
     { labelKey: 'documents', tabKey: 'documents', href: '/dashboard?tab=documents', icon: FileText, pathPrefix: '/dashboard/documents' },
+    { labelKey: 'fiscal',    tabKey: 'fiscal',    href: '/dashboard?tab=fiscal',    icon: Landmark },
   ];
 
   const isActive = (tab: SectionTab) => {

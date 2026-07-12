@@ -85,6 +85,7 @@
     "intervention": "Fiche d'Intervention",
     "attachement": "Attachement des Travaux",
     "clients": "Clients",
+    "fiscal": "Fiscal",
     "newDocument": "Nouveau document",
     "allDocuments": "Tous les documents",
     "templates": "Modèles",
@@ -1438,5 +1439,24 @@
       "ctaFinalDesc": "Rejoignez des centaines de partenaires qui génèrent déjà des revenus avec Rakmana.",
       "ctaStart": "Commencer maintenant"
     }
+  },
+  "fiscal": {
+    "title": "Obligations Fiscales",
+    "subtitle": "Suivi DGI — Déclarations & Seuils",
+    "totalRevenue": "Chiffre d'affaires",
+    "invoiceCount": "{count} factures",
+    "tvaCollected": "TVA collectée",
+    "timbrePaid": "Timbre : {amount}",
+    "taxRegime": "Régime fiscal",
+    "regimeReel": "Régime Réel",
+    "regimeForfaitaire": "Forfaitaire (IFU)",
+    "ifuThreshold": "Seuil IFU : {amount} DA",
+    "ifuProgressTitle": "Progression vers le seuil IFU",
+    "ifuRemaining": "Reste {amount} avant passage au régime réel",
+    "ifuExceeded": "Seuil IFU dépassé — vous êtes au régime réel",
+    "monthlyRevenue": "Chiffre d'affaires mensuel",
+    "g50Title": "Calendrier G50",
+    "nextDeadline": "Prochaine échéance",
+    "daysLeft": "{days} jours restants"
   }
 }
