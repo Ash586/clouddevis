@@ -10,21 +10,17 @@ import { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useDocumentStore } from '@/stores/documentStore';
 import { useDashboardStats } from '@/mobile/lib/useDashboardStats';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
+import { useDocumentStore } from '@/stores/documentStore';
 import { HomeHeader } from '../components/HomeHeader';
 import { StatCards } from '../components/StatCards';
-import { QuickActions } from '../components/QuickActions';
 import { RecentDocuments } from '../components/RecentDocuments';
 import type { Document } from '@/mobile/types';
 
 interface HomeScreenProps {
   userName: string;
-  onNewDevis?: () => void;
-  onNewFacture?: () => void;
-  onDuplicate?: () => void;
   onDocumentTap?: (doc: Document) => void;
   onSeeAll?: () => void;
   onNotificationTap?: () => void;
@@ -33,17 +29,12 @@ interface HomeScreenProps {
 
 export function HomeScreen({
   userName,
-  onNewDevis,
-  onNewFacture,
-  onDuplicate,
   onDocumentTap,
   onSeeAll,
   onNotificationTap,
   hasNotifications = false,
 }: HomeScreenProps) {
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
-  const setType        = useDocumentStore((s) => s.setType);
-  const resetDocument  = useDocumentStore((s) => s.resetDocument);
 
   // ── Stats from API (falls back to local on error) ──────────
   const { stats, loading: statsLoading, refetch } = useDashboardStats(true);
@@ -57,23 +48,6 @@ export function HomeScreen({
   const initials = useMemo(() =>
     userName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2),
   [userName]);
-
-  // ── Action handlers ────────────────────────────────────────
-  const handleNewDevis = useCallback(() => {
-    resetDocument(); setType('DEVIS'); onNewDevis?.();
-  }, [resetDocument, setType, onNewDevis]);
-
-  const handleNewFacture = useCallback(() => {
-    resetDocument(); setType('FACTURE'); onNewFacture?.();
-  }, [resetDocument, setType, onNewFacture]);
-
-  const handleDuplicate = useCallback(() => {
-    if (savedDocuments.length === 0) return;
-    useDocumentStore.getState().loadDocumentIntoWizard(
-      savedDocuments[savedDocuments.length - 1].id,
-    );
-    onDuplicate?.();
-  }, [savedDocuments, onDuplicate]);
 
   return (
     <motion.div
@@ -110,15 +84,7 @@ export function HomeScreen({
       {/* 2. Stats 2×2 grid */}
       <StatCards stats={stats} loading={statsLoading} />
 
-      {/* 3. Quick actions */}
-      <QuickActions
-        onNewDevis={handleNewDevis}
-        onNewFacture={handleNewFacture}
-        onDuplicate={handleDuplicate}
-        canDuplicate={savedDocuments.length > 0}
-      />
-
-      {/* 4. Recent documents */}
+      {/* 3. Recent documents — FAB handles creation (no QuickActions duplication) */}
       <RecentDocuments
         documents={savedDocuments}
         onDocumentTap={onDocumentTap}

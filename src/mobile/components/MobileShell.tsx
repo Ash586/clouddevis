@@ -181,6 +181,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     return () => { void teardownPushNotifications(); };
   }, [authState]);
 
+  // ── Duplicate guard (reactive — re-renders FAB when first doc saved) ─
+  const hasSavedDocs = useDocumentStore((s) => s.savedDocuments.length > 0);
+
   // ── Network detection ─────────────────────────────────────
   const { isOnline } = useNetwork();
 
@@ -256,9 +259,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         return (
           <HomeScreen
             userName={userName || 'Utilisateur'}
-            onNewDevis={handleNewDevis}
-            onNewFacture={handleNewFacture}
-            onDuplicate={handleDuplicate}
             onDocumentTap={handleEditDocument}
             onSeeAll={() => setActiveTab('documents')}
             hasNotifications={hasUnread}
@@ -291,9 +291,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         return (
           <HomeScreen
             userName={userName || 'Utilisateur'}
-            onNewDevis={handleNewDevis}
-            onNewFacture={handleNewFacture}
-            onDuplicate={handleDuplicate}
             onDocumentTap={handleEditDocument}
             onSeeAll={() => setActiveTab('documents')}
           />
@@ -360,8 +357,13 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
         {renderScreen()}
       </main>
 
-      {/* FAB — quick document creation */}
-      <FAB onNewDevis={handleNewDevis} onNewFacture={handleNewFacture} />
+      {/* FAB — quick document creation (replaces HomeScreen QuickActions) */}
+      <FAB
+        onNewDevis={handleNewDevis}
+        onNewFacture={handleNewFacture}
+        onDuplicate={handleDuplicate}
+        canDuplicate={hasSavedDocs}
+      />
 
       {/* Bottom tab bar */}
       <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />

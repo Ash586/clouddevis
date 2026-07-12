@@ -2,15 +2,17 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, FileText, Receipt, X } from 'lucide-react';
+import { Plus, FileText, Receipt, Copy, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FABProps {
   onNewDevis: () => void;
   onNewFacture: () => void;
+  onDuplicate?: () => void;
+  canDuplicate?: boolean;
 }
 
-export function FAB({ onNewDevis, onNewFacture }: FABProps) {
+export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = false }: FABProps) {
   const [open, setOpen] = useState(false);
 
   const toggle = useCallback(() => setOpen((o) => !o), []);
@@ -24,6 +26,38 @@ export function FAB({ onNewDevis, onNewFacture }: FABProps) {
     setOpen(false);
     onNewFacture();
   }, [onNewFacture]);
+
+  const handleDuplicate = useCallback(() => {
+    setOpen(false);
+    onDuplicate?.();
+  }, [onDuplicate]);
+
+  const actions = [
+    {
+      id: 'facture',
+      label: 'Facture',
+      icon: Receipt,
+      color: 'bg-blue-500',
+      onPress: handleFacture,
+      show: true,
+    },
+    {
+      id: 'devis',
+      label: 'Devis',
+      icon: FileText,
+      color: 'bg-emerald-500',
+      onPress: handleDevis,
+      show: true,
+    },
+    {
+      id: 'duplicate',
+      label: 'Dupliquer',
+      icon: Copy,
+      color: 'bg-amber-500',
+      onPress: handleDuplicate,
+      show: canDuplicate && !!onDuplicate,
+    },
+  ];
 
   return (
     <>
@@ -50,32 +84,29 @@ export function FAB({ onNewDevis, onNewFacture }: FABProps) {
       >
         {/* Mini buttons */}
         <AnimatePresence>
-          {open && (
-            <>
-              <motion.button
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                transition={{ delay: 0.05 }}
-                onClick={handleFacture}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-blue-500 text-white shadow-lg active:scale-95"
-              >
-                <Receipt size={18} />
-                <span className="text-sm font-bold">Facture</span>
-              </motion.button>
-              <motion.button
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                transition={{ delay: 0 }}
-                onClick={handleDevis}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-500 text-white shadow-lg active:scale-95"
-              >
-                <FileText size={18} />
-                <span className="text-sm font-bold">Devis</span>
-              </motion.button>
-            </>
-          )}
+          {open &&
+            actions
+              .filter((a) => a.show)
+              .map((action, i) => {
+                const Icon = action.icon;
+                return (
+                  <motion.button
+                    key={action.id}
+                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                    transition={{ delay: i * 0.04 }}
+                    onClick={action.onPress}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2.5 rounded-full text-white shadow-lg active:scale-95',
+                      action.color,
+                    )}
+                  >
+                    <Icon size={17} />
+                    <span className="text-sm font-bold">{action.label}</span>
+                  </motion.button>
+                );
+              })}
         </AnimatePresence>
 
         {/* Main FAB */}
@@ -86,14 +117,12 @@ export function FAB({ onNewDevis, onNewFacture }: FABProps) {
           className={cn(
             'w-14 h-14 rounded-full shadow-xl flex items-center justify-center',
             'active:scale-90 transition-colors',
-            open ? 'bg-[var(--sand-muted)]' : 'bg-[var(--green-2)]',
           )}
+          style={{ background: open ? 'var(--sand-muted)' : 'var(--green-2)' }}
+          aria-label={open ? 'Fermer' : 'Nouveau document'}
+          aria-expanded={open}
         >
-          {open ? (
-            <X size={24} className="text-white" />
-          ) : (
-            <Plus size={26} className="text-white" strokeWidth={2.5} />
-          )}
+          <Plus size={26} className="text-white" strokeWidth={2.5} />
         </motion.button>
       </div>
     </>
