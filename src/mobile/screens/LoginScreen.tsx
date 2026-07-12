@@ -64,12 +64,25 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         transition={{ duration: 0.4 }}
         className="flex flex-col items-center mb-8"
       >
-        <div className="w-16 h-16 rounded-2xl bg-[var(--green-2)] flex items-center justify-center mb-4 shadow-lg">
-          <FileText size={28} className="text-white" />
+        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-xl overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0d3d24 0%, #0f5132 100%)' }}>
+          {/* Document icon matching the app icon */}
+          <svg width="44" height="44" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <rect x="148" y="110" width="200" height="260" rx="18" fill="#22c55e"/>
+            <path d="M298 110 L348 160 L298 160 Z" fill="rgba(0,0,0,0.18)"/>
+            <rect x="173" y="190" width="120" height="8" rx="4" fill="rgba(255,255,255,0.9)"/>
+            <rect x="173" y="214" width="80" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+            <rect x="173" y="238" width="100" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+            <rect x="173" y="290" width="140" height="1.5" rx="1" fill="rgba(255,255,255,0.2)"/>
+            <rect x="173" y="308" width="140" height="28" rx="8" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="338" cy="338" r="52" fill="#0d3d24"/>
+            <circle cx="338" cy="338" r="44" fill="#4ade80"/>
+            <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[var(--sand)]">Rakmana</h1>
+        <h1 className="text-3xl font-bold text-[var(--sand)]" style={{ fontFamily: 'serif' }}>رقمنة</h1>
         <p className="text-sm text-[var(--sand-muted)] mt-1">
-          Connectez-vous à votre compte
+          سجّل الدخول إلى حسابك
         </p>
       </motion.div>
 
@@ -204,23 +217,23 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           )}
         </button>
 
-        {/* Forgot password — opens web browser */}
+        {/* Forgot password */}
         <p className="text-center text-xs text-[var(--sand-muted)]">
-          Mot de passe oublié ?{' '}
+          نسيت كلمة المرور؟{' '}
           <a
             href="https://clouddevis.vercel.app/auth/reset-password"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[var(--green-2)] underline underline-offset-2"
           >
-            Réinitialiser
+            إعادة التعيين
           </a>
         </p>
       </motion.form>
 
       {/* Footer */}
       <p className="mt-8 text-[11px] text-[var(--sand-muted)]/50">
-        Rakmana · Conforme DGI Algérie
+        رقمنة · متوافق مع DGI الجزائر
       </p>
     </div>
   );

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">CloudDevis</string>
-    <string name="title_activity_main">CloudDevis</string>
-    <string name="package_name">com.clouddevis.app</string>
-    <string name="custom_url_scheme">com.clouddevis.app</string>
+    <string name="app_name">رقمنة</string>
+    <string name="title_activity_main">رقمنة</string>
+    <string name="package_name">com.rakmana.app</string>
+    <string name="custom_url_scheme">com.rakmana.app</string>
 </resources>

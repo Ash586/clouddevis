@@ -1,0 +1,40 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d3d24"/>
+      <stop offset="100%" stop-color="#0f5132"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <ellipse cx="140" cy="100" rx="180" ry="100" fill="rgba(255,255,255,0.04)"/>
+
+  <!-- Document -->
+  <rect x="148" y="110" width="200" height="260" rx="18" fill="url(#shine)"/>
+  <path d="M298 110 L348 160 L298 160 Z" fill="rgba(0,0,0,0.15)"/>
+  <path d="M298 110 L348 160 L298 160 Z" fill="rgba(255,255,255,0.08)"/>
+
+  <!-- Lines -->
+  <rect x="173" y="190" width="120" height="8" rx="4" fill="rgba(255,255,255,0.9)"/>
+  <rect x="173" y="214" width="80" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+  <rect x="173" y="238" width="100" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+  <rect x="173" y="262" width="60" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+  <rect x="173" y="290" width="140" height="1.5" rx="1" fill="rgba(255,255,255,0.2)"/>
+  <rect x="173" y="308" width="140" height="28" rx="8" fill="rgba(255,255,255,0.12)"/>
+  <rect x="183" y="316" width="50" height="12" rx="3" fill="rgba(255,255,255,0.7)"/>
+  <rect x="253" y="316" width="50" height="12" rx="3" fill="rgba(255,255,255,0.9)"/>
+
+  <!-- Checkmark badge -->
+  <circle cx="338" cy="338" r="52" fill="#0d3d24"/>
+  <circle cx="338" cy="338" r="44" fill="url(#accent)"/>
+  <path d="M318 338 L330 350 L360 322" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

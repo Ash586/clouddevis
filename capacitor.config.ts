@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.clouddevis.app',
-  appName: 'CloudDevis',
+  appId: 'com.rakmana.app',
+  appName: 'رقمنة',
   webDir: 'out',
   server: {
     androidScheme: 'https',
@@ -18,7 +18,7 @@ const config: CapacitorConfig = {
       androidScaleType: 'CENTER_CROP',
       splashFullScreen: true,
       splashImmersive: true,
-      backgroundColor: '#F3F6FC',
+      backgroundColor: '#0d3d24',
     },
     Keyboard: {
       resize: 'body',
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       style: 'LIGHT',
-      backgroundColor: '#F3F6FC',
+      backgroundColor: '#0d3d24',
     },
     Preferences: {
       group: 'clouddevis',
