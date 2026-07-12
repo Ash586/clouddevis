@@ -49,6 +49,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
     <html lang={locale} dir={dir} data-theme="light" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable}`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body className="min-h-screen antialiased flex flex-col">
         <noscript>
           <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'sans-serif', background: '#0B0F1A', color: '#F5EDD6' }}>
@@ -72,6 +77,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </I18nClientProvider>
         </ThemeProvider>
         <Script defer data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.tagged-events.js" strategy="afterInteractive" />
+        <Script id="sw-register" strategy="afterInteractive">
+          {`if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(() => {}); }`}
+        </Script>
       </body>
     </html>
   );
