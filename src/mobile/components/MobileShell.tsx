@@ -17,6 +17,7 @@ import { processWebSyncItem } from '@/lib/webSync';
 import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
+import { App } from '@capacitor/app';
 import { BottomTabs, type TabId } from './BottomTabs';
 import { FAB } from './FAB';
 import { OfflineBanner } from './OfflineBanner';
@@ -67,6 +68,62 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [pushToast, setPushToast] = useState<PushToastData | null>(null);
   const [hasUnread, setHasUnread] = useState(false);
   const toastIdRef = useRef(0);
+
+  // ── Android back button — refs hold live state to avoid stale closures ──
+  const activeTabRef    = useRef<TabId>(initialTab);
+  const showWizardRef   = useRef(false);
+  const companyViewRef  = useRef<CompanyView>('profile');
+  const backPressedOnce = useRef(false);
+  const backPressTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Keep refs in sync with state
+  useEffect(() => { activeTabRef.current   = activeTab;    }, [activeTab]);
+  useEffect(() => { showWizardRef.current  = showWizard;   }, [showWizard]);
+  useEffect(() => { companyViewRef.current = companyView;  }, [companyView]);
+
+  // ── Android hardware back button ───────────────────────────
+  useEffect(() => {
+    let handle: Awaited<ReturnType<typeof App.addListener>> | null = null;
+
+    App.addListener('backButton', () => {
+      // 1. Wizard open → close it (same as the ← button inside CreateScreen)
+      if (showWizardRef.current) {
+        setShowWizard(false);
+        setEditingDocId(null);
+        return;
+      }
+      // 2. Company sub-view → back to profile
+      if (companyViewRef.current === 'clients') {
+        setCompanyView('profile');
+        return;
+      }
+      // 3. Not on home tab → go home
+      if (activeTabRef.current !== 'home') {
+        setActiveTab('home');
+        return;
+      }
+      // 4. Already on home — double-press within 2s to exit
+      if (backPressedOnce.current) {
+        if (backPressTimer.current) clearTimeout(backPressTimer.current);
+        void App.exitApp();
+        return;
+      }
+      backPressedOnce.current = true;
+      // Reuse the existing toast system for "press again to exit"
+      void import('@/mobile/lib/toast').then(({ notify }) =>
+        notify('اضغط مرة أخرى للخروج'),
+      );
+      backPressTimer.current = setTimeout(() => {
+        backPressedOnce.current = false;
+      }, 2000);
+    }).then((h) => { handle = h; });
+
+    return () => {
+      handle?.remove();
+      if (backPressTimer.current) clearTimeout(backPressTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Update check ──────────────────────────────────────────
   const [updateInfo, setUpdateInfo] = useState<{
