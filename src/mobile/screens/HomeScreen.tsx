@@ -8,8 +8,12 @@
 
 import { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useDashboardStats } from '@/mobile/lib/useDashboardStats';
+import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
+import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { HomeHeader } from '../components/HomeHeader';
 import { StatCards } from '../components/StatCards';
 import { QuickActions } from '../components/QuickActions';
@@ -42,7 +46,12 @@ export function HomeScreen({
   const resetDocument  = useDocumentStore((s) => s.resetDocument);
 
   // ── Stats from API (falls back to local on error) ──────────
-  const { stats, loading: statsLoading } = useDashboardStats(true);
+  const { stats, loading: statsLoading, refetch } = useDashboardStats(true);
+
+  // ── Pull-to-refresh ───────────────────────────────────────
+  const { pull, refreshing, handlers: pullHandlers } = usePullToRefresh(
+    useCallback(async () => { await refreshAllData(); refetch(); }, [refetch]),
+  );
 
   // ── User initials ──────────────────────────────────────────
   const initials = useMemo(() =>
@@ -71,8 +80,25 @@ export function HomeScreen({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col gap-5 pb-4"
+      className="flex flex-col gap-5 pb-4 overflow-y-auto"
+      {...pullHandlers}
     >
+      {/* Pull-to-refresh indicator */}
+      {(pull > 0 || refreshing) && (
+        <div
+          className="flex items-center justify-center transition-all"
+          style={{ height: `${pull}px` }}
+        >
+          <Loader2
+            size={20}
+            className={cn(
+              'text-[var(--green-2)]',
+              refreshing && 'animate-spin',
+            )}
+            style={{ opacity: Math.min(1, pull / 50) }}
+          />
+        </div>
+      )}
       {/* 1. Header */}
       <HomeHeader
         userName={userName}

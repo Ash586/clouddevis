@@ -18,10 +18,12 @@ import {
   Pencil,
   Copy,
   Trash2,
+  CloudOff,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useSyncStore } from '@/stores/syncStore';
 import { formatAmount, formatDate } from '@/mobile/lib/format';
 import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
 
@@ -82,6 +84,11 @@ export function DocumentRow({
   const x = useMotionValue(0);
   const rowRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Check if this document is pending sync
+  const isPendingSync = useSyncStore((s) =>
+    s.queue.some((item) => item.entityId === doc.id && item.entity === 'document'),
+  );
 
   // Transform x for action button opacity
   const editOpacity = useTransform(x, [-150, -80, -40], [1, 1, 0]);
@@ -238,7 +245,12 @@ export function DocumentRow({
 
         {/* ── Right side: badge + amount ──────────────────────── */}
         <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+          <div className="flex items-center gap-1">
+            {isPendingSync && (
+              <CloudOff size={12} className="text-amber-400" />
+            )}
+            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+          </div>
           <span className="text-sm font-bold text-[var(--sand)] tabular-nums">
             {formatAmount(doc.totalTTC)}
           </span>

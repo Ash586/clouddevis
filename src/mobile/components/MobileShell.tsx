@@ -18,6 +18,7 @@ import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
 import { BottomTabs, type TabId } from './BottomTabs';
+import { FAB } from './FAB';
 import { OfflineBanner } from './OfflineBanner';
 import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
@@ -256,6 +257,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       <main className="min-h-screen">
         {renderScreen()}
       </main>
+
+      {/* FAB — quick document creation */}
+      <FAB onNewDevis={handleNewDevis} onNewFacture={handleNewFacture} />
 
       {/* Bottom tab bar */}
       <BottomTabs activeTab={activeTab} onTabChange={handleTabChange} />

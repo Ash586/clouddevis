@@ -236,6 +236,12 @@ export async function fetchDocuments(page = 1, limit = 100): Promise<ApiDocument
   return data.documents;
 }
 
+export async function fetchDocumentsPaginated(page = 1, limit = 20): Promise<DocumentsListResponse> {
+  return request<DocumentsListResponse>(
+    `/api/documents?page=${page}&limit=${limit}&sortBy=date&sortOrder=desc`
+  );
+}
+
 // ── Auth ──────────────────────────────────────────────────────
 
 export async function loginApi(

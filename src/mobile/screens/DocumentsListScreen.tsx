@@ -188,6 +188,13 @@ export function DocumentsListScreen({
           updateDocumentStatus(doc.id, 'PAID').catch(() => {});
           void notify('Marqué payé ✓');
           break;
+        case 'convertToFacture': {
+          if (onDuplicateDocument) onDuplicateDocument(doc);
+          // After loading into wizard, override the type to FACTURE
+          useDocumentStore.getState().setType('FACTURE');
+          void notify('Converti en Facture');
+          break;
+        }
         case 'delete':
           setDocToDelete(doc);
           break;
