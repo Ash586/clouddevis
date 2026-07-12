@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { OfflineSyncProvider } from '@/components/layout/OfflineSyncProvider';
 import { FeedbackFab } from '@/components/feedback/FeedbackFab';
 import { TourProvider } from '@/contexts/TourProvider';
+import { PWAInstallBanner } from '@/components/mobile/PWAInstallBanner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <TourProvider>
         {children}
         <FeedbackFab />
+        <PWAInstallBanner />
       </TourProvider>
     </OfflineSyncProvider>
   );

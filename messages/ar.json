@@ -1458,5 +1458,10 @@
     "g50Title": "روزنامة G50",
     "nextDeadline": "الأجل القادم",
     "daysLeft": "{days} أيام متبقية"
+  },
+  "pwa": {
+    "install_title": "تثبيت Rakmana",
+    "install_desc": "أضف Rakmana إلى شاشتك الرئيسية",
+    "install": "تثبيت"
   }
 }

@@ -1458,5 +1458,10 @@
     "g50Title": "G50 Calendar",
     "nextDeadline": "Next Deadline",
     "daysLeft": "{days} days left"
+  },
+  "pwa": {
+    "install_title": "Install Rakmana",
+    "install_desc": "Add Rakmana to your home screen",
+    "install": "Install"
   }
 }

@@ -1458,5 +1458,10 @@
     "g50Title": "Calendrier G50",
     "nextDeadline": "Prochaine échéance",
     "daysLeft": "{days} jours restants"
+  },
+  "pwa": {
+    "install_title": "Installer Rakmana",
+    "install_desc": "Ajoutez Rakmana à votre écran d'accueil",
+    "install": "Installer"
   }
 }
