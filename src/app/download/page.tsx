@@ -13,9 +13,8 @@ export const metadata = {
   description: 'Téléchargez l’application mobile Rakmana pour créer vos devis, factures et bons de livraison depuis votre téléphone.',
 };
 
-// Direct-download link to the hosted APK on Google Drive.
-// (Share link → direct download: drive.google.com/uc?export=download&id=<fileId>)
-const APK_URL = 'https://drive.usercontent.google.com/download?id=1y9WWMJIaZzns6bRm6wHeWOZE43yB2sc-&export=download&authuser=0';
+// Google Drive link to the APK file.
+const APK_URL = 'https://drive.google.com/file/d/1QARVNJOWlU4tjnfrsJ2DQKYSCccitBEp/view?usp=sharing';
 
 export default async function DownloadPage() {
   const qrSvg = await QRCode.toString(APK_URL, {
