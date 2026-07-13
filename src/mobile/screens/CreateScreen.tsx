@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
-  Building2, CheckCircle2,
+  Building2, CheckCircle2, Send,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
@@ -556,31 +556,51 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         onModeChange={(m) => { setDockMode(m); if (m !== 'line') setEditingLineId(null); }}
       />
 
-      {/* Action bar */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-[var(--navy-2)] border-t border-[var(--border)]">
-        <button type="button" onClick={openPreview}
-          className="h-12 px-3 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform"
-          aria-label="Aperçu du document">
-          <Eye size={18} /> Aperçu
-        </button>
-        <button type="button" onClick={handleSave} disabled={saving}
-          className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-all disabled:opacity-60"
-          style={{ background: 'var(--green-2)' }}>
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          Enregistrer
-        </button>
-        {/* New doc: "Envoyer" routes through save first (real server number
-            on the PDF) then the success sheet offers WhatsApp instantly.
-            Edit mode: the number already exists → direct share menu. */}
-        <button type="button"
-          onClick={() => (editingDocId ? setShareOpen(true) : handleSave())}
-          disabled={busy || saving}
-          className="h-12 px-3 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform disabled:opacity-60"
-          aria-label="Envoyer">
-          {busy ? <Loader2 size={16} className="animate-spin" /> : <Share2 size={18} />}
-          Envoyer
-        </button>
-      </div>
+      {/* Bottom action bar — style bottom tabs like dashboard */}
+      <nav
+        className="bg-[var(--navy-2)] border-t border-[var(--border)]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="flex items-stretch justify-around h-16 px-1">
+          {/* Aperçu */}
+          <button type="button" onClick={openPreview}
+            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)]">
+            <Eye size={20} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Aperçu</span>
+          </button>
+
+          {/* Télécharger */}
+          <button type="button" onClick={handleDownload} disabled={busy}
+            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            {busy ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} strokeWidth={1.8} />}
+            <span className="text-[10px] font-semibold">Télécharger</span>
+          </button>
+
+          {/* Enregistrer — main action, highlighted */}
+          <button type="button" onClick={handleSave} disabled={saving}
+            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform disabled:opacity-40"
+            style={{ color: 'var(--green-2)' }}>
+            {saving ? <Loader2 size={22} className="animate-spin" /> : <Save size={22} strokeWidth={2.3} />}
+            <span className="text-[10px] font-bold">Enregistrer</span>
+          </button>
+
+          {/* Imprimer */}
+          <button type="button" onClick={handlePrint} disabled={busy}
+            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            <Printer size={20} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Imprimer</span>
+          </button>
+
+          {/* Envoyer */}
+          <button type="button"
+            onClick={() => (editingDocId ? setShareOpen(true) : handleSave())}
+            disabled={busy || saving}
+            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            <Send size={20} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Envoyer</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Full document preview (see before download) */}
       <DocumentPreview

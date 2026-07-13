@@ -6,9 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    // Remote Server Mode — يعرض الموقع كاملاً (Landing + Dashboard) بتصميم mobile-first
-    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000'
-    url: 'https://clouddevis.vercel.app',
+    // Remote Server Mode — يفتح مباشرة على شاشة تسجيل الدخول
+    // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000/app'
+    url: 'https://clouddevis.vercel.app/app',
     cleartext: false,
   },
   plugins: {

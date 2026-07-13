@@ -10,9 +10,11 @@ import type { DashboardStats } from '@/mobile/lib/useDashboardStats';
 // ── Helpers ───────────────────────────────────────────────────
 
 function formatDA(n: number): string {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + ' M';
-  if (n >= 1_000)     return (n / 1_000).toFixed(1).replace(/\.0$/, '') + ' k';
-  return n.toFixed(0);
+  if (n >= 1_000_000) {
+    const m = (n / 1_000_000).toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
+    return m + ' M';
+  }
+  return Math.round(n).toLocaleString('fr-DZ');
 }
 
 // ── Single card ───────────────────────────────────────────────

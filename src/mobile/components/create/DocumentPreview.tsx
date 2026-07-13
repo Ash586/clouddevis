@@ -66,8 +66,9 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
             <span className="w-10" />
           </div>
 
-          {/* Paper */}
-          <div className="flex-1 overflow-y-auto px-3 pb-4">
+          {/* Paper — scaled to 75% so the full page is visible without scrolling */}
+          <div className="flex-1 overflow-y-auto px-2 pb-4 flex justify-center">
+            <div style={{ width: '133.33%', transformOrigin: 'top center', transform: 'scale(0.75)' }}>
             <motion.div
               initial={{ y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -237,6 +238,7 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                 </div>
               </div>
             </motion.div>
+            </div>
           </div>
 
           {/* Footer actions */}

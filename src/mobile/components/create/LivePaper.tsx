@@ -214,23 +214,11 @@ export function LivePaper({
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-[var(--border-2)]">
-            <button
-              type="button"
-              onClick={onTapDetails}
-              className={cn(
-                'text-[11px] font-semibold text-[var(--green-2)] active:opacity-70',
-                activeZone === 'details' && 'underline',
-              )}
-            >
-              Détails
-            </button>
-            <span className="flex items-center gap-2">
-              {pendingSync && (
-                <CloudOff size={14} className="text-[var(--gold)]" aria-label="En attente de synchronisation" />
-              )}
-              <span className="text-xl font-bold text-[var(--green-2)] heading">{formatDA(net)}</span>
-            </span>
+          <div className="flex justify-end items-center gap-2 mt-2 pt-2 border-t border-[var(--border-2)]">
+            {pendingSync && (
+              <CloudOff size={14} className="text-[var(--gold)]" aria-label="En attente de synchronisation" />
+            )}
+            <span className="text-xl font-bold text-[var(--green-2)] heading">{formatDA(net)}</span>
           </div>
         </div>
       </div>

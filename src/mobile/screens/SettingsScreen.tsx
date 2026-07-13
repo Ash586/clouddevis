@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint, Bug } from 'lucide-react';
 import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
 import { cn } from '@/lib/utils';
 import {
@@ -130,14 +130,14 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-screen">
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="px-5 pt-4 pb-3">
         <h1 className="text-xl font-bold text-[var(--sand)]">{t('settings.title')}</h1>
       </div>
 
-      {/* ── Content ─────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-5 pb-24 space-y-4">
+      {/* ── Content — body scroll, pb-32 clears the fixed bottom tabs ── */}
+      <div className="px-5 pb-32 space-y-4">
 
         {/* ── Account persona ───────────────────────────────── */}
         <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
@@ -334,11 +334,11 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
           )}
         </div>
 
-        {/* ── Support ──────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
+        {/* ── Support & Bug Report ─────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden divide-y divide-[var(--border)]">
           <a
             href="mailto:support@rakmana.app"
-            className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
+            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
           >
             <HeadphonesIcon size={18} className="text-[var(--sand-muted)]" />
             <div className="flex-1">
@@ -347,6 +347,21 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
               </span>
               <span className="block text-[10px] text-[var(--sand-muted)] text-start">
                 {t('settings.supportHint')}
+              </span>
+            </div>
+            <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
+          </a>
+          <a
+            href="mailto:support@rakmana.app?subject=Rapport%20de%20bug%20%E2%80%94%20Rakmana&body=D%C3%A9crivez%20le%20bug%20ici..."
+            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
+          >
+            <Bug size={18} className="text-amber-400" />
+            <div className="flex-1">
+              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
+                Signaler un bug
+              </span>
+              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
+                Envoyez-nous le problème rencontré
               </span>
             </div>
             <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
