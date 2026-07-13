@@ -10,10 +10,11 @@
 // ============================================================
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
-  Building2, CheckCircle2, Send,
+  Building2, CheckCircle2, Send, SlidersHorizontal,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
@@ -569,11 +570,15 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
             <span className="text-[10px] font-semibold">Aperçu</span>
           </button>
 
-          {/* Télécharger */}
-          <button type="button" onClick={handleDownload} disabled={busy}
-            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
-            {busy ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} strokeWidth={1.8} />}
-            <span className="text-[10px] font-semibold">Télécharger</span>
+          {/* Éditer — ouvre le dock "Détails du document" */}
+          <button type="button"
+            onClick={() => { setDockMode('details'); setEditingLineId(null); }}
+            className={cn(
+              'flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform',
+              dockMode === 'details' ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]',
+            )}>
+            <SlidersHorizontal size={20} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Éditer</span>
           </button>
 
           {/* Enregistrer — main action, highlighted */}
