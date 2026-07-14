@@ -1,0 +1,188 @@
+# ============================================================
+# Rakmana — iOS IPA Build
+# Runs on macOS (GitHub hosted), builds and signs the Capacitor
+# iOS app, then uploads the IPA as a workflow artifact.
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   APPLE_CERTIFICATE_BASE64       — Distribution .p12 base64
+#   APPLE_CERTIFICATE_PASSWORD     — .p12 password
+#   APPLE_PROVISIONING_PROFILE_BASE64 — .mobileprovision base64
+#   APPLE_PROVISIONING_PROFILE_NAME   — Profile name (Dev Portal)
+#   APPLE_TEAM_ID                  — 10-char Team ID (e.g. ABC123XYZ9)
+#   KEYCHAIN_PASSWORD              — any temp password (e.g. "build")
+#
+# How to encode your certificate / profile:
+#   macOS: base64 -i MyDist.p12 | pbcopy
+#   Linux: base64 -w 0 MyDist.p12
+# ============================================================
+
+name: iOS Build (IPA)
+
+on:
+  workflow_dispatch:
+    inputs:
+      export_method:
+        description: 'Distribution method'
+        required: true
+        default: 'ad-hoc'
+        type: choice
+        options:
+          - ad-hoc
+          - app-store
+
+env:
+  BUNDLE_ID: com.rakmana.app
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      # ── 1. Source ────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Node + deps ───────────────────────────────────────
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      # ── 3. Web assets (Remote Server Mode — minimal stub) ────
+      # The app loads everything from Vercel; cap copy still
+      # needs a non-empty out/ directory to complete successfully.
+      - name: Create web assets stub
+        run: |
+          mkdir -p out
+          printf '<!DOCTYPE html><html><body>Rakmana — Remote Server</body></html>' \
+            > out/index.html
+
+      # ── 4. Reconstruct iOS Xcode project ────────────────────
+      # The repo ships only ios/App/App/ (Info.plist, source).
+      # Podfile + .xcodeproj must be regenerated on macOS via
+      # `cap add ios`, then our custom Info.plist is restored.
+      - name: Backup custom Info.plist
+        run: cp ios/App/App/Info.plist "$RUNNER_TEMP/Info.plist.bak"
+
+      - name: Remove incomplete iOS project and re-initialize
+        run: |
+          rm -rf ios/App
+          npx cap add ios
+
+      - name: Restore custom Info.plist (permissions + domains)
+        run: cp "$RUNNER_TEMP/Info.plist.bak" ios/App/App/Info.plist
+
+      # ── 5. Sync Capacitor ────────────────────────────────────
+      - name: Copy web assets to iOS
+        run: npx cap copy ios
+
+      # ── 6. CocoaPods ─────────────────────────────────────────
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods --no-document
+
+      - name: pod install
+        working-directory: ios/App
+        run: pod install
+
+      # ── 7. Code signing ──────────────────────────────────────
+      - name: Import Distribution Certificate
+        env:
+          CERT_B64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          CERT_PWD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KC_PWD:   ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERT="$RUNNER_TEMP/cert.p12"
+          KC="$RUNNER_TEMP/build.keychain"
+
+          echo "$CERT_B64" | base64 --decode > "$CERT"
+
+          security create-keychain -p "$KC_PWD" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KC_PWD" "$KC"
+          security import "$CERT" -P "$CERT_PWD" -A -t cert -f pkcs12 -k "$KC"
+          security list-keychain -d user -s "$KC"
+
+      - name: Import Provisioning Profile
+        env:
+          PROFILE_B64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PP="$RUNNER_TEMP/profile.mobileprovision"
+          echo "$PROFILE_B64" | base64 --decode > "$PP"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      # ── 8. ExportOptions ─────────────────────────────────────
+      - name: Generate ExportOptions.plist
+        env:
+          METHOD:       ${{ github.event.inputs.export_method }}
+          TEAM_ID:      ${{ secrets.APPLE_TEAM_ID }}
+          PROFILE_NAME: ${{ secrets.APPLE_PROVISIONING_PROFILE_NAME }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>${METHOD}</string>
+            <key>teamID</key>
+            <string>${TEAM_ID}</string>
+            <key>compileBitcode</key>
+            <false/>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key>
+              <string>${PROFILE_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
+
+      # ── 9. Build ─────────────────────────────────────────────
+      - name: Archive (xcodebuild)
+        working-directory: ios/App
+        env:
+          TEAM_ID:      ${{ secrets.APPLE_TEAM_ID }}
+          PROFILE_NAME: ${{ secrets.APPLE_PROVISIONING_PROFILE_NAME }}
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/Rakmana.xcarchive" \
+            archive \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CODE_SIGN_IDENTITY="iPhone Distribution" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            | xcpretty || true
+
+      - name: Export IPA
+        run: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$RUNNER_TEMP/Rakmana.xcarchive" \
+            -exportPath  "$RUNNER_TEMP/ipa" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+
+      # ── 10. Artifact ─────────────────────────────────────────
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rakmana-iOS-${{ github.event.inputs.export_method }}-${{ github.sha }}
+          path: ${{ runner.temp }}/ipa/*.ipa
+          retention-days: 30
+
+      # ── 11. Cleanup ──────────────────────────────────────────
+      - name: Delete temp keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/build.keychain" 2>/dev/null || true
