@@ -557,52 +557,54 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         onModeChange={(m) => { setDockMode(m); if (m !== 'line') setEditingLineId(null); }}
       />
 
-      {/* Bottom action bar — style bottom tabs like dashboard */}
+      {/* Bottom action bar */}
       <nav
         className="bg-[var(--navy-2)] border-t border-[var(--border)]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="flex items-stretch justify-around h-16 px-1">
+        <div className="flex items-center h-16 px-3 gap-1">
           {/* Aperçu */}
           <button type="button" onClick={openPreview}
-            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)]">
+            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)]">
             <Eye size={20} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Aperçu</span>
+            <span className="text-[9px] font-semibold">Aperçu</span>
           </button>
 
-          {/* Éditer — ouvre le dock "Détails du document" */}
+          {/* Éditer */}
           <button type="button"
             onClick={() => { setDockMode('details'); setEditingLineId(null); }}
             className={cn(
-              'flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform',
+              'flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform',
               dockMode === 'details' ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]',
             )}>
             <SlidersHorizontal size={20} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Éditer</span>
+            <span className="text-[9px] font-semibold">Éditer</span>
           </button>
 
-          {/* Enregistrer — main action, highlighted */}
+          {/* Enregistrer — action principale, bouton centré proéminent */}
           <button type="button" onClick={handleSave} disabled={saving}
-            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform disabled:opacity-40"
-            style={{ color: 'var(--green-2)' }}>
-            {saving ? <Loader2 size={22} className="animate-spin" /> : <Save size={22} strokeWidth={2.3} />}
-            <span className="text-[10px] font-bold">Enregistrer</span>
+            className="flex-1 h-11 mx-1 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-white active:scale-[0.97] transition-all disabled:opacity-40"
+            style={{ background: 'var(--green-2)' }}>
+            {saving
+              ? <Loader2 size={18} className="animate-spin" />
+              : <Save size={18} strokeWidth={2.5} />}
+            Enregistrer
           </button>
 
           {/* Imprimer */}
           <button type="button" onClick={handlePrint} disabled={busy}
-            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
             <Printer size={20} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Imprimer</span>
+            <span className="text-[9px] font-semibold">Imprimer</span>
           </button>
 
           {/* Envoyer */}
           <button type="button"
-            onClick={() => (editingDocId ? setShareOpen(true) : handleSave())}
+            onClick={() => (editingDocId ? setShareOpen(true) : void handleSave())}
             disabled={busy || saving}
-            className="flex flex-col items-center justify-center gap-1 flex-1 active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
             <Send size={20} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Envoyer</span>
+            <span className="text-[9px] font-semibold">Envoyer</span>
           </button>
         </div>
       </nav>

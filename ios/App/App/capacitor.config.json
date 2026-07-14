@@ -1,10 +1,11 @@
 {
-	"appId": "com.clouddevis.app",
-	"appName": "CloudDevis",
+	"appId": "com.rakmana.app",
+	"appName": "رقمنة",
 	"webDir": "out",
 	"server": {
 		"androidScheme": "https",
-		"url": "https://clouddevis.vercel.app",
+		"iosScheme": "https",
+		"url": "https://clouddevis.vercel.app/app",
 		"cleartext": false
 	},
 	"plugins": {
@@ -14,7 +15,7 @@
 			"androidScaleType": "CENTER_CROP",
 			"splashFullScreen": true,
 			"splashImmersive": true,
-			"backgroundColor": "#F3F6FC"
+			"backgroundColor": "#0d3d24"
 		},
 		"Keyboard": {
 			"resize": "body",
@@ -22,7 +23,7 @@
 		},
 		"StatusBar": {
 			"style": "LIGHT",
-			"backgroundColor": "#F3F6FC"
+			"backgroundColor": "#0d3d24"
 		},
 		"Preferences": {
 			"group": "clouddevis"
@@ -36,6 +37,7 @@
 		}
 	},
 	"packageClassList": [
+		"BiometricAuthNative",
 		"CapacitorSQLitePlugin",
 		"AppPlugin",
 		"CAPBrowserPlugin",

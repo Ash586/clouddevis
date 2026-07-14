@@ -6,6 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
+    iosScheme: 'https',
     // Remote Server Mode — يفتح مباشرة على شاشة تسجيل الدخول
     // غيّر هذا للتطوير المحلي: url: 'http://YOUR_IP:3000/app'
     url: 'https://clouddevis.vercel.app/app',

@@ -2,16 +2,18 @@
 
 // ============================================================
 // Rakmana Mobile — FlashFacture: the persistent dock
-// One thumb-anchored container that swaps CONTENT (never stacks
-// sheet-on-sheet) between four modes: add · line · client · details.
-// Every action maps 1:1 onto the document store setters.
+// Four modes: add · line · client · details.
+// "details" mode uses an accordion (Section) to avoid a giant
+// flat scroll — each category collapses/expands with haptics.
 // ============================================================
 
-import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Plus, Check, Trash2, ChevronLeft, Search, UserPlus, CornerDownLeft,
+  Plus, Check, Trash2, ChevronLeft, ChevronDown, Search, UserPlus, CornerDownLeft,
+  FileText, AlignLeft, CreditCard, Truck, MessageSquare,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateNIF } from '@/lib/dgi';
 import { hapticLight, hapticSuccess, hapticWarning } from '@/mobile/lib/haptics';
@@ -40,6 +42,10 @@ const PAYMENT_MODES: Array<{ id: PaymentMode; label: string }> = [
   { id: 'cb', label: 'Carte' },
 ];
 const LANGS: Language[] = ['FR', 'AR', 'EN'];
+const TEMPLATES: Array<[string, string]> = [
+  ['classic', 'Classique'], ['haussmann', 'Haussmann'], ['nordic', 'Nordic'],
+  ['velours', 'Velours'], ['industrielle', 'Industrielle'],
+];
 
 const inputCls =
   'h-11 px-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] ' +
@@ -48,6 +54,60 @@ const inputCls =
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] uppercase tracking-wide text-[var(--sand-muted)] mb-1.5">{children}</p>;
+}
+
+// ── Accordion section ─────────────────────────────────────────
+function Section({
+  title, icon: Icon, isOpen, onToggle, children,
+}: {
+  title: string; icon: LucideIcon; isOpen: boolean;
+  onToggle: () => void; children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-[var(--border)] last:border-b-0">
+      <button
+        type="button"
+        onClick={() => { hapticLight(); onToggle(); }}
+        className="w-full flex items-center gap-2.5 py-3 active:opacity-70 transition-opacity"
+      >
+        <span className={cn(
+          'w-7 h-7 rounded-lg flex items-center justify-center transition-colors',
+          isOpen ? 'bg-[var(--blue-bg)]' : 'bg-[var(--navy-3)]',
+        )}>
+          <Icon size={14} className={isOpen ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]'} />
+        </span>
+        <span className={cn(
+          'flex-1 text-left text-sm font-semibold transition-colors',
+          isOpen ? 'text-[var(--sand)]' : 'text-[var(--sand-muted)]',
+        )}>
+          {title}
+        </span>
+        <ChevronDown
+          size={16}
+          className={cn(
+            'text-[var(--sand-muted)] transition-transform duration-200',
+            isOpen && 'rotate-180',
+          )}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="pb-3 flex flex-col gap-2.5">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 interface CreateDockProps {
@@ -60,7 +120,7 @@ interface CreateDockProps {
 export function CreateDock({ mode, editingLineId, catalog, onModeChange }: CreateDockProps) {
   return (
     <div className="bg-[var(--navy-2)] border-t border-[var(--border)] px-3 pt-2.5 pb-2">
-      {/* Mode header (back-to-add for non-default modes) */}
+      {/* Mode header */}
       {mode !== 'add' && (
         <div className="flex items-center gap-2 mb-2">
           <button
@@ -77,9 +137,6 @@ export function CreateDock({ mode, editingLineId, catalog, onModeChange }: Creat
         </div>
       )}
 
-      {/* No AnimatePresence "wait" here: if an exit animation ever stalls
-          (frozen rAF on weak devices), the next mode would never mount.
-          A keyed enter-only transition gives the same morph feel, robustly. */}
       <motion.div
         key={mode + (editingLineId ?? '')}
         initial={{ opacity: 0, y: 8 }}
@@ -97,7 +154,7 @@ export function CreateDock({ mode, editingLineId, catalog, onModeChange }: Creat
   );
 }
 
-// ── ADD mode: catalog quick-add + inline new-line form ────────
+// ── ADD mode ──────────────────────────────────────────────────
 function AddMode({ catalog }: { catalog: CatalogItem[] }) {
   const addItem = useDocumentStore((s) => s.addItem);
 
@@ -109,7 +166,10 @@ function AddMode({ catalog }: { catalog: CatalogItem[] }) {
             <button
               key={`${c.label}-${i}`}
               type="button"
-              onClick={() => { hapticLight(); addItem({ label: c.label, quantity: 1, unit: c.unit, unitPrice: c.unitPrice, tvaRate: c.tvaRate }); }}
+              onClick={() => {
+                hapticLight();
+                addItem({ label: c.label, quantity: 1, unit: c.unit, unitPrice: c.unitPrice, tvaRate: c.tvaRate });
+              }}
               className="shrink-0 flex items-center gap-1.5 px-3 h-9 rounded-full bg-[var(--navy-3)] border border-[var(--border)] text-xs text-[var(--sand)] active:scale-95 transition-transform"
             >
               <Plus size={13} className="text-[var(--green-2)]" />
@@ -124,7 +184,7 @@ function AddMode({ catalog }: { catalog: CatalogItem[] }) {
   );
 }
 
-// ── Shared line form (used by ADD as new + LINE as edit) ──────
+// ── Line form (new + edit) ────────────────────────────────────
 function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onDone: () => void }) {
   const items = useDocumentStore((s) => s.currentDoc.items);
   const addItem = useDocumentStore((s) => s.addItem);
@@ -172,69 +232,46 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Code"
-          className={cn(inputCls, 'w-[84px]')}
-          aria-label="Code article"
+          type="text" value={code} onChange={(e) => setCode(e.target.value)}
+          placeholder="Code" className={cn(inputCls, 'w-[84px]')} aria-label="Code article"
         />
         <input
-          type="text"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          placeholder="Désignation de l'article"
-          className={cn(inputCls, 'flex-1')}
+          type="text" value={label} onChange={(e) => setLabel(e.target.value)}
+          placeholder="Désignation de l'article" className={cn(inputCls, 'flex-1')}
         />
       </div>
       <div className="flex gap-2">
         <input
-          type="text" inputMode="decimal" value={qty}
-          onChange={(e) => setQty(e.target.value)}
-          placeholder="Qté"
-          className={cn(inputCls, 'w-16 text-center')}
-          aria-label="Quantité"
+          type="text" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)}
+          placeholder="Qté" className={cn(inputCls, 'w-16 text-center')} aria-label="Quantité"
         />
-        <select
-          value={unit}
-          onChange={(e) => setUnit(e.target.value as UnitMeasure)}
-          className={cn(inputCls, 'w-[88px] px-2')}
-          aria-label="Unité"
-        >
+        <select value={unit} onChange={(e) => setUnit(e.target.value as UnitMeasure)}
+          className={cn(inputCls, 'w-[88px] px-2')} aria-label="Unité">
           {UNIT_OPTIONS.map((u) => <option key={u} value={u}>{UNIT_LABELS[u]}</option>)}
         </select>
         <input
-          type="text" inputMode="decimal" value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="Prix unitaire"
-          className={cn(inputCls, 'flex-1')}
-          aria-label="Prix unitaire"
+          type="text" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)}
+          placeholder="Prix unitaire" className={cn(inputCls, 'flex-1')} aria-label="Prix unitaire"
         />
       </div>
       <div className="flex items-center gap-2">
         <div className="flex gap-1.5 flex-1">
           {TVA_OPTIONS.map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setTva(r)}
+            <button key={r} type="button" onClick={() => setTva(r)}
               className={cn(
                 'flex-1 h-9 rounded-lg text-xs font-semibold border transition-colors',
                 tva === r
                   ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
                   : 'bg-[var(--navy-3)] border-[var(--border)] text-[var(--sand-muted)]',
-              )}
-            >
+              )}>
               {r}%
             </button>
           ))}
         </div>
         <div className="relative">
           <input
-            type="text" inputMode="decimal" value={remise}
-            onChange={(e) => setRemise(e.target.value)}
-            placeholder="Remise"
-            className={cn(inputCls, 'w-[88px] h-9 pr-6 text-center')}
+            type="text" inputMode="decimal" value={remise} onChange={(e) => setRemise(e.target.value)}
+            placeholder="Remise" className={cn(inputCls, 'w-[88px] h-9 pr-6 text-center')}
             aria-label="Remise en pourcentage"
           />
           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-[var(--sand-muted)]">%</span>
@@ -248,24 +285,18 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
       )}
       <div className="flex gap-2">
         {editing && (
-          <button
-            type="button"
+          <button type="button"
             onClick={() => { hapticWarning(); removeItem(editing.id); onDone(); }}
-            className="h-11 px-4 rounded-xl flex items-center justify-center gap-1.5 bg-red-400/10 text-red-400 text-sm font-semibold active:scale-[0.97] transition-transform"
-          >
+            className="h-11 px-4 rounded-xl flex items-center justify-center gap-1.5 bg-red-400/10 text-red-400 text-sm font-semibold active:scale-[0.97] transition-transform">
             <Trash2 size={16} /> Supprimer
           </button>
         )}
-        <button
-          type="button"
-          onClick={submit}
-          disabled={!canSubmit}
+        <button type="button" onClick={submit} disabled={!canSubmit}
           className={cn(
             'flex-1 h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white',
             'active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed',
           )}
-          style={{ background: 'var(--green-2)' }}
-        >
+          style={{ background: 'var(--green-2)' }}>
           {editing ? <Check size={16} /> : <CornerDownLeft size={16} />}
           {editing ? 'Enregistrer' : 'Ajouter la ligne'}
         </button>
@@ -274,7 +305,7 @@ function LineForm({ editingLineId, onDone }: { editingLineId: string | null; onD
   );
 }
 
-// ── CLIENT mode: search saved + inline new ────────────────────
+// ── CLIENT mode ───────────────────────────────────────────────
 function ClientMode({ onDone }: { onDone: () => void }) {
   const clients = useClientStore((s) => s.clients);
   const searchClients = useClientStore((s) => s.searchClients);
@@ -284,7 +315,9 @@ function ClientMode({ onDone }: { onDone: () => void }) {
   const [q, setQ] = useState('');
   const [creating, setCreating] = useState(false);
   const [moreFields, setMoreFields] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', email: '', nif: '', rc: '', nis: '', ai: '', address: '' });
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '', nif: '', rc: '', nis: '', ai: '', address: '',
+  });
 
   const list = useMemo(() => (q.trim() ? searchClients(q) : clients.slice(0, 12)), [q, clients, searchClients]);
   const nifState = form.nif.trim() ? validateNIF(form.nif) : null;
@@ -315,14 +348,13 @@ function ClientMode({ onDone }: { onDone: () => void }) {
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
         <input className={cn(inputCls, 'w-full')} inputMode="tel" placeholder="Téléphone *" value={form.phone}
           onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
-        {/* Extra identity/fiscal fields stay folded — name+phone is enough
-            to keep the flow fast; unfold for the full DGI identity. */}
         {moreFields ? (
           <>
-            <input className={cn(inputCls, 'w-full')} inputMode="email" placeholder="Email (optionnel)" value={form.email}
-              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+            <input className={cn(inputCls, 'w-full')} inputMode="email" placeholder="Email (optionnel)"
+              value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
             <div className="relative">
-              <input className={cn(inputCls, 'w-full pr-9')} inputMode="numeric" placeholder="NIF (11 ou 15 chiffres)" value={form.nif}
+              <input className={cn(inputCls, 'w-full pr-9')} inputMode="numeric"
+                placeholder="NIF (11 chiffres)" value={form.nif}
                 onChange={(e) => setForm((f) => ({ ...f, nif: e.target.value }))} />
               {nifState === true && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
@@ -331,15 +363,15 @@ function ClientMode({ onDone }: { onDone: () => void }) {
               )}
             </div>
             <div className="flex gap-2">
-              <input className={cn(inputCls, 'w-full')} placeholder="RC" value={form.rc}
-                onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
-              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS" value={form.nis}
-                onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
-              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI" value={form.ai}
-                onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
+              <input className={cn(inputCls, 'w-full')} placeholder="RC"
+                value={form.rc} onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
+              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS"
+                value={form.nis} onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
+              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI"
+                value={form.ai} onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
             </div>
-            <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)" value={form.address}
-              onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
+            <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)"
+              value={form.address} onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
           </>
         ) : (
           <button type="button" onClick={() => setMoreFields(true)}
@@ -373,8 +405,8 @@ function ClientMode({ onDone }: { onDone: () => void }) {
       </div>
       <div className="relative">
         <Search size={16} className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]" />
-        <input className={cn(inputCls, 'w-full ltr:pl-9 rtl:pr-9')} placeholder="Rechercher un client…" value={q}
-          onChange={(e) => setQ(e.target.value)} autoFocus />
+        <input className={cn(inputCls, 'w-full ltr:pl-9 rtl:pr-9')} placeholder="Rechercher un client…"
+          value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
       </div>
       <div className="max-h-[176px] overflow-y-auto flex flex-col gap-1.5">
         {list.map((c) => (
@@ -403,7 +435,7 @@ function ClientMode({ onDone }: { onDone: () => void }) {
   );
 }
 
-// ── DETAILS mode: deferred fields, all live ───────────────────
+// ── DETAILS mode: accordion categories ───────────────────────
 function DetailsMode() {
   const doc = useDocumentStore((s) => s.currentDoc);
   const setType = useDocumentStore((s) => s.setType);
@@ -416,142 +448,160 @@ function DetailsMode() {
   const setReference = useDocumentStore((s) => s.setReference);
   const setTemplate = useDocumentStore((s) => s.setTemplate);
   const updateDelivery = useDocumentStore((s) => s.updateDelivery);
+  const userMode = useUserStore((s) => s.mode);
+
+  // Start with "document" open; user opens others on demand
+  const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(['document']));
+  const toggle = useCallback((id: string) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   const [acompte, setAcompteLocal] = useState(doc.acompte ? String(doc.acompte) : '');
   useEffect(() => { setAcompte(parseFloat(acompte.replace(',', '.')) || 0); }, [acompte, setAcompte]);
 
   const isBL = doc.type === 'BL';
 
-  // Persona soft-gating: artisans see the 3 everyday types; BC/BR/BL sit behind
-  // a "Plus" chip (auto-expanded when editing one of those documents).
-  const userMode = useUserStore((s) => s.mode);
   const [showAllTypes, setShowAllTypes] = useState(false);
   const typesCollapsed = userMode === 'artisan' && !showAllTypes && !['BC', 'BR', 'BL'].includes(doc.type);
   const visibleTypes: DocumentType[] = typesCollapsed ? ['DEVIS', 'FACTURE', 'PROFORMA'] : DOC_TYPES;
 
   const chip = (active: boolean) => cn(
     'px-3 h-9 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap',
-    active ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
-           : 'bg-[var(--navy-3)] border-[var(--border)] text-[var(--sand-muted)]',
+    active
+      ? 'bg-[var(--green-2)] border-[var(--green-2)] text-white'
+      : 'bg-[var(--navy-3)] border-[var(--border)] text-[var(--sand-muted)]',
   );
 
   return (
-    <div className="flex flex-col gap-3 max-h-[320px] overflow-y-auto pb-1">
-      <div>
-        <FieldLabel>Objet du document</FieldLabel>
-        <textarea
-          className={cn(inputCls, 'w-full h-auto py-2 min-h-[48px] resize-none')}
-          placeholder="Ex : Réparation et remise en état d'un appareil…"
-          value={doc.objet}
-          onChange={(e) => setObjet(e.target.value)}
-        />
-      </div>
-      <div>
-        <FieldLabel>Référence (Bon de commande N°)</FieldLabel>
-        <input className={cn(inputCls, 'w-full')} placeholder="Ex : BC N° 15/2024 du 07/03/2024"
-          value={doc.reference} onChange={(e) => setReference(e.target.value)} />
-      </div>
-      <div>
-        <FieldLabel>Type de document</FieldLabel>
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
-          {visibleTypes.map((t) => (
-            <button key={t} type="button" onClick={() => setType(t)} className={chip(doc.type === t)}>
-              {DOCUMENT_TYPE_LABELS[t]}
-            </button>
-          ))}
-          {typesCollapsed && (
-            <button
-              type="button"
-              onClick={() => setShowAllTypes(true)}
-              className={cn(chip(false), 'border-dashed')}
-              aria-label="Afficher plus de types de documents"
-            >
-              + Plus
-            </button>
-          )}
-        </div>
-      </div>
+    <div className="max-h-[420px] overflow-y-auto -mx-3 px-3 pb-1">
 
-      {/* PDF style template — applied when the doc is rendered on the web */}
-      <div>
-        <FieldLabel>Modèle PDF</FieldLabel>
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
-          {([['classic', 'Classique'], ['haussmann', 'Haussmann'], ['nordic', 'Nordic'], ['velours', 'Velours'], ['industrielle', 'Industrielle']] as Array<[string, string]>).map(([id, label]) => (
-            <button key={id} type="button"
-              onClick={() => { hapticLight(); setTemplate(id); }}
-              className={chip((doc.template ?? 'classic') === id)}>
-              {label}
-            </button>
-          ))}
+      {/* ① Type de document */}
+      <Section title="Type de document" icon={FileText}
+        isOpen={openSections.has('document')} onToggle={() => toggle('document')}>
+        <div>
+          <FieldLabel>Format</FieldLabel>
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
+            {visibleTypes.map((t) => (
+              <button key={t} type="button" onClick={() => setType(t)} className={chip(doc.type === t)}>
+                {DOCUMENT_TYPE_LABELS[t]}
+              </button>
+            ))}
+            {typesCollapsed && (
+              <button type="button" onClick={() => setShowAllTypes(true)} className={cn(chip(false), 'border-dashed')}>
+                + Plus
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+        <div>
+          <FieldLabel>Langue</FieldLabel>
+          <div className="flex gap-1.5">
+            {LANGS.map((l) => (
+              <button key={l} type="button" onClick={() => setLanguage(l)} className={chip(doc.language === l)}>
+                {l === 'FR' ? 'Français' : l === 'AR' ? 'العربية' : 'English'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <FieldLabel>Modèle PDF</FieldLabel>
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
+            {TEMPLATES.map(([id, label]) => (
+              <button key={id} type="button"
+                onClick={() => { hapticLight(); setTemplate(id); }}
+                className={chip((doc.template ?? 'classic') === id)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Section>
 
-      {/* BL — delivery block (décret 05-468): deliverer/transporter + location */}
-      {isBL ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-[var(--border)] p-2.5">
-          <FieldLabel>Livraison</FieldLabel>
+      {/* ② Contenu */}
+      <Section title="Contenu" icon={AlignLeft}
+        isOpen={openSections.has('contenu')} onToggle={() => toggle('contenu')}>
+        <div>
+          <FieldLabel>Objet du document</FieldLabel>
+          <textarea
+            className={cn(inputCls, 'w-full h-auto py-2 min-h-[48px] resize-none')}
+            placeholder="Ex : Réparation et remise en état d'un appareil…"
+            value={doc.objet}
+            onChange={(e) => setObjet(e.target.value)}
+          />
+        </div>
+        <div>
+          <FieldLabel>Référence (Bon de commande N°…)</FieldLabel>
+          <input className={cn(inputCls, 'w-full')} placeholder="Ex : BC N° 15/2024 du 07/03/2024"
+            value={doc.reference} onChange={(e) => setReference(e.target.value)} />
+        </div>
+        <div>
+          <FieldLabel>Valable jusqu&apos;au</FieldLabel>
+          <input className={cn(inputCls, 'w-full')} type="date" value={doc.validUntil ?? ''}
+            onChange={(e) => setValidUntil(e.target.value || undefined)} />
+        </div>
+      </Section>
+
+      {/* ③ Paiement (non-BL) */}
+      {!isBL && (
+        <Section title="Paiement" icon={CreditCard}
+          isOpen={openSections.has('paiement')} onToggle={() => toggle('paiement')}>
+          <div>
+            <FieldLabel>Mode de règlement</FieldLabel>
+            <div className="flex gap-1.5 flex-wrap">
+              {PAYMENT_MODES.map((p) => (
+                <button key={p.id} type="button" onClick={() => setPaymentMode(p.id)} className={chip(doc.paymentMode === p.id)}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <FieldLabel>Acompte (DA)</FieldLabel>
+            <input className={cn(inputCls, 'w-full')} inputMode="decimal" placeholder="0"
+              value={acompte} onChange={(e) => setAcompteLocal(e.target.value)} />
+          </div>
+        </Section>
+      )}
+
+      {/* ④ Livraison (BL only) */}
+      {isBL && (
+        <Section title="Livraison" icon={Truck}
+          isOpen={openSections.has('livraison')} onToggle={() => toggle('livraison')}>
           <div className="flex gap-2">
             <input className={cn(inputCls, 'flex-1')} placeholder="Livreur — Nom"
               value={doc.delivererName ?? ''} onChange={(e) => updateDelivery({ delivererName: e.target.value })} />
-            <input className={cn(inputCls, 'flex-1')} placeholder="Livreur — N° CIN"
+            <input className={cn(inputCls, 'flex-1')} placeholder="N° CIN"
               value={doc.delivererIdCard ?? ''} onChange={(e) => updateDelivery({ delivererIdCard: e.target.value })} />
           </div>
           <div className="flex gap-2">
             <input className={cn(inputCls, 'flex-1')} placeholder="Transporteur — Nom"
               value={doc.transporterName ?? ''} onChange={(e) => updateDelivery({ transporterName: e.target.value })} />
-            <input className={cn(inputCls, 'flex-1')} placeholder="Transporteur — N° CIN"
+            <input className={cn(inputCls, 'flex-1')} placeholder="N° CIN"
               value={doc.transporterIdCard ?? ''} onChange={(e) => updateDelivery({ transporterIdCard: e.target.value })} />
           </div>
-          <input className={cn(inputCls, 'w-full')} placeholder="Lieu de livraison (si différent du client)"
-            value={doc.deliveryAddress ?? ''} onChange={(e) => updateDelivery({ deliveryAddress: e.target.value })} />
-        </div>
-      ) : null}
+          <div>
+            <FieldLabel>Lieu de livraison</FieldLabel>
+            <input className={cn(inputCls, 'w-full')} placeholder="Si différent du client"
+              value={doc.deliveryAddress ?? ''} onChange={(e) => updateDelivery({ deliveryAddress: e.target.value })} />
+          </div>
+        </Section>
+      )}
 
-      {!isBL ? (
-      <div>
-        <FieldLabel>Mode de paiement</FieldLabel>
-        <div className="flex gap-1.5 flex-wrap">
-          {PAYMENT_MODES.map((p) => (
-            <button key={p.id} type="button" onClick={() => setPaymentMode(p.id)} className={chip(doc.paymentMode === p.id)}>
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      ) : null}
-      <div className="flex gap-2">
-        {!isBL ? (
-        <div className="flex-1">
-          <FieldLabel>Acompte (DA)</FieldLabel>
-          <input className={cn(inputCls, 'w-full')} inputMode="decimal" placeholder="0" value={acompte}
-            onChange={(e) => setAcompteLocal(e.target.value)} />
-        </div>
-        ) : null}
-        <div className="flex-1">
-          <FieldLabel>Valable jusqu&apos;au</FieldLabel>
-          <input className={cn(inputCls, 'w-full')} type="date" value={doc.validUntil ?? ''}
-            onChange={(e) => setValidUntil(e.target.value || undefined)} />
-        </div>
-      </div>
-      <div>
-        <FieldLabel>Langue</FieldLabel>
-        <div className="flex gap-1.5">
-          {LANGS.map((l) => (
-            <button key={l} type="button" onClick={() => setLanguage(l)} className={chip(doc.language === l)}>
-              {l === 'FR' ? 'Français' : l === 'AR' ? 'العربية' : 'English'}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <FieldLabel>Notes</FieldLabel>
+      {/* ⑤ Notes */}
+      <Section title="Notes & remarques" icon={MessageSquare}
+        isOpen={openSections.has('notes')} onToggle={() => toggle('notes')}>
         <textarea
           className={cn(inputCls, 'w-full h-auto py-2 min-h-[60px] resize-none')}
-          placeholder="Conditions, remarques…"
+          placeholder="Conditions de paiement, remarques…"
           value={doc.notes}
           onChange={(e) => setNotes(e.target.value)}
         />
-      </div>
+      </Section>
     </div>
   );
 }
