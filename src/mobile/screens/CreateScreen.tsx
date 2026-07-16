@@ -24,11 +24,12 @@ import {
   type ApiDocumentDetail,
 } from '@/mobile/lib/api';
 import { hapticSuccess, hapticError } from '@/mobile/lib/haptics';
+import { useMobileKeyboard } from '@/mobile/lib/useMobileKeyboard';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64, printDocument, downloadDocument } from '@/mobile/lib/pdf';
 import { shareDocument, openWhatsApp } from '@/mobile/lib/whatsapp';
 import { notify } from '@/mobile/lib/toast';
-import { generateDocNumber, numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
+import { generateDocNumber, numberToFrenchWords, numberToArabicWords, formatDateAlgerian } from '@/lib/dgi';
 import { LivePaper } from '@/mobile/components/create/LivePaper';
 import { CreateDock, type DockMode, type CatalogItem } from '@/mobile/components/create/CreateDock';
 import { DocumentPreview } from '@/mobile/components/create/DocumentPreview';
@@ -62,6 +63,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const updateSavedDocument = useDocumentStore((s) => s.updateSavedDocument);
   const company = useCompanyStore((s) => s.company);
 
+  const keyboardOpen = useMobileKeyboard();
   const [dockMode, setDockMode] = useState<DockMode>('add');
   const [editingLineId, setEditingLineId] = useState<string | null>(null);
   const [loadingDoc, setLoadingDoc] = useState(false);
@@ -245,7 +247,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         totalTTC: totals.totalTTC,
         netAPayer: totals.netAPayer,
         acompte: currentDoc.acompte || undefined,
-        totalInWords: numberToFrenchWords(totals.netAPayer),
+        language: currentDoc.language,
+        totalInWords: currentDoc.language === 'AR'
+          ? numberToArabicWords(totals.netAPayer)
+          : numberToFrenchWords(totals.netAPayer),
         companyName: company?.name,
         companyAddress: company?.address,
         companyNif: company?.nif,
@@ -557,7 +562,8 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         onModeChange={(m) => { setDockMode(m); if (m !== 'line') setEditingLineId(null); }}
       />
 
-      {/* Bottom action bar */}
+      {/* Bottom action bar — hidden while the keyboard is open to free space for the dock */}
+      {!keyboardOpen && (
       <nav
         className="bg-[var(--navy-2)] border-t border-[var(--border)]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
@@ -608,6 +614,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           </button>
         </div>
       </nav>
+      )}
 
       {/* Full document preview (see before download) */}
       <DocumentPreview

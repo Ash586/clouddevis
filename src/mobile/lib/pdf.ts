@@ -150,6 +150,7 @@ export async function generatePDFBase64(options: {
   paymentMode?: string;
   date?: string;
   notes?: string;
+  language?: 'FR' | 'AR' | 'EN';
 }): Promise<string> {
   const pdfData: PDFDocumentData = {
     type: (options.docType.toUpperCase() as PDFDocumentData['type']) || 'FACTURE',
@@ -203,7 +204,7 @@ export async function generatePDFBase64(options: {
     netAPayer: options.netAPayer,
     acompte: options.acompte,
     totalInWords: options.totalInWords,
-    language: 'FR',
+    language: options.language ?? 'FR',
   };
 
   return engineGeneratePDF(pdfData);
