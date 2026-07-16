@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
-  Building2, CheckCircle2, Send, SlidersHorizontal,
+  Building2, CheckCircle2, SlidersHorizontal,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
@@ -568,26 +568,26 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         className="bg-[var(--navy-2)] border-t border-[var(--border)]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="flex items-center h-16 px-3 gap-1">
+        <div className="flex items-center h-16 px-3 gap-1.5">
           {/* Aperçu */}
           <button type="button" onClick={openPreview}
-            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)]">
-            <Eye size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-semibold">Aperçu</span>
+            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)]">
+            <Eye size={22} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Aperçu</span>
           </button>
 
           {/* Éditer */}
           <button type="button"
             onClick={() => { setDockMode('details'); setEditingLineId(null); }}
             className={cn(
-              'flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform',
+              'flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform',
               dockMode === 'details' ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]',
             )}>
-            <SlidersHorizontal size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-semibold">Éditer</span>
+            <SlidersHorizontal size={22} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Éditer</span>
           </button>
 
-          {/* Enregistrer — action principale, bouton centré proéminent */}
+          {/* Enregistrer — action principale */}
           <button type="button" onClick={handleSave} disabled={saving}
             className="flex-1 h-11 mx-1 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-white active:scale-[0.97] transition-all disabled:opacity-40"
             style={{ background: 'var(--green-2)' }}>
@@ -597,20 +597,13 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
             Enregistrer
           </button>
 
-          {/* Imprimer */}
-          <button type="button" onClick={handlePrint} disabled={busy}
-            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
-            <Printer size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-semibold">Imprimer</span>
-          </button>
-
-          {/* Envoyer */}
+          {/* Envoyer — always opens share sheet */}
           <button type="button"
-            onClick={() => (editingDocId ? setShareOpen(true) : void handleSave())}
+            onClick={() => setShareOpen(true)}
             disabled={busy || saving}
-            className="flex flex-col items-center justify-center gap-0.5 w-[52px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
-            <Send size={20} strokeWidth={1.8} />
-            <span className="text-[9px] font-semibold">Envoyer</span>
+            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
+            <Share2 size={22} strokeWidth={1.8} />
+            <span className="text-[10px] font-semibold">Envoyer</span>
           </button>
         </div>
       </nav>

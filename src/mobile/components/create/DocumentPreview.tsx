@@ -14,7 +14,7 @@ import { X, Download, Share2, Loader2 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
 import { DOCUMENT_TYPE_LABELS, UNIT_LABELS } from '@/mobile/types';
-import { numberToFrenchWords, formatDateAlgerian } from '@/lib/dgi';
+import { numberToFrenchWords, numberToArabicWords, formatDateAlgerian } from '@/lib/dgi';
 
 function da(n: number): string {
   return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -62,7 +62,9 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
               className="w-10 h-10 rounded-full flex items-center justify-center bg-white/10 text-white active:scale-95 transition-transform">
               <X size={20} />
             </button>
-            <span className="text-sm font-semibold text-white/90">Aperçu du document</span>
+            <span className="text-sm font-semibold text-white/90">
+              {doc.language === 'AR' ? 'معاينة المستند' : 'Aperçu du document'}
+            </span>
             <span className="w-10" />
           </div>
 
@@ -138,7 +140,9 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
 
                 {/* ── Client (DOIT) ── */}
                 <div className="mt-3 p-3 rounded-md" style={{ background: '#F3F6FC', border: `1px solid ${hair}` }}>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: muted }}>Doit</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: muted }}>
+                    {doc.language === 'AR' ? 'المدين' : 'Doit'}
+                  </p>
                   <p className="text-[13px] font-bold mt-0.5" style={{ color: ink }}>
                     {doc.client?.name || '—'}
                   </p>
@@ -215,9 +219,10 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                 </div>
 
                 {/* ── Amount in words ── */}
-                <p className="text-[10.5px] italic mt-3" style={{ color: ink }}>
-                  Arrêté{doc.type === 'DEVIS' ? ' le présent devis' : 'e la présente facture'} à la somme de :{' '}
-                  {numberToFrenchWords(totals.netAPayer)}.
+                <p className="text-[10.5px] italic mt-3" style={{ color: ink, direction: doc.language === 'AR' ? 'rtl' : 'ltr' }}>
+                  {doc.language === 'AR'
+                    ? `أوقف هذا ${DOC_NOUN_AR[doc.type] ?? 'المستند'} على مبلغ: ${numberToArabicWords(totals.netAPayer)}.`
+                    : `Arrêté${DOC_NOUN_FR[doc.type]?.fem ? 'e' : ''} ${DOC_NOUN_FR[doc.type]?.article ?? 'le présent document'} à la somme de : ${numberToFrenchWords(totals.netAPayer)}.`}
                 </p>
 
                 {doc.notes && (
@@ -266,6 +271,20 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
 
 const PAYMENT_LABEL: Record<string, string> = {
   especes: 'Espèces', cheque: 'Chèque', virement: 'Virement', cb: 'Carte bancaire',
+};
+
+const DOC_NOUN_FR: Record<string, { article: string; fem: boolean }> = {
+  DEVIS: { article: 'le présent devis', fem: false },
+  FACTURE: { article: 'la présente facture', fem: true },
+  PROFORMA: { article: 'la présente facture proforma', fem: true },
+  BC: { article: 'le présent bon de commande', fem: false },
+  BR: { article: 'le présent bon de réception', fem: false },
+  BL: { article: 'le présent bon de livraison', fem: false },
+};
+
+const DOC_NOUN_AR: Record<string, string> = {
+  DEVIS: 'التقدير', FACTURE: 'الفاتورة', PROFORMA: 'الفاتورة الأولية',
+  BC: 'أمر الشراء', BR: 'وصل الاستلام', BL: 'وصل التسليم',
 };
 
 function Th({ children, align = 'center' }: { children?: React.ReactNode; align?: 'left' | 'right' | 'center' }) {
