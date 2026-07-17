@@ -1,12 +1,10 @@
 'use client';
 
 // ============================================================
-// Rakmana Mobile — FlashFacture: the single-canvas creator
-// Replaces the 4-step wizard. One living invoice (LivePaper) +
-// a persistent dock (CreateDock) + an action bar. Tapping a zone
-// on the paper morphs the dock — no screen transitions.
-// Edit mode (editingDocId) pre-loads the document into the same
-// canvas. Maps 1:1 onto the document store.
+// Rakmana Mobile — FlashFacture v2: Form-first tabbed editor
+// No live paper on the main screen. Three tabs (Articles,
+// Client, Détails) get the full viewport. Running total in
+// the top bar. Preview is a separate full-screen overlay.
 // ============================================================
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,7 +13,7 @@ import { useMobileI18n } from '@/mobile/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
-  Building2, CheckCircle2, SlidersHorizontal,
+  Building2, CheckCircle2, Plus, Package, UserRound, Settings2,
 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
@@ -24,27 +22,31 @@ import {
   fetchDocumentDetail, createApiDocument, updateApiDocument, updateDocumentStatus,
   type ApiDocumentDetail,
 } from '@/mobile/lib/api';
-import { hapticSuccess, hapticError } from '@/mobile/lib/haptics';
+import { hapticSuccess, hapticError, hapticLight } from '@/mobile/lib/haptics';
 import { useMobileKeyboard } from '@/mobile/lib/useMobileKeyboard';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
 import { generatePDFBase64, printDocument, downloadDocument } from '@/mobile/lib/pdf';
 import { shareDocument, openWhatsApp } from '@/mobile/lib/whatsapp';
 import { notify } from '@/mobile/lib/toast';
 import { generateDocNumber, numberToFrenchWords, numberToArabicWords, formatDateAlgerian } from '@/lib/dgi';
-import { LivePaper } from '@/mobile/components/create/LivePaper';
 import { CreateDock, type DockMode, type CatalogItem } from '@/mobile/components/create/CreateDock';
 import { DocumentPreview } from '@/mobile/components/create/DocumentPreview';
-import { DOCUMENT_TYPE_LABELS } from '@/mobile/types';
+import { DOCUMENT_TYPE_LABELS, UNIT_LABELS } from '@/mobile/types';
 import type { DocumentType, Client, LineItem, PaymentMode } from '@/mobile/types';
+
+type TabId = 'items' | 'client' | 'details';
 
 const PAYMENT_LABEL: Record<string, string> = {
   especes: 'Espèces', cheque: 'Chèque', virement: 'Virement', cb: 'Carte bancaire',
 };
 
+function formatDA(n: number): string {
+  return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 interface CreateScreenProps {
   editingDocId?: string;
   onExit?: () => void;
-  /** Navigate to the Company tab (used by the missing-company guard). */
   onConfigureCompany?: () => void;
 }
 
@@ -66,6 +68,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
 
   const keyboardOpen = useMobileKeyboard();
   const { t } = useMobileI18n();
+  const [activeTab, setActiveTab] = useState<TabId>('items');
   const [dockMode, setDockMode] = useState<DockMode>('add');
   const [editingLineId, setEditingLineId] = useState<string | null>(null);
   const [loadingDoc, setLoadingDoc] = useState(false);
@@ -76,16 +79,12 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const [shareOpen, setShareOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [exitConfirmOpen, setExitConfirmOpen] = useState(false);
-  /** Post-save success sheet: real server number + share CTAs.
-   *  Carries a snapshot (the draft is reset right after save). */
   const [savedSheet, setSavedSheet] = useState<{
     id: string; number: string; offline: boolean;
     clientName: string; clientPhone?: string; total: number; typeLabel: string;
   } | null>(null);
   const savedPdfRef = useRef<string | null>(null);
   const pdfRef = useRef<string | null>(null);
-  /** Smart-morph: after the FIRST item lands with no client, morph the dock
-   *  to client mode once — a natural pause to capture the identity. */
   const clientPromptShown = useRef(false);
 
   // ── Real document number ──
@@ -97,7 +96,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     return generateDocNumber(currentDoc.type, savedDocuments.length + 1);
   }, [editingDocId, savedDocuments, currentDoc.type]);
 
-  // ── Catalog: most-used items from saved documents ──
+  // ── Catalog ──
   const catalog: CatalogItem[] = useMemo(() => {
     const map = new Map<string, { item: CatalogItem; count: number }>();
     for (const doc of savedDocuments) {
@@ -112,8 +111,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     return [...map.values()].sort((a, b) => b.count - a.count).slice(0, 8).map((e) => e.item);
   }, [savedDocuments]);
 
-  // ── Load on mount: edit pre-loads doc; new resets — UNLESS a prefill
-  // (duplicate) or a restored draft is waiting in the store. ──
+  // ── Load on mount ──
   useEffect(() => {
     if (!editingDocId) {
       const store = useDocumentStore.getState();
@@ -121,13 +119,9 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       const hasDraft = store.currentDoc.items.length > 0 || !!store.currentDoc.client?.name;
       if (prefilled) {
         void notify('Document dupliqué — vérifiez et enregistrez');
-        // Prefilled doc already has items — suppress the smart-morph so the
-        // user isn't immediately hijacked into client mode on open.
         clientPromptShown.current = true;
       } else if (hasDraft) {
         void notify('Brouillon restauré ✓');
-        // Same: draft was already in progress; the user knows what they're doing.
-        // Smart-morph should only trigger for brand-new item additions.
         clientPromptShown.current = true;
       } else {
         resetDocument();
@@ -171,11 +165,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     fetchDocumentDetail(editingDocId)
       .then(loadIntoStore)
       .catch(() => {
-        // Offline / not-yet-synced doc → fall back to the local copy.
         const local = useDocumentStore.getState().savedDocuments.find((d) => d.id === editingDocId);
         if (local) {
           useDocumentStore.getState().loadDocumentIntoWizard(local.id);
-          useDocumentStore.getState().consumePrefill(); // not a duplicate — plain edit
+          useDocumentStore.getState().consumePrefill();
         } else {
           setLoadError('Impossible de charger le document.');
         }
@@ -184,40 +177,19 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingDocId, retryToken]);
 
-  // ── Zone taps morph the dock ──
-  const tapType = useCallback(() => { setEditingLineId(null); setDockMode('details'); }, []);
-  const tapDetails = useCallback(() => { setEditingLineId(null); setDockMode('details'); }, []);
-  const tapClient = useCallback(() => { setEditingLineId(null); setDockMode('client'); }, []);
-  const tapLine = useCallback((id: string) => { setEditingLineId(id); setDockMode('line'); }, []);
-
-  const handleBack = useCallback(() => {
-    // Unsaved work → confirm; the draft is kept (autosaved in the store)
-    // and restored on the next open. No more silent data loss.
-    const hasWork = !editingDocId && (currentDoc.items.length > 0 || !!currentDoc.client?.name);
-    if (hasWork) { setExitConfirmOpen(true); return; }
-    if (!editingDocId) resetDocument();
-    onExit?.();
-  }, [editingDocId, onExit, resetDocument, currentDoc]);
-
-  // ── Smart-morph: first item added while no client → ask "pour qui ?" once.
-  // Deferred a beat so the new line's landing animation finishes first.
-  // Reset when all items are cleared so the prompt can fire again on the
-  // next new item (user started over within the same session). ──
+  // ── Smart-morph: first item → ask client ──
   useEffect(() => {
     if (editingDocId) return;
-    if (currentDoc.items.length === 0) {
-      clientPromptShown.current = false;
-      return;
-    }
+    if (currentDoc.items.length === 0) { clientPromptShown.current = false; return; }
     if (clientPromptShown.current) return;
     if (!currentDoc.client?.name) {
       clientPromptShown.current = true;
-      const t = setTimeout(() => setDockMode('client'), 350);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => { setActiveTab('client'); setDockMode('client'); }, 350);
+      return () => clearTimeout(timer);
     }
   }, [currentDoc.items.length, currentDoc.client?.name, editingDocId]);
 
-  // ── DGI awareness: announce the timbre fiscal when it kicks in ──
+  // ── DGI timbre fiscal notification ──
   const prevTimbre = useRef(totals.timbreFiscal);
   useEffect(() => {
     if (totals.timbreFiscal && !prevTimbre.current) {
@@ -226,7 +198,14 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     prevTimbre.current = totals.timbreFiscal;
   }, [totals.timbreFiscal, totals.timbreAmount]);
 
-  // ── PDF (cached until the doc changes) ──
+  const handleBack = useCallback(() => {
+    const hasWork = !editingDocId && (currentDoc.items.length > 0 || !!currentDoc.client?.name);
+    if (hasWork) { setExitConfirmOpen(true); return; }
+    if (!editingDocId) resetDocument();
+    onExit?.();
+  }, [editingDocId, onExit, resetDocument, currentDoc]);
+
+  // ── PDF ──
   const buildPdf = useCallback(async (overrideNumber?: string): Promise<string | null> => {
     if (!overrideNumber && pdfRef.current) return pdfRef.current;
     try {
@@ -283,12 +262,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     }
   }, [docNumber, currentDoc, totals, company]);
 
-  // invalidate cached PDF whenever the document content changes
   useEffect(() => { pdfRef.current = null; }, [currentDoc, totals]);
 
   const guardReady = useCallback((): boolean => {
-    if (!currentDoc.client?.name) { setDockMode('client'); void notify('Choisissez un client'); return false; }
-    if (currentDoc.items.length === 0) { setDockMode('add'); void notify('Ajoutez au moins un article'); return false; }
+    if (!currentDoc.client?.name) { setActiveTab('client'); setDockMode('client'); void notify('Choisissez un client'); return false; }
+    if (currentDoc.items.length === 0) { setActiveTab('items'); setDockMode('add'); void notify('Ajoutez au moins un article'); return false; }
     return true;
   }, [currentDoc]);
 
@@ -299,14 +277,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setSaving(true);
     try {
       if (editingDocId) {
-        // Edit path: PURE build — appending via saveDocument() here used to
-        // create a local duplicate + a queued CREATE for an existing doc.
         const temp = useDocumentStore.getState().buildFromCurrent(company);
         if (!temp) { void notify('Aucun article à enregistrer'); return; }
         try {
           await updateApiDocument(editingDocId, { ...temp, id: editingDocId });
         } catch {
-          // Offline: queue the UPDATE for replay — and say so honestly.
           useSyncStore.getState().enqueue({
             action: 'UPDATE', entity: 'document', entityId: editingDocId,
             payload: { ...temp, id: editingDocId },
@@ -324,25 +299,19 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         void notify('Enregistré ✓');
         setTimeout(() => onExit?.(), 700);
       } else {
-        // New path: local save (+ queued CREATE for offline resilience)…
         const doc = saveDocument(company);
         if (!doc) { void notify('Aucun article à enregistrer'); return; }
         let finalId = doc.id;
         let finalNumber = doc.number;
         let offline = false;
         try {
-          // …then direct POST. On success, adopt the SERVER identity and
-          // drop the queued CREATE so a later replay can't double-submit.
           const res = await createApiDocument(doc);
           useDocumentStore.getState().confirmDocSynced(doc.id, res);
           finalId = res.id;
           finalNumber = res.number;
         } catch {
-          // Offline / server error: the doc IS saved locally and queued.
           offline = true;
         }
-        // Build the PDF with the real number BEFORE the draft is reset,
-        // so the success sheet can share it instantly.
         savedPdfRef.current = await buildPdf(finalNumber);
         hapticSuccess();
         setSavedSheet({
@@ -360,7 +329,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     }
   }, [company, editingDocId, guardReady, saveDocument, updateSavedDocument, resetDocument, currentDoc, totals, onExit, buildPdf]);
 
-  // ── Success-sheet actions (post-save) ──
+  // ── Post-save sheet actions ──
   const whatsappMessage = useCallback((s: NonNullable<typeof savedSheet>) =>
     `Bonjour ${s.clientName}, veuillez trouver ci-joint votre ${s.typeLabel.toLowerCase()} N°${s.number} ` +
     `d'un montant de ${s.total.toLocaleString('fr-DZ')} DA. Merci de votre confiance — ${company?.name || 'Rakmana'}.`,
@@ -393,12 +362,9 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     void notify('PDF téléchargé ✓');
   }, [savedSheet]);
 
-  const handleSheetDone = useCallback(() => {
-    setSavedSheet(null);
-    onExit?.();
-  }, [onExit]);
+  const handleSheetDone = useCallback(() => { setSavedSheet(null); onExit?.(); }, [onExit]);
 
-  // ── Share actions (all web-aware) ──
+  // ── Share actions ──
   const handleWhatsApp = useCallback(async () => {
     setShareOpen(false);
     if (!guardReady()) return;
@@ -447,12 +413,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     const pdf = await buildPdf();
     setBusy(false);
     if (!pdf) return;
-    // Prefer the native/web share sheet so the PDF actually attaches.
     const result = await shareDocument({
       pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
     });
     if (result === 'downloaded') {
-      // Desktop: PDF was downloaded — open the mail composer (mailto can't attach).
       const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
       const subject = `${label} ${docNumber}`;
       const body =
@@ -465,11 +429,28 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   }, [guardReady, buildPdf, currentDoc, docNumber, totals, company]);
 
   const openPreview = useCallback(() => {
-    if (currentDoc.items.length === 0) { setDockMode('add'); void notify('Ajoutez au moins un article'); return; }
+    if (currentDoc.items.length === 0) { setActiveTab('items'); void notify('Ajoutez au moins un article'); return; }
     setPreviewOpen(true);
   }, [currentDoc.items.length]);
 
-  // ── Company guard: don't let the user build a doc that can't be saved ──
+  // ── Tab switch helper ──
+  const switchTab = useCallback((tab: TabId) => {
+    hapticLight();
+    setActiveTab(tab);
+    if (tab === 'client') setDockMode('client');
+    else if (tab === 'details') setDockMode('details');
+    else { setDockMode('add'); setEditingLineId(null); }
+  }, []);
+
+  // When dock morphs to line editing, stay on items tab
+  const handleDockModeChange = useCallback((m: DockMode) => {
+    setDockMode(m);
+    if (m === 'client') setActiveTab('client');
+    else if (m === 'details') setActiveTab('details');
+    else { setActiveTab('items'); if (m !== 'line') setEditingLineId(null); }
+  }, []);
+
+  // ── Company guard ──
   if (!company && !savedSheet) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--navy)] px-8">
@@ -494,7 +475,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     );
   }
 
-  // ── Loading / error states ──
+  // ── Loading / error ──
   if (loadingDoc) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--navy)]">
@@ -513,7 +494,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           <div className="flex items-center justify-center gap-2">
             <button type="button" onClick={() => onExit?.()}
               className="px-5 py-2.5 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">Retour</button>
-            <button type="button" onClick={() => setRetryToken((t) => t + 1)}
+            <button type="button" onClick={() => setRetryToken((prev) => prev + 1)}
               className="px-5 py-2.5 rounded-xl bg-[var(--green-2)] text-sm font-semibold text-white">Réessayer</button>
           </div>
         </div>
@@ -521,97 +502,218 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     );
   }
 
+  // ── Readiness indicators ──
+  const hasClient = !!currentDoc.client?.name;
+  const itemCount = currentDoc.items.length;
+
   return (
     <div
       className="relative min-h-screen flex flex-col bg-[var(--navy)] overflow-hidden"
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      {/* Top bar */}
-      <div className="flex items-center gap-3 px-4 pt-2 pb-1">
-        <button type="button" onClick={handleBack}
-          className="w-11 h-11 -ml-1 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
-          aria-label={t('editor.close')}>
-          <ArrowLeft size={20} className="rtl:rotate-180" />
-        </button>
-        <div className="flex-1">
-          <p className="text-xs text-[var(--sand-muted)]">{editingDocId ? t('editor.edit') : t('editor.new')}</p>
-          <p className="text-sm font-semibold text-[var(--sand)]">{DOCUMENT_TYPE_LABELS[currentDoc.type]}</p>
+      {/* ═══ TOP BAR ═══ */}
+      <div className="shrink-0 px-4 pt-2 pb-2">
+        {/* Row 1: back + type + total */}
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={handleBack}
+            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
+            aria-label={t('editor.close')}>
+            <ArrowLeft size={20} className="rtl:rotate-180" />
+          </button>
+
+          {/* Type pill + number */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--green-2)] text-white">
+                {DOCUMENT_TYPE_LABELS[currentDoc.type]}
+              </span>
+              <span className="text-[11px] text-[var(--sand-muted)] truncate">
+                {editingDocId ? docNumber : formatDateAlgerian(new Date())}
+              </span>
+            </div>
+          </div>
+
+          {/* Running total hero */}
+          <div className="text-right shrink-0">
+            <p className="text-[10px] text-[var(--sand-muted)] leading-none mb-0.5">Net à payer</p>
+            <p className="text-lg font-bold text-[var(--green-2)] leading-none tabular-nums">
+              {formatDA(totals.netAPayer)}
+            </p>
+          </div>
+        </div>
+
+        {/* Row 2: Summary chips */}
+        <div className="flex items-center gap-2 mt-2">
+          <span className={cn(
+            'inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold',
+            itemCount > 0
+              ? 'bg-[var(--green-2)]/15 text-[var(--green-2)]'
+              : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
+          )}>
+            <Package size={11} /> {itemCount} article{itemCount !== 1 ? 's' : ''}
+          </span>
+          <span className={cn(
+            'inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold',
+            hasClient
+              ? 'bg-[var(--green-2)]/15 text-[var(--green-2)]'
+              : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
+          )}>
+            <UserRound size={11} /> {hasClient ? currentDoc.client?.name : 'Aucun client'}
+          </span>
+          {totals.timbreFiscal && (
+            <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-semibold bg-amber-500/10 text-[var(--gold)]">
+              Timbre {formatDA(totals.timbreAmount)}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Living invoice */}
-      <LivePaper
-        type={currentDoc.type}
-        docNumber={editingDocId ? docNumber : 'Brouillon — N° à l’enregistrement'}
-        dateLabel={formatDateAlgerian(new Date())}
-        editing={!!editingDocId}
-        client={currentDoc.client}
-        items={currentDoc.items}
-        totals={totals}
-        activeZone={dockMode === 'add' ? null : dockMode}
-        activeLineId={editingLineId}
-        onTapType={tapType}
-        onTapClient={tapClient}
-        onTapDetails={tapDetails}
-        onTapLine={tapLine}
-      />
-
-      {/* Dock */}
-      <CreateDock
-        mode={dockMode}
-        editingLineId={editingLineId}
-        catalog={catalog}
-        onModeChange={(m) => { setDockMode(m); if (m !== 'line') setEditingLineId(null); }}
-      />
-
-      {/* Bottom action bar — hidden while the keyboard is open to free space for the dock */}
-      {!keyboardOpen && (
-      <nav
-        className="bg-[var(--navy-2)] border-t border-[var(--border)]"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <div className="flex items-center h-16 px-3 gap-1.5">
-          {/* Aperçu */}
-          <button type="button" onClick={openPreview}
-            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)]">
-            <Eye size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">{t('editor.preview')}</span>
-          </button>
-
-          {/* Éditer */}
-          <button type="button"
-            onClick={() => { setDockMode('details'); setEditingLineId(null); }}
+      {/* ═══ TAB BAR ═══ */}
+      <div className="shrink-0 flex items-center gap-1 px-4 py-1.5">
+        {([
+          { id: 'items' as TabId, label: t('editor.preview') === 'Preview' ? 'Items' : 'Articles', icon: Plus, badge: itemCount || undefined },
+          { id: 'client' as TabId, label: t('editor.client'), icon: UserRound, badge: hasClient ? '✓' : undefined },
+          { id: 'details' as TabId, label: t('editor.editBtn') === 'Edit' ? 'Details' : 'Détails', icon: Settings2, badge: undefined as string | number | undefined },
+        ] as const).map(({ id, label, icon: Icon, badge }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => switchTab(id)}
             className={cn(
-              'flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform',
-              dockMode === 'details' ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]',
-            )}>
-            <SlidersHorizontal size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">{t('editor.editBtn')}</span>
+              'flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl text-xs font-semibold transition-all active:scale-[0.97]',
+              activeTab === id
+                ? 'bg-[var(--green-2)] text-white shadow-lg shadow-emerald-900/30'
+                : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
+            )}
+          >
+            <Icon size={15} strokeWidth={2} />
+            {label}
+            {badge && (
+              <span className={cn(
+                'min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center',
+                activeTab === id ? 'bg-white/25 text-white' : 'bg-[var(--navy-4)] text-[var(--sand-muted)]',
+              )}>
+                {badge}
+              </span>
+            )}
           </button>
+        ))}
+      </div>
 
-          {/* Enregistrer — action principale */}
-          <button type="button" onClick={handleSave} disabled={saving}
-            className="flex-1 h-11 mx-1 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-white active:scale-[0.97] transition-all disabled:opacity-40"
-            style={{ background: 'var(--green-2)' }}>
-            {saving
-              ? <Loader2 size={18} className="animate-spin" />
-              : <Save size={18} strokeWidth={2.5} />}
-            {t('editor.save')}
-          </button>
+      {/* ═══ MAIN CONTENT ═══ */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Items tab: item list + dock */}
+        {activeTab === 'items' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Item list */}
+            {itemCount > 0 && (
+              <div className="shrink-0 max-h-[35vh] overflow-y-auto px-4 py-2 flex flex-col gap-1.5">
+                <AnimatePresence initial={false}>
+                  {currentDoc.items.map((item, i) => (
+                    <motion.button
+                      key={item.id}
+                      type="button"
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                      onClick={() => { setEditingLineId(item.id); setDockMode('line'); }}
+                      className={cn(
+                        'flex items-center gap-2.5 text-left rounded-xl px-3 py-2.5',
+                        'bg-[var(--navy-2)] border border-[var(--border)] active:scale-[0.99] transition-transform',
+                        editingLineId === item.id && dockMode === 'line' && 'border-[var(--green-2)] bg-[var(--green-2)]/5',
+                      )}
+                    >
+                      <span className="w-6 h-6 rounded-lg bg-[var(--green-2)]/15 text-[var(--green-2)] flex items-center justify-center text-[11px] font-bold shrink-0">
+                        {i + 1}
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-[13px] font-medium text-[var(--sand)] truncate">{item.label}</span>
+                        <span className="block text-[10px] text-[var(--sand-muted)]">
+                          {item.quantity} {UNIT_LABELS[item.unit]} × {item.unitPrice.toLocaleString('fr-DZ')} · TVA {item.tvaRate}%
+                        </span>
+                      </span>
+                      <span className="text-[13px] font-semibold text-[var(--sand)] whitespace-nowrap tabular-nums">
+                        {formatDA(item.totalHT)}
+                      </span>
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
 
-          {/* Envoyer — always opens share sheet */}
-          <button type="button"
-            onClick={() => setShareOpen(true)}
-            disabled={busy || saving}
-            className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
-            <Share2 size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">{t('editor.send')}</span>
-          </button>
-        </div>
-      </nav>
+            {/* Dock (add/edit form) */}
+            <div className="flex-1 overflow-y-auto">
+              <CreateDock
+                mode={dockMode}
+                editingLineId={editingLineId}
+                catalog={catalog}
+                onModeChange={handleDockModeChange}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Client tab */}
+        {activeTab === 'client' && (
+          <div className="flex-1 overflow-y-auto">
+            <CreateDock
+              mode="client"
+              editingLineId={null}
+              catalog={catalog}
+              onModeChange={handleDockModeChange}
+            />
+          </div>
+        )}
+
+        {/* Details tab */}
+        {activeTab === 'details' && (
+          <div className="flex-1 overflow-y-auto">
+            <CreateDock
+              mode="details"
+              editingLineId={null}
+              catalog={catalog}
+              onModeChange={handleDockModeChange}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ═══ BOTTOM ACTION BAR ═══ */}
+      {!keyboardOpen && (
+        <nav
+          className="shrink-0 bg-[var(--navy-2)] border-t border-[var(--border)]"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+          <div className="flex items-center h-14 px-3 gap-2">
+            <button type="button" onClick={openPreview}
+              className="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform">
+              <Eye size={20} strokeWidth={2} />
+            </button>
+
+            <button type="button" onClick={handleSave} disabled={saving}
+              className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-white active:scale-[0.97] transition-all disabled:opacity-40"
+              style={{ background: 'var(--green-2)' }}>
+              {saving
+                ? <Loader2 size={18} className="animate-spin" />
+                : <Save size={18} strokeWidth={2.5} />}
+              {t('editor.save')}
+            </button>
+
+            <button type="button"
+              onClick={() => setShareOpen(true)}
+              disabled={busy || saving}
+              className="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform disabled:opacity-40">
+              <Share2 size={20} strokeWidth={2} />
+            </button>
+          </div>
+        </nav>
       )}
 
-      {/* Full document preview (see before download) */}
+      {/* ═══ OVERLAYS ═══ */}
+
+      {/* Document preview */}
       <DocumentPreview
         open={previewOpen}
         docNumber={docNumber}
@@ -621,7 +723,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         onShare={handleWhatsApp}
       />
 
-      {/* Share menu */}
+      {/* Share sheet */}
       <AnimatePresence>
         {shareOpen && (
           <>
@@ -634,12 +736,12 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}>
               <div className="flex justify-center pt-1 pb-3"><div className="w-10 h-1 rounded-full bg-[var(--navy-4)]" /></div>
-              <p className="px-4 pb-2 text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">Envoyer le document</p>
+              <p className="px-4 pb-2 text-xs font-semibold text-[var(--sand-muted)] uppercase tracking-wide">{t('editor.send')}</p>
               {[
                 { icon: MessageCircle, label: 'WhatsApp', tint: '#25D366', on: handleWhatsApp },
                 { icon: Mail, label: 'Email', tint: 'var(--green-2)', on: handleEmail },
-                { icon: Download, label: 'Télécharger le PDF', tint: 'var(--green-2)', on: handleDownload },
-                { icon: Printer, label: 'Imprimer', tint: 'var(--gold)', on: handlePrint },
+                { icon: Download, label: 'PDF', tint: 'var(--green-2)', on: handleDownload },
+                { icon: Printer, label: t('editor.notes') === 'Notes & remarks' ? 'Print' : 'Imprimer', tint: 'var(--gold)', on: handlePrint },
               ].map(({ icon: Icon, label, tint, on }) => (
                 <button key={label} type="button" onClick={on}
                   className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl active:bg-[var(--navy-3)] transition-colors">
@@ -654,7 +756,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         )}
       </AnimatePresence>
 
-      {/* Exit guard — the draft is autosaved; leaving keeps it */}
+      {/* Exit guard */}
       <ConfirmSheet
         open={exitConfirmOpen}
         title="Quitter la création ?"
@@ -666,7 +768,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         onClose={() => setExitConfirmOpen(false)}
       />
 
-      {/* Post-save success sheet — the real server number + instant send */}
+      {/* Post-save success sheet */}
       <AnimatePresence>
         {savedSheet && (
           <>
