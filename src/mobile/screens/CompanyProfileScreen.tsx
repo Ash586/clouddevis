@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Building, ChevronRight, ChevronDown, Pencil, Image as ImageIcon, Users, X } from 'lucide-react';
+import { Building, ChevronRight, ChevronDown, Image as ImageIcon, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
@@ -80,11 +80,10 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   const userMode = useUserStore((s) => s.mode);
   const fieldSections = getFieldSections(userMode);
 
-  const [isEditing, setIsEditing] = useState(!isSetup);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [logoData, setLogoData] = useState<string | undefined>(company?.logo);
   const [logoError, setLogoError] = useState('');
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ identity: true });
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ identity: true, fiscal: true, bank: true });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form state ──
@@ -115,7 +114,6 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
     if (result && !result.valid) {
       setErrors(result.errors);
-      // Expand any section that contains an invalid field so the error is visible.
       setOpenSections((prev) => {
         const next = { ...prev };
         for (const section of fieldSections) {
@@ -128,7 +126,6 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
     }
 
     setErrors({});
-    setIsEditing(false);
     void notify('Société enregistrée ✓');
   }, [form, company, logoData, setCompany, fieldSections]);
 
@@ -182,14 +179,6 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
       <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-xl font-bold text-[var(--sand)]">{userMode === 'artisan' ? 'Mon activité' : 'Société'}</h1>
-          {isSetup && (
-            <button type="button"               onClick={() => setIsEditing(!isEditing)}
-              className="w-11 h-11 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
-              aria-label={isEditing ? 'Annuler la modification' : 'Modifier la société'}
-            >
-              {isEditing ? <X size={18} /> : <Pencil size={18} />}
-            </button>
-          )}
         </div>
         {isSetup && (
           <div className="flex items-center gap-2">
@@ -202,30 +191,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
 
       {/* ── Content ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-5 pb-24">
-        {!isSetup && !isEditing ? (
-          /* ── Empty state ── */
-          <motion.div
-            className="flex flex-col items-center justify-center py-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
-              <Building size={28} className="text-[var(--sand-muted)]" />
-            </div>
-            <p className="text-sm font-semibold text-[var(--sand-muted)]">
-              Aucune société configurée
-            </p>
-            <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px] mb-4">
-              Ajoutez les informations de votre entreprise pour générer des documents conformes
-            </p>
-            <button type="button"               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-[0.97] transition-transform"
-            >
-              Configurer ma société
-            </button>
-          </motion.div>
-        ) : (
-          /* ── Company form / display ── */
+        {(
           <motion.div
             className="space-y-4"
             initial={{ opacity: 0 }}
@@ -240,8 +206,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                   <Building size={28} className="text-[var(--sand-muted)]" />
                 )}
               </div>
-              {isEditing && (
-                <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -259,7 +224,6 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                   </button>
                   {logoError && <p className="text-[11px] text-red-400">{logoError}</p>}
                 </div>
-              )}
             </div>
 
             {/* Form fields — grouped into collapsible sections */}
@@ -290,26 +254,20 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                       {section.fields.map(({ label, field, placeholder }) => (
                         <div key={field}>
                           <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">{label}</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              value={form[field as keyof typeof form]}
-                              onChange={(e) => handleFieldChange(field, e.target.value)}
-                              placeholder={placeholder}
-                              className={cn(
-                                'w-full px-4 py-3 rounded-xl text-sm',
-                                'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-                                'border transition-colors',
-                                errors[field]
-                                  ? 'border-red-400/50 focus:border-red-400'
-                                  : 'border-[var(--border)] focus:border-[var(--green-2)]',
-                              )}
-                            />
-                          ) : (
-                            <div className="px-4 py-3 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">
-                              {company?.[field as keyof typeof company] || '—'}
-                            </div>
-                          )}
+                          <input
+                            type="text"
+                            value={form[field as keyof typeof form]}
+                            onChange={(e) => handleFieldChange(field, e.target.value)}
+                            placeholder={placeholder}
+                            className={cn(
+                              'w-full px-4 py-3 rounded-xl text-sm',
+                              'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
+                              'border transition-colors',
+                              errors[field]
+                                ? 'border-red-400/50 focus:border-red-400'
+                                : 'border-[var(--border)] focus:border-[var(--green-2)]',
+                            )}
+                          />
                           {errors[field] && <p className="text-[11px] text-red-400 mt-1">{errors[field]}</p>}
                         </div>
                       ))}
@@ -320,16 +278,14 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             })}
 
             {/* Save button */}
-            {isEditing && (
-              <button type="button"                 onClick={handleSave}
-                className={cn(
-                  'w-full py-3.5 rounded-xl text-sm font-semibold',
-                  'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
-                )}
-              >
-                Enregistrer
-              </button>
-            )}
+            <button type="button" onClick={handleSave}
+              className={cn(
+                'w-full py-3.5 rounded-xl text-sm font-semibold',
+                'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
+              )}
+            >
+              Enregistrer
+            </button>
 
             {/* Clients navigation */}
             {isSetup && onGoToClients && (

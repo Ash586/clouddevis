@@ -268,8 +268,14 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   );
 
   // ── Wizard handlers ───────────────────────────────────────
-  const handleNewDevis = useCallback(() => setShowWizard(true), []);
-  const handleNewFacture = useCallback(() => setShowWizard(true), []);
+  const handleNewDevis = useCallback(() => {
+    useDocumentStore.getState().setType('DEVIS');
+    setShowWizard(true);
+  }, []);
+  const handleNewFacture = useCallback(() => {
+    useDocumentStore.getState().setType('FACTURE');
+    setShowWizard(true);
+  }, []);
   const handleDuplicate = useCallback(() => setShowWizard(true), []);
   const handleWizardClose = useCallback(() => {
     setShowWizard(false);

@@ -79,6 +79,8 @@ export interface DocumentStore {
   // ── Saved documents (local cache) ──
   savedDocuments: Document[];
   syncStatus: 'synced' | 'pending' | 'offline';
+  /** Monotonic counter for document sequence numbers — never decreases on delete */
+  docSequenceCounter: number;
 
   // ── Document-level setters ──
   setType: (type: DocumentType) => void;
@@ -210,6 +212,7 @@ export const useDocumentStore = create<DocumentStore>()(
       totals: { ...emptyTotals },
       savedDocuments: [],
       syncStatus: 'offline',
+      docSequenceCounter: 0,
 
       // ── Document-level setters ──
 
@@ -330,12 +333,13 @@ export const useDocumentStore = create<DocumentStore>()(
         const state = get();
         if (state.currentDoc.items.length === 0) return null;
 
-        const sequenceNumber = state.savedDocuments.length + 1;
+        const sequenceNumber = state.docSequenceCounter + 1;
         const doc = buildDocument(state.currentDoc, company, state.totals, sequenceNumber);
 
         set((prevState) => ({
           savedDocuments: [...prevState.savedDocuments, doc],
           syncStatus: 'pending',
+          docSequenceCounter: sequenceNumber,
         }));
 
         // Enqueue for API sync (processQueue will push when online)
@@ -349,18 +353,29 @@ export const useDocumentStore = create<DocumentStore>()(
         return doc;
       },
 
-      deleteDocument: (id) =>
-        set((state) => ({
-          savedDocuments: state.savedDocuments.filter((doc) => doc.id !== id),
-          syncStatus: state.savedDocuments.length > 1 ? 'pending' : 'synced',
-        })),
+      deleteDocument: (id) => {
+        // Enqueue DELETE to sync with server
+        useSyncStore.getState().enqueue({
+          action: 'DELETE',
+          entity: 'document',
+          entityId: id,
+          payload: { id },
+        });
+        set((state) => {
+          const remaining = state.savedDocuments.filter((doc) => doc.id !== id);
+          return {
+            savedDocuments: remaining,
+            syncStatus: 'pending',
+          };
+        });
+      },
 
       duplicateDocument: (id) => {
         const state = get();
         const sourceDoc = state.savedDocuments.find((d) => d.id === id);
         if (!sourceDoc) return null;
 
-        const sequenceNumber = state.savedDocuments.length + 1;
+        const sequenceNumber = state.docSequenceCounter + 1;
         const today = new Date().toISOString().split('T')[0];
 
         const duplicatedDoc: Document = {
@@ -379,6 +394,7 @@ export const useDocumentStore = create<DocumentStore>()(
         set((prevState) => ({
           savedDocuments: [...prevState.savedDocuments, duplicatedDoc],
           syncStatus: 'pending',
+          docSequenceCounter: sequenceNumber,
         }));
 
         return duplicatedDoc;
@@ -451,9 +467,9 @@ export const useDocumentStore = create<DocumentStore>()(
       markDocumentSynced: (id) =>
         set((state) => ({
           savedDocuments: state.savedDocuments.map((doc) =>
-            doc.id === id ? doc : doc
+            doc.id === id ? { ...doc, status: doc.status } : doc
           ),
-          syncStatus: state.savedDocuments.length > 0 ? 'synced' : 'offline',
+          syncStatus: useSyncStore.getState().queue.length > 0 ? 'pending' : 'synced',
         })),
 
       confirmDocSynced: (localId, server) => {
@@ -518,6 +534,7 @@ export const useDocumentStore = create<DocumentStore>()(
         savedDocuments: state.savedDocuments,
         syncStatus: state.syncStatus,
         currentDoc: state.currentDoc,
+        docSequenceCounter: state.docSequenceCounter,
       }),
       // totals is derived — recompute it from the rehydrated draft.
       merge: (persisted, current) => {

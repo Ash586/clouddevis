@@ -516,7 +516,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         {/* Row 1: back + type + total */}
         <div className="flex items-center gap-3">
           <button type="button" onClick={handleBack}
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
+            className="w-11 h-11 -ml-1 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
             aria-label={t('editor.close')}>
             <ArrowLeft size={20} className="rtl:rotate-180" />
           </button>
@@ -558,7 +558,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
               ? 'bg-[var(--green-2)]/15 text-[var(--green-2)]'
               : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
           )}>
-            <UserRound size={11} /> {hasClient ? currentDoc.client?.name : 'Aucun client'}
+            <UserRound size={11} /> <span className="truncate max-w-[120px]">{hasClient ? currentDoc.client?.name : 'Aucun client'}</span>
           </span>
           {totals.timbreFiscal && (
             <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-semibold bg-amber-500/10 text-[var(--gold)]">

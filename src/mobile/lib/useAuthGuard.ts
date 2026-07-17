@@ -78,6 +78,8 @@ export function useAuthGuard(): AuthGuard {
     // Wipe all local stores
     useClientStore.getState().clearAll();
     useDocumentStore.getState().resetDocument();
+    // Also wipe saved documents to prevent data leakage between accounts
+    useDocumentStore.setState({ savedDocuments: [], syncStatus: 'synced' });
     useSyncStore.getState().clearQueue();
     useUserStore.getState().reset();
     setUserName('');

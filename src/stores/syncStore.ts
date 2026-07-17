@@ -94,40 +94,50 @@ export const useSyncStore = create<SyncStore>()(
       },
 
       processQueue: async (processor) => {
-        const state = get();
-        if (state.queue.length === 0 || state.status === 'syncing') return;
+        if (get().queue.length === 0 || get().status === 'syncing') return;
 
         set({ status: 'syncing' });
 
-        const remaining: SyncQueueItem[] = [];
+        // Snapshot only the items present NOW — new items enqueued while we
+        // run will stay in the queue and be processed on the next call.
+        const snapshot = get().queue.slice();
+        const processedIds = new Set<string>();
+        const failed: SyncQueueItem[] = [];
         let failedCount = 0;
 
-        for (const item of state.queue) {
+        for (const item of snapshot) {
+          // Skip items that have already been retried too many times (dead-letter)
+          if (item.retryCount >= 5) {
+            failed.push(item);
+            failedCount++;
+            continue;
+          }
           try {
             const success = await processor(item);
-            if (!success) {
+            if (success) {
+              processedIds.add(item.id);
+            } else {
               failedCount++;
-              remaining.push({
-                ...item,
-                retryCount: item.retryCount + 1,
-                lastError: 'Processor returned false',
-              });
+              failed.push({ ...item, retryCount: item.retryCount + 1, lastError: 'Processor returned false' });
+              processedIds.add(item.id);
             }
           } catch (err) {
             failedCount++;
-            remaining.push({
-              ...item,
-              retryCount: item.retryCount + 1,
-              lastError: err instanceof Error ? err.message : 'Unknown error',
-            });
+            failed.push({ ...item, retryCount: item.retryCount + 1, lastError: err instanceof Error ? err.message : 'Unknown error' });
+            processedIds.add(item.id);
           }
         }
 
-        set({
-          queue: remaining,
-          status: remaining.length > 0 ? 'error' : 'synced',
-          lastSyncAt: failedCount === 0 ? Date.now() : get().lastSyncAt,
-          failedCount,
+        // Merge: keep items added during processing + replace processed items with failed versions
+        set((state) => {
+          const newItems = state.queue.filter((i) => !processedIds.has(i.id));
+          const queue = [...newItems, ...failed];
+          return {
+            queue,
+            status: queue.length > 0 ? (failedCount > 0 ? 'error' : 'pending') : 'synced',
+            lastSyncAt: failedCount === 0 ? Date.now() : state.lastSyncAt,
+            failedCount,
+          };
         });
       },
 

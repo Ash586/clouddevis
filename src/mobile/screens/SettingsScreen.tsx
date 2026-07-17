@@ -41,6 +41,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
   const [biometryInfo, setBiometryInfo] = useState<BiometryInfo>({ available: false, type: '' });
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -113,7 +114,12 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
     try {
-      const res = await fetch('/api/user/delete', { method: 'DELETE', credentials: 'include' });
+      const res = await fetch('/api/user/delete', {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: deletePassword }),
+      });
       if (!res.ok) throw new Error();
       // Clear all local data then trigger logout
       await clearAllOfflineData();
@@ -375,12 +381,20 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
               <p className="text-sm font-semibold text-red-400 mb-2">
                 {t('settings.deleteAccountConfirmTitle')}
               </p>
-              <p className="text-xs text-[var(--sand-muted)] mb-4">
+              <p className="text-xs text-[var(--sand-muted)] mb-3">
                 {t('settings.deleteAccountConfirmBody')}
               </p>
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder={t('settings.enterPasswordToConfirm')}
+                className="w-full px-3 py-2.5 mb-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-red-400 focus:outline-none"
+              />
               <div className="flex gap-2">
                 <button type="button"
-                  onClick={() => setShowDeleteAccountConfirm(false)}
+                  onClick={() => { setShowDeleteAccountConfirm(false); setDeletePassword(''); }}
                   disabled={deletingAccount}
                   className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] disabled:opacity-50"
                 >
@@ -388,7 +402,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
                 </button>
                 <button type="button"
                   onClick={handleDeleteAccount}
-                  disabled={deletingAccount}
+                  disabled={deletingAccount || !deletePassword.trim()}
                   className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-red-500 text-white disabled:opacity-50"
                 >
                   {deletingAccount ? t('settings.deleteAccounting') : t('settings.deleteAccount')}

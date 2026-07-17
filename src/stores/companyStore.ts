@@ -126,6 +126,14 @@ export const useCompanyStore = create<CompanyStore>()(
           lastUpdatedAt: new Date().toISOString(),
         });
 
+        // Enqueue company profile sync
+        useSyncStore.getState().enqueue({
+          action: 'UPDATE',
+          entity: 'company',
+          entityId: updated.id,
+          payload: updated,
+        });
+
         return null; // null = success
       },
 
@@ -133,9 +141,14 @@ export const useCompanyStore = create<CompanyStore>()(
         const current = get().company;
         if (!current) return;
 
-        set({
-          company: { ...current, logo },
-          lastUpdatedAt: new Date().toISOString(),
+        const updated = { ...current, logo };
+        set({ company: updated, lastUpdatedAt: new Date().toISOString() });
+
+        useSyncStore.getState().enqueue({
+          action: 'UPDATE',
+          entity: 'company',
+          entityId: current.id,
+          payload: updated,
         });
       },
 
@@ -143,9 +156,14 @@ export const useCompanyStore = create<CompanyStore>()(
         const current = get().company;
         if (!current) return;
 
-        set({
-          company: { ...current, signature },
-          lastUpdatedAt: new Date().toISOString(),
+        const updated = { ...current, signature };
+        set({ company: updated, lastUpdatedAt: new Date().toISOString() });
+
+        useSyncStore.getState().enqueue({
+          action: 'UPDATE',
+          entity: 'company',
+          entityId: current.id,
+          payload: updated,
         });
       },
 

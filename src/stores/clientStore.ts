@@ -90,17 +90,34 @@ export const useClientStore = create<ClientStore>()(
         return newClient;
       },
 
-      updateClient: (id, updates) =>
+      updateClient: (id, updates) => {
         set((state) => ({
           clients: state.clients.map((client) =>
             client.id === id ? { ...client, ...updates } : client
           ),
-        })),
+        }));
+        const updated = get().clients.find((c) => c.id === id);
+        if (updated) {
+          useSyncStore.getState().enqueue({
+            action: 'UPDATE',
+            entity: 'client',
+            entityId: id,
+            payload: updated,
+          });
+        }
+      },
 
-      deleteClient: (id) =>
+      deleteClient: (id) => {
+        useSyncStore.getState().enqueue({
+          action: 'DELETE',
+          entity: 'client',
+          entityId: id,
+          payload: { id },
+        });
         set((state) => ({
           clients: state.clients.filter((client) => client.id !== id),
-        })),
+        }));
+      },
 
       searchClients: (query) => {
         if (!query || query.trim().length === 0) return get().clients;

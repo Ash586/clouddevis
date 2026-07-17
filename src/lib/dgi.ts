@@ -447,8 +447,8 @@ export function numberToFrenchWords(n: number): string {
       const t = Math.floor(num / 10);
       const u = num % 10;
       if (t === 7) {
-        // 70-79: soixante-dix à soixante-dix-neuf
-        r += 'soixante-' + units[10 + u] + ' ';
+        // 70-79: soixante-dix à soixante-dix-neuf (71 = soixante et onze)
+        r += (u === 1 ? 'soixante et onze ' : 'soixante-' + units[10 + u] + ' ');
       } else if (t === 8) {
         // 80-89: quatre-vingts / quatre-vingt-un …
         r += 'quatre-vingt' + (u === 0 ? 's' : '-' + units[u]) + ' ';
@@ -456,7 +456,8 @@ export function numberToFrenchWords(n: number): string {
         // 90-99: quatre-vingt-dix à quatre-vingt-dix-neuf
         r += 'quatre-vingt-' + units[10 + u] + ' ';
       } else {
-        r += tens[t] + (u > 0 ? '-' + units[u] : '') + ' ';
+        // 21, 31, 41, 51, 61 use "et" before "un"
+        r += tens[t] + (u === 1 ? ' et un ' : u > 0 ? '-' + units[u] : '') + ' ';
       }
     } else if (num > 0) { r += units[num] + ' '; }
     return r;
@@ -484,8 +485,22 @@ export function numberToArabicWords(n: number): string {
   function toWords(num: number): string {
     if (num === 0) return '';
     let r = '';
-    if (num >= 1000000) { r += toWords(Math.floor(num / 1000000)) + ' مليون '; num %= 1000000; }
-    if (num >= 1000) { const k = Math.floor(num / 1000); r += (k === 1 ? 'ألف ' : toWords(k) + ' ألف '); num %= 1000; }
+    if (num >= 1000000) {
+      const m = Math.floor(num / 1000000);
+      if (m === 1) r += 'مليون ';
+      else if (m === 2) r += 'مليونان ';
+      else if (m <= 10) r += u[m] + ' ملايين ';
+      else r += toWords(m) + ' مليون ';
+      num %= 1000000;
+    }
+    if (num >= 1000) {
+      const k = Math.floor(num / 1000);
+      if (k === 1) r += 'ألف ';
+      else if (k === 2) r += 'ألفان ';
+      else if (k <= 10) r += u[k] + ' آلاف ';
+      else r += toWords(k) + ' ألف ';
+      num %= 1000;
+    }
     if (num >= 100) { const h = Math.floor(num / 100); r += (h === 1 ? 'مائة ' : h === 2 ? 'مئتان ' : u[h] + ' مائة '); num %= 100; }
     if (num >= 20) { const d = Math.floor(num / 10); const o = num % 10; r += (o ? u[o] + ' و ' : '') + t[d] + ' '; }
     else if (num > 0) r += u[num] + ' ';

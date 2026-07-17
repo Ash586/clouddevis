@@ -26,7 +26,7 @@ type TranslationKeys =
   | 'settings.support' | 'settings.supportHint'
   | 'settings.deleteAccount' | 'settings.deleteAccountConfirmTitle'
   | 'settings.deleteAccountConfirmBody' | 'settings.deleteAccountError'
-  | 'settings.deleteAccounting'
+  | 'settings.deleteAccounting' | 'settings.enterPasswordToConfirm'
   | 'settings.biometric' | 'settings.biometricHint' | 'settings.biometricUnavailable'
   | 'fab.facture' | 'fab.devis' | 'fab.duplicate'
   | 'common.artisan' | 'common.entreprise'
@@ -103,6 +103,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountConfirmBody': 'Cette action est irréversible. Toutes vos données (documents, clients, société) seront supprimées du serveur.',
     'settings.deleteAccountError': 'Erreur lors de la suppression',
     'settings.deleteAccounting': 'Suppression…',
+    'settings.enterPasswordToConfirm': 'Saisissez votre mot de passe pour confirmer',
     'settings.biometric': 'Verrouillage biométrique',
     'settings.biometricHint': 'Empreinte ou Face ID après 5 min en arrière-plan',
     'settings.biometricUnavailable': 'Non disponible sur cet appareil',
@@ -214,6 +215,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountConfirmBody': 'هذا الإجراء لا يمكن التراجع عنه. ستُحذف جميع بياناتك (وثائق، عملاء، شركة) من الخادم.',
     'settings.deleteAccountError': 'خطأ أثناء الحذف',
     'settings.deleteAccounting': 'جاري الحذف…',
+    'settings.enterPasswordToConfirm': 'أدخل كلمة المرور للتأكيد',
     'settings.biometric': 'القفل البيومتري',
     'settings.biometricHint': 'بصمة أو وجه بعد 5 دقائق في الخلفية',
     'settings.biometricUnavailable': 'غير متاح على هذا الجهاز',
@@ -325,6 +327,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountConfirmBody': 'This action is irreversible. All your data (documents, clients, company) will be deleted from the server.',
     'settings.deleteAccountError': 'Error during deletion',
     'settings.deleteAccounting': 'Deleting…',
+    'settings.enterPasswordToConfirm': 'Enter your password to confirm',
     'settings.biometric': 'Biometric lock',
     'settings.biometricHint': 'Fingerprint or Face ID after 5 min in background',
     'settings.biometricUnavailable': 'Not available on this device',

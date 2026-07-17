@@ -32,6 +32,9 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
   const [form, setForm] = useState({
     name: client?.name || '',
     nif: client?.nif || '',
+    rc: client?.rc || '',
+    nis: client?.nis || '',
+    ai: client?.ai || '',
     phone: client?.phone || '',
     email: client?.email || '',
     address: client?.address || '',
@@ -42,6 +45,9 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
     onSave({
       ...form,
       nif: form.nif || undefined,
+      rc: form.rc || undefined,
+      nis: form.nis || undefined,
+      ai: form.ai || undefined,
       email: form.email || undefined,
       address: form.address || undefined,
     });
@@ -71,6 +77,36 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
           value={form.nif}
           onChange={(e) => setForm((p) => ({ ...p, nif: e.target.value }))}
           placeholder="123456789012345"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">RC</label>
+        <input
+          type="text"
+          value={form.rc}
+          onChange={(e) => setForm((p) => ({ ...p, rc: e.target.value }))}
+          placeholder="16B1234567"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">NIS</label>
+        <input
+          type="text"
+          value={form.nis}
+          onChange={(e) => setForm((p) => ({ ...p, nis: e.target.value }))}
+          placeholder="1234567890"
+          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">AI</label>
+        <input
+          type="text"
+          value={form.ai}
+          onChange={(e) => setForm((p) => ({ ...p, ai: e.target.value }))}
+          placeholder="1234567890"
           className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
         />
       </div>

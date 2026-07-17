@@ -152,7 +152,8 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               placeholder="••••••••••••"
               disabled={loading}
               className={cn(
-                'w-full px-4 py-3 pr-12 rounded-xl text-sm',
+                'w-full px-4 py-3 rounded-xl text-sm',
+                'pe-12', // logical end-padding for RTL/LTR eye button
                 'bg-[var(--navy-3)] text-[var(--sand)]',
                 'placeholder:text-[var(--sand-muted)]',
                 'border border-[var(--border)]',
@@ -163,7 +164,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             <button
               type="button"
               onClick={() => setShowPw((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors"
+              className="absolute end-3 top-1/2 -translate-y-1/2 p-1 text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors"
               tabIndex={-1}
               aria-label={showPw ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
             >
