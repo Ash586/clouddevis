@@ -39,6 +39,7 @@ function mapApiClientToStore(c: {
     nif: c.nif ?? undefined,
     rc: c.rc ?? undefined,
     nis: c.nis ?? undefined,
+    ai: c.ai ?? undefined,
   };
 }
 

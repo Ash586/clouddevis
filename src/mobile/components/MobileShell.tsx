@@ -16,7 +16,7 @@ import { useDocumentStore } from '@/stores/documentStore';
 import { processWebSyncItem } from '@/lib/webSync';
 import { useApiSync } from '@/mobile/lib/useApiSync';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
-import { useMobileI18n } from '@/mobile/lib/i18n';
+import { useMobileI18n, getMobileT } from '@/mobile/lib/i18n';
 import { useUserStore } from '@/stores/userStore';
 import { getSettings } from '@/lib/offline';
 import type { MobileLocale } from '@/stores/userStore';
@@ -121,9 +121,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       }
       backPressedOnce.current = true;
       // Reuse the existing toast system for "press again to exit"
-      void import('@/mobile/lib/toast').then(({ notify }) =>
-        notify('اضغط مرة أخرى للخروج'),
-      );
+      void import('@/mobile/lib/toast').then(({ notify }) => {
+        notify(getMobileT(useUserStore.getState().locale)('nav.pressAgainToExit'));
+      });
       backPressTimer.current = setTimeout(() => {
         backPressedOnce.current = false;
       }, 2000);

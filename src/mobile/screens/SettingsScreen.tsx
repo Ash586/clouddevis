@@ -18,6 +18,7 @@ import {
 import { useDocumentStore } from '@/stores/documentStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useCompanyStore } from '@/stores/companyStore';
+import { useSyncStore } from '@/stores/syncStore';
 import { useUserStore } from '@/stores/userStore';
 import { updateUserMode } from '@/mobile/lib/api';
 import { notify } from '@/mobile/lib/toast';
@@ -105,8 +106,10 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   const handleClearAllData = async () => {
     await clearAllOfflineData();
     useDocumentStore.getState().resetDocument();
+    useDocumentStore.setState({ savedDocuments: [], syncStatus: 'synced' });
     useClientStore.getState().clearAll();
     useCompanyStore.getState().clearCompany();
+    useSyncStore.getState().clearQueue();
     setShowClearConfirm(false);
     void notify(getMobileT(useUserStore.getState().locale)('settings.cleared'));
   };
@@ -364,10 +367,10 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
             <Bug size={18} className="text-amber-400" />
             <div className="flex-1">
               <span className="block text-sm font-semibold text-[var(--sand)] text-start">
-                Signaler un bug
+                {t('settings.bugReport')}
               </span>
               <span className="block text-[10px] text-[var(--sand-muted)] text-start">
-                Envoyez-nous le problème rencontré
+                {t('settings.bugReportHint')}
               </span>
             </div>
             <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />

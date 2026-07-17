@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Share2, Loader2 } from 'lucide-react';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useCompanyStore } from '@/stores/companyStore';
+import { useUserStore } from '@/stores/userStore';
 import { DOCUMENT_TYPE_LABELS, UNIT_LABELS } from '@/mobile/types';
 import { numberToFrenchWords, numberToArabicWords, formatDateAlgerian } from '@/lib/dgi';
 
@@ -23,16 +24,22 @@ function da(n: number): string {
 interface DocumentPreviewProps {
   open: boolean;
   docNumber: string;
+  /** Date of the document being edited (ISO string). If absent, today is used. */
+  documentDate?: string;
   busy?: boolean;
   onClose: () => void;
   onDownload: () => void;
   onShare: () => void;
 }
 
-export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, onShare }: DocumentPreviewProps) {
+export function DocumentPreview({ open, docNumber, documentDate, busy, onClose, onDownload, onShare }: DocumentPreviewProps) {
   const doc = useDocumentStore((s) => s.currentDoc);
   const totals = useDocumentStore((s) => s.totals);
   const company = useCompanyStore((s) => s.company);
+  const locale = useUserStore((s) => s.locale);
+
+  const isAr = doc.language === 'AR';
+  const dateToShow = documentDate ? new Date(documentDate) : new Date();
 
   const showRemise = doc.items.some((i) => (i.remise ?? 0) > 0);
   const typeLabel = DOCUMENT_TYPE_LABELS[doc.type].toUpperCase();
@@ -131,7 +138,7 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                     <p className="text-[17px] font-bold leading-tight" style={{ color: ink }}>{docNumber}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[11px]" style={{ color: ink }}>Le {formatDateAlgerian(new Date())}</p>
+                    <p className="text-[11px]" style={{ color: ink }}>{isAr ? '' : 'Le '}{formatDateAlgerian(dateToShow)}</p>
                     <p className="text-[10px]" style={{ color: muted }}>
                       {PAYMENT_LABEL[doc.paymentMode] ?? doc.paymentMode}
                     </p>
@@ -172,12 +179,12 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                   <table className="w-full text-[10.5px]" style={{ borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: '#F3F6FC', color: muted }}>
-                        <Th>N°</Th>
-                        <Th align="left">Désignation</Th>
-                        <Th align="right">Qté</Th>
-                        <Th align="right">P.U HT</Th>
-                        {showRemise && <Th align="right">Rem.</Th>}
-                        <Th align="right">Montant HT</Th>
+                        <Th>{isAr ? 'رقم' : 'N°'}</Th>
+                        <Th align="left">{isAr ? 'البيان' : locale === 'en' ? 'Description' : 'Désignation'}</Th>
+                        <Th align="right">{isAr ? 'الكمية' : locale === 'en' ? 'Qty' : 'Qté'}</Th>
+                        <Th align="right">{isAr ? 'السعر HT' : locale === 'en' ? 'Unit Price' : 'P.U HT'}</Th>
+                        {showRemise && <Th align="right">{isAr ? 'خصم' : locale === 'en' ? 'Disc.' : 'Rem.'}</Th>}
+                        <Th align="right">{isAr ? 'المبلغ HT' : locale === 'en' ? 'Amount HT' : 'Montant HT'}</Th>
                         <Th align="right">TVA</Th>
                       </tr>
                     </thead>
@@ -197,7 +204,11 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                         </tr>
                       ))}
                       {doc.items.length === 0 && (
-                        <tr><Td>—</Td><Td align="left">Aucun article</Td><Td align="right" /><Td align="right" /><Td align="right" /><Td align="right" /></tr>
+                        <tr>
+                          <td colSpan={showRemise ? 7 : 6} style={{ textAlign: 'center', padding: '10px 4px', color: muted, fontSize: 10 }}>
+                            {isAr ? 'لا توجد مقالات' : locale === 'en' ? 'No items' : 'Aucun article'}
+                          </td>
+                        </tr>
                       )}
                     </tbody>
                   </table>
@@ -232,7 +243,9 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
                 {/* ── Signature ── */}
                 <div className="flex justify-end mt-6">
                   <div className="text-center">
-                    <p className="text-[10px] mb-8" style={{ color: muted }}>Cachet et signature</p>
+                    <p className="text-[10px] mb-8" style={{ color: muted }}>
+                      {isAr ? 'الختم والتوقيع' : locale === 'en' ? 'Stamp & Signature' : 'Cachet et signature'}
+                    </p>
                     {company?.signature ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={company.signature} alt="" className="h-12 mx-auto object-contain" />
@@ -255,12 +268,12 @@ export function DocumentPreview({ open, docNumber, busy, onClose, onDownload, on
               className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
               style={{ background: accent }}>
               {busy ? <Loader2 size={16} className="animate-spin" /> : <Download size={18} />}
-              Télécharger le PDF
+              {isAr ? 'تحميل PDF' : locale === 'en' ? 'Download PDF' : 'Télécharger le PDF'}
             </button>
             <button type="button" onClick={onShare} disabled={busy}
               className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-transform disabled:opacity-60"
               style={{ background: 'rgba(255,255,255,0.12)' }}>
-              <Share2 size={18} /> Partager
+              <Share2 size={18} /> {isAr ? 'مشاركة' : locale === 'en' ? 'Share' : 'Partager'}
             </button>
           </div>
         </motion.div>

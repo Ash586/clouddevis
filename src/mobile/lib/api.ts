@@ -127,6 +127,9 @@ function toApiDocumentBody(doc: Document) {
       email: doc.client.email,
       address: doc.client.address,
       nif: doc.client.nif,
+      rc: doc.client.rc,
+      nis: doc.client.nis,
+      ai: doc.client.ai,
     },
     companyInfo: {
       name: doc.company.name,

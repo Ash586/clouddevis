@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // ============================================================
 // Rakmana Mobile — FlashFacture v2: Form-first tabbed editor
@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
+import { useUserStore } from '@/stores/userStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
@@ -68,6 +69,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
 
   const keyboardOpen = useMobileKeyboard();
   const { t } = useMobileI18n();
+  const locale = useUserStore((s) => s.locale);
   const [activeTab, setActiveTab] = useState<TabId>('items');
   const [dockMode, setDockMode] = useState<DockMode>('add');
   const [editingLineId, setEditingLineId] = useState<string | null>(null);
@@ -87,7 +89,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const pdfRef = useRef<string | null>(null);
   const clientPromptShown = useRef(false);
 
-  // ── Real document number ──
+  // ── Real document number + original date ──
   const docNumber = useMemo(() => {
     if (editingDocId) {
       const existing = savedDocuments.find((d) => d.id === editingDocId);
@@ -95,6 +97,14 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     }
     return generateDocNumber(currentDoc.type, savedDocuments.length + 1);
   }, [editingDocId, savedDocuments, currentDoc.type]);
+
+  const documentDate = useMemo(() => {
+    if (editingDocId) {
+      const existing = savedDocuments.find((d) => d.id === editingDocId);
+      if (existing?.date) return existing.date;
+    }
+    return new Date().toISOString().split('T')[0];
+  }, [editingDocId, savedDocuments]);
 
   // ── Catalog ──
   const catalog: CatalogItem[] = useMemo(() => {
@@ -251,7 +261,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         reference: currentDoc.reference || undefined,
         objet: currentDoc.objet || undefined,
         paymentMode: PAYMENT_LABEL[currentDoc.paymentMode] ?? currentDoc.paymentMode,
-        date: new Date().toISOString().split('T')[0],
+        date: documentDate,
         notes: currentDoc.notes,
       });
       pdfRef.current = base64;
@@ -260,7 +270,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       void notify('Échec de la génération du PDF');
       return null;
     }
-  }, [docNumber, currentDoc, totals, company]);
+  }, [docNumber, documentDate, currentDoc, totals, company]);
 
   useEffect(() => { pdfRef.current = null; }, [currentDoc, totals]);
 
@@ -272,7 +282,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
 
   // ── Save ──
   const handleSave = useCallback(async () => {
-    if (!company) { void notify('Configurez votre société d’abord'); return; }
+    if (!company) { void notify("Configurez votre société d'abord"); return; }
     if (!guardReady()) { hapticError(); return; }
     setSaving(true);
     try {
@@ -378,13 +388,15 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     if (result === 'downloaded') {
       void notify('PDF téléchargé — joignez-le à votre message');
       const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
-      void openWhatsApp({
-        phone: currentDoc.client?.phone,
-        message:
-          `Bonjour ${currentDoc.client?.name || ''}, veuillez trouver ci-joint votre ${label.toLowerCase()} ` +
-          `N°${docNumber} d'un montant de ${totals.netAPayer.toLocaleString('fr-DZ')} DA. ` +
-          `Merci de votre confiance — ${company?.name || 'Rakmana'}.`,
-      });
+      const amount = totals.netAPayer.toLocaleString('fr-DZ');
+      const clientName = currentDoc.client?.name || '';
+      const coName = company?.name || 'Rakmana';
+      const waMessage = currentDoc.language === 'AR'
+        ? `مرحباً ${clientName}، يرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج. شكراً لثقتكم — ${coName}.`
+        : currentDoc.language === 'EN'
+        ? `Hello ${clientName}, please find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA. Thank you — ${coName}.`
+        : `Bonjour ${clientName}, veuillez trouver ci-joint votre ${label.toLowerCase()} N°${docNumber} d'un montant de ${amount} DA. Merci de votre confiance — ${coName}.`;
+      void openWhatsApp({ phone: currentDoc.client?.phone, message: waMessage });
     }
   }, [guardReady, buildPdf, docNumber, currentDoc, totals, company?.name]);
 
@@ -419,11 +431,15 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     if (result === 'downloaded') {
       const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
       const subject = `${label} ${docNumber}`;
-      const body =
-        `Bonjour ${currentDoc.client?.name || ''},\n\n` +
-        `Veuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ` +
-        `${totals.netAPayer.toLocaleString('fr-DZ')} DA.\n\nCordialement,\n${company?.name || 'Rakmana'}`;
-      void notify('PDF téléchargé — joignez-le à l’email');
+      const amount = totals.netAPayer.toLocaleString('fr-DZ');
+      const clientName = currentDoc.client?.name || '';
+      const coName = company?.name || 'Rakmana';
+      const body = currentDoc.language === 'AR'
+        ? `مرحباً ${clientName}،\n\nيرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج.\n\nمع تحياتنا،\n${coName}`
+        : currentDoc.language === 'EN'
+        ? `Hello ${clientName},\n\nPlease find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA.\n\nBest regards,\n${coName}`
+        : `Bonjour ${clientName},\n\nVeuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ${amount} DA.\n\nCordialement,\n${coName}`;
+      void notify('PDF téléchargé — joignez-le à l\'email');
       window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_system');
     }
   }, [guardReady, buildPdf, currentDoc, docNumber, totals, company]);
@@ -571,9 +587,9 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       {/* ═══ TAB BAR ═══ */}
       <div className="shrink-0 flex items-center gap-1 px-4 py-1.5">
         {([
-          { id: 'items' as TabId, label: t('editor.preview') === 'Preview' ? 'Items' : 'Articles', icon: Plus, badge: itemCount || undefined },
+          { id: 'items' as TabId, label: locale === 'en' ? 'Items' : 'Articles', icon: Plus, badge: itemCount || undefined },
           { id: 'client' as TabId, label: t('editor.client'), icon: UserRound, badge: hasClient ? '✓' : undefined },
-          { id: 'details' as TabId, label: t('editor.editBtn') === 'Edit' ? 'Details' : 'Détails', icon: Settings2, badge: undefined as string | number | undefined },
+          { id: 'details' as TabId, label: locale === 'en' ? 'Details' : locale === 'ar' ? 'التفاصيل' : 'Détails', icon: Settings2, badge: undefined as string | number | undefined },
         ] as const).map(({ id, label, icon: Icon, badge }) => (
           <button
             key={id}
@@ -717,6 +733,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       <DocumentPreview
         open={previewOpen}
         docNumber={docNumber}
+        documentDate={documentDate}
         busy={busy}
         onClose={() => setPreviewOpen(false)}
         onDownload={handleDownload}

@@ -113,6 +113,8 @@ export interface DocumentStore {
   deleteDocument: (id: string) => void;
   duplicateDocument: (id: string) => Document | null;
   loadDocumentIntoWizard: (id: string) => void;
+  /** Atomically prefill the wizard with a doc copy AND override the document type. */
+  loadDocumentIntoWizardAsType: (id: string, type: DocumentType) => void;
   /**
    * Set when loadDocumentIntoWizard pre-fills the draft (edit-less duplicate):
    * tells CreateScreen NOT to reset on mount. Cleared by resetDocument/consumePrefill.
@@ -397,6 +399,13 @@ export const useDocumentStore = create<DocumentStore>()(
           docSequenceCounter: sequenceNumber,
         }));
 
+        useSyncStore.getState().enqueue({
+          action: 'CREATE',
+          entity: 'document',
+          entityId: duplicatedDoc.id,
+          payload: duplicatedDoc,
+        });
+
         return duplicatedDoc;
       },
 
@@ -433,6 +442,42 @@ export const useDocumentStore = create<DocumentStore>()(
           pendingPrefill: true,
           currentDoc: {
             type: doc.type,
+            client: { ...doc.client },
+            items: [...doc.items],
+            objet: doc.objet || '',
+            reference: doc.reference || '',
+            notes: doc.notes || '',
+            language: doc.language,
+            paymentMode: doc.paymentMode,
+            acompte: doc.acompte || 0,
+            validUntil: doc.validUntil,
+            delivererName: doc.delivererName,
+            delivererIdCard: doc.delivererIdCard,
+            transporterName: doc.transporterName,
+            transporterIdCard: doc.transporterIdCard,
+            deliveryAddress: doc.deliveryAddress,
+          },
+          step: 1,
+          totals: {
+            subTotalHT: doc.totalHT,
+            totalTVA: doc.totalTVA,
+            totalTTC: doc.totalTTC,
+            timbreFiscal: doc.timbreFiscal,
+            timbreAmount: doc.timbreAmount,
+            netAPayer: doc.totalTTC + doc.timbreAmount - (doc.acompte || 0),
+          },
+        });
+      },
+
+      loadDocumentIntoWizardAsType: (id, type) => {
+        const state = get();
+        const doc = state.savedDocuments.find((d) => d.id === id);
+        if (!doc) return;
+
+        set({
+          pendingPrefill: true,
+          currentDoc: {
+            type, // override the document type atomically
             client: { ...doc.client },
             items: [...doc.items],
             objet: doc.objet || '',

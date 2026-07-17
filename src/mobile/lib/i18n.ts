@@ -9,7 +9,7 @@ import { useUserStore, type MobileLocale } from '@/stores/userStore';
 // ── Translations ─────────────────────────────────────────────
 
 type TranslationKeys =
-  | 'nav.home' | 'nav.documents' | 'nav.company' | 'nav.settings'
+  | 'nav.home' | 'nav.documents' | 'nav.company' | 'nav.settings' | 'nav.pressAgainToExit'
   | 'stats.thisMonth' | 'stats.docsCreated' | 'stats.revenue' | 'stats.revenueSub'
   | 'stats.clients' | 'stats.clientsSub' | 'stats.drafts' | 'stats.draftsSub'
   | 'stats.unpaid' | 'stats.unpaidSub'
@@ -27,6 +27,7 @@ type TranslationKeys =
   | 'settings.deleteAccount' | 'settings.deleteAccountConfirmTitle'
   | 'settings.deleteAccountConfirmBody' | 'settings.deleteAccountError'
   | 'settings.deleteAccounting' | 'settings.enterPasswordToConfirm'
+  | 'settings.bugReport' | 'settings.bugReportHint'
   | 'settings.biometric' | 'settings.biometricHint' | 'settings.biometricUnavailable'
   | 'fab.facture' | 'fab.devis' | 'fab.duplicate'
   | 'common.artisan' | 'common.entreprise'
@@ -53,6 +54,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'nav.documents': 'Documents',
     'nav.company': 'Société',
     'nav.settings': 'Réglages',
+    'nav.pressAgainToExit': 'Appuyez encore pour quitter',
     'stats.thisMonth': 'Ce mois',
     'stats.docsCreated': 'documents créés',
     'stats.revenue': "Chiffre d'affaires",
@@ -104,6 +106,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountError': 'Erreur lors de la suppression',
     'settings.deleteAccounting': 'Suppression…',
     'settings.enterPasswordToConfirm': 'Saisissez votre mot de passe pour confirmer',
+    'settings.bugReport': 'Signaler un bug',
+    'settings.bugReportHint': 'Envoyez-nous le problème rencontré',
     'settings.biometric': 'Verrouillage biométrique',
     'settings.biometricHint': 'Empreinte ou Face ID après 5 min en arrière-plan',
     'settings.biometricUnavailable': 'Non disponible sur cet appareil',
@@ -165,6 +169,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'nav.documents': 'الوثائق',
     'nav.company': 'الشركة',
     'nav.settings': 'الإعدادات',
+    'nav.pressAgainToExit': 'اضغط مرة أخرى للخروج',
     'stats.thisMonth': 'هذا الشهر',
     'stats.docsCreated': 'وثيقة منشأة',
     'stats.revenue': 'رقم الأعمال',
@@ -216,6 +221,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountError': 'خطأ أثناء الحذف',
     'settings.deleteAccounting': 'جاري الحذف…',
     'settings.enterPasswordToConfirm': 'أدخل كلمة المرور للتأكيد',
+    'settings.bugReport': 'الإبلاغ عن خلل',
+    'settings.bugReportHint': 'أرسل لنا المشكلة التي واجهتها',
     'settings.biometric': 'القفل البيومتري',
     'settings.biometricHint': 'بصمة أو وجه بعد 5 دقائق في الخلفية',
     'settings.biometricUnavailable': 'غير متاح على هذا الجهاز',
@@ -276,6 +283,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'nav.home': 'Home',
     'nav.documents': 'Documents',
     'nav.company': 'Company',
+    'nav.pressAgainToExit': 'Press again to exit',
     'nav.settings': 'Settings',
     'stats.thisMonth': 'This month',
     'stats.docsCreated': 'docs created',
@@ -328,6 +336,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.deleteAccountError': 'Error during deletion',
     'settings.deleteAccounting': 'Deleting…',
     'settings.enterPasswordToConfirm': 'Enter your password to confirm',
+    'settings.bugReport': 'Report a bug',
+    'settings.bugReportHint': 'Send us the issue you encountered',
     'settings.biometric': 'Biometric lock',
     'settings.biometricHint': 'Fingerprint or Face ID after 5 min in background',
     'settings.biometricUnavailable': 'Not available on this device',

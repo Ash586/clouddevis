@@ -56,7 +56,7 @@ function filterDocuments(docs: Document[], filter: FilterId): Document[] {
     case 'paid':
       return docs.filter((d) => d.status === 'PAID');
     case 'pending':
-      return docs.filter((d) => d.status === 'SENT');
+      return docs.filter((d) => d.status === 'SENT' || d.status === 'DRAFT');
     case 'thisMonth':
       return docs.filter((d) => isThisMonth(d.date));
     default:
@@ -166,7 +166,7 @@ export function DocumentsListScreen({
       devis: savedDocuments.filter((d) => d.type === 'DEVIS').length,
       facture: savedDocuments.filter((d) => d.type === 'FACTURE').length,
       paid: savedDocuments.filter((d) => d.status === 'PAID').length,
-      pending: savedDocuments.filter((d) => d.status === 'SENT').length,
+      pending: savedDocuments.filter((d) => d.status === 'SENT' || d.status === 'DRAFT').length,
       thisMonth: savedDocuments.filter((d) => isThisMonth(d.date)).length,
     }),
     [savedDocuments]
@@ -217,13 +217,21 @@ export function DocumentsListScreen({
           break;
         case 'markPaid':
           useDocumentStore.getState().setDocumentStatus(doc.id, 'PAID');
-          updateDocumentStatus(doc.id, 'PAID').catch(() => {});
+          updateDocumentStatus(doc.id, 'PAID').catch(() => {
+            // Offline: queue the status change for replay on reconnect
+            useSyncStore.getState().enqueue({
+              action: 'UPDATE',
+              entity: 'document',
+              entityId: doc.id,
+              payload: { status: 'PAID' },
+            });
+          });
           void notify('Marqué payé ✓');
           break;
         case 'convertToFacture': {
-          if (onDuplicateDocument) onDuplicateDocument(doc);
-          // After loading into wizard, override the type to FACTURE
-          useDocumentStore.getState().setType('FACTURE');
+          // Atomically prefill wizard with FACTURE type — no race condition
+          useDocumentStore.getState().loadDocumentIntoWizardAsType(doc.id, 'FACTURE');
+          onEditDocument?.(doc);
           void notify('Converti en Facture');
           break;
         }
