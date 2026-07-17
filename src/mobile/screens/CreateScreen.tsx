@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Save, MessageCircle, Share2, Mail, Download, Printer, Eye,
@@ -64,6 +65,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const company = useCompanyStore((s) => s.company);
 
   const keyboardOpen = useMobileKeyboard();
+  const { t } = useMobileI18n();
   const [dockMode, setDockMode] = useState<DockMode>('add');
   const [editingLineId, setEditingLineId] = useState<string | null>(null);
   const [loadingDoc, setLoadingDoc] = useState(false);
@@ -528,11 +530,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       <div className="flex items-center gap-3 px-4 pt-2 pb-1">
         <button type="button" onClick={handleBack}
           className="w-11 h-11 -ml-1 rounded-full flex items-center justify-center bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-95 transition-transform"
-          aria-label="Fermer">
+          aria-label={t('editor.close')}>
           <ArrowLeft size={20} className="rtl:rotate-180" />
         </button>
         <div className="flex-1">
-          <p className="text-xs text-[var(--sand-muted)]">{editingDocId ? 'Modifier' : 'Nouveau'}</p>
+          <p className="text-xs text-[var(--sand-muted)]">{editingDocId ? t('editor.edit') : t('editor.new')}</p>
           <p className="text-sm font-semibold text-[var(--sand)]">{DOCUMENT_TYPE_LABELS[currentDoc.type]}</p>
         </div>
       </div>
@@ -573,7 +575,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           <button type="button" onClick={openPreview}
             className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)]">
             <Eye size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Aperçu</span>
+            <span className="text-[10px] font-semibold">{t('editor.preview')}</span>
           </button>
 
           {/* Éditer */}
@@ -584,7 +586,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
               dockMode === 'details' ? 'text-[var(--green-2)]' : 'text-[var(--sand-muted)]',
             )}>
             <SlidersHorizontal size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Éditer</span>
+            <span className="text-[10px] font-semibold">{t('editor.editBtn')}</span>
           </button>
 
           {/* Enregistrer — action principale */}
@@ -594,7 +596,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
             {saving
               ? <Loader2 size={18} className="animate-spin" />
               : <Save size={18} strokeWidth={2.5} />}
-            Enregistrer
+            {t('editor.save')}
           </button>
 
           {/* Envoyer — always opens share sheet */}
@@ -603,7 +605,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
             disabled={busy || saving}
             className="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-full active:scale-95 transition-transform text-[var(--sand-muted)] disabled:opacity-40">
             <Share2 size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-semibold">Envoyer</span>
+            <span className="text-[10px] font-semibold">{t('editor.send')}</span>
           </button>
         </div>
       </nav>

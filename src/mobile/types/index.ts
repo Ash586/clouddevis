@@ -84,6 +84,7 @@ export interface LineItem {
   unitPrice: number;
   tvaRate: 0 | 9 | 19;   // TVA rate per item
   remise?: number;       // Optional per-line discount % (RIS.%), 0–100
+  category?: string;     // Groups items under category headers in the document
   totalHT: number;       // Computed: quantity * unitPrice * (1 - remise/100)
 }
 
