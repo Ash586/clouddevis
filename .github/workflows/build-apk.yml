@@ -1,0 +1,98 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'نوع البناء'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Prepare release keystore
+        if: ${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/ci-keystore.jks
+          fi
+
+      - name: Build Debug APK
+        if: ${{ github.event.inputs.build_type != 'release' }}
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Build Release APK
+        if: ${{ github.event.inputs.build_type != 'debug' }}
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      - name: Upload Debug APK
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clouddevis-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: ignore
+
+      - name: Upload Release APK
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clouddevis-release
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: ignore
+
+      - name: Upload Build Report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-report
+          path: android/app/build/reports/
+          if-no-files-found: ignore
