@@ -27,21 +27,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -49,9 +34,6 @@ jobs:
         if: ${{ github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both' }}
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > android/ci-keystore.jks
