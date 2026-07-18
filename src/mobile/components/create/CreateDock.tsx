@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { validateNIF } from '@/lib/dgi';
+import { ClientFields, EMPTY_CLIENT_FIELDS, type ClientFieldsState } from '@/mobile/components/ClientFields';
 import { hapticLight, hapticSuccess, hapticWarning } from '@/mobile/lib/haptics';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import { useDocumentStore } from '@/stores/documentStore';
@@ -374,13 +374,9 @@ function ClientMode({ onDone }: { onDone: () => void }) {
 
   const [q, setQ] = useState('');
   const [creating, setCreating] = useState(false);
-  const [moreFields, setMoreFields] = useState(false);
-  const [form, setForm] = useState({
-    name: '', phone: '', email: '', nif: '', rc: '', nis: '', ai: '', address: '',
-  });
+  const [form, setForm] = useState<ClientFieldsState>(EMPTY_CLIENT_FIELDS);
 
   const list = useMemo(() => (q.trim() ? searchClients(q) : clients.slice(0, 12)), [q, clients, searchClients]);
-  const nifState = form.nif.trim() ? validateNIF(form.nif) : null;
   const canCreate = form.name.trim().length >= 2 && form.phone.trim().length >= 8;
 
   function pick(c: Client) { hapticLight(); setClient(c); onDone(); }
@@ -403,51 +399,21 @@ function ClientMode({ onDone }: { onDone: () => void }) {
 
   if (creating) {
     return (
-      <div className="flex flex-col gap-2">
-        <input className={cn(inputCls, 'w-full')} placeholder="Nom du client *" value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-        <input className={cn(inputCls, 'w-full')} inputMode="tel" placeholder="Téléphone *" value={form.phone}
-          onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
-        {moreFields ? (
-          <>
-            <input className={cn(inputCls, 'w-full')} inputMode="email" placeholder="Email (optionnel)"
-              value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
-            <div className="relative">
-              <input className={cn(inputCls, 'w-full pr-9')} inputMode="numeric"
-                placeholder="NIF (11 chiffres)" value={form.nif}
-                onChange={(e) => setForm((f) => ({ ...f, nif: e.target.value }))} />
-              {nifState === true && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                  <Check size={12} className="text-white" strokeWidth={3} />
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <input className={cn(inputCls, 'w-full')} placeholder="RC"
-                value={form.rc} onChange={(e) => setForm((f) => ({ ...f, rc: e.target.value }))} />
-              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="NIS"
-                value={form.nis} onChange={(e) => setForm((f) => ({ ...f, nis: e.target.value }))} />
-              <input className={cn(inputCls, 'w-full')} inputMode="numeric" placeholder="AI"
-                value={form.ai} onChange={(e) => setForm((f) => ({ ...f, ai: e.target.value }))} />
-            </div>
-            <input className={cn(inputCls, 'w-full')} placeholder="Adresse (optionnel)"
-              value={form.address} onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
-          </>
-        ) : (
-          <button type="button" onClick={() => setMoreFields(true)}
-            className="h-9 rounded-lg text-xs font-semibold text-[var(--green-2)] bg-[var(--blue-bg)] active:scale-[0.98] transition-transform">
-            + Détails (email, NIF, RC, adresse…)
-          </button>
-        )}
+      <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto">
+        <ClientFields
+          form={form}
+          onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+          autoFocusName
+        />
         <div className="flex gap-2">
           <button type="button" onClick={() => setCreating(false)}
             className="flex-1 h-11 rounded-xl text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]">
-            Annuler
+            {t('clients.cancel')}
           </button>
           <button type="button" onClick={create} disabled={!canCreate}
             className="flex-1 h-11 rounded-xl text-sm font-semibold text-white disabled:opacity-40"
             style={{ background: 'var(--green-2)' }}>
-            Sélectionner
+            {t('clients.select')}
           </button>
         </div>
       </div>

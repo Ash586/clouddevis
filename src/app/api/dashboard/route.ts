@@ -9,10 +9,11 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     const ALL_TYPES = ['DEVIS', 'PROFORMA', 'BC', 'BR', 'FACTURE', 'INTERVENTION', 'ATTACHEMENT'] as const;
 
-    const [totalDocs, monthDocs, totalClients, aggregated, typeGroup, statusGroup, draftCount, recentDraft, user] = await Promise.all([
+    const [totalDocs, monthDocs, totalClients, aggregated, typeGroup, statusGroup, draftCount, recentDraft, user, unpaidAgg, recentInvoices, topClientsGroup] = await Promise.all([
       prisma.document.count({ where: { userId: session.userId } }),
       prisma.document.count({ where: { userId: session.userId, createdAt: { gte: startOfMonth } } }),
       prisma.client.count({ where: { userId: session.userId } }),
@@ -40,9 +41,53 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
         where: { id: session.userId },
         select: { name: true, mode: true, phone: true, companyInfo: true, trialStartAt: true, subscriptionEndAt: true, subscriptionStatus: true },
       }),
+      prisma.document.aggregate({
+        where: { userId: session.userId, type: 'FACTURE', status: 'SENT' },
+        _sum: { totalTTC: true },
+        _count: { _all: true },
+      }),
+      prisma.document.findMany({
+        where: { userId: session.userId, type: 'FACTURE', date: { gte: sixMonthsAgo } },
+        select: { date: true, totalTTC: true },
+      }),
+      prisma.document.groupBy({
+        by: ['clientId'],
+        where: { userId: session.userId, clientId: { not: null } },
+        _sum: { totalTTC: true },
+        _count: { _all: true },
+        orderBy: { _sum: { totalTTC: 'desc' } },
+        take: 3,
+      }),
     ]);
 
     const totalTTC = aggregated._sum.totalTTC || 0;
+
+    // ── Monthly revenue series (last 6 months, FACTURE TTC) ──
+    const monthlyRevenue: { month: string; total: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      monthlyRevenue.push({ month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, total: 0 });
+    }
+    for (const inv of recentInvoices) {
+      const d = new Date(inv.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const bucket = monthlyRevenue.find((b) => b.month === key);
+      if (bucket) bucket.total += inv.totalTTC || 0;
+    }
+
+    // ── Top clients by cumulative TTC ──
+    const topClientIds = topClientsGroup.map((g) => g.clientId).filter((id): id is string => id !== null);
+    const topClientRecords = topClientIds.length
+      ? await prisma.client.findMany({ where: { id: { in: topClientIds } }, select: { id: true, name: true } })
+      : [];
+    const topClients = topClientsGroup
+      .filter((g) => g.clientId !== null)
+      .map((g) => ({
+        id: g.clientId as string,
+        name: topClientRecords.find((c) => c.id === g.clientId)?.name || '—',
+        total: g._sum.totalTTC || 0,
+        count: g._count._all,
+      }));
 
     const typeBreakdown: Record<string, number> = {};
     for (const t of ALL_TYPES) {
@@ -84,6 +129,10 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
         typeBreakdown,
         statusBreakdown,
         draftCount,
+        unpaidTotal: unpaidAgg._sum.totalTTC || 0,
+        unpaidCount: unpaidAgg._count._all,
+        monthlyRevenue,
+        topClients,
         recentDraft: recentDraft
           ? { id: recentDraft.id, number: recentDraft.number, type: recentDraft.type, clientName: recentDraft.client?.name || '', updatedAt: recentDraft.updatedAt }
           : null,

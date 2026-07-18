@@ -103,8 +103,8 @@ export function StatCards({ stats, loading }: StatCardsProps) {
       icon: <AlertCircle size={16} strokeWidth={2} className="text-red-400" />,
       iconBg: 'bg-[rgba(239,68,68,0.12)]',
       label: t('stats.unpaid'),
-      value: String(stats.unpaidCount),
-      sub: t('stats.unpaidSub'),
+      value: privacyMode ? '••••' : formatDA(stats.unpaidTotal),
+      sub: `${stats.unpaidCount} ${t('stats.unpaidSub')}`,
       delay: 0.16,
     },
   ];

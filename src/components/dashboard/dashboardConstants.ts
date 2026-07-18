@@ -10,11 +10,22 @@ export interface RecentDraft {
   id: string; number: string; type: string; clientName: string; updatedAt: string;
 }
 
+export interface MonthlyRevenuePoint { month: string; total: number }
+export interface TopClient { id: string; name: string; total: number; count: number }
+
 export interface DashboardStats {
   totalDocs: number; monthDocs: number; totalTTC: string | number;
   totalClients: number; trialDaysRemaining: number;
   draftCount: number; statusBreakdown: Record<string, number>;
   recentDraft: RecentDraft | null; typeBreakdown: Record<string, number>;
+  /** Sum of TTC for FACTUREs with status SENT */
+  unpaidTotal?: number;
+  /** Count of FACTUREs with status SENT (matches unpaidTotal) */
+  unpaidCount?: number;
+  /** Last 6 months of FACTURE TTC, oldest first ('YYYY-MM') */
+  monthlyRevenue?: MonthlyRevenuePoint[];
+  /** Top 3 clients by cumulative TTC */
+  topClients?: TopClient[];
 }
 
 export const DOC_TYPE_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {

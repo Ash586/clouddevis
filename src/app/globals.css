@@ -26,6 +26,17 @@
    DESIGN TOKENS (White + Blue Theme)
    Single light theme — surfaces white/blue-tint,
    text deep navy-blue, accent vivid blue.
+
+   ⚠ NAMING IS HISTORICAL — VALUES ARE CURRENT:
+   the app started dark-green ("navy" surfaces, "sand"
+   text, "green" accent) then was rethemed light + blue
+   WITHOUT renaming the variables. So today:
+     --navy*  = LIGHT surfaces (white / blue-gray fills)
+     --sand*  = DARK navy-blue TEXT colors
+     --green* = BLUE accent (#2563EB family)
+   Do not pick a token by its name — read the swatch
+   comment next to it. Rename only in a dedicated PR
+   touching every consumer at once.
 ═══════════════════════════════════════ */
 :root {
   /* ── Surfaces (white + cool blue-gray) ── */

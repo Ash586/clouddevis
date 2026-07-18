@@ -10,7 +10,12 @@ export function DashboardKpiRow({ stats }: Props) {
   const t = useTranslations('dashboard');
   const tc = useTranslations('common');
 
-  const sentCount = stats.statusBreakdown?.SENT || 0;
+  const sentCount = stats.unpaidCount ?? (stats.statusBreakdown?.SENT || 0);
+  const unpaidTotal = stats.unpaidTotal ?? 0;
+  const fmtDA = (n: number) =>
+    n >= 1_000_000
+      ? (n / 1_000_000).toLocaleString('fr-DZ', { maximumFractionDigits: 1 }) + ' M'
+      : Math.round(n).toLocaleString('fr-DZ');
 
   return (
     <div data-tour="kpi-row" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -32,13 +37,14 @@ export function DashboardKpiRow({ stats }: Props) {
         </div>
       </div>
 
-      {/* Factures impayées */}
+      {/* Factures impayées — montant DA, nombre en sous-titre */}
       <KpiCard
         label={t('statUnpaid')}
-        value={sentCount}
-        sub={t('statUnpaidSub')}
+        value={`${fmtDA(unpaidTotal)} ${tc('currency')}`}
+        sub={`${sentCount} ${t('statUnpaidSub')}`}
         icon={<AlertCircle size={17} />}
         color={sentCount > 0 ? 'red' : 'default'}
+        alert={unpaidTotal > 0}
       />
 
       {/* Documents */}
@@ -61,9 +67,9 @@ export function DashboardKpiRow({ stats }: Props) {
   );
 }
 
-function KpiCard({ label, value, sub, icon, color = 'default' }: {
+function KpiCard({ label, value, sub, icon, color = 'default', alert }: {
   label: string; value: string | number; sub?: string;
-  icon: React.ReactNode; color?: 'default' | 'blue' | 'red';
+  icon: React.ReactNode; color?: 'default' | 'blue' | 'red'; alert?: boolean;
 }) {
   const colorMap = {
     default: { iconBg: 'bg-[var(--navy-3)]', iconText: 'text-[var(--sand-muted)]' },
@@ -71,7 +77,7 @@ function KpiCard({ label, value, sub, icon, color = 'default' }: {
     red:     { iconBg: 'bg-red-400/10',       iconText: 'text-red-400' },
   };
   const c = colorMap[color];
-  const isAlert = color === 'red' && Number(value) > 0;
+  const isAlert = alert ?? (color === 'red' && Number(value) > 0);
 
   return (
     <Card className="p-4 sm:p-5 h-full hover:-translate-y-0.5 hover:shadow-lg transition-all">

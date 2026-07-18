@@ -13,6 +13,8 @@ import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
+import { ClientFields, type ClientFieldsState } from '@/mobile/components/ClientFields';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import type { Client } from '@/mobile/types';
 
 interface ClientsScreenProps {
@@ -29,27 +31,29 @@ interface ClientFormProps {
 }
 
 function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
-  const [form, setForm] = useState({
+  const { t } = useMobileI18n();
+  const [form, setForm] = useState<ClientFieldsState>({
     name: client?.name || '',
+    phone: client?.phone || '',
+    email: client?.email || '',
+    address: client?.address || '',
     nif: client?.nif || '',
     rc: client?.rc || '',
     nis: client?.nis || '',
     ai: client?.ai || '',
-    phone: client?.phone || '',
-    email: client?.email || '',
-    address: client?.address || '',
   });
 
   const handleSubmit = () => {
     if (!form.name.trim()) return;
     onSave({
-      ...form,
-      nif: form.nif || undefined,
-      rc: form.rc || undefined,
-      nis: form.nis || undefined,
-      ai: form.ai || undefined,
-      email: form.email || undefined,
-      address: form.address || undefined,
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      nif: form.nif.trim() || undefined,
+      rc: form.rc.trim() || undefined,
+      nis: form.nis.trim() || undefined,
+      ai: form.ai.trim() || undefined,
+      email: form.email.trim() || undefined,
+      address: form.address.trim() || undefined,
     });
   };
 
@@ -60,93 +64,18 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
       exit={{ opacity: 0, y: 20 }}
       className="space-y-3"
     >
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">Nom *</label>
-        <input
-          type="text"
-          value={form.name}
-          onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-          placeholder="Nom du client"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">NIF</label>
-        <input
-          type="text"
-          value={form.nif}
-          onChange={(e) => setForm((p) => ({ ...p, nif: e.target.value }))}
-          placeholder="123456789012345"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">RC</label>
-        <input
-          type="text"
-          value={form.rc}
-          onChange={(e) => setForm((p) => ({ ...p, rc: e.target.value }))}
-          placeholder="16B1234567"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">NIS</label>
-        <input
-          type="text"
-          value={form.nis}
-          onChange={(e) => setForm((p) => ({ ...p, nis: e.target.value }))}
-          placeholder="1234567890"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">AI</label>
-        <input
-          type="text"
-          value={form.ai}
-          onChange={(e) => setForm((p) => ({ ...p, ai: e.target.value }))}
-          placeholder="1234567890"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">Téléphone</label>
-        <input
-          type="tel"
-          value={form.phone}
-          onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-          placeholder="0555 12 34 56"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">Email</label>
-        <input
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-          placeholder="client@example.com"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
-      <div>
-        <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">Adresse</label>
-        <input
-          type="text"
-          value={form.address}
-          onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
-          placeholder="123 Rue Principale, Alger"
-          className="w-full px-4 py-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-[var(--green-2)]"
-        />
-      </div>
+      <ClientFields
+        form={form}
+        onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
+        autoFocusName={!client}
+      />
       <div className="flex gap-2 pt-2">
-        <button type="button"           onClick={onCancel}
+        <button type="button" onClick={onCancel}
           className="flex-1 py-3 rounded-xl text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]"
         >
-          Annuler
+          {t('clients.cancel')}
         </button>
-        <button type="button"           onClick={handleSubmit}
+        <button type="button" onClick={handleSubmit}
           disabled={!form.name.trim()}
           className={cn(
             'flex-1 py-3 rounded-xl text-sm font-semibold transition-all',
@@ -155,7 +84,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
               : 'bg-[var(--navy-3)] text-[var(--sand-muted)] cursor-not-allowed',
           )}
         >
-          {client ? 'Modifier' : 'Ajouter'}
+          {client ? t('clients.edit') : t('clients.add')}
         </button>
       </div>
     </motion.div>
@@ -165,6 +94,7 @@ function ClientForm({ client, onSave, onCancel }: ClientFormProps) {
 // ── Main Screen ──────────────────────────────────────────────
 
 export function ClientsScreen({ onBack }: ClientsScreenProps) {
+  const { t } = useMobileI18n();
   const clients = useClientStore((s) => s.clients);
   const addClient = useClientStore((s) => s.addClient);
   const updateClient = useClientStore((s) => s.updateClient);
@@ -226,9 +156,9 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               </button>
             )}
             <div>
-              <h1 className="text-xl font-bold text-[var(--sand)]">Clients</h1>
+              <h1 className="text-xl font-bold text-[var(--sand)]">{t('clients.title')}</h1>
               <p className="text-xs text-[var(--sand-muted)] mt-0.5">
-                {clients.length} client{clients.length !== 1 ? 's' : ''}
+                {clients.length} {t('stats.clientsSub')}
               </p>
             </div>
           </div>
@@ -253,7 +183,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Rechercher un client..."
+            placeholder={t('clients.searchPlaceholder')}
             className={cn(
               'w-full ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 py-2.5 rounded-xl text-sm',
               'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
@@ -287,12 +217,10 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                 <Users size={28} className="text-[var(--sand-muted)]" />
               </div>
               <p className="text-sm font-semibold text-[var(--sand-muted)]">
-                {searchQuery ? 'Aucun résultat' : 'Aucun client'}
+                {searchQuery ? t('clients.noResults') : t('clients.empty')}
               </p>
               <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px]">
-                {searchQuery
-                  ? 'Essayez un autre terme'
-                  : 'Ajoutez votre premier client en appuyant sur +'}
+                {searchQuery ? t('clients.noResultsHint') : t('clients.emptyHint')}
               </p>
             </motion.div>
           ) : (
@@ -344,10 +272,10 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-3 pt-3 border-t border-[var(--border)]">
-                      <button type="button"                         onClick={() => handleEdit(client)}
+                      <button type="button" onClick={() => handleEdit(client)}
                         className="flex-1 py-2 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] active:scale-[0.98] transition-transform"
                       >
-                        Modifier
+                        {t('clients.edit')}
                       </button>
                       <button
                         type="button"
@@ -369,11 +297,11 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
       {/* Delete confirmation */}
       <ConfirmSheet
         open={clientToDelete !== null}
-        title={`Supprimer ${clientToDelete?.name ?? 'ce client'} ?`}
+        title={`${t('clients.deleteTitle')} ${clientToDelete?.name ?? ''} ?`}
         message={
           clientToDelete && getClientDocCount(clientToDelete.id) > 0
-            ? `Ce client est lié à ${getClientDocCount(clientToDelete.id)} document(s). Cette action est irréversible.`
-            : 'Cette action est irréversible.'
+            ? `${t('clients.deleteLinked')} ${t('clients.deleteIrreversible')}`
+            : t('clients.deleteIrreversible')
         }
         onConfirm={() => {
           if (clientToDelete) deleteClient(clientToDelete.id);

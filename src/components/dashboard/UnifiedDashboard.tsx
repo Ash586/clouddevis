@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardKpiRow } from './DashboardKpiRow';
+import { DashboardInsights } from './DashboardInsights';
 import { DashboardSidebar } from './DashboardSidebar';
 import { QUICK_CREATE_TYPES, type DashboardStats } from './dashboardConstants';
 
@@ -46,6 +47,7 @@ export function UnifiedDashboard({ userName, stats, mode }: UnifiedDashboardProp
       </div>
 
       <DashboardKpiRow stats={stats} />
+      <DashboardInsights stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2">
           <QuickCreateSection />

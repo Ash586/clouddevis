@@ -16,6 +16,7 @@ import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { useDocumentStore } from '@/stores/documentStore';
 import { HomeHeader } from '../components/HomeHeader';
 import { StatCards } from '../components/StatCards';
+import { RevenueTrend } from '../components/RevenueTrend';
 import { RecentDocuments } from '../components/RecentDocuments';
 import type { Document } from '@/mobile/types';
 
@@ -83,6 +84,9 @@ export function HomeScreen({
 
       {/* 2. Stats 2×2 grid */}
       <StatCards stats={stats} loading={statsLoading} />
+
+      {/* 2b. Revenue mini-chart (hidden when no invoices in 6 months) */}
+      <RevenueTrend />
 
       {/* 3. Recent documents — FAB handles creation (no QuickActions duplication) */}
       <RecentDocuments

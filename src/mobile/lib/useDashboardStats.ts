@@ -17,6 +17,8 @@ interface ApiDashboardStats {
   draftCount: number;
   statusBreakdown: Record<string, number>;
   typeBreakdown: Record<string, number>;
+  /** Count of FACTUREs with status SENT (newer servers only) */
+  unpaidCount?: number;
 }
 
 // ── Shape consumed by StatCards ───────────────────────────────
@@ -30,6 +32,16 @@ export interface DashboardStats {
   deliveredCount: number;
   /** Factures with status SENT — awaiting payment */
   unpaidCount: number;
+  /** Sum of TTC for FACTUREs awaiting payment (computed locally) */
+  unpaidTotal: number;
+}
+
+/** Unpaid DA amount — always from local store (API doesn't expose it). */
+function computeUnpaidTotal(): number {
+  const docs = useDocumentStore.getState().savedDocuments;
+  return docs
+    .filter((d) => d.type === 'FACTURE' && d.status === 'SENT')
+    .reduce((s, d) => s + (d.totalTTC ?? 0), 0);
 }
 
 // ── Fallback: compute from local savedDocuments ───────────────
@@ -49,7 +61,8 @@ function computeLocalStats(): DashboardStats {
     totalClients: 0,
     draftCount: docs.filter((d) => d.status === 'DRAFT').length,
     deliveredCount: docs.filter((d) => d.status === 'PAID').length,
-    unpaidCount: docs.filter((d) => d.status === 'SENT').length,
+    unpaidCount: docs.filter((d) => d.type === 'FACTURE' && d.status === 'SENT').length,
+    unpaidTotal: computeUnpaidTotal(),
   };
 }
 
@@ -69,6 +82,7 @@ const DEFAULT_STATS: DashboardStats = {
   draftCount: 0,
   deliveredCount: 0,
   unpaidCount: 0,
+  unpaidTotal: 0,
 };
 
 export function useDashboardStats(enabled = true): UseDashboardStatsResult {
@@ -93,7 +107,8 @@ export function useDashboardStats(enabled = true): UseDashboardStatsResult {
         deliveredCount:
           (s.statusBreakdown?.DELIVERED ?? 0) +
           (s.statusBreakdown?.ACCEPTED ?? 0),
-        unpaidCount: s.statusBreakdown?.SENT ?? 0,
+        unpaidCount: s.unpaidCount ?? s.statusBreakdown?.SENT ?? 0,
+        unpaidTotal: computeUnpaidTotal(),
       });
     } catch {
       // Fall back to local store computation
@@ -105,7 +120,9 @@ export function useDashboardStats(enabled = true): UseDashboardStatsResult {
   }, [enabled]);
 
   useEffect(() => {
-    void fetchStats();
+    // Deferred so the sync setLoading inside fetchStats doesn't run during the effect
+    const id = setTimeout(() => { void fetchStats(); }, 0);
+    return () => clearTimeout(id);
   }, [fetchStats]);
 
   return { stats, loading, error, refetch: fetchStats };
