@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def keystorePath = rootProject.file('clouddevis-release.jks')
+def keystorePath = file('clouddevis-release.jks')
 def keystoreExists = keystorePath.exists()
 def useCiKeystore = System.getenv('KEYSTORE_BASE64') != null
 
