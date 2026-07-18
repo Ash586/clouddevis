@@ -4,6 +4,10 @@
 // caller can give the right follow-up (e.g. open WhatsApp / mailto on web).
 
 import { downloadDocument } from './pdf';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Browser } from '@capacitor/browser';
 
 export type ShareResult = 'shared' | 'downloaded';
 
@@ -49,17 +53,14 @@ export async function shareDocument(options: {
   const text = `${docNumber}\nClient: ${clientName}\nTotal: ${total.toLocaleString('fr-DZ')} ${currency}`;
 
   // 1. Native (Capacitor) — write to cache then open the OS share sheet.
-  try {
-    const { Capacitor } = await import('@capacitor/core');
-    if (Capacitor.isNativePlatform()) {
-      const { Filesystem, Directory } = await import('@capacitor/filesystem');
-      const { Share } = await import('@capacitor/share');
+  if (Capacitor.isNativePlatform()) {
+    try {
       const { uri } = await Filesystem.writeFile({ path: fileName, data: pdfBase64, directory: Directory.Cache });
       await Share.share({ title, text, files: [uri], dialogTitle: 'Partager le document' });
       return 'shared';
+    } catch {
+      // fall through to web
     }
-  } catch {
-    // fall through to web
   }
 
   // 2. Web Share API with a real file (works on most mobile browsers).
@@ -102,15 +103,13 @@ export async function openWhatsApp(options: {
     url = `https://wa.me/?text=${encodedMessage}`;
   }
 
-  try {
-    const { Capacitor } = await import('@capacitor/core');
-    if (Capacitor.isNativePlatform()) {
-      const { Browser } = await import('@capacitor/browser');
+  if (Capacitor.isNativePlatform()) {
+    try {
       await Browser.open({ url });
       return;
+    } catch {
+      // fall through to window.open
     }
-  } catch {
-    // Browser plugin not available — fall through to window.open
   }
 
   window.open(url, '_blank');

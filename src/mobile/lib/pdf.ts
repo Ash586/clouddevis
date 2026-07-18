@@ -8,6 +8,9 @@ import { generatePDFBase64 as engineGeneratePDF } from '../../../packages/pdf-en
 import { numberToFrenchWords, numberToArabicWords } from '../../lib/dgi';
 import type { PDFDocumentData } from '../../../packages/pdf-engine';
 import type { Document } from '../types';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 /**
  * Generate a PDF from a Document object and return as base64.
@@ -220,17 +223,14 @@ export async function downloadDocument(base64: string, fileName: string): Promis
   const name = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
 
   // Native (Capacitor) — write to cache then share sheet
-  try {
-    const { Capacitor } = await import('@capacitor/core');
-    if (Capacitor.isNativePlatform()) {
-      const { Filesystem, Directory } = await import('@capacitor/filesystem');
-      const { Share } = await import('@capacitor/share');
+  if (Capacitor.isNativePlatform()) {
+    try {
       const { uri } = await Filesystem.writeFile({ path: name, data: base64, directory: Directory.Cache });
       await Share.share({ title: name, files: [uri], dialogTitle: 'Enregistrer le PDF' });
       return;
+    } catch {
+      // fall through to browser download
     }
-  } catch {
-    // fall through to browser download
   }
 
   // Browser fallback — anchor download
@@ -270,17 +270,14 @@ export async function printDocument(base64OrHtml: string): Promise<void> {
   }
 
   // Native (Capacitor) — write to cache then open share sheet for printing
-  try {
-    const { Capacitor } = await import('@capacitor/core');
-    if (Capacitor.isNativePlatform()) {
-      const { Filesystem, Directory } = await import('@capacitor/filesystem');
-      const { Share } = await import('@capacitor/share');
+  if (Capacitor.isNativePlatform()) {
+    try {
       const { uri } = await Filesystem.writeFile({ path: 'document.pdf', data: base64OrHtml, directory: Directory.Cache });
       await Share.share({ title: 'Imprimer', files: [uri], dialogTitle: 'Imprimer le document' });
       return;
+    } catch {
+      // fall through to browser
     }
-  } catch {
-    // fall through to browser
   }
 
   // Browser fallback

@@ -322,18 +322,27 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         } catch {
           offline = true;
         }
-        savedPdfRef.current = await buildPdf(finalNumber);
-        hapticSuccess();
-        setSavedSheet({
-          id: finalId, number: finalNumber, offline,
-          clientName: currentDoc.client?.name || 'Client',
-          clientPhone: currentDoc.client?.phone || undefined,
-          total: totals.netAPayer,
-          typeLabel: DOCUMENT_TYPE_LABELS[currentDoc.type],
-        });
-        resetDocument();
-        clientPromptShown.current = false;
+        try {
+          savedPdfRef.current = await buildPdf(finalNumber);
+        } catch {
+          void notify('Erreur de génération du PDF');
+          savedPdfRef.current = null;
+        }
+        if (savedPdfRef.current) {
+          hapticSuccess();
+          setSavedSheet({
+            id: finalId, number: finalNumber, offline,
+            clientName: currentDoc.client?.name || 'Client',
+            clientPhone: currentDoc.client?.phone || undefined,
+            total: totals.netAPayer,
+            typeLabel: DOCUMENT_TYPE_LABELS[currentDoc.type],
+          });
+          resetDocument();
+          clientPromptShown.current = false;
+        }
       }
+    } catch {
+      void notify('Erreur lors de l\'enregistrement');
     } finally {
       setSaving(false);
     }
@@ -353,12 +362,16 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const handleSheetWhatsApp = useCallback(async () => {
     const s = savedSheet;
     if (!s || !savedPdfRef.current) return;
-    const result = await shareDocument({
-      pdfBase64: savedPdfRef.current, docNumber: s.number, clientName: s.clientName, total: s.total,
-    });
-    if (result === 'downloaded') {
-      void notify('PDF téléchargé — joignez-le à votre message');
-      void openWhatsApp({ phone: s.clientPhone, message: whatsappMessage(s) });
+    try {
+      const result = await shareDocument({
+        pdfBase64: savedPdfRef.current, docNumber: s.number, clientName: s.clientName, total: s.total,
+      });
+      if (result === 'downloaded') {
+        void notify('PDF téléchargé — joignez-le à votre message WhatsApp');
+        await openWhatsApp({ phone: s.clientPhone, message: whatsappMessage(s) });
+      }
+    } catch {
+      void notify('Échec du partage');
     }
     markSent(s);
     setSavedSheet(null);
@@ -368,8 +381,12 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const handleSheetDownload = useCallback(async () => {
     const s = savedSheet;
     if (!s || !savedPdfRef.current) return;
-    await downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
-    void notify('PDF téléchargé ✓');
+    try {
+      await downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
+      void notify('PDF téléchargé ✓');
+    } catch {
+      void notify('Échec du téléchargement');
+    }
   }, [savedSheet]);
 
   const handleSheetDone = useCallback(() => { setSavedSheet(null); onExit?.(); }, [onExit]);
@@ -379,24 +396,29 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setShareOpen(false);
     if (!guardReady()) return;
     setBusy(true);
-    const pdf = await buildPdf();
-    setBusy(false);
-    if (!pdf) return;
-    const result = await shareDocument({
-      pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
-    });
-    if (result === 'downloaded') {
-      void notify('PDF téléchargé — joignez-le à votre message');
-      const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
-      const amount = totals.netAPayer.toLocaleString('fr-DZ');
-      const clientName = currentDoc.client?.name || '';
-      const coName = company?.name || 'Rakmana';
-      const waMessage = currentDoc.language === 'AR'
-        ? `مرحباً ${clientName}، يرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج. شكراً لثقتكم — ${coName}.`
-        : currentDoc.language === 'EN'
-        ? `Hello ${clientName}, please find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA. Thank you — ${coName}.`
-        : `Bonjour ${clientName}, veuillez trouver ci-joint votre ${label.toLowerCase()} N°${docNumber} d'un montant de ${amount} DA. Merci de votre confiance — ${coName}.`;
-      void openWhatsApp({ phone: currentDoc.client?.phone, message: waMessage });
+    try {
+      const pdf = await buildPdf();
+      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      const result = await shareDocument({
+        pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
+      });
+      if (result === 'downloaded') {
+        void notify('PDF téléchargé — joignez-le à votre message WhatsApp');
+        const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
+        const amount = totals.netAPayer.toLocaleString('fr-DZ');
+        const clientName = currentDoc.client?.name || '';
+        const coName = company?.name || 'Rakmana';
+        const waMessage = currentDoc.language === 'AR'
+          ? `مرحباً ${clientName}، يرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج. شكراً لثقتكم — ${coName}.`
+          : currentDoc.language === 'EN'
+          ? `Hello ${clientName}, please find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA. Thank you — ${coName}.`
+          : `Bonjour ${clientName}, veuillez trouver ci-joint votre ${label.toLowerCase()} N°${docNumber} d'un montant de ${amount} DA. Merci de votre confiance — ${coName}.`;
+        await openWhatsApp({ phone: currentDoc.client?.phone, message: waMessage });
+      }
+    } catch {
+      void notify('Échec de l\'envoi WhatsApp');
+    } finally {
+      setBusy(false);
     }
   }, [guardReady, buildPdf, docNumber, currentDoc, totals, company?.name]);
 
@@ -404,43 +426,60 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setShareOpen(false);
     if (!guardReady()) return;
     setBusy(true);
-    const pdf = await buildPdf();
-    setBusy(false);
-    if (pdf) { await downloadDocument(pdf, `${docNumber}.pdf`); void notify('PDF téléchargé ✓'); }
+    try {
+      const pdf = await buildPdf();
+      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      await downloadDocument(pdf, `${docNumber}.pdf`);
+      void notify('PDF téléchargé ✓');
+    } catch {
+      void notify('Échec du téléchargement');
+    } finally {
+      setBusy(false);
+    }
   }, [guardReady, buildPdf, docNumber]);
 
   const handlePrint = useCallback(async () => {
     setShareOpen(false);
     if (!guardReady()) return;
     setBusy(true);
-    const pdf = await buildPdf();
-    setBusy(false);
-    if (pdf) await printDocument(pdf);
+    try {
+      const pdf = await buildPdf();
+      if (pdf) await printDocument(pdf);
+    } catch {
+      void notify('Échec de l\'impression');
+    } finally {
+      setBusy(false);
+    }
   }, [guardReady, buildPdf]);
 
   const handleEmail = useCallback(async () => {
     setShareOpen(false);
     if (!guardReady()) return;
     setBusy(true);
-    const pdf = await buildPdf();
-    setBusy(false);
-    if (!pdf) return;
-    const result = await shareDocument({
-      pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
-    });
-    if (result === 'downloaded') {
-      const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
-      const subject = `${label} ${docNumber}`;
-      const amount = totals.netAPayer.toLocaleString('fr-DZ');
-      const clientName = currentDoc.client?.name || '';
-      const coName = company?.name || 'Rakmana';
-      const body = currentDoc.language === 'AR'
-        ? `مرحباً ${clientName}،\n\nيرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج.\n\nمع تحياتنا،\n${coName}`
-        : currentDoc.language === 'EN'
-        ? `Hello ${clientName},\n\nPlease find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA.\n\nBest regards,\n${coName}`
-        : `Bonjour ${clientName},\n\nVeuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ${amount} DA.\n\nCordialement,\n${coName}`;
-      void notify('PDF téléchargé — joignez-le à l\'email');
-      window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_system');
+    try {
+      const pdf = await buildPdf();
+      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      const result = await shareDocument({
+        pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
+      });
+      if (result === 'downloaded') {
+        const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
+        const subject = `${label} ${docNumber}`;
+        const amount = totals.netAPayer.toLocaleString('fr-DZ');
+        const clientName = currentDoc.client?.name || '';
+        const coName = company?.name || 'Rakmana';
+        const body = currentDoc.language === 'AR'
+          ? `مرحباً ${clientName}،\n\nيرجى الاطلاع على ${label} رقم ${docNumber} بمبلغ ${amount} دج.\n\nمع تحياتنا،\n${coName}`
+          : currentDoc.language === 'EN'
+          ? `Hello ${clientName},\n\nPlease find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA.\n\nBest regards,\n${coName}`
+          : `Bonjour ${clientName},\n\nVeuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ${amount} DA.\n\nCordialement,\n${coName}`;
+        void notify('PDF téléchargé — joignez-le à l\'email');
+        window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+      }
+    } catch {
+      void notify('Échec de l\'envoi par email');
+    } finally {
+      setBusy(false);
     }
   }, [guardReady, buildPdf, currentDoc, docNumber, totals, company]);
 
