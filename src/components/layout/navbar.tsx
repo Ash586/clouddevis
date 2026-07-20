@@ -15,7 +15,7 @@ import { ENABLED_DOC_TYPES } from '@/lib/config';
 import {
   Menu, X, Home, LayoutDashboard, FileText, Users, ChevronDown, User, Bell, LogOut,
   FileStack, CreditCard, UsersRound, Plus, PenLine, Receipt, ClipboardList, Wrench,
-  FilePen, ScrollText, Truck, HelpCircle,
+  FilePen, ScrollText, Truck, HelpCircle, Smartphone,
 } from 'lucide-react';
 
 const LANG_LABELS: Record<string, string> = { fr: 'FR', ar: 'AR', en: 'EN' };
@@ -65,6 +65,13 @@ export function Navbar() {
   const [documentsOpen, setDocumentsOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [clientCount, setClientCount] = useState(0);
+  const [isNativeApp, setIsNativeApp] = useState(false);
+
+  useEffect(() => {
+    import('@capacitor/core').then(({ Capacitor }) => {
+      setIsNativeApp(Capacitor.isNativePlatform());
+    }).catch(() => {});
+  }, []);
 
   // Fetch nav badge data only once we know a user session exists.
   useEffect(() => {
@@ -209,6 +216,14 @@ export function Navbar() {
             {!loading && !user && (
               <div className="hidden md:flex items-center gap-6">{guestLinks}</div>
             )}
+            {isNativeApp && user && (
+              <button type="button" onClick={() => { window.location.href = '/app'; }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--green-bg)] text-[var(--green-2)] text-xs font-bold min-h-[36px] active:scale-[0.97] transition-transform"
+                title={t('backToApp')}>
+                <Smartphone size={14} />
+                <span className="hidden sm:inline">{t('backToApp')}</span>
+              </button>
+            )}
             {!loading && user && <div className="hidden md:block">{quickCreate}</div>}
 
             <div className="flex items-center gap-1.5 sm:gap-2 sm:pl-3 sm:border-l border-[rgba(15,39,71,0.1)]">
@@ -334,6 +349,12 @@ export function Navbar() {
                     <button type="button" onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-red-400 min-h-[44px]">
                       <LogOut size={16} /> {t('logout')}
                     </button>
+                    {isNativeApp && (
+                      <button type="button" onClick={() => { window.location.href = '/app'; }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-[var(--green-2)] min-h-[44px]">
+                        <Smartphone size={16} /> {t('backToApp')}
+                      </button>
+                    )}
                   </div>
                 </>
               ) : (

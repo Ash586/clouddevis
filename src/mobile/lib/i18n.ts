@@ -36,6 +36,7 @@ type TranslationKeys =
   | 'settings.deleteAccounting' | 'settings.enterPasswordToConfirm'
   | 'settings.bugReport' | 'settings.bugReportHint'
   | 'settings.biometric' | 'settings.biometricHint' | 'settings.biometricUnavailable'
+  | 'settings.fullSite' | 'settings.fullSiteHint'
   | 'fab.facture' | 'fab.devis' | 'fab.duplicate'
   | 'common.artisan' | 'common.entreprise'
   | 'editor.new' | 'editor.edit' | 'editor.preview' | 'editor.editBtn'
@@ -144,6 +145,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.biometric': 'Verrouillage biométrique',
     'settings.biometricHint': 'Empreinte ou Face ID après 5 min en arrière-plan',
     'settings.biometricUnavailable': 'Non disponible sur cet appareil',
+    'settings.fullSite': 'Version complète',
+    'settings.fullSiteHint': 'Ouvrir le site complet dans l\'application',
     'fab.facture': 'Facture',
     'fab.devis': 'Devis',
     'fab.duplicate': 'Dupliquer',
@@ -285,6 +288,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.biometric': 'القفل البيومتري',
     'settings.biometricHint': 'بصمة أو وجه بعد 5 دقائق في الخلفية',
     'settings.biometricUnavailable': 'غير متاح على هذا الجهاز',
+    'settings.fullSite': 'النسخة الكاملة',
+    'settings.fullSiteHint': 'فتح الموقع الكامل داخل التطبيق',
     'fab.facture': 'فاتورة',
     'fab.devis': 'عرض سعر',
     'fab.duplicate': 'نسخ',
@@ -426,6 +431,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'settings.biometric': 'Biometric lock',
     'settings.biometricHint': 'Fingerprint or Face ID after 5 min in background',
     'settings.biometricUnavailable': 'Not available on this device',
+    'settings.fullSite': 'Full version',
+    'settings.fullSiteHint': 'Open the full website inside the app',
     'fab.facture': 'Invoice',
     'fab.devis': 'Quote',
     'fab.duplicate': 'Duplicate',

@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint, Bug } from 'lucide-react';
+import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint, Bug, Globe } from 'lucide-react';
 import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
 import { cn } from '@/lib/utils';
 import {
@@ -375,6 +375,26 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
             </div>
             <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
           </a>
+        </div>
+
+        {/* ── Full Site ─────────────────────────────────────── */}
+        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
+          <button
+            type="button"
+            onClick={() => { window.location.href = '/dashboard'; }}
+            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
+          >
+            <Globe size={18} className="text-[var(--green-2)]" />
+            <div className="flex-1">
+              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
+                {t('settings.fullSite')}
+              </span>
+              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
+                {t('settings.fullSiteHint')}
+              </span>
+            </div>
+            <ChevronRight size={16} className={cn('text-[var(--green-2)]/50', dir === 'rtl' && 'rotate-180')} />
+          </button>
         </div>
 
         {/* ── Delete Account ────────────────────────────────── */}

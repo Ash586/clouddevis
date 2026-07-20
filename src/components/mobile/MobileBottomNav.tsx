@@ -42,7 +42,8 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
   const handleTabClick = (item: NavItem) => {
     impact(ImpactStyle.Light);
     if (item.tabKey === '__new__') {
-      onNewDoc?.();
+      if (onNewDoc) onNewDoc();
+      else router.push('/dashboard/editor?type=DEVIS');
     } else {
       router.push(item.href);
     }

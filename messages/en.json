@@ -73,7 +73,8 @@
     "langFr": "Français",
     "langAr": "العربية",
     "langEn": "English",
-    "tourHelp": "Guided tour"
+    "tourHelp": "Guided tour",
+    "backToApp": "Back to app"
   },
   "sidebar": {
     "stats": "Overview",

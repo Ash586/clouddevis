@@ -332,7 +332,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pb-20 md:pb-0">
           <TrialGate>
             {loading ? (
               <div className="max-w-4xl mx-auto p-6">

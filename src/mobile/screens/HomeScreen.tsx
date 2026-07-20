@@ -8,12 +8,13 @@
 
 import { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Globe, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDashboardStats } from '@/mobile/lib/useDashboardStats';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
 import { refreshAllData } from '@/mobile/lib/useApiSync';
 import { useDocumentStore } from '@/stores/documentStore';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { HomeHeader } from '../components/HomeHeader';
 import { StatCards } from '../components/StatCards';
 import { RevenueTrend } from '../components/RevenueTrend';
@@ -36,6 +37,7 @@ export function HomeScreen({
   hasNotifications = false,
 }: HomeScreenProps) {
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
+  const { t } = useMobileI18n();
 
   // ── Stats from API (falls back to local on error) ──────────
   const { stats, loading: statsLoading, refetch } = useDashboardStats(true);
@@ -87,6 +89,21 @@ export function HomeScreen({
 
       {/* 2b. Revenue mini-chart (hidden when no invoices in 6 months) */}
       <RevenueTrend />
+
+      {/* 2c. Full site shortcut */}
+      <button
+        type="button"
+        onClick={() => { window.location.href = '/dashboard'; }}
+        className="mx-5 flex items-center gap-3 px-4 py-3 rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] active:scale-[0.98] transition-transform"
+      >
+        <div className="w-9 h-9 rounded-xl bg-[var(--green-bg)] flex items-center justify-center shrink-0">
+          <Globe size={18} className="text-[var(--green-2)]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="block text-sm font-semibold text-[var(--sand)]">{t('settings.fullSite')}</span>
+          <span className="block text-[10px] text-[var(--sand-muted)]">{t('settings.fullSiteHint')}</span>
+        </div>
+      </button>
 
       {/* 3. Recent documents — FAB handles creation (no QuickActions duplication) */}
       <RecentDocuments

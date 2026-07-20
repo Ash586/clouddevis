@@ -73,7 +73,8 @@
     "langFr": "Français",
     "langAr": "العربية",
     "langEn": "English",
-    "tourHelp": "Visite guidée"
+    "tourHelp": "Visite guidée",
+    "backToApp": "Retour à l'app"
   },
   "sidebar": {
     "stats": "Vue d'ensemble",

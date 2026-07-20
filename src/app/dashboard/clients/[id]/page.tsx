@@ -88,13 +88,13 @@ export default function ClientDetailPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pb-20 md:pb-0">
             <TrialGate>
               <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
                 <div className="animate-pulse space-y-4">
                   <div className="h-8 w-48 bg-[var(--navy-4)] rounded" />
                   <div className="h-32 bg-[var(--navy-3)] rounded-xl" />
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[1, 2, 3].map(i => <div key={i} className="h-20 bg-[var(--navy-3)] rounded-xl" />)}
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export default function ClientDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pb-20 md:pb-0">
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
               <div className="flex items-center gap-3">
@@ -161,7 +161,9 @@ export default function ClientDetailPage() {
                     <p className="text-sm text-[var(--sand-muted)]">{t('noDocuments')}</p>
                   </Card>
                 ) : (
-                  <Card className="overflow-x-auto p-0">
+                  <>
+                  {/* Desktop table */}
+                  <Card className="hidden md:block overflow-x-auto p-0">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-[rgba(15,39,71,0.06)]">
@@ -189,6 +191,24 @@ export default function ClientDetailPage() {
                       </tbody>
                     </table>
                   </Card>
+                  {/* Mobile cards */}
+                  <div className="md:hidden space-y-2">
+                    {documents.map(doc => (
+                      <Card key={doc.id} className="p-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm font-bold text-[var(--sand)]">{doc.number}</span>
+                          <span className={cn('inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold', STATUS_COLORS[doc.status] ?? 'bg-[var(--navy-3)] text-[var(--sand-2)]')}>
+                            {doc.status}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-[var(--sand-muted)]">{TYPE_LABELS[doc.type] ?? doc.type} · {doc.date}</span>
+                          <span className="text-sm font-semibold text-[var(--sand)]">{doc.total}</span>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                  </>
                 )}
               </div>
             </div>

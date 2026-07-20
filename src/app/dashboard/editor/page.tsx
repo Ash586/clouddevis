@@ -325,6 +325,20 @@ function EditorContent() {
         return;
       }
     }
+    // Native (Capacitor WebView): generate a real PDF via pdf-engine and share it
+    // through the OS share sheet — window.open/print doesn't work in a WebView.
+    try {
+      const { Capacitor } = await import('@capacitor/core');
+      if (Capacitor.isNativePlatform()) {
+        try { await saveDoc(); } catch { /* save failed — still generate the PDF */ }
+        track('Document Downloaded', { type: doc.documentType, mode: doc.mode, native: true });
+        const langMap: Record<string, 'FR' | 'AR' | 'EN'> = { fr: 'FR', ar: 'AR', en: 'EN' };
+        const { downloadEditorPdfNative } = await import('@/lib/editorPdfBridge');
+        await downloadEditorPdfNative(doc, results, langMap[locale] ?? 'FR');
+        return;
+      }
+    } catch { /* not in Capacitor — fall through to browser flow */ }
+
     // Open window synchronously during user-gesture so popup blockers don't fire.
     // Write placeholder immediately so the window stays alive during async work.
     // Using location.replace(blobUrl) instead of document.write() because document.write()
@@ -623,7 +637,7 @@ function EditorContent() {
 
   return (
     <TrialGate>
-      <div className="h-screen flex flex-col bg-[var(--navy)] text-[var(--sand)] font-sans print:bg-white overflow-hidden">
+      <div className="h-dvh flex flex-col bg-[var(--navy)] text-[var(--sand)] font-sans print:bg-white overflow-hidden">
 
         {docLoading && (
           <div className="absolute inset-0 z-[200] flex items-center justify-center bg-[var(--navy)]/80 backdrop-blur-sm">
@@ -635,7 +649,7 @@ function EditorContent() {
         )}
 
         {/* ═══════════════ COMMAND BAR ═══════════════ */}
-        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[var(--border-2)] shadow-[var(--shadow-sm)] z-50 shrink-0 gap-3">
+        <div className="no-print h-14 flex items-center px-4 bg-[var(--navy-2)] border-b border-[var(--border-2)] shadow-[var(--shadow-sm)] z-50 shrink-0 gap-3" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
           {/* Left: Nav back + Doc type selector */}
           <button type="button" onClick={() => router.push('/dashboard')} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-[var(--sand-muted)] hover:text-[var(--sand)] hover:bg-[var(--navy-4)] transition" title={tc('dashboard')}>
             <ChevronRight size={18} className="rotate-180" />

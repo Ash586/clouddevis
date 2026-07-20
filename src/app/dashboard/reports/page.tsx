@@ -140,7 +140,7 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pb-20 md:pb-0">
           <TrialGate>
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
 
@@ -300,11 +300,12 @@ export default function ReportsPage() {
                     </Card>
                   </div>
 
-                  {/* Top Clients Table */}
+                  {/* Top Clients */}
                   {data.topClients.length > 0 && (
                     <Card>
                       <h2 className="text-sm font-bold text-[var(--sand-2)] mb-4">{t('topClients')}</h2>
-                      <div className="overflow-x-auto">
+                      {/* Desktop table */}
+                      <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b border-[rgba(15,39,71,0.06)]">
@@ -323,6 +324,23 @@ export default function ReportsPage() {
                             ))}
                           </tbody>
                         </table>
+                      </div>
+                      {/* Mobile cards */}
+                      <div className="md:hidden space-y-2">
+                        {data.topClients.map((r, i) => (
+                          <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[var(--navy-3)]">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-7 h-7 rounded-full bg-[var(--navy-4)] text-[var(--sand-muted)] flex items-center justify-center text-xs font-bold shrink-0">
+                                {(r.name[0] ?? '?').toUpperCase()}
+                              </span>
+                              <div className="min-w-0">
+                                <span className="block text-sm font-semibold text-[var(--sand)] truncate">{r.name}</span>
+                                <span className="text-[10px] text-[var(--sand-muted)]">{r.count} docs</span>
+                              </div>
+                            </div>
+                            <span className="text-sm font-bold text-[var(--sand)] whitespace-nowrap">{r.total.toLocaleString()} {tc('currency')}</span>
+                          </div>
+                        ))}
                       </div>
                     </Card>
                   )}

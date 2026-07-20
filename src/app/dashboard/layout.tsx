@@ -7,6 +7,8 @@ import { OfflineSyncProvider } from '@/components/layout/OfflineSyncProvider';
 import { FeedbackFab } from '@/components/feedback/FeedbackFab';
 import { TourProvider } from '@/contexts/TourProvider';
 import { PWAInstallBanner } from '@/components/mobile/PWAInstallBanner';
+import { DashboardBackHandler } from '@/components/native/DashboardBackHandler';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,6 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {children}
         <FeedbackFab />
         <PWAInstallBanner />
+        <MobileBottomNav />
+        <DashboardBackHandler />
       </TourProvider>
     </OfflineSyncProvider>
   );
