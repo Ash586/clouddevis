@@ -116,6 +116,7 @@ function isPublicApiPath(pathname: string): boolean {
     pathname === '/api/track/pageview' ||
     pathname.startsWith('/api/webhooks/') ||
     pathname.startsWith('/api/r/') ||
+    pathname === '/api/pdf/generate' ||
     pathname === '/api/diag'
   );
 }

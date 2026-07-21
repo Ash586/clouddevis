@@ -9,6 +9,10 @@ const analyze = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
+  // @react-pdf/renderer (and its fontkit deps) must run as a real Node module
+  // server-side, not be bundled by webpack — otherwise PDF generation throws.
+  serverExternalPackages: ['@react-pdf/renderer'],
+
   images: {
     formats: ['image/avif', 'image/webp'],
   },
