@@ -12,6 +12,25 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
+async function generatePDFWithFallback(pdfData: PDFDocumentData): Promise<string> {
+  try {
+    return await engineGeneratePDF(pdfData);
+  } catch (clientErr) {
+    logger.warn('Client-side PDF failed, trying server-side');
+  }
+  const res = await fetch('/api/pdf/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pdfData),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Server PDF failed' }));
+    throw new Error(err.error || 'Server PDF generation failed');
+  }
+  const { base64 } = await res.json();
+  return base64;
+}
+
 /**
  * Generate a PDF from a Document object and return as base64.
  * Uses @react-pdf/renderer via the pdf-engine package.
@@ -96,7 +115,7 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
     showWatermark: doc.status === 'DRAFT',
   };
 
-  return engineGeneratePDF(pdfData);
+  return generatePDFWithFallback(pdfData);
 }
 
 /**
@@ -210,7 +229,7 @@ export async function generatePDFBase64(options: {
     language: options.language ?? 'FR',
   };
 
-  return engineGeneratePDF(pdfData);
+  return generatePDFWithFallback(pdfData);
 }
 
 /**

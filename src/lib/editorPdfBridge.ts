@@ -111,16 +111,30 @@ export function editorStateToPDFData(
   };
 }
 
+async function generateWithFallback(pdfData: import('../../packages/pdf-engine').PDFDocumentData): Promise<string> {
+  try {
+    const { generatePDFBase64 } = await import('../../packages/pdf-engine');
+    return await generatePDFBase64(pdfData);
+  } catch { /* client-side failed */ }
+  const res = await fetch('/api/pdf/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pdfData),
+  });
+  if (!res.ok) throw new Error('Server PDF generation failed');
+  const { base64 } = await res.json();
+  return base64;
+}
+
 export async function downloadEditorPdfNative(
   doc: DocumentState,
   results: CalculationResult,
   language: 'FR' | 'AR' | 'EN' = 'FR',
 ): Promise<void> {
-  const { generatePDFBase64 } = await import('../../packages/pdf-engine');
   const { downloadDocument } = await import('@/mobile/lib/pdf');
 
   const pdfData = editorStateToPDFData(doc, results, language);
-  const base64 = await generatePDFBase64(pdfData);
+  const base64 = await generateWithFallback(pdfData);
   const fileName = `${pdfData.type}_${pdfData.number || 'document'}.pdf`;
   await downloadDocument(base64, fileName);
 }
