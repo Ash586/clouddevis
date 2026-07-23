@@ -128,10 +128,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       const prefilled = store.consumePrefill();
       const hasDraft = store.currentDoc.items.length > 0 || !!store.currentDoc.client?.name;
       if (prefilled) {
-        void notify('Document dupliqué — vérifiez et enregistrez');
+        void notify(t('toast.docDuplicated'));
         clientPromptShown.current = true;
       } else if (hasDraft) {
-        void notify('Brouillon restauré ✓');
+        void notify(t('toast.draftRestored'));
         clientPromptShown.current = true;
       } else {
         resetDocument();
@@ -180,7 +180,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           useDocumentStore.getState().loadDocumentIntoWizard(local.id);
           useDocumentStore.getState().consumePrefill();
         } else {
-          setLoadError('Impossible de charger le document.');
+          setLoadError(t('toast.loadError'));
         }
       })
       .finally(() => setLoadingDoc(false));
@@ -203,7 +203,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   const prevTimbre = useRef(totals.timbreFiscal);
   useEffect(() => {
     if (totals.timbreFiscal && !prevTimbre.current) {
-      void notify(`Timbre fiscal (${totals.timbreAmount.toLocaleString('fr-DZ')} DA) ajouté — Art. 220 CII`);
+      void notify(`${t('toast.timbreAdded')} (${totals.timbreAmount.toLocaleString('fr-DZ')} DA)`);
     }
     prevTimbre.current = totals.timbreFiscal;
   }, [totals.timbreFiscal, totals.timbreAmount]);
@@ -267,7 +267,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       pdfRef.current = base64;
       return base64;
     } catch {
-      void notify('Échec de la génération du PDF');
+      void notify(t('toast.pdfFailed'));
       return null;
     }
   }, [docNumber, documentDate, currentDoc, totals, company]);
@@ -275,20 +275,20 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
   useEffect(() => { pdfRef.current = null; }, [currentDoc, totals]);
 
   const guardReady = useCallback((): boolean => {
-    if (!currentDoc.client?.name) { setActiveTab('client'); setDockMode('client'); void notify('Choisissez un client'); return false; }
-    if (currentDoc.items.length === 0) { setActiveTab('items'); setDockMode('add'); void notify('Ajoutez au moins un article'); return false; }
+    if (!currentDoc.client?.name) { setActiveTab('client'); setDockMode('client'); void notify(t('toast.chooseClient')); return false; }
+    if (currentDoc.items.length === 0) { setActiveTab('items'); setDockMode('add'); void notify(t('toast.addLine')); return false; }
     return true;
   }, [currentDoc]);
 
   // ── Save ──
   const handleSave = useCallback(async () => {
-    if (!company) { void notify("Configurez votre société d'abord"); return; }
+    if (!company) { void notify(t('toast.configureFirst')); return; }
     if (!guardReady()) { hapticError(); return; }
     setSaving(true);
     try {
       if (editingDocId) {
         const temp = useDocumentStore.getState().buildFromCurrent(company);
-        if (!temp) { void notify('Aucun article à enregistrer'); return; }
+        if (!temp) { void notify(t('toast.noLines')); return; }
         try {
           await updateApiDocument(editingDocId, { ...temp, id: editingDocId });
         } catch {
@@ -296,7 +296,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
             action: 'UPDATE', entity: 'document', entityId: editingDocId,
             payload: { ...temp, id: editingDocId },
           });
-          void notify('Modifié hors ligne — synchronisation automatique ✓');
+          void notify(t('toast.offlineModified'));
         }
         updateSavedDocument(editingDocId, {
           type: currentDoc.type, client: currentDoc.client as Client, items: currentDoc.items,
@@ -306,11 +306,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           timbreFiscal: totals.timbreFiscal, timbreAmount: totals.timbreAmount,
         });
         hapticSuccess();
-        void notify('Enregistré ✓');
+        void notify(t('toast.saved'));
         setTimeout(() => onExit?.(), 700);
       } else {
         const doc = saveDocument(company);
-        if (!doc) { void notify('Aucun article à enregistrer'); return; }
+        if (!doc) { void notify(t('toast.noLines')); return; }
         let finalId = doc.id;
         let finalNumber = doc.number;
         let offline = false;
@@ -325,7 +325,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         try {
           savedPdfRef.current = await buildPdf(finalNumber);
         } catch {
-          void notify('Erreur de génération du PDF');
+          void notify(t('toast.pdfError'));
           savedPdfRef.current = null;
         }
         if (savedPdfRef.current) {
@@ -342,7 +342,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         }
       }
     } catch {
-      void notify('Erreur lors de l\'enregistrement');
+      void notify(t('toast.saveError'));
     } finally {
       setSaving(false);
     }
@@ -367,11 +367,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         pdfBase64: savedPdfRef.current, docNumber: s.number, clientName: s.clientName, total: s.total,
       });
       if (result === 'downloaded') {
-        void notify('PDF téléchargé — joignez-le à votre message WhatsApp');
+        void notify(t('toast.pdfDownloadedWa'));
         await openWhatsApp({ phone: s.clientPhone, message: whatsappMessage(s) });
       }
     } catch {
-      void notify('Échec du partage');
+      void notify(t('toast.shareFailed'));
     }
     markSent(s);
     setSavedSheet(null);
@@ -383,9 +383,9 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     if (!s || !savedPdfRef.current) return;
     try {
       await downloadDocument(savedPdfRef.current, `${s.number}.pdf`);
-      void notify('PDF téléchargé ✓');
+      void notify(t('toast.pdfDownloaded'));
     } catch {
-      void notify('Échec du téléchargement');
+      void notify(t('toast.downloadFailed'));
     }
   }, [savedSheet]);
 
@@ -398,12 +398,12 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setBusy(true);
     try {
       const pdf = await buildPdf();
-      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      if (!pdf) {       void notify(t('toast.pdfImpossible')); return; }
       const result = await shareDocument({
         pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
       });
       if (result === 'downloaded') {
-        void notify('PDF téléchargé — joignez-le à votre message WhatsApp');
+        void notify(t('toast.pdfDownloadedWa'));
         const label = DOCUMENT_TYPE_LABELS[currentDoc.type];
         const amount = totals.netAPayer.toLocaleString('fr-DZ');
         const clientName = currentDoc.client?.name || '';
@@ -416,7 +416,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         await openWhatsApp({ phone: currentDoc.client?.phone, message: waMessage });
       }
     } catch {
-      void notify('Échec de l\'envoi WhatsApp');
+      void notify(t('toast.whatsappFailed'));
     } finally {
       setBusy(false);
     }
@@ -428,11 +428,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setBusy(true);
     try {
       const pdf = await buildPdf();
-      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      if (!pdf) {       void notify(t('toast.pdfImpossible')); return; }
       await downloadDocument(pdf, `${docNumber}.pdf`);
-      void notify('PDF téléchargé ✓');
+      void notify(t('toast.pdfDownloaded'));
     } catch {
-      void notify('Échec du téléchargement');
+      void notify(t('toast.downloadFailed'));
     } finally {
       setBusy(false);
     }
@@ -446,7 +446,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       const pdf = await buildPdf();
       if (pdf) await printDocument(pdf);
     } catch {
-      void notify('Échec de l\'impression');
+      void notify(t('toast.printFailed'));
     } finally {
       setBusy(false);
     }
@@ -458,7 +458,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
     setBusy(true);
     try {
       const pdf = await buildPdf();
-      if (!pdf) { void notify('Génération du PDF impossible'); return; }
+      if (!pdf) {       void notify(t('toast.pdfImpossible')); return; }
       const result = await shareDocument({
         pdfBase64: pdf, docNumber, clientName: currentDoc.client?.name || 'Client', total: totals.netAPayer,
       });
@@ -473,18 +473,18 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           : currentDoc.language === 'EN'
           ? `Hello ${clientName},\n\nPlease find attached your ${label.toLowerCase()} No. ${docNumber} for ${amount} DA.\n\nBest regards,\n${coName}`
           : `Bonjour ${clientName},\n\nVeuillez trouver ci-joint votre ${label.toLowerCase()} ${docNumber} d'un montant de ${amount} DA.\n\nCordialement,\n${coName}`;
-        void notify('PDF téléchargé — joignez-le à l\'email');
+        void notify(t('toast.pdfForEmail'));
         window.open(`mailto:${currentDoc.client?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
       }
     } catch {
-      void notify('Échec de l\'envoi par email');
+      void notify(t('toast.emailFailed'));
     } finally {
       setBusy(false);
     }
   }, [guardReady, buildPdf, currentDoc, docNumber, totals, company]);
 
   const openPreview = useCallback(() => {
-    if (currentDoc.items.length === 0) { setActiveTab('items'); void notify('Ajoutez au moins un article'); return; }
+    if (currentDoc.items.length === 0) { setActiveTab('items'); void notify(t('toast.addLine')); return; }
     setPreviewOpen(true);
   }, [currentDoc.items.length]);
 
@@ -513,17 +513,17 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
           <span className="inline-flex w-16 h-16 rounded-2xl bg-[var(--blue-bg)] items-center justify-center mb-4">
             <Building2 size={28} className="text-[var(--green-2)]" />
           </span>
-          <h2 className="text-lg font-bold text-[var(--sand)]">Configurez votre société</h2>
+          <h2 className="text-lg font-bold text-[var(--sand)]">{t('editor.configureTitle')}</h2>
           <p className="text-sm text-[var(--sand-muted)] mt-2 mb-6">
-            Vos documents ont besoin de l&apos;en-tête de votre activité (nom, NIF…) pour être valides.
+            {t('editor.configureHint')}
           </p>
           <button type="button" onClick={() => (onConfigureCompany ?? onExit)?.()}
             className="w-full h-12 rounded-xl bg-[var(--green-2)] text-white text-sm font-semibold active:scale-[0.98] transition-transform">
-            Configurer ma société
+            {t('editor.configureBtn')}
           </button>
           <button type="button" onClick={() => onExit?.()}
             className="mt-3 text-xs text-[var(--sand-muted)] underline">
-            Plus tard
+            {t('editor.later')}
           </button>
         </div>
       </div>
@@ -536,7 +536,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       <div className="min-h-screen flex items-center justify-center bg-[var(--navy)]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={28} className="animate-spin text-[var(--green-2)]" />
-          <p className="text-sm text-[var(--sand-muted)]">Chargement du document…</p>
+          <p className="text-sm text-[var(--sand-muted)]">{t('editor.loading')}</p>
         </div>
       </div>
     );
@@ -547,10 +547,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
         <div className="text-center">
           <p className="text-sm text-red-400 mb-4">{loadError}</p>
           <div className="flex items-center justify-center gap-2">
-            <button type="button" onClick={() => onExit?.()}
-              className="px-5 py-2.5 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">Retour</button>
-            <button type="button" onClick={() => setRetryToken((prev) => prev + 1)}
-              className="px-5 py-2.5 rounded-xl bg-[var(--green-2)] text-sm font-semibold text-white">Réessayer</button>
+              <button type="button" onClick={() => onExit?.()}
+                className="px-5 py-2.5 rounded-xl bg-[var(--navy-3)] text-sm text-[var(--sand)]">{t('editor.back')}</button>
+              <button type="button" onClick={() => setRetryToken((prev) => prev + 1)}
+                className="px-5 py-2.5 rounded-xl bg-[var(--green-2)] text-sm font-semibold text-white">{t('editor.retry')}</button>
           </div>
         </div>
       </div>
@@ -590,7 +590,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
 
           {/* Running total hero */}
           <div className="text-right shrink-0">
-            <p className="text-[10px] text-[var(--sand-muted)] leading-none mb-0.5">Net à payer</p>
+            <p className="text-[10px] text-[var(--sand-muted)] leading-none mb-0.5">{t('editor.netToPay')}</p>
             <p className="text-lg font-bold text-[var(--green-2)] leading-none tabular-nums">
               {formatDA(totals.netAPayer)}
             </p>
@@ -613,11 +613,11 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
               ? 'bg-[var(--green-2)]/15 text-[var(--green-2)]'
               : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
           )}>
-            <UserRound size={11} /> <span className="truncate max-w-[120px]">{hasClient ? currentDoc.client?.name : 'Aucun client'}</span>
+            <UserRound size={11} /> <span className="truncate max-w-[120px]">{hasClient ? currentDoc.client?.name : t('editor.noClient')}</span>
           </span>
           {totals.timbreFiscal && (
             <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-semibold bg-amber-500/10 text-[var(--gold)]">
-              Timbre {formatDA(totals.timbreAmount)}
+              {t('editor.timbre')} {formatDA(totals.timbreAmount)}
             </span>
           )}
         </div>
@@ -797,7 +797,7 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
                 { icon: MessageCircle, label: 'WhatsApp', tint: '#25D366', on: handleWhatsApp },
                 { icon: Mail, label: 'Email', tint: 'var(--green-2)', on: handleEmail },
                 { icon: Download, label: 'PDF', tint: 'var(--green-2)', on: handleDownload },
-                { icon: Printer, label: t('editor.notes') === 'Notes & remarks' ? 'Print' : 'Imprimer', tint: 'var(--gold)', on: handlePrint },
+                { icon: Printer, label: t('editor.print'), tint: 'var(--gold)', on: handlePrint },
               ].map(({ icon: Icon, label, tint, on }) => (
                 <button key={label} type="button" onClick={on}
                   className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl active:bg-[var(--navy-3)] transition-colors">
@@ -815,10 +815,10 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
       {/* Exit guard */}
       <ConfirmSheet
         open={exitConfirmOpen}
-        title="Quitter la création ?"
-        message="Votre brouillon sera conservé et restauré à la prochaine ouverture."
-        confirmLabel="Quitter"
-        cancelLabel="Continuer"
+        title={t('editor.exitTitle')}
+        message={t('editor.exitMessage')}
+        confirmLabel={t('editor.exitConfirm')}
+        cancelLabel={t('editor.exitCancel')}
         destructive={false}
         onConfirm={() => { setExitConfirmOpen(false); onExit?.(); }}
         onClose={() => setExitConfirmOpen(false)}
@@ -843,27 +843,27 @@ export function CreateScreen({ editingDocId, onExit, onConfigureCompany }: Creat
                   <CheckCircle2 size={30} className="text-emerald-400" />
                 </motion.span>
                 <p className="text-base font-bold text-[var(--sand)]">
-                  {savedSheet.typeLabel} enregistré
+                  {savedSheet.typeLabel} {t('editor.documentSaved')}
                 </p>
                 <p className="mono text-sm text-[var(--green-2)] mt-0.5">{savedSheet.number}</p>
                 {savedSheet.offline && (
                   <p className="text-[11px] text-[var(--gold)] mt-1.5">
-                    Hors ligne — synchronisation automatique au retour du réseau ✓
+                    {t('editor.offlineHint')}
                   </p>
                 )}
               </div>
               <button type="button" onClick={handleSheetWhatsApp}
                 className="w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white active:scale-[0.98] transition-transform"
                 style={{ background: '#25D366' }}>
-                <MessageCircle size={18} /> Envoyer via WhatsApp
+                <MessageCircle size={18} /> {t('editor.sendWhatsApp')}
               </button>
               <button type="button" onClick={handleSheetDownload}
                 className="w-full h-11 mt-2 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold bg-[var(--navy-3)] text-[var(--sand)] active:scale-[0.98] transition-transform">
-                <Download size={17} /> Télécharger le PDF
+                <Download size={17} /> {t('editor.downloadPdf')}
               </button>
               <button type="button" onClick={handleSheetDone}
                 className="w-full h-10 mt-1 text-sm font-medium text-[var(--sand-muted)]">
-                Terminé
+                {t('editor.done')}
               </button>
             </motion.div>
           </>

@@ -1,13 +1,9 @@
 // Rakmana Mobile — Share Helper
-// Cross-platform: native (Capacitor) → Web Share API (mobile browsers) →
-// download fallback (desktop browsers). Returns how it was delivered so the
-// caller can give the right follow-up (e.g. open WhatsApp / mailto on web).
+// Cross-platform: native (WebView bridge) → Web Share API (mobile browsers) →
+// download fallback (desktop browsers).
 
 import { downloadDocument } from './pdf';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
-import { Browser } from '@capacitor/browser';
+import { isNativePlatform, nativeShareFile, nativeOpenUrl } from '@/lib/native';
 
 export type ShareResult = 'shared' | 'downloaded';
 
@@ -20,17 +16,12 @@ function base64ToBlob(base64: string, type = 'application/pdf'): Blob {
 
 /**
  * Convert an Algerian phone number to international format for WhatsApp.
- * - 0555123456 → 213555123456
- * - +213555123456 → 213555123456
- * - 213555123456 → 213555123456 (unchanged)
  */
 function formatPhoneForWhatsApp(phone: string): string {
   let cleaned = phone.replace(/[\s\-+()]/g, '');
-  // Algerian local numbers starting with 0 → replace with 213
   if (cleaned.startsWith('0')) {
     cleaned = '213' + cleaned.slice(1);
   }
-  // Ensure country code 213 is present
   if (!cleaned.startsWith('213')) {
     cleaned = '213' + cleaned;
   }
@@ -52,14 +43,10 @@ export async function shareDocument(options: {
   const title = `${docNumber} — ${clientName}`;
   const text = `${docNumber}\nClient: ${clientName}\nTotal: ${total.toLocaleString('fr-DZ')} ${currency}`;
 
-  // 1. Native (Capacitor) — write to cache then open the OS share sheet.
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const { uri } = await Filesystem.writeFile({ path: fileName, data: pdfBase64, directory: Directory.Cache });
-      await Share.share({ title, text, files: [uri], dialogTitle: 'Partager le document' });
+  // 1. Native (WebView) — share via Android Intent
+  if (isNativePlatform()) {
+    if (nativeShareFile(pdfBase64, fileName, title)) {
       return 'shared';
-    } catch {
-      // fall through to web
     }
   }
 
@@ -85,8 +72,6 @@ export async function shareDocument(options: {
 
 /**
  * Open WhatsApp directly with a pre-filled message.
- * On native (Capacitor), uses the Browser plugin or intent.
- * On web, opens wa.me in a new tab.
  */
 export async function openWhatsApp(options: {
   phone?: string;
@@ -103,16 +88,7 @@ export async function openWhatsApp(options: {
     url = `https://wa.me/?text=${encodedMessage}`;
   }
 
-  if (Capacitor.isNativePlatform()) {
-    try {
-      await Browser.open({ url });
-      return;
-    } catch {
-      // fall through to window.open
-    }
-  }
-
-  window.open(url, '_blank');
+  nativeOpenUrl(url);
 }
 
 /**

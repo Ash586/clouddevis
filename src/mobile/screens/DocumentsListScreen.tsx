@@ -248,7 +248,7 @@ export function DocumentsListScreen({
               total: doc.totalTTC + doc.timbreAmount - (doc.acompte || 0),
             });
           } catch {
-            void notify('Partage impossible');
+            void notify(t('toast.shareFailed'));
           }
           break;
         case 'download':
@@ -256,7 +256,7 @@ export function DocumentsListScreen({
             const pdf = await generatePDFBase64FromDoc(doc);
             await downloadDocument(pdf, `${doc.number}.pdf`);
           } catch {
-            void notify('Génération du PDF impossible');
+            void notify(t('toast.pdfImpossible'));
           }
           break;
         case 'print':
@@ -264,7 +264,7 @@ export function DocumentsListScreen({
             const pdf = await generatePDFBase64FromDoc(doc);
             await printDocument(pdf);
           } catch {
-            void notify('Génération du PDF impossible');
+            void notify(t('toast.pdfImpossible'));
           }
           break;
       }

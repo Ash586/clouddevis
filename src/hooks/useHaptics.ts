@@ -1,31 +1,30 @@
 'use client';
 
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { Capacitor } from '@capacitor/core';
+import { vibrate, isNativePlatform } from '@/lib/native';
 
 export function useHaptics() {
-  const isNative = Capacitor.isNativePlatform();
+  const isNative = isNativePlatform();
 
-  const impact = async (style: ImpactStyle = ImpactStyle.Medium) => {
+  const impact = async () => {
     if (!isNative) return;
     try {
-      await Haptics.impact({ style });
+      vibrate(30);
     } catch {}
   };
 
-  const notification = async (type: NotificationType = NotificationType.Success) => {
+  const notification = async () => {
     if (!isNative) return;
     try {
-      await Haptics.notification({ type });
+      vibrate(50);
     } catch {}
   };
 
-  const vibrate = async (ms: number = 10) => {
+  const vibrateFn = async (ms: number = 10) => {
     if (!isNative) return;
     try {
-      await Haptics.vibrate({ duration: ms });
+      vibrate(ms);
     } catch {}
   };
 
-  return { impact, notification, vibrate };
+  return { impact, notification, vibrate: vibrateFn };
 }

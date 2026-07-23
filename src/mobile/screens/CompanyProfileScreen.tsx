@@ -9,6 +9,7 @@ import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Building, ChevronRight, ChevronDown, Image as ImageIcon, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useClientStore } from '@/stores/clientStore';
 import { useUserStore } from '@/stores/userStore';
@@ -76,6 +77,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
   const setCompany = useCompanyStore((s) => s.setCompany);
   const setLogo = useCompanyStore((s) => s.setLogo);
   const validate = useCompanyStore((s) => s.validate);
+  const { t } = useMobileI18n();
 
   const userMode = useUserStore((s) => s.mode);
   const fieldSections = getFieldSections(userMode);
@@ -141,7 +143,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
       e.target.value = ''; // allow re-picking the same file
       if (!file) return;
       if (!file.type.startsWith('image/')) {
-        setLogoError('Veuillez choisir une image.');
+        setLogoError(t('company.logoError'));
         return;
       }
       // Compress client-side (≤500 KB) instead of rejecting heavy photos —
@@ -155,7 +157,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
         })
         .catch(() => setLogoError('Lecture du fichier impossible.'));
     },
-    [isSetup, setLogo],
+    [isSetup, setLogo, t],
   );
 
   const handleFieldChange = (field: string, value: string) => {
@@ -178,12 +180,12 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-xl font-bold text-[var(--sand)]">{userMode === 'artisan' ? 'Mon activité' : 'Société'}</h1>
+          <h1 className="text-xl font-bold text-[var(--sand)]">{userMode === 'artisan' ? t('company.myActivity') : t('company.title')}</h1>
         </div>
         {isSetup && (
           <div className="flex items-center gap-2">
             <Badge variant={isValid ? 'success' : 'danger'}>
-              {isValid ? '✓ Conforme DGI' : '⚠ Non conforme'}
+              {isValid ? t('company.conforme') : t('company.nonConforme')}
             </Badge>
           </div>
         )}
@@ -220,7 +222,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                     className="flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform"
                   >
                     <ImageIcon size={14} />
-                    {(logoData || company?.logo) ? 'Changer le logo' : 'Ajouter un logo'}
+                    {(logoData || company?.logo) ? t('company.logoChange') : t('company.logoAdd')}
                   </button>
                   {logoError && <p className="text-[11px] text-red-400">{logoError}</p>}
                 </div>
@@ -284,7 +286,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                 'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
               )}
             >
-              Enregistrer
+              {t('company.save')}
             </button>
 
             {/* Clients navigation */}
@@ -301,9 +303,9 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
                     <Users size={18} className="text-[var(--green-3)]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-[var(--sand)]">Gérer les clients</p>
+                    <p className="text-sm font-semibold text-[var(--sand)]">{t('company.manageClients')}</p>
                     <p className="text-[11px] text-[var(--sand-muted)]">
-                      {clientCount} client{clientCount !== 1 ? 's' : ''} enregistré{clientCount !== 1 ? 's' : ''}
+                      {clientCount} {t('company.clientsCount')}
                     </p>
                   </div>
                 </div>
@@ -314,7 +316,7 @@ export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProp
             {/* Validation details */}
             {isSetup && validation && !validation.valid && (
               <div className="p-4 rounded-xl bg-red-400/5 border border-red-400/10">
-                <p className="text-xs font-semibold text-red-400 mb-2">Erreurs de validation :</p>
+                <p className="text-xs font-semibold text-red-400 mb-2">{t('company.validationErrors')}</p>
                 {Object.entries(validation.errors).map(([key, msg]) => (
                   <p key={key} className="text-[11px] text-red-400/80">
                     • {msg}

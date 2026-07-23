@@ -9,7 +9,6 @@ import { Modal } from '@/components/ui/modal';
 import { PullToRefresh } from '@/components/mobile/PullToRefresh';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
-import { NotificationType } from '@capacitor/haptics';
 
 type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
 
@@ -225,7 +224,7 @@ export function DocumentsPanel() {
     await fetch(`/api/documents/${id}`, { method: 'DELETE' });
     setDeleteTarget(null);
     fetchData();
-    notification(NotificationType.Success);
+    notification();
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {

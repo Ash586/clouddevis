@@ -150,7 +150,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
             {onBack && (
               <button type="button"                 onClick={onBack}
                 className="w-11 h-11 rounded-xl bg-[var(--navy-3)] flex items-center justify-center text-[var(--sand-muted)] active:scale-95 transition-transform"
-                aria-label="Retour"
+                aria-label={t('clients.back')}
               >
                 <ArrowLeft size={18} className="rtl:rotate-180" />
               </button>
@@ -167,7 +167,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
               setShowForm(true);
             }}
             className="w-11 h-11 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label="Ajouter un client"
+            aria-label={t('clients.addClientLabel')}
           >
             <UserPlus size={18} />
           </button>
@@ -281,7 +281,7 @@ export function ClientsScreen({ onBack }: ClientsScreenProps) {
                         type="button"
                         onClick={() => setClientToDelete(client)}
                         className="py-2 px-3 min-h-[44px] rounded-xl text-xs font-semibold bg-red-400/10 text-red-400 active:scale-[0.98] transition-transform"
-                        aria-label={`Supprimer ${client.name}`}
+                        aria-label={`${t('clients.deleteClient')} ${client.name}`}
                       >
                         <X size={14} />
                       </button>

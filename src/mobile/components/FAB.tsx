@@ -121,7 +121,7 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = fals
             'active:scale-90 transition-colors',
           )}
           style={{ background: open ? 'var(--sand-muted)' : 'var(--green-2)' }}
-          aria-label={open ? 'Fermer' : 'Nouveau document'}
+          aria-label={open ? t('fab.close') : t('fab.open')}
           aria-expanded={open}
         >
           <Plus size={26} className="text-white" strokeWidth={2.5} />

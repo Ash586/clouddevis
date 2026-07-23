@@ -1,7 +1,7 @@
 // Rakmana Mobile — Network Status & Offline Sync
 // Detect online/offline and sync pending data
 
-import { Network } from '@capacitor/network';
+import { checkIsOnline, isNativePlatform } from '@/lib/native';
 import { getUnsyncedDocuments, markSynced } from './sqlite';
 
 let isOnline = true;
@@ -11,23 +11,38 @@ let syncCallback: (() => Promise<void>) | null = null;
  * Initialize network listener
  */
 export function initNetworkListener(onStatusChange?: (online: boolean) => void): void {
-  Network.addListener('networkStatusChange', (status) => {
-    isOnline = status.connected;
-    onStatusChange?.(isOnline);
-
-    // Auto-sync when coming back online
-    if (isOnline && syncCallback) {
-      syncCallback().catch(console.error);
-    }
-  });
+  // On native, poll periodically; on web, use events
+  if (isNativePlatform()) {
+    setInterval(() => {
+      const nowOnline = checkIsOnline();
+      if (nowOnline !== isOnline) {
+        isOnline = nowOnline;
+        onStatusChange?.(isOnline);
+        if (isOnline && syncCallback) {
+          syncCallback().catch(console.error);
+        }
+      }
+    }, 3000);
+  } else {
+    const onOnline = () => {
+      isOnline = true;
+      onStatusChange?.(true);
+      if (syncCallback) syncCallback().catch(console.error);
+    };
+    const onOffline = () => {
+      isOnline = false;
+      onStatusChange?.(false);
+    };
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+  }
 }
 
 /**
  * Check current network status
  */
 export async function checkNetworkStatus(): Promise<boolean> {
-  const status = await Network.getStatus();
-  isOnline = status.connected;
+  isOnline = checkIsOnline();
   return isOnline;
 }
 

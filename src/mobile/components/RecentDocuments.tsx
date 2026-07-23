@@ -18,6 +18,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUserStore } from '@/stores/userStore';
 import { useSyncStatusStore } from '@/stores/syncStatusStore';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { formatAmount } from '@/mobile/lib/format';
 import { DocumentListSkeleton } from './DocumentRowSkeleton';
@@ -38,11 +39,11 @@ const DOC_ICONS: Record<DocumentType, LucideIcon> = {
 
 type BadgeVariant = 'success' | 'warning' | 'default' | 'danger';
 
-const STATUS_MAP: Record<string, { label: string; variant: BadgeVariant }> = {
-  PAID: { label: 'Payé', variant: 'success' },
-  SENT: { label: 'En attente', variant: 'warning' },
-  DRAFT: { label: 'Brouillon', variant: 'default' },
-  CANCELLED: { label: 'Annulé', variant: 'danger' },
+const STATUS_MAP: Record<string, { labelKey: 'docs.status.paid' | 'docs.status.pending' | 'docs.status.draft' | 'docs.status.cancelled'; variant: BadgeVariant }> = {
+  PAID: { labelKey: 'docs.status.paid', variant: 'success' },
+  SENT: { labelKey: 'docs.status.pending', variant: 'warning' },
+  DRAFT: { labelKey: 'docs.status.draft', variant: 'default' },
+  CANCELLED: { labelKey: 'docs.status.cancelled', variant: 'danger' },
 };
 
 // ── Component ─────────────────────────────────────────────────
@@ -70,6 +71,7 @@ const itemVariants = {
 export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDocumentsProps) {
   const privacyMode = useUserStore((s) => s.privacyMode);
   const initialSyncDone = useSyncStatusStore((s) => s.initialSyncDone);
+  const { t } = useMobileI18n();
   const recentDocs = [...documents]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
@@ -77,7 +79,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
   if (!initialSyncDone && recentDocs.length === 0) {
     return (
       <div className="px-5">
-        <h3 className="text-base font-bold text-[var(--sand)] mb-3">Récents</h3>
+        <h3 className="text-base font-bold text-[var(--sand)] mb-3">{t('docs.recent')}</h3>
         <DocumentListSkeleton count={3} />
       </div>
     );
@@ -86,7 +88,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
   if (recentDocs.length === 0) {
     return (
       <div className="px-5">
-        <h3 className="text-base font-bold text-[var(--sand)] mb-3">Récents</h3>
+        <h3 className="text-base font-bold text-[var(--sand)] mb-3">{t('docs.recent')}</h3>
         <div
           className={cn(
             'rounded-2xl p-8 text-center',
@@ -94,9 +96,9 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
           )}
         >
           <FileText size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
-          <p className="text-sm text-[var(--sand-muted)]">Aucun document récent</p>
+          <p className="text-sm text-[var(--sand-muted)]">{t('docs.noRecent')}</p>
           <p className="text-xs text-[var(--sand-muted)] mt-1 opacity-60">
-            Créez votre premier devis pour commencer
+            {t('docs.createFirst')}
           </p>
         </div>
       </div>
@@ -111,13 +113,13 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
           className="heading text-base text-[var(--sand)]"
          
         >
-          Récents
+          {t('docs.recent')}
         </h3>
         {onSeeAll && (
           <button type="button"             onClick={onSeeAll}
             className="text-xs font-semibold text-[var(--green-3)] active:opacity-60 transition-opacity"
           >
-            Voir tout
+            {t('docs.seeAll')}
           </button>
         )}
       </div>
@@ -153,7 +155,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               {/* Client name + doc number */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[var(--sand)] truncate">
-                  {doc.client?.name || 'Client inconnu'}
+                  {doc.client?.name || t('common.unknownClient')}
                 </p>
                 <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">
                   {doc.number}
@@ -163,7 +165,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
               {/* Status badge + amount */}
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <Badge variant={status.variant}>
-                  {status.label}
+                  {t(status.labelKey)}
                 </Badge>
                 <span className="text-xs font-semibold text-[var(--sand)] whitespace-nowrap">
                   {privacyMode ? '••••' : formatAmount(doc.totalTTC)}

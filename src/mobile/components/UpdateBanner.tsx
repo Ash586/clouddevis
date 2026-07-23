@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, Sparkles, Loader2 } from 'lucide-react';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { downloadAndInstallAPK } from '@/mobile/lib/appUpdate';
 
 interface UpdateBannerProps {
@@ -15,6 +16,7 @@ interface UpdateBannerProps {
 
 export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDismiss }: UpdateBannerProps) {
   const [downloading, setDownloading] = useState(false);
+  const { t } = useMobileI18n();
 
   const handleDownload = async () => {
     if (!apkUrl || downloading) return;
@@ -47,7 +49,7 @@ export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDism
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-bold text-white">
-                  Mise à jour disponible — v{newVersion}
+                  {t('update.title')}{newVersion}
                 </p>
                 <p className="text-[11px] text-white/80 mt-0.5 leading-relaxed">
                   {releaseNotes}
@@ -63,14 +65,14 @@ export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDism
                   ) : (
                     <Download size={13} />
                   )}
-                  {downloading ? 'Téléchargement…' : 'Télécharger'}
+                  {downloading ? t('update.downloading') : t('update.download')}
                 </button>
               </div>
               <button
                 type="button"
                 onClick={onDismiss}
                 className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shrink-0 active:scale-90 transition-transform"
-                aria-label="Fermer"
+                aria-label={t('update.close')}
               >
                 <X size={14} className="text-white" />
               </button>

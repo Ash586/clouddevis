@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, RefreshCw, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { useSyncStore } from '@/stores/syncStore';
 
 interface OfflineBannerProps {
@@ -15,6 +16,7 @@ interface OfflineBannerProps {
 
 export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
   const queue = useSyncStore((s) => s.queue);
+  const { t } = useMobileI18n();
   const [showSynced, setShowSynced] = useState(false);
   const prevOnlineRef = useRef(isOnline);
 
@@ -56,7 +58,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
           >
             <Check size={14} className="text-emerald-400" />
             <span className="text-xs font-semibold text-emerald-400">
-              Synchronisé ✓
+              {t('common.synced')}
             </span>
           </div>
         </motion.div>
@@ -78,9 +80,9 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
             <div className="flex items-center gap-2">
               <WifiOff size={14} className="text-amber-400 flex-shrink-0" />
               <span className="text-xs font-semibold text-amber-400">
-                Hors ligne
+                {t('common.offline')}
                 {pendingCount > 0 && (
-                  <> · {pendingCount} modification{pendingCount !== 1 ? 's' : ''} en attente</>
+                  <> · {pendingCount} {t('common.pendingChanges')}</>
                 )}
               </span>
             </div>
@@ -93,7 +95,7 @@ export function OfflineBanner({ isOnline, onRetry }: OfflineBannerProps) {
                 )}
               >
                 <RefreshCw size={12} className="text-amber-400" />
-                <span className="text-[10px] font-semibold text-amber-400">Réessayer</span>
+                <span className="text-[10px] font-semibold text-amber-400">{t('common.retry')}</span>
               </button>
             )}
           </div>

@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Home, FileText, Plus, Users, User } from 'lucide-react';
 import { useHaptics } from '@/hooks/useHaptics';
-import { ImpactStyle } from '@capacitor/haptics';
 
 interface NavItem {
   label: string;
@@ -40,7 +39,7 @@ export function MobileBottomNav({ onNewDoc }: MobileBottomNavProps) {
   };
 
   const handleTabClick = (item: NavItem) => {
-    impact(ImpactStyle.Light);
+    impact();
     if (item.tabKey === '__new__') {
       if (onNewDoc) onNewDoc();
       else router.push('/dashboard/editor?type=DEVIS');

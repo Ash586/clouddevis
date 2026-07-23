@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useHaptics } from '@/hooks/useHaptics';
-import { ImpactStyle } from '@capacitor/haptics';
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -32,7 +31,7 @@ export function PullToRefresh({ onRefresh, children, threshold = 80 }: PullToRef
     if (diff > 0) {
       const newPull = Math.min(diff * 0.5, threshold + 20);
       if (newPull >= threshold && !hapticFired.current) {
-        impact(ImpactStyle.Medium);
+        impact();
         hapticFired.current = true;
       }
       setPull(newPull);

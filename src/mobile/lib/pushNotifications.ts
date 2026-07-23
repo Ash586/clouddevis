@@ -1,139 +1,36 @@
 // ============================================================
 // Rakmana Mobile — Push Notifications Service
-// Wraps @capacitor/push-notifications with:
-//   - Permission request (Android 13+ POST_NOTIFICATIONS)
-//   - FCM token registration → /api/user/push-token
-//   - Foreground notification listener (in-app toast)
-//   - Notification-tap routing (open relevant document)
+// Push notifications are not available in the WebView app.
+// This module is a no-op stub that gracefully degrades.
 // ============================================================
-
-import { Capacitor } from '@capacitor/core';
-import { PushNotifications } from '@capacitor/push-notifications';
-import type { Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 
 // ── Types ─────────────────────────────────────────────────────
 
 export interface NotificationPayload {
-  /** Document ID to open when tapped */
   documentId?: string;
-  /** 'invoice_paid' | 'invoice_approved' | 'devis_accepted' | 'reminder' */
   type?: string;
-  /** Extra key/value pairs from FCM data */
   [key: string]: string | undefined;
 }
 
 type NotificationTapHandler = (payload: NotificationPayload) => void;
 type ForegroundHandler = (title: string, body: string, payload: NotificationPayload) => void;
 
-// ── Internal state ────────────────────────────────────────────
-
-let onTap: NotificationTapHandler | null = null;
-let onForeground: ForegroundHandler | null = null;
-let initialized = false;
-
-// ── Helpers ───────────────────────────────────────────────────
-
-function extractPayload(notification: PushNotificationSchema): NotificationPayload {
-  const data = (notification.data ?? {}) as Record<string, string>;
-  return {
-    documentId: data.documentId,
-    type: data.type,
-    ...data,
-  };
-}
-
-async function registerToken(token: string): Promise<void> {
-  try {
-    await fetch('/api/user/push-token', {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, platform: Capacitor.getPlatform() }),
-    });
-  } catch {
-    // Non-fatal — token will re-register on next app open
-  }
-}
-
 // ── Public API ────────────────────────────────────────────────
 
 /**
  * Call once on app startup (after auth confirmed).
- * Safe to call multiple times — subsequent calls are no-ops.
+ * Returns false — push notifications require Firebase SDK + native plugin.
  */
-export async function initPushNotifications(opts: {
-  onTap?: NotificationTapHandler;
-  onForeground?: ForegroundHandler;
-}): Promise<boolean> {
-  // Only on real Android/iOS — skip in browser
-  if (!Capacitor.isNativePlatform()) return false;
-  if (initialized) return true;
-
-  onTap = opts.onTap ?? null;
-  onForeground = opts.onForeground ?? null;
-
-  try {
-    // ── 1. Request permission ──
-    const permResult = await PushNotifications.requestPermissions();
-    if (permResult.receive !== 'granted') return false;
-
-    // ── 2. Register with FCM ──
-    await PushNotifications.register();
-
-    // ── 3. FCM token received → send to server ──
-    PushNotifications.addListener('registration', (token: Token) => {
-      void registerToken(token.value);
-    });
-
-    // ── 4. Registration error ──
-    PushNotifications.addListener('registrationError', () => {
-      // Silently ignore — graceful degradation
-    });
-
-    // ── 5. Foreground notification received ──
-    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-      try {
-        const payload = extractPayload(notification);
-        onForeground?.(
-          notification.title ?? 'Rakmana',
-          notification.body ?? '',
-          payload,
-        );
-      } catch {
-        // Malformed notification payload — ignore
-      }
-    });
-
-    // ── 6. User tapped a notification ──
-    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
-      try {
-        const payload = extractPayload(action.notification);
-        onTap?.(payload);
-      } catch {
-        // Malformed notification payload — ignore
-      }
-    });
-
-    initialized = true;
-    return true;
-  } catch {
-    // Capacitor plugin not available, FCM not configured, or
-    // any other native error — graceful degradation (no push)
-    return false;
-  }
+export async function initPushNotifications(
+  _opts: { onTap?: NotificationTapHandler; onForeground?: ForegroundHandler }
+): Promise<boolean> {
+  // Push notifications not available in WebView app
+  return false;
 }
 
 /**
  * Remove all listeners (call on logout).
  */
 export async function teardownPushNotifications(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-  try {
-    await PushNotifications.removeAllListeners();
-  } catch {
-    // Ignore teardown errors
-  }
-  initialized = false;
-  onTap = null;
-  onForeground = null;
+  // No-op
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
+import { isNativePlatform, addBackPressListener } from '@/lib/native';
 
 /**
  * Handles the Android hardware back button on /dashboard pages.
@@ -10,22 +10,17 @@ import { Capacitor } from '@capacitor/core';
  */
 export function DashboardBackHandler() {
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (!isNativePlatform()) return;
 
-    let cleanup: (() => void) | undefined;
-
-    import('@capacitor/app').then(({ App }) => {
-      const handle = App.addListener('backButton', () => {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          window.location.href = '/app';
-        }
-      });
-      cleanup = () => { void handle.then((h) => h.remove()); };
+    const removeListener = addBackPressListener(() => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/app';
+      }
     });
 
-    return () => { cleanup?.(); };
+    return () => { removeListener(); };
   }, []);
 
   return null;

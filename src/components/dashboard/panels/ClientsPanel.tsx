@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { useHaptics } from '@/hooks/useHaptics';
-import { NotificationType } from '@capacitor/haptics';
 
 interface ClientDoc {
   number: string;
@@ -136,7 +135,7 @@ export function ClientsPanel() {
     if (res.ok) {
       setDeleteTarget(null);
       fetchClients();
-      notification(NotificationType.Success);
+      notification();
     }
   }
 

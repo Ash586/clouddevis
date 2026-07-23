@@ -21,7 +21,7 @@ import { useUserStore } from '@/stores/userStore';
 import { getSettings } from '@/lib/offline';
 import type { MobileLocale } from '@/stores/userStore';
 import { initPushNotifications, teardownPushNotifications } from '@/mobile/lib/pushNotifications';
-import { App } from '@capacitor/app';
+import { isNativePlatform, exitApp, addBackPressListener, addAppStateListener } from '@/lib/native';
 import { BottomTabs, type TabId } from './BottomTabs';
 import { FAB } from './FAB';
 import { OfflineBanner } from './OfflineBanner';
@@ -94,10 +94,10 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
 
   // ── Android hardware back button ───────────────────────────
   useEffect(() => {
-    let handle: Awaited<ReturnType<typeof App.addListener>> | null = null;
+    if (!isNativePlatform()) return;
 
-    App.addListener('backButton', () => {
-      // 1. Wizard open → close it (same as the ← button inside CreateScreen)
+    const removeListener = addBackPressListener(() => {
+      // 1. Wizard open → close it
       if (showWizardRef.current) {
         setShowWizard(false);
         setEditingDocId(null);
@@ -116,24 +116,22 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       // 4. Already on home — double-press within 2s to exit
       if (backPressedOnce.current) {
         if (backPressTimer.current) clearTimeout(backPressTimer.current);
-        void App.exitApp();
+        exitApp();
         return;
       }
       backPressedOnce.current = true;
-      // Reuse the existing toast system for "press again to exit"
       void import('@/mobile/lib/toast').then(({ notify }) => {
         notify(getMobileT(useUserStore.getState().locale)('nav.pressAgainToExit'));
       });
       backPressTimer.current = setTimeout(() => {
         backPressedOnce.current = false;
       }, 2000);
-    }).then((h) => { handle = h; });
+    });
 
     return () => {
-      handle?.remove();
+      removeListener();
       if (backPressTimer.current) clearTimeout(backPressTimer.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Update check ──────────────────────────────────────────
@@ -200,9 +198,8 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
 
   useEffect(() => {
     if (authState !== 'authenticated') return;
-    let handle: Awaited<ReturnType<typeof App.addListener>> | null = null;
 
-    App.addListener('appStateChange', async ({ isActive }) => {
+    const removeListener = addAppStateListener(async (isActive) => {
       if (!isActive) {
         backgroundedAtRef.current = Date.now();
         return;
@@ -218,9 +215,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       if (s.biometricEnabled && biometryInfo.available) {
         setShowBiometricLock(true);
       }
-    }).then((h) => { handle = h; });
+    });
 
-    return () => { handle?.remove(); };
+    return () => { removeListener(); };
   // biometryInfo.available intentionally excluded — checked async at foreground time
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState]);
@@ -230,6 +227,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     if (authState !== 'authenticated') return;
     try {
       if (!localStorage.getItem('rakmana_onboarded')) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowOnboarding(true);
       }
     } catch { /* private browsing */ }

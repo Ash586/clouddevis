@@ -1,12 +1,8 @@
 // ============================================================
 // Rakmana — Offline Storage Layer
-// Capacitor Preferences for company/clients/settings
-// Capacitor Filesystem for PDF cache
+// Uses localStorage for preferences and sessionStorage for PDF cache.
 // All reads/writes are local-first
 // ============================================================
-
-import { Preferences } from '@capacitor/preferences';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 // ── Preference Keys ──────────────────────────────────────────
 
@@ -26,7 +22,6 @@ export interface AppSettings {
   currency: string;
   autoSync: boolean;
   theme: 'light' | 'dark' | 'system';
-  /** Lock the app with biometric after returning from background (>5 min). */
   biometricEnabled: boolean;
 }
 
@@ -39,60 +34,37 @@ export const DEFAULT_SETTINGS: AppSettings = {
   biometricEnabled: false,
 };
 
-// ── Preferences API ──────────────────────────────────────────
+// ── Preferences API (localStorage) ───────────────────────────
 
-/**
- * Generic get/set for Capacitor Preferences.
- * Falls back to localStorage when not on native platform.
- */
-async function getPref<T>(key: string): Promise<T | null> {
+function getPref<T>(key: string): T | null {
   try {
-    const result = await Preferences.get({ key });
-    if (result.value) {
-      return JSON.parse(result.value) as T;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = window.localStorage.getItem(key);
+      return raw ? (JSON.parse(raw) as T) : null;
     }
-    return null;
   } catch {
-    // Capacitor not available — try localStorage
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const raw = window.localStorage.getItem(key);
-        return raw ? (JSON.parse(raw) as T) : null;
-      }
-    } catch {
-      // ignore
+    // ignore
+  }
+  return null;
+}
+
+function setPref<T>(key: string, value: T): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, JSON.stringify(value));
     }
-    return null;
+  } catch {
+    // ignore
   }
 }
 
-async function setPref<T>(key: string, value: T): Promise<void> {
-  const json = JSON.stringify(value);
+function removePref(key: string): void {
   try {
-    await Preferences.set({ key, value: json });
-  } catch {
-    // Capacitor not available — try localStorage
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(key, json);
-      }
-    } catch {
-      // ignore
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key);
     }
-  }
-}
-
-async function removePref(key: string): Promise<void> {
-  try {
-    await Preferences.remove({ key });
   } catch {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.removeItem(key);
-      }
-    } catch {
-      // ignore
-    }
+    // ignore
   }
 }
 
@@ -103,22 +75,22 @@ export async function getCompany<T>(): Promise<T | null> {
 }
 
 export async function setCompany<T>(company: T): Promise<void> {
-  await setPref(PREF_KEYS.COMPANY, company);
+  setPref(PREF_KEYS.COMPANY, company);
 }
 
 export async function clearCompany(): Promise<void> {
-  await removePref(PREF_KEYS.COMPANY);
+  removePref(PREF_KEYS.COMPANY);
 }
 
 // ── Clients ──────────────────────────────────────────────────
 
 export async function getClients<T>(): Promise<T[]> {
-  const result = await getPref<T[]>(PREF_KEYS.CLIENTS);
+  const result = getPref<T[]>(PREF_KEYS.CLIENTS);
   return result ?? [];
 }
 
 export async function setClients<T>(clients: T[]): Promise<void> {
-  await setPref(PREF_KEYS.CLIENTS, clients);
+  setPref(PREF_KEYS.CLIENTS, clients);
 }
 
 export async function addClient<T extends { id: string }>(client: T): Promise<void> {
@@ -129,12 +101,12 @@ export async function addClient<T extends { id: string }>(client: T): Promise<vo
   } else {
     clients.push(client);
   }
-  await setPref(PREF_KEYS.CLIENTS, clients);
+  setPref(PREF_KEYS.CLIENTS, clients);
 }
 
 export async function removeClient(id: string): Promise<void> {
   const clients = await getClients<{ id: string }>();
-  await setPref(
+  setPref(
     PREF_KEYS.CLIENTS,
     clients.filter((c) => c.id !== id)
   );
@@ -143,65 +115,35 @@ export async function removeClient(id: string): Promise<void> {
 // ── Settings ─────────────────────────────────────────────────
 
 export async function getSettings(): Promise<AppSettings> {
-  const result = await getPref<AppSettings>(PREF_KEYS.SETTINGS);
+  const result = getPref<AppSettings>(PREF_KEYS.SETTINGS);
   return { ...DEFAULT_SETTINGS, ...result };
 }
 
 export async function setSettings(settings: Partial<AppSettings>): Promise<void> {
   const current = await getSettings();
-  await setPref(PREF_KEYS.SETTINGS, { ...current, ...settings });
+  setPref(PREF_KEYS.SETTINGS, { ...current, ...settings });
 }
 
-// ── PDF Cache (Filesystem) ───────────────────────────────────
-
-const PDF_CACHE_DIR = Directory.Cache;
-const PDF_CACHE_PATH = 'pdf_cache';
+// ── PDF Cache (sessionStorage) ───────────────────────────────
 
 /**
  * Save a PDF (base64) to the local cache.
- * Returns the file path for later retrieval.
+ * Returns the storage key for later retrieval.
  */
 export async function savePDFToCache(
   docId: string,
   base64Data: string
 ): Promise<string> {
-  const fileName = `${PDF_CACHE_PATH}/${docId}.pdf`;
-
   try {
-    // Ensure directory exists
-    try {
-      await Filesystem.mkdir({
-        path: PDF_CACHE_PATH,
-        directory: PDF_CACHE_DIR,
-        recursive: true,
-      });
-    } catch {
-      // Directory may already exist
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const key = `pdf_cache_${docId}`;
+      window.sessionStorage.setItem(key, base64Data);
+      return key;
     }
-
-    // Write the file
-    await Filesystem.writeFile({
-      path: fileName,
-      data: base64Data,
-      directory: PDF_CACHE_DIR,
-      encoding: Encoding.UTF8,
-    });
-
-    return fileName;
   } catch {
-    // Filesystem not available — use data URL fallback
-    // Store in sessionStorage (limited to ~5MB)
-    try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        const key = `pdf_cache_${docId}`;
-        window.sessionStorage.setItem(key, base64Data);
-        return key;
-      }
-    } catch {
-      // ignore
-    }
-    return '';
+    // ignore
   }
+  return '';
 }
 
 /**
@@ -209,48 +151,26 @@ export async function savePDFToCache(
  * Returns base64 data or null if not found.
  */
 export async function getPDFFromCache(docId: string): Promise<string | null> {
-  const fileName = `${PDF_CACHE_PATH}/${docId}.pdf`;
-
   try {
-    const result = await Filesystem.readFile({
-      path: fileName,
-      directory: PDF_CACHE_DIR,
-      encoding: Encoding.UTF8,
-    });
-    return result.data as string;
-  } catch {
-    // Try sessionStorage fallback
-    try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        return window.sessionStorage.getItem(`pdf_cache_${docId}`);
-      }
-    } catch {
-      // ignore
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      return window.sessionStorage.getItem(`pdf_cache_${docId}`);
     }
-    return null;
+  } catch {
+    // ignore
   }
+  return null;
 }
 
 /**
  * Delete a cached PDF by document ID.
  */
 export async function deletePDFFromCache(docId: string): Promise<void> {
-  const fileName = `${PDF_CACHE_PATH}/${docId}.pdf`;
-
   try {
-    await Filesystem.deleteFile({
-      path: fileName,
-      directory: PDF_CACHE_DIR,
-    });
-  } catch {
-    // Try sessionStorage cleanup
-    try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        window.sessionStorage.removeItem(`pdf_cache_${docId}`);
-      }
-    } catch {
-      // ignore
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.removeItem(`pdf_cache_${docId}`);
     }
+  } catch {
+    // ignore
   }
 }
 
@@ -259,12 +179,16 @@ export async function deletePDFFromCache(docId: string): Promise<void> {
  */
 export async function clearPDFCache(): Promise<void> {
   try {
-    await Filesystem.rmdir({
-      path: PDF_CACHE_PATH,
-      directory: PDF_CACHE_DIR,
-    });
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const keys = Object.keys(window.sessionStorage);
+      for (const key of keys) {
+        if (key.startsWith('pdf_cache_')) {
+          window.sessionStorage.removeItem(key);
+        }
+      }
+    }
   } catch {
-    // Ignore — dir may not exist
+    // ignore
   }
 }
 
@@ -275,7 +199,7 @@ export async function getLastSyncTime(): Promise<number | null> {
 }
 
 export async function setLastSyncTime(timestamp: number): Promise<void> {
-  await setPref(PREF_KEYS.LAST_SYNC, timestamp);
+  setPref(PREF_KEYS.LAST_SYNC, timestamp);
 }
 
 // ── Clear All Offline Data ───────────────────────────────────

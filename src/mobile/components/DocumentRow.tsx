@@ -23,6 +23,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { formatAmount, formatDate } from '@/mobile/lib/format';
 import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
@@ -52,11 +53,11 @@ const DOC_COLORS: Record<DocumentType, string> = {
 
 type BadgeVariant = 'success' | 'warning' | 'default' | 'danger';
 
-const STATUS_MAP: Record<DocumentStatus, { label: string; variant: BadgeVariant }> = {
-  PAID: { label: 'Payé', variant: 'success' },
-  SENT: { label: 'En attente', variant: 'warning' },
-  DRAFT: { label: 'Brouillon', variant: 'default' },
-  CANCELLED: { label: 'Annulé', variant: 'danger' },
+const STATUS_MAP: Record<DocumentStatus, { labelKey: 'docs.status.paid' | 'docs.status.pending' | 'docs.status.draft' | 'docs.status.cancelled'; variant: BadgeVariant }> = {
+  PAID: { labelKey: 'docs.status.paid', variant: 'success' },
+  SENT: { labelKey: 'docs.status.pending', variant: 'warning' },
+  DRAFT: { labelKey: 'docs.status.draft', variant: 'default' },
+  CANCELLED: { labelKey: 'docs.status.cancelled', variant: 'danger' },
 };
 
 // ── Props ────────────────────────────────────────────────────
@@ -91,6 +92,7 @@ export function DocumentRow({
 }: DocumentRowProps) {
   const [swiped, setSwiped] = useState(false);
   const [hintDone, setHintDone] = useState(false);
+  const { t } = useMobileI18n();
   const x = useMotionValue(0);
   const rowRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -185,7 +187,7 @@ export function DocumentRow({
           whileTap={{ scale: 0.95 }}
         >
           <Pencil size={18} strokeWidth={2} />
-          <span className="text-[10px] font-semibold">Modifier</span>
+          <span className="text-[10px] font-semibold">{t('docs.swipeEdit')}</span>
         </motion.button>
         <motion.button
           onClick={handleDuplicate}
@@ -194,7 +196,7 @@ export function DocumentRow({
           whileTap={{ scale: 0.95 }}
         >
           <Copy size={18} strokeWidth={2} />
-          <span className="text-[10px] font-semibold">Dupliquer</span>
+          <span className="text-[10px] font-semibold">{t('docs.swipeDuplicate')}</span>
         </motion.button>
         <motion.button
           onClick={handleDelete}
@@ -203,7 +205,7 @@ export function DocumentRow({
           whileTap={{ scale: 0.95 }}
         >
           <Trash2 size={18} strokeWidth={2} />
-          <span className="text-[10px] font-semibold">Supprimer</span>
+          <span className="text-[10px] font-semibold">{t('docs.swipeDelete')}</span>
         </motion.button>
       </div>
 
@@ -242,7 +244,7 @@ export function DocumentRow({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-[var(--sand)] truncate">
-              {doc.client?.name || 'Client inconnu'}
+              {doc.client?.name || t('common.unknownClient')}
             </span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
@@ -262,7 +264,7 @@ export function DocumentRow({
             {isPendingSync && (
               <CloudOff size={12} className="text-amber-400" />
             )}
-            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+            <Badge variant={statusInfo.variant}>{t(statusInfo.labelKey)}</Badge>
           </div>
           <span className="text-sm font-bold text-[var(--sand)] tabular-nums">
             {formatAmount(doc.totalTTC)}

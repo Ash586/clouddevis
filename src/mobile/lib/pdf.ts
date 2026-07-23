@@ -8,14 +8,12 @@ import { generatePDFBase64 as engineGeneratePDF } from '../../../packages/pdf-en
 import { numberToFrenchWords, numberToArabicWords } from '../../lib/dgi';
 import type { PDFDocumentData } from '../../../packages/pdf-engine';
 import type { Document } from '../types';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
+import { isNativePlatform, nativeDownloadFile, nativeShareFile } from '@/lib/native';
 
 async function generatePDFWithFallback(pdfData: PDFDocumentData): Promise<string> {
   try {
     return await engineGeneratePDF(pdfData);
-  } catch (clientErr) {
+  } catch {
     logger.warn('Client-side PDF failed, trying server-side');
   }
   const res = await fetch('/api/pdf/generate', {
@@ -31,13 +29,6 @@ async function generatePDFWithFallback(pdfData: PDFDocumentData): Promise<string
   return base64;
 }
 
-/**
- * Generate a PDF from a Document object and return as base64.
- * Uses @react-pdf/renderer via the pdf-engine package.
- *
- * @param doc - The document to generate PDF for
- * @returns Base64-encoded PDF string
- */
 export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
   const pdfData: PDFDocumentData = {
     type: doc.type,
@@ -118,13 +109,6 @@ export async function generatePDFBase64FromDoc(doc: Document): Promise<string> {
   return generatePDFWithFallback(pdfData);
 }
 
-/**
- * Generate a PDF from document options (legacy interface).
- * Maintains backward compatibility with existing code.
- *
- * @param options - Document data in the old format
- * @returns Base64-encoded PDF string
- */
 export async function generatePDFBase64(options: {
   docNumber: string;
   docType: string;
@@ -234,22 +218,15 @@ export async function generatePDFBase64(options: {
 
 /**
  * Trigger a download of a base64-encoded PDF.
- * On native (Capacitor): writes to cache then opens the OS share sheet,
- * which gives the user "Save to Downloads" and other options.
+ * On native (WebView): uses the native share sheet.
  * On browser: uses the anchor download attribute.
  */
 export async function downloadDocument(base64: string, fileName: string): Promise<void> {
   const name = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
 
-  // Native (Capacitor) — write to cache then share sheet
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const { uri } = await Filesystem.writeFile({ path: name, data: base64, directory: Directory.Cache });
-      await Share.share({ title: name, files: [uri], dialogTitle: 'Enregistrer le PDF' });
-      return;
-    } catch {
-      // fall through to browser download
-    }
+  // Native — download directly via DownloadManager
+  if (isNativePlatform()) {
+    if (nativeDownloadFile(base64, name)) return;
   }
 
   // Browser fallback — anchor download
@@ -275,7 +252,7 @@ export async function downloadDocument(base64: string, fileName: string): Promis
 
 /**
  * Open PDF in a new window for printing (browser fallback).
- * On native (Capacitor): uses Share sheet so the user can pick a print app.
+ * On native (WebView): uses share sheet so the user can pick a print app.
  * On browser: opens in a new tab.
  */
 export async function printDocument(base64OrHtml: string): Promise<void> {
@@ -288,15 +265,9 @@ export async function printDocument(base64OrHtml: string): Promise<void> {
     return;
   }
 
-  // Native (Capacitor) — write to cache then open share sheet for printing
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const { uri } = await Filesystem.writeFile({ path: 'document.pdf', data: base64OrHtml, directory: Directory.Cache });
-      await Share.share({ title: 'Imprimer', files: [uri], dialogTitle: 'Imprimer le document' });
-      return;
-    } catch {
-      // fall through to browser
-    }
+  // Native — use share sheet for printing
+  if (isNativePlatform()) {
+    if (nativeShareFile(base64OrHtml, 'document.pdf', 'Imprimer le document')) return;
   }
 
   // Browser fallback
