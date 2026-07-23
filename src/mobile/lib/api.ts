@@ -263,6 +263,19 @@ export async function logoutApi(): Promise<void> {
   await request('/api/auth/logout', { method: 'POST' });
 }
 
+export async function registerApi(
+  name: string,
+  email: string,
+  password: string,
+  mode: 'artisan' | 'entreprise' = 'artisan',
+): Promise<{ id: string; name: string; email: string }> {
+  const res = await request<{ success: boolean; user: { id: string; name: string; email: string } }>(
+    '/api/auth/register',
+    { method: 'POST', body: JSON.stringify({ name, email, password, mode, country: 'algeria', language: 'fr' }) }
+  );
+  return res.user;
+}
+
 export async function fetchCurrentUser(): Promise<{
   id: string;
   name: string;

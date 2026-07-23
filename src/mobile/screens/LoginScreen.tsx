@@ -7,15 +7,16 @@
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, FileText } from 'lucide-react';
+import { Eye, EyeOff, Loader2, FileText, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ApiError } from '@/mobile/lib/api';
 
 interface LoginScreenProps {
   onLogin: (email: string, password: string, rememberMe: boolean) => Promise<void>;
+  onBackToWelcome: () => void;
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -57,6 +58,22 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       className="min-h-screen flex flex-col items-center justify-center px-5 bg-[var(--navy)]"
       style={{ paddingTop: 'env(safe-area-inset-top, 24px)' }}
     >
+      {/* ── Back button ─────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-sm flex justify-start mb-4"
+      >
+        <button
+          onClick={onBackToWelcome}
+          className="flex items-center gap-2 text-sm text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors"
+        >
+          <ArrowLeft size={18} />
+          Retour
+        </button>
+      </motion.div>
+
       {/* ── Brand ───────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

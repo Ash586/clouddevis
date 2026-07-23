@@ -6,7 +6,7 @@
 // ============================================================
 
 import { useState, useCallback, useEffect } from 'react';
-import { loginApi, logoutApi, fetchCurrentUser, ApiError } from './api';
+import { loginApi, registerApi, logoutApi, fetchCurrentUser, ApiError } from './api';
 import { useClientStore } from '@/stores/clientStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
@@ -20,6 +20,7 @@ export interface AuthGuard {
   /** Call when any API returns 401 to drop back to login screen */
   onUnauthorized: () => void;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
+  register: (name: string, email: string, password: string, mode?: 'artisan' | 'entreprise') => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -68,6 +69,21 @@ export function useAuthGuard(): AuthGuard {
       .catch(() => {});
   }, []);
 
+  // ── Register ──────────────────────────────────────────────
+  const register = useCallback(async (
+    name: string,
+    email: string,
+    password: string,
+    mode: 'artisan' | 'entreprise' = 'artisan'
+  ) => {
+    const user = await registerApi(name, email, password, mode);
+    setUserName(user.name);
+    setAuthState('authenticated');
+    fetchCurrentUser()
+      .then((u) => useUserStore.getState().setMode(u.mode === 'ENTREPRISE' ? 'entreprise' : 'artisan'))
+      .catch(() => {});
+  }, []);
+
   // ── Logout ────────────────────────────────────────────────
   const logout = useCallback(async () => {
     try {
@@ -86,5 +102,5 @@ export function useAuthGuard(): AuthGuard {
     setAuthState('unauthenticated');
   }, []);
 
-  return { authState, userName, onUnauthorized, login, logout };
+  return { authState, userName, onUnauthorized, login, register, logout };
 }

@@ -28,6 +28,8 @@ import { OfflineBanner } from './OfflineBanner';
 import { UpdateBanner } from './UpdateBanner';
 import { PushToast, type PushToastData } from './PushToast';
 import { LoginScreen } from '../screens/LoginScreen';
+import { WelcomeScreen } from '../screens/WelcomeScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 import { OnboardingScreen } from './OnboardingScreen';
 import { BiometricLockScreen } from './BiometricLockScreen';
 import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
@@ -69,6 +71,7 @@ interface MobileShellProps {
 
 export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
+  const [authView, setAuthView] = useState<'welcome' | 'login' | 'register'>('welcome');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showBiometricLock, setShowBiometricLock] = useState(false);
   const [biometryInfo, setBiometryInfo] = useState<BiometryInfo>({ available: false, type: '' });
@@ -159,7 +162,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   }, []);
 
   // ── Auth: check session on mount, expose login/logout ─────
-  const { authState, userName, onUnauthorized, login, logout } = useAuthGuard();
+  const { authState, userName, onUnauthorized, login, register, logout } = useAuthGuard();
+
+  // ── Reset authView when session expires ──────────────────
+  useEffect(() => {
+    if (authState === 'unauthenticated') setAuthView('welcome');
+  }, [authState]);
 
   // ── Bootstrap API only when authenticated ─────────────────
   useApiSync({ enabled: authState === 'authenticated', onUnauthorized });
@@ -282,9 +290,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
 
   // ── Logout: clear FCM token then call auth logout ─────────
   const handleLogout = useCallback(async () => {
-    // Best-effort: clear token server-side before logging out
     await fetch('/api/user/push-token', { method: 'DELETE', credentials: 'include' }).catch(() => {});
     await logout();
+    setAuthView('welcome');
   }, [logout]);
 
   // ── Document tap handler ──────────────────────────────────
@@ -383,9 +391,30 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     );
   }
 
-  // ── Login screen ──────────────────────────────────────────
+  // ── Auth screens (welcome → login/register) ────────────────
   if (authState === 'unauthenticated') {
-    return <LoginScreen onLogin={login} />;
+    if (authView === 'login') {
+      return (
+        <LoginScreen
+          onLogin={login}
+          onBackToWelcome={() => setAuthView('welcome')}
+        />
+      );
+    }
+    if (authView === 'register') {
+      return (
+        <RegisterScreen
+          onRegister={register}
+          onBackToLogin={() => setAuthView('login')}
+        />
+      );
+    }
+    return (
+      <WelcomeScreen
+        onLogin={() => setAuthView('login')}
+        onRegister={() => setAuthView('register')}
+      />
+    );
   }
 
   // ── First-run onboarding ───────────────────────────────────

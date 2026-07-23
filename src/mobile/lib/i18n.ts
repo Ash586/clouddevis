@@ -74,7 +74,20 @@ type TranslationKeys =
   | 'editor.content' | 'editor.objet' | 'editor.reference' | 'editor.validUntil'
   | 'editor.payment' | 'editor.paymentMode' | 'editor.acompte'
   | 'editor.delivery' | 'editor.deliverer' | 'editor.idCard' | 'editor.transporter'
-  | 'editor.deliveryAddress' | 'editor.notes';
+  | 'editor.deliveryAddress' | 'editor.notes'
+  | 'welcome.title' | 'welcome.subtitle' | 'welcome.login' | 'welcome.register'
+  | 'register.title' | 'register.name' | 'register.namePh'
+  | 'register.email' | 'register.emailPh'
+  | 'register.password' | 'register.passwordPh'
+  | 'register.confirmPassword'
+  | 'register.modeArtisan' | 'register.modeEntreprise'
+  | 'register.submit' | 'register.loading'
+  | 'register.alreadyHave' | 'register.signIn'
+  | 'register.error.fillAll' | 'register.error.passwordMismatch'
+  | 'register.error.emailTaken' | 'register.error.network'
+  | 'register.error.server' | 'register.error.rateLimit'
+  | 'register.error.nameRequired' | 'register.error.emailRequired'
+  | 'register.error.passwordRequired' | 'register.error.confirmRequired';
 
 type Translations = Record<TranslationKeys, string>;
 
@@ -297,6 +310,36 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.sendWhatsApp': 'Envoyer via WhatsApp',
     'editor.downloadPdf': 'Télécharger le PDF',
     'editor.done': 'Terminé',
+
+    'welcome.title': 'رقمنة',
+    'welcome.subtitle': 'Créez vos factures, devis et plus',
+    'welcome.login': 'Se connecter',
+    'welcome.register': 'Créer un compte',
+
+    'register.title': 'Créer un compte',
+    'register.name': 'Nom complet',
+    'register.namePh': 'Votre nom',
+    'register.email': 'Email',
+    'register.emailPh': 'vous@exemple.com',
+    'register.password': 'Mot de passe',
+    'register.passwordPh': '••••••••',
+    'register.confirmPassword': 'Confirmer le mot de passe',
+    'register.modeArtisan': 'Artisan',
+    'register.modeEntreprise': 'Entreprise',
+    'register.submit': 'Créer mon compte',
+    'register.loading': 'Création du compte…',
+    'register.alreadyHave': 'Vous avez déjà un compte ?',
+    'register.signIn': 'Se connecter',
+    'register.error.fillAll': 'Veuillez remplir tous les champs',
+    'register.error.passwordMismatch': 'Les mots de passe ne correspondent pas',
+    'register.error.emailTaken': 'Cet email est déjà utilisé',
+    'register.error.network': 'Erreur réseau. Vérifiez votre connexion.',
+    'register.error.server': 'Erreur serveur. Réessayez plus tard.',
+    'register.error.rateLimit': 'Trop de tentatives. Réessayez dans 1 minute.',
+    'register.error.nameRequired': 'Le nom est requis',
+    'register.error.emailRequired': "L'email est requis",
+    'register.error.passwordRequired': 'Le mot de passe est requis',
+    'register.error.confirmRequired': 'Veuillez confirmer le mot de passe',
   },
 
   ar: {
@@ -517,6 +560,36 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.sendWhatsApp': 'إرسال عبر واتساب',
     'editor.downloadPdf': 'تحميل PDF',
     'editor.done': 'تم',
+
+    'welcome.title': 'رقمنة',
+    'welcome.subtitle': 'أنشئ فواتيرك وعروض أسعارك',
+    'welcome.login': 'تسجيل الدخول',
+    'welcome.register': 'إنشاء حساب',
+
+    'register.title': 'إنشاء حساب',
+    'register.name': 'الاسم الكامل',
+    'register.namePh': 'اسمك',
+    'register.email': 'البريد الإلكتروني',
+    'register.emailPh': 'you@example.com',
+    'register.password': 'كلمة المرور',
+    'register.passwordPh': '••••••••',
+    'register.confirmPassword': 'تأكيد كلمة المرور',
+    'register.modeArtisan': 'حرفي',
+    'register.modeEntreprise': 'شركة',
+    'register.submit': 'إنشاء حساب',
+    'register.loading': 'جارٍ إنشاء الحساب…',
+    'register.alreadyHave': 'لديك حساب بالفعل؟',
+    'register.signIn': 'تسجيل الدخول',
+    'register.error.fillAll': 'يرجى ملء جميع الحقول',
+    'register.error.passwordMismatch': 'كلمتا المرور غير متطابقتين',
+    'register.error.emailTaken': 'البريد الإلكتروني مستخدم بالفعل',
+    'register.error.network': 'خطأ في الشبكة',
+    'register.error.server': 'خطأ في الخادم',
+    'register.error.rateLimit': 'محاولات كثيرة جداً',
+    'register.error.nameRequired': 'الاسم مطلوب',
+    'register.error.emailRequired': 'البريد الإلكتروني مطلوب',
+    'register.error.passwordRequired': 'كلمة المرور مطلوبة',
+    'register.error.confirmRequired': 'يرجى تأكيد كلمة المرور',
   },
 
   en: {
@@ -737,6 +810,36 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.sendWhatsApp': 'Send via WhatsApp',
     'editor.downloadPdf': 'Download PDF',
     'editor.done': 'Done',
+
+    'welcome.title': 'Rakmana',
+    'welcome.subtitle': 'Create your invoices, quotes & more',
+    'welcome.login': 'Sign in',
+    'welcome.register': 'Create account',
+
+    'register.title': 'Create account',
+    'register.name': 'Full name',
+    'register.namePh': 'Your name',
+    'register.email': 'Email',
+    'register.emailPh': 'you@example.com',
+    'register.password': 'Password',
+    'register.passwordPh': '••••••••',
+    'register.confirmPassword': 'Confirm password',
+    'register.modeArtisan': 'Artisan',
+    'register.modeEntreprise': 'Company',
+    'register.submit': 'Create my account',
+    'register.loading': 'Creating account…',
+    'register.alreadyHave': 'Already have an account?',
+    'register.signIn': 'Sign in',
+    'register.error.fillAll': 'Please fill all fields',
+    'register.error.passwordMismatch': 'Passwords do not match',
+    'register.error.emailTaken': 'This email is already in use',
+    'register.error.network': 'Network error. Check your connection.',
+    'register.error.server': 'Server error. Try again later.',
+    'register.error.rateLimit': 'Too many attempts. Try in 1 minute.',
+    'register.error.nameRequired': 'Name is required',
+    'register.error.emailRequired': 'Email is required',
+    'register.error.passwordRequired': 'Password is required',
+    'register.error.confirmRequired': 'Please confirm your password',
   },
 };
 
