@@ -1,6 +1,5 @@
 // Rakmana Mobile — SQLite Helper (stub)
-// Capacitor SQLite has been removed. This module provides no-op stubs
-// so existing imports don't break. The app uses API calls for data.
+// Capacitor SQLite removed — app uses API calls for data.
 
 export interface LocalClientRow {
   id: string;

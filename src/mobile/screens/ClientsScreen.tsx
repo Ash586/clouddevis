@@ -1,235 +1,199 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Pencil, Trash2, Phone, Mail, ChevronLeft, ChevronRight, X, Check } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Search, Plus, Phone, Mail, Building, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
-
-interface Client {
-  id: string; name: string; phone: string | null; email: string | null;
-  nif: string | null; rc: string | null; nis: string | null;
-  docCount: number; lastDoc: { number: string; date: string } | null;
-}
-
-const EMPTY_FORM = { name: '', phone: '', email: '', address: '', nif: '', nis: '', rc: '' };
+import { fetchAllClients, createApiClient, deleteApiClient } from '@/mobile/lib/api';
+import type { ApiClientRecord } from '@/mobile/lib/api';
 
 interface ClientsScreenProps {
-  onNavigate?: (target: string) => void;
+  onBack?: () => void;
 }
 
-export function ClientsScreen({ onNavigate }: ClientsScreenProps) {
-  const { t, dir } = useMobileI18n();
-  const [clients, setClients] = useState<Client[]>([]);
+export function ClientsScreen({ onBack }: ClientsScreenProps) {
+  const { t } = useMobileI18n();
+  const [clients, setClients] = useState<ApiClientRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [showForm, setShowForm] = useState(false);
-  const [editTarget, setEditTarget] = useState<Client | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newEmail, setNewEmail] = useState('');
   const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
-
-  const fetchClients = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: '20' });
-      if (search) params.set('search', search);
-      const res = await fetch(`/api/clients?${params}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setClients(data.clients || []);
-      setTotalPages(data.pagination?.totalPages || 1);
-    } catch { setClients([]); } finally { setLoading(false); }
-  }, [page, search]);
-
-  useEffect(() => { void fetchClients(); }, [fetchClients]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => setPage(1), 300);
-    return () => clearTimeout(debounce);
-  }, [search]);
+    fetchAllClients()
+      .then(setClients)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-  function openAdd() { setForm(EMPTY_FORM); setEditTarget(null); setShowForm(true); }
-  function openEdit(c: Client) { setEditTarget(c); setForm({ name: c.name, phone: c.phone ?? '', email: c.email ?? '', address: '', nif: c.nif ?? '', nis: c.nis ?? '', rc: c.rc ?? '' }); setShowForm(true); }
+  const filtered = useMemo(() =>
+    clients.filter((c) =>
+      !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.phone?.includes(search)
+    ), [clients, search]);
 
-  async function handleSave() {
-    if (!form.name.trim()) return;
+  const handleAdd = async () => {
+    if (!newName.trim() || !newPhone.trim()) return;
     setSaving(true);
     try {
-      const isEdit = !!editTarget;
-      const url = isEdit ? `/api/clients/${editTarget.id}` : '/api/clients';
-      const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
-      if (res.ok) { setShowForm(false); setEditTarget(null); fetchClients(); }
-    } finally { setSaving(false); }
-  }
+      const res = await createApiClient({ name: newName.trim(), phone: newPhone.trim(), email: newEmail.trim() } as any);
+      setClients((prev) => [...prev, { id: res.id, name: newName.trim(), phone: newPhone.trim(), email: newEmail.trim(), address: null, nif: null, rc: null, nis: null, ai: null }]);
+      setShowAdd(false);
+      setNewName(''); setNewPhone(''); setNewEmail('');
+    } catch {}
+    setSaving(false);
+  };
 
-  async function handleDelete() {
-    if (!deleteTarget) return;
-    await fetch(`/api/clients/${deleteTarget.id}`, { method: 'DELETE' });
-    setDeleteTarget(null);
-    fetchClients();
-  }
+  const handleDelete = async (id: string) => {
+    if (!confirm(t('clients.deleteTitle'))) return;
+    try {
+      await deleteApiClient(id);
+      setClients((prev) => prev.filter((c) => c.id !== id));
+    } catch {}
+  };
 
-  // Full-screen form
-  if (showForm) {
-    return (
-      <div dir={dir} className="min-h-dvh bg-[#F3F6FC]">
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[rgba(15,39,71,0.08)] px-5 py-3 flex items-center justify-between">
-          <button type="button" onClick={() => setShowForm(false)} className="p-2 -ms-2 rounded-xl hover:bg-[#EDF2FB] transition">
-            <X size={20} className="text-[#0F2747]" />
-          </button>
-          <h2 className="text-base font-bold text-[#0F2747]">{editTarget ? t('clients.edit') : t('clients.add')}</h2>
-          <button type="button" onClick={handleSave} disabled={saving || !form.name.trim()} className="p-2 -me-2 rounded-xl hover:bg-[#EDF2FB] transition disabled:opacity-40">
-            <Check size={20} className="text-[#2563EB]" />
-          </button>
-        </div>
-        <main className="px-5 pt-6 max-w-lg mx-auto space-y-4">
-          <div>
-            <label className="block text-[11px] font-bold text-[#5A6B85] uppercase tracking-wider mb-1.5">{t('clients.name')} *</label>
-            <input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder={t('clients.namePh')}
-              className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-4 py-3 text-sm text-[#0F2747] placeholder:text-[#5A6B85] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-bold text-[#5A6B85] uppercase tracking-wider mb-1.5">{t('clients.phone')}</label>
-              <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} placeholder="0555 55 55 55"
-                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-4 py-3 text-sm text-[#0F2747] placeholder:text-[#5A6B85] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-            </div>
-            <div>
-              <label className="block text-[11px] font-bold text-[#5A6B85] uppercase tracking-wider mb-1.5">{t('clients.email')}</label>
-              <input value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="client@email.com" type="email"
-                className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-4 py-3 text-sm text-[#0F2747] placeholder:text-[#5A6B85] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[11px] font-bold text-[#5A6B85] uppercase tracking-wider mb-1.5">{t('clients.address')}</label>
-            <input value={form.address} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))} placeholder={t('clients.addressPh')}
-              className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-4 py-3 text-sm text-[#0F2747] placeholder:text-[#5A6B85] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-          </div>
-          <div className="pt-2">
-            <p className="text-[11px] font-bold text-[#5A6B85] uppercase tracking-wider mb-3">{t('clients.groupFiscal')}</p>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[10px] font-semibold text-[#5A6B85] uppercase mb-1">NIF</label>
-                <input value={form.nif} onChange={(e) => setForm((p) => ({ ...p, nif: e.target.value }))} maxLength={15}
-                  className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-3 py-2.5 text-sm text-[#0F2747] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-[#5A6B85] uppercase mb-1">NIS</label>
-                <input value={form.nis} onChange={(e) => setForm((p) => ({ ...p, nis: e.target.value }))} maxLength={10}
-                  className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-3 py-2.5 text-sm text-[#0F2747] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold text-[#5A6B85] uppercase mb-1">RC</label>
-                <input value={form.rc} onChange={(e) => setForm((p) => ({ ...p, rc: e.target.value }))} maxLength={14}
-                  className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-white px-3 py-2.5 text-sm text-[#0F2747] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-2.5 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
 
   return (
-    <div dir={dir} className="min-h-dvh bg-[#F3F6FC] pb-20">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-dvh bg-[#F4F6FA] pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[rgba(15,39,71,0.08)] px-5 py-3">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-extrabold text-[#0F2747]">{t('clients.title')}</h1>
-          <button type="button" onClick={openAdd} className="w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-md shadow-[rgba(37,99,235,0.25)]">
-            <Plus size={18} />
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4A5268] hover:bg-[#F4F6FA]">
+                <ArrowLeft size={18} />
+              </button>
+            )}
+            <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('clients.title')}</h1>
+            <span className="text-xs text-[#9AA1B4]">({clients.length})</span>
+          </div>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2A6B52] text-white shadow-md shadow-[#2A6B52]/25 active:scale-95 transition-all"
+          >
+            <Plus size={18} strokeWidth={2.5} />
           </button>
         </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A6B85]" />
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('clients.searchPlaceholder')}
-            className="w-full rounded-xl border border-[rgba(15,39,71,0.1)] bg-[#F3F6FC] pl-10 pr-4 py-2.5 text-sm text-[#0F2747] placeholder:text-[#5A6B85] focus:outline-none focus:ring-2 focus:ring-[rgba(37,99,235,0.28)] transition-all" />
+
+        {/* Search */}
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA1B4]" />
+            <input
+              type="text"
+              placeholder={t('clients.searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] py-2.5 pl-9 pr-8 text-sm text-[#2A6B52] placeholder-[#9AA1B4] focus:border-[#2A6B52] focus:outline-none transition-colors"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9AA1B4]">
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      <main className="px-5 pt-4 max-w-lg mx-auto">
+      {/* List */}
+      <div className="p-4">
         {loading ? (
           <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-2xl bg-white border border-[rgba(15,39,71,0.06)] p-4 animate-pulse">
-                <div className="h-4 w-32 bg-[#EDF2FB] rounded mb-2" /><div className="h-3 w-24 bg-[#EDF2FB] rounded" />
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="rounded-xl border border-[#E8E1CE] bg-white p-4">
+                <div className="pd-skeleton mb-2 h-4 w-32 rounded" />
+                <div className="pd-skeleton h-3 w-24 rounded" />
               </div>
             ))}
           </div>
-        ) : clients.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-3">👤</div>
-            <p className="text-sm font-semibold text-[#0F2747]">{t('clients.empty')}</p>
-            <p className="text-xs text-[#5A6B85] mt-1">{t('clients.emptyHint')}</p>
+        ) : filtered.length === 0 ? (
+          <div className="py-16 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2A6B52]/5">
+              <Users size={28} className="text-[#2A6B52]/30" />
+            </div>
+            <p className="text-sm font-bold text-[#2A6B52]">{t('clients.empty')}</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {clients.map((c) => (
-              <div key={c.id} className="rounded-2xl bg-white border border-[rgba(15,39,71,0.06)] p-4">
+          <div className="space-y-2">
+            {filtered.map((client) => (
+              <div key={client.id} className="rounded-xl border border-[#E8E1CE] bg-white p-3.5">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#0F2747] text-[15px] truncate">{c.name}</p>
-                    <div className="mt-1.5 space-y-0.5">
-                      {c.phone && <p className="flex items-center gap-1.5 text-xs text-[#5A6B85]"><Phone size={11} /> {c.phone}</p>}
-                      {c.email && <p className="flex items-center gap-1.5 text-xs text-[#5A6B85]"><Mail size={11} /> {c.email}</p>}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2A6B52]/10 text-sm font-bold text-[#2A6B52]">
+                      {client.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-[#2A6B52]">{client.name}</div>
+                      <div className="flex items-center gap-3 mt-1">
+                        {client.phone && (
+                          <span className="flex items-center gap-1 text-xs text-[#9AA1B4]">
+                            <Phone size={10} /> {client.phone}
+                          </span>
+                        )}
+                        {client.email && (
+                          <span className="flex items-center gap-1 text-xs text-[#9AA1B4]">
+                            <Mail size={10} /> {client.email}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 ms-3">
-                    <button type="button" onClick={() => openEdit(c)} className="p-2 rounded-lg text-[#5A6B85] hover:text-[#2563EB] hover:bg-blue-500/10 transition min-w-[44px] min-h-[44px] flex items-center justify-center">
-                      <Pencil size={15} />
-                    </button>
-                    <button type="button" onClick={() => setDeleteTarget(c)} className="p-2 rounded-lg text-[#5A6B85] hover:text-red-500 hover:bg-red-50 transition min-w-[44px] min-h-[44px] flex items-center justify-center">
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-[#5A6B85]">
-                  <div className="flex items-center gap-2">
-                    {c.nif && <span className="px-2 py-0.5 rounded-full bg-[#EDF2FB] font-semibold">NIF {c.nif}</span>}
-                    <span>{c.docCount} doc(s)</span>
-                  </div>
-                  {c.lastDoc && <span className="text-[10px]">{c.lastDoc.number}</span>}
+                  <button
+                    onClick={() => handleDelete(client.id)}
+                    className="flex h-7 w-7 items-center justify-center rounded text-[#9AA1B4] hover:text-[#B5402C] hover:bg-[#B5402C]/10 transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
+      </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 pt-4 pb-4">
-            <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="p-2 rounded-xl border border-[rgba(15,39,71,0.1)] bg-white disabled:opacity-40">
-              <ChevronLeft size={16} className="text-[#0F2747]" />
-            </button>
-            <span className="text-sm text-[#5A6B85] font-medium">{page} / {totalPages}</span>
-            <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="p-2 rounded-xl border border-[rgba(15,39,71,0.1)] bg-white disabled:opacity-40">
-              <ChevronRight size={16} className="text-[#0F2747]" />
-            </button>
-          </div>
-        )}
-      </main>
-
-      {/* Delete confirmation */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-sm">
-          <div className="w-full max-w-lg bg-white rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom">
-            <div className="w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
-            <p className="text-sm font-bold text-[#0F2747] text-center mb-1">{t('clients.deleteTitle')}</p>
-            <p className="text-xs text-[#5A6B85] text-center mb-5">{t('clients.deleteIrreversible')}</p>
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setDeleteTarget(null)} className="flex-1 py-3 rounded-xl border border-[rgba(15,39,71,0.1)] text-sm font-bold text-[#0F2747] hover:bg-[#EDF2FB] transition">
+      {/* Add client modal */}
+      {showAdd && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#2A6B52]/40 backdrop-blur-sm" onClick={() => setShowAdd(false)} />
+          <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-[#E8E1CE]">
+            <h3 className="mb-4 text-lg font-bold text-[#2A6B52]">{t('clients.add')}</h3>
+            <div className="space-y-3">
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t('clients.namePh')} className={inputCls} />
+              <input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} placeholder={t('clients.phone')} dir="ltr" className={inputCls} />
+              <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder={t('clients.email')} dir="ltr" className={inputCls} />
+            </div>
+            <div className="mt-5 flex gap-3">
+              <button onClick={() => setShowAdd(false)} className="flex-1 rounded-lg border border-[#E8E1CE] py-2.5 text-sm font-bold text-[#4A5268] hover:bg-[#FBF8F2] transition-colors">
                 {t('clients.cancel')}
               </button>
-              <button type="button" onClick={handleDelete} className="flex-1 py-3 rounded-xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition">
-                {t('clients.deleteClient')}
+              <button
+                onClick={handleAdd}
+                disabled={!newName.trim() || !newPhone.trim() || saving}
+                className="flex-1 rounded-lg bg-[#2A6B52] py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#1C5E42] transition-all disabled:opacity-50 active:scale-[0.97]"
+              >
+                {saving ? '...' : t('clients.addClientLabel')}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
+  );
+}
+
+function Users(props: React.SVGProps<SVGSVGElement> & { size?: number }) {
+  const { size = 24, ...rest } = props;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...rest}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
   );
 }

@@ -6,11 +6,6 @@
 import { logger } from '@/lib/logger';
 import { isNativePlatform, nativeOpenUrl } from '@/lib/native';
 
-/**
- * Download and install an APK update.
- * - Android WebView: opens in system browser
- * - Browser: opens in a new tab
- */
 export async function downloadAndInstallAPK(apkUrl: string): Promise<void> {
   if (!apkUrl) {
     logger.error('No APK URL provided for update');
@@ -25,10 +20,6 @@ export async function downloadAndInstallAPK(apkUrl: string): Promise<void> {
   window.open(apkUrl, '_blank');
 }
 
-/**
- * Check if a newer version is available.
- * Returns the update info or null if up-to-date.
- */
 export async function checkForUpdate(currentVersion: string): Promise<{
   needsUpdate: boolean;
   version: string;

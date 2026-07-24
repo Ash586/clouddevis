@@ -1,20 +1,13 @@
 'use client';
 
-// ============================================================
 // Rakmana Mobile — keyboard awareness
-// Uses visualViewport heuristic for web and Android WebView.
-// ============================================================
+// Uses visualViewport heuristic for both web and Android WebView.
 
 import { useEffect, useState } from 'react';
 
-/**
- * Returns true while the on-screen keyboard is open, and keeps the
- * currently-focused text field scrolled into view.
- */
 export function useMobileKeyboard(): boolean {
   const [open, setOpen] = useState(false);
 
-  // ── keyboard open/close via visualViewport heuristic ──
   useEffect(() => {
     let disposed = false;
     const removers: Array<() => void> = [];
@@ -30,7 +23,6 @@ export function useMobileKeyboard(): boolean {
     return () => { disposed = true; removers.forEach((r) => r()); };
   }, []);
 
-  // ── keep the focused field visible ──
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const onFocusIn = (e: FocusEvent) => {

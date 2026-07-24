@@ -1,14 +1,8 @@
 // Rakmana Mobile — lightweight toast helper
-// Native Android → DOM toast. Web → DOM toast.
-// Capacitor has been removed — we use the JS Bridge instead.
-
-import { isNativePlatform } from '@/lib/native';
+// Uses DOM toast on all platforms.
 
 export async function notify(message: string): Promise<void> {
-  // We always show a DOM toast for consistent UX across platforms
-  if (typeof document !== 'undefined') {
-    showDomToast(message);
-  }
+  showDomToast(message);
 }
 
 function showDomToast(message: string): void {
