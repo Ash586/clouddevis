@@ -32,18 +32,20 @@ export function StatCards({ stats, loading }: StatCardsProps) {
     );
   }
 
+  const fmt = (n: number) => n.toLocaleString('fr-DZ');
+
   const cards = [
     {
       icon: FileText,
       label: t('stats.docsCreated'),
-      value: stats?.monthDocs ?? 0,
+      value: fmt(stats?.monthDocs ?? 0),
       color: '#2563EB',
       bgColor: '#2563EB',
     },
     {
       icon: Banknote,
       label: t('stats.revenue'),
-      value: `${(stats?.totalTTC ?? 0).toLocaleString('fr-DZ')}`,
+      value: fmt(stats?.totalTTC ?? 0),
       suffix: 'DA',
       color: '#D4A843',
       bgColor: '#D4A843',
@@ -51,14 +53,14 @@ export function StatCards({ stats, loading }: StatCardsProps) {
     {
       icon: AlertTriangle,
       label: t('stats.unpaid'),
-      value: stats?.unpaidCount ?? 0,
+      value: fmt(stats?.unpaidCount ?? 0),
       color: '#E8542E',
       bgColor: '#E8542E',
     },
     {
       icon: Clock,
       label: t('stats.drafts'),
-      value: stats?.draftCount ?? 0,
+      value: fmt(stats?.draftCount ?? 0),
       color: '#1E40AF',
       bgColor: '#1E40AF',
     },
@@ -79,8 +81,8 @@ export function StatCards({ stats, loading }: StatCardsProps) {
             <div className="text-[11px] font-bold uppercase tracking-wider text-[#33425C]">
               {card.label}
             </div>
-            <div className="mt-1 text-2xl font-bold text-[#2563EB]" style={{ fontFamily: 'var(--font-mono, monospace)' }}>
-              {card.value}{card.suffix && <span className="text-xs font-medium text-[#5A6B85] ml-1">{card.suffix}</span>}
+            <div className="mt-1 text-2xl font-extrabold tracking-tight text-[#0F2747]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {card.value}{card.suffix && <span className="text-xs font-semibold text-[#5A6B85] ml-1">{card.suffix}</span>}
             </div>
           </div>
         );

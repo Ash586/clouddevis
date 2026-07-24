@@ -275,7 +275,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     <div
       dir={dir}
       className={cn('relative min-h-dvh bg-[#F3F6FC]', 'max-w-lg mx-auto')}
-      style={{ paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
+      style={{ paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       <UpdateBanner
         visible={updateInfo.visible}
