@@ -12,6 +12,8 @@ import { ClientsScreen } from '../screens/ClientsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { CompanyScreen } from '../screens/CompanyScreen';
 import { BottomTabs, type TabKey } from './BottomTabs';
+import { Fab } from './Fab';
+import { openEditor } from '@/mobile/lib/editorLauncher';
 
 type AuthView = 'landing' | 'login' | 'register';
 
@@ -27,12 +29,13 @@ export function MobileShell() {
   const handleBackToLanding = useCallback(() => setAuthView('landing'), []);
   const handleBackToLogin = useCallback(() => setAuthView('login'), []);
 
-  // Double-press back to exit
+  // Back button handling
   const lastBackRef = useState({ current: 0 })[0];
   useEffect(() => {
     if (authState !== 'authenticated') return;
     const handler = () => {
       if (overlay) { setOverlay(null); return; }
+      if (activeTab !== 'home') { setActiveTab('home'); return; }
       const now = Date.now();
       if (now - lastBackRef.current < 1500) {
         if (typeof window !== 'undefined' && (window as any).Capacitor?.Plugins?.App) {
@@ -44,11 +47,21 @@ export function MobileShell() {
     };
     window.addEventListener('backbutton', handler);
     return () => window.removeEventListener('backbutton', handler);
-  }, [authState, overlay]);
+  }, [authState, overlay, activeTab]);
 
   const handleNavigate = useCallback((target: string) => {
     if (target === 'company') { setOverlay('company'); return; }
-    if (target.startsWith('editor:')) return; // Phase 7+
+    if (target.startsWith('editor:')) {
+      const payload = target.slice(7); // "editor:devis" or "editor:draft:{id}"
+      if (payload === 'new') { openEditor(); return; }
+      // Check if it's a known doc type
+      const docTypes = ['devis', 'facture', 'proforma', 'bc', 'br', 'bl', 'intervention', 'attachement'];
+      if (docTypes.includes(payload)) { openEditor({ type: payload }); return; }
+      // "draft:{id}" → extract the real doc ID
+      const docId = payload.startsWith('draft:') ? payload.slice(6) : payload;
+      openEditor({ docId });
+      return;
+    }
     const tabMap: Record<string, TabKey> = {
       documents: 'documents', clients: 'clients', settings: 'settings', home: 'home',
     };
@@ -77,6 +90,7 @@ export function MobileShell() {
         {activeTab === 'documents' && <DocumentsScreen onNavigate={handleNavigate} />}
         {activeTab === 'clients' && <ClientsScreen onNavigate={handleNavigate} />}
         {activeTab === 'settings' && <SettingsScreen onNavigate={handleNavigate} />}
+        <Fab />
         <BottomTabs active={activeTab} onChange={setActiveTab} />
       </div>
     );
