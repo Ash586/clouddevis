@@ -7,15 +7,20 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { DashboardScreen } from '../screens/DashboardScreen';
+import { DocumentsScreen } from '../screens/DocumentsScreen';
+import { ClientsScreen } from '../screens/ClientsScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
+import { CompanyScreen } from '../screens/CompanyScreen';
 import { BottomTabs, type TabKey } from './BottomTabs';
 
 type AuthView = 'landing' | 'login' | 'register';
 
 export function MobileShell() {
-  const { t, dir } = useMobileI18n();
+  const { dir } = useMobileI18n();
   const { authState } = useAuthGuard();
   const [authView, setAuthView] = useState<AuthView>('landing');
   const [activeTab, setActiveTab] = useState<TabKey>('home');
+  const [overlay, setOverlay] = useState<string | null>(null);
 
   const handleLogin = useCallback(() => setAuthView('login'), []);
   const handleRegister = useCallback(() => setAuthView('register'), []);
@@ -27,6 +32,7 @@ export function MobileShell() {
   useEffect(() => {
     if (authState !== 'authenticated') return;
     const handler = () => {
+      if (overlay) { setOverlay(null); return; }
       const now = Date.now();
       if (now - lastBackRef.current < 1500) {
         if (typeof window !== 'undefined' && (window as any).Capacitor?.Plugins?.App) {
@@ -38,15 +44,13 @@ export function MobileShell() {
     };
     window.addEventListener('backbutton', handler);
     return () => window.removeEventListener('backbutton', handler);
-  }, [authState]);
+  }, [authState, overlay]);
 
   const handleNavigate = useCallback((target: string) => {
-    if (target.startsWith('editor:')) return; // editor routing later (Phase 6+)
+    if (target === 'company') { setOverlay('company'); return; }
+    if (target.startsWith('editor:')) return; // Phase 7+
     const tabMap: Record<string, TabKey> = {
-      documents: 'documents',
-      clients: 'clients',
-      settings: 'settings',
-      home: 'home',
+      documents: 'documents', clients: 'clients', settings: 'settings', home: 'home',
     };
     if (tabMap[target]) setActiveTab(tabMap[target]);
   }, []);
@@ -55,34 +59,24 @@ export function MobileShell() {
   if (authState === 'loading') {
     return (
       <div dir={dir} className="min-h-dvh bg-[#F3F6FC] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-[rgba(37,99,235,0.2)] border-t-[#2563EB] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-[rgba(37,99,235,0.2)] border-t-[#2563EB] rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Authenticated → dashboard with bottom tabs
+  // Authenticated
   if (authState === 'authenticated') {
+    // Overlay screens (company)
+    if (overlay === 'company') {
+      return <div dir={dir}><CompanyScreen onBack={() => setOverlay(null)} /></div>;
+    }
+
     return (
       <div dir={dir} className="min-h-dvh bg-[#F3F6FC]">
         {activeTab === 'home' && <DashboardScreen onNavigate={handleNavigate} />}
-        {activeTab === 'documents' && (
-          <div className="min-h-dvh bg-[#F3F6FC] px-5 pt-6 pb-20">
-            <h1 className="text-lg font-bold text-[#0F2747]">{t('nav.documents')}</h1>
-            <p className="text-sm text-[#5A6B85] mt-2">Phase 6</p>
-          </div>
-        )}
-        {activeTab === 'clients' && (
-          <div className="min-h-dvh bg-[#F3F6FC] px-5 pt-6 pb-20">
-            <h1 className="text-lg font-bold text-[#0F2747]">{t('nav.clients')}</h1>
-            <p className="text-sm text-[#5A6B85] mt-2">Phase 6</p>
-          </div>
-        )}
-        {activeTab === 'settings' && (
-          <div className="min-h-dvh bg-[#F3F6FC] px-5 pt-6 pb-20">
-            <h1 className="text-lg font-bold text-[#0F2747]">{t('nav.settings')}</h1>
-            <p className="text-sm text-[#5A6B85] mt-2">Phase 6</p>
-          </div>
-        )}
+        {activeTab === 'documents' && <DocumentsScreen onNavigate={handleNavigate} />}
+        {activeTab === 'clients' && <ClientsScreen onNavigate={handleNavigate} />}
+        {activeTab === 'settings' && <SettingsScreen onNavigate={handleNavigate} />}
         <BottomTabs active={activeTab} onChange={setActiveTab} />
       </div>
     );
@@ -92,10 +86,8 @@ export function MobileShell() {
   if (authView === 'register') {
     return <RegisterScreen onBackToLogin={handleBackToLogin} />;
   }
-
   if (authView === 'login') {
     return <LoginScreen onBackToLanding={handleBackToLanding} onGoToRegister={handleRegister} />;
   }
-
   return <HomeScreen onLogin={handleLogin} onRegister={handleRegister} />;
 }
