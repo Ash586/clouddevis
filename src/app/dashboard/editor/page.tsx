@@ -325,11 +325,11 @@ function EditorContent() {
         return;
       }
     }
-    // Native (Capacitor WebView): generate a real PDF via pdf-engine and share it
+    // Native WebView: generate a real PDF via pdf-engine and share it
     // through the OS share sheet — window.open/print doesn't work in a WebView.
     try {
-      const { Capacitor } = await import('@capacitor/core');
-      if (Capacitor.isNativePlatform()) {
+      const { isNativePlatform } = await import('@/lib/native');
+      if (isNativePlatform()) {
         try { await saveDoc(); } catch { /* save failed — still generate the PDF */ }
         track('Document Downloaded', { type: doc.documentType, mode: doc.mode, native: true });
         const langMap: Record<string, 'FR' | 'AR' | 'EN'> = { fr: 'FR', ar: 'AR', en: 'EN' };

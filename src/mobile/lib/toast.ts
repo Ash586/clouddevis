@@ -1,19 +1,14 @@
 // Rakmana Mobile — lightweight toast helper
-// Native (Capacitor) → OS toast. Web → a visible DOM toast (NOT just a
-// console log, so feedback is visible when the app runs in a browser).
+// Native Android → DOM toast. Web → DOM toast.
+// Capacitor has been removed — we use the JS Bridge instead.
+
+import { isNativePlatform } from '@/lib/native';
 
 export async function notify(message: string): Promise<void> {
-  try {
-    const { Capacitor } = await import('@capacitor/core');
-    if (Capacitor.isNativePlatform()) {
-      const { Toast } = await import('@capacitor/toast');
-      await Toast.show({ text: message, duration: 'short' });
-      return;
-    }
-  } catch {
-    // fall through to the DOM toast
+  // We always show a DOM toast for consistent UX across platforms
+  if (typeof document !== 'undefined') {
+    showDomToast(message);
   }
-  showDomToast(message);
 }
 
 function showDomToast(message: string): void {

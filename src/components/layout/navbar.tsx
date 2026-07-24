@@ -68,8 +68,8 @@ export function Navbar() {
   const [isNativeApp, setIsNativeApp] = useState(false);
 
   useEffect(() => {
-    import('@capacitor/core').then(({ Capacitor }) => {
-      setIsNativeApp(Capacitor.isNativePlatform());
+    import('@/lib/native').then(({ isNativePlatform }) => {
+      setIsNativeApp(isNativePlatform());
     }).catch(() => {});
   }, []);
 
