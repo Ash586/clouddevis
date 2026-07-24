@@ -1,332 +1,177 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Company Profile Screen
-// Displays and edits company info: name, NIF, RC, NIS, AI, logo
-// ============================================================
-
-import { useState, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building, ChevronRight, ChevronDown, Image as ImageIcon, Users } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
-import { useCompanyStore } from '@/stores/companyStore';
-import { useClientStore } from '@/stores/clientStore';
-import { useUserStore } from '@/stores/userStore';
-import { Badge } from '@/components/ui/badge';
-import { notify } from '@/mobile/lib/toast';
-import { compressImageFile } from '@/mobile/lib/image';
-import type { UserMode } from '@/mobile/types';
-
-interface FieldDef { label: string; field: string; placeholder: string; type?: string }
-interface FieldSection { id: string; title: string; fields: FieldDef[] }
-
-/**
- * Persona-aware sections (soft gating): an artisan sees an "individual"
- * identity, an 11-digit NIF, and the fiscal/bank sections marked optional —
- * nothing is removed, everything stays fillable.
- */
-function getFieldSections(mode: UserMode): FieldSection[] {
-  const artisan = mode === 'artisan';
-  return [
-    {
-      id: 'identity', title: 'Identité',
-      fields: [
-        artisan
-          ? { label: 'Nom complet ou enseigne', field: 'name', placeholder: 'Ex: Karim Plomberie' }
-          : { label: 'Nom de la société', field: 'name', placeholder: 'Ex: Bâtiment Plus SARL' },
-        { label: 'Activité (sous le nom)', field: 'activity', placeholder: artisan ? 'Ex: Plomberie · Chauffage' : 'Ex: Importation · Vente · SAV' },
-        { label: 'Adresse', field: 'address', placeholder: '123 Rue Principale, Alger' },
-        { label: 'Téléphone', field: 'phone', placeholder: '0555 12 34 56' },
-        { label: 'Email', field: 'email', placeholder: 'contact@societe.dz' },
-        { label: 'Fax', field: 'fax', placeholder: '023 59 82 17' },
-      ],
-    },
-    {
-      id: 'fiscal', title: artisan ? 'Identifiants fiscaux (optionnel)' : 'Identifiants fiscaux',
-      fields: [
-        artisan
-          ? { label: 'NIF (11 chiffres)', field: 'nif', placeholder: '12345678901', type: 'nif' }
-          : { label: 'NIF (15 chiffres)', field: 'nif', placeholder: '123456789012345', type: 'nif' },
-        { label: 'RC', field: 'rc', placeholder: '16/00-123456 A' },
-        { label: 'NIS (10 chiffres)', field: 'nis', placeholder: '1234567890' },
-        { label: 'AI', field: 'ai', placeholder: '1234567890' },
-        { label: 'Capital', field: 'capital', placeholder: 'Ex: 100 000 DA' },
-      ],
-    },
-    {
-      id: 'bank', title: artisan ? 'Coordonnées bancaires (optionnel)' : 'Coordonnées bancaires',
-      fields: [
-        { label: 'Banque (nom + agence)', field: 'bankName', placeholder: 'Ex: Société Générale Sidi Yahia' },
-        { label: 'RIB', field: 'rib', placeholder: '021 00001 1130036271 09' },
-        { label: 'CCP', field: 'ccp', placeholder: '007 99999 0000 391575 54' },
-      ],
-    },
-  ];
-}
+import { fetchCurrentUser, updateCompanyProfile } from '@/mobile/lib/api';
+import type { Company } from '@/mobile/types';
 
 interface CompanyProfileScreenProps {
-  /** Navigate to clients list */
   onGoToClients?: () => void;
+  onBack?: () => void;
 }
 
-export function CompanyProfileScreen({ onGoToClients }: CompanyProfileScreenProps) {
-  const clientCount = useClientStore((s) => s.clients.length);
-  const company = useCompanyStore((s) => s.company);
-  const isSetup = useCompanyStore((s) => s.isSetup);
-  const setCompany = useCompanyStore((s) => s.setCompany);
-  const setLogo = useCompanyStore((s) => s.setLogo);
-  const validate = useCompanyStore((s) => s.validate);
+export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileScreenProps) {
   const { t } = useMobileI18n();
+  const [company, setCompany] = useState<Partial<Company>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  const userMode = useUserStore((s) => s.mode);
-  const fieldSections = getFieldSections(userMode);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [logoData, setLogoData] = useState<string | undefined>(company?.logo);
-  const [logoError, setLogoError] = useState('');
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ identity: true, fiscal: true, bank: true });
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // ── Form state ──
-  const [form, setForm] = useState({
-    name: company?.name || '',
-    activity: company?.activity || '',
-    nif: company?.nif || '',
-    rc: company?.rc || '',
-    nis: company?.nis || '',
-    ai: company?.ai || '',
-    phone: company?.phone || '',
-    email: company?.email || '',
-    fax: company?.fax || '',
-    address: company?.address || '',
-    capital: company?.capital || '',
-    rib: company?.rib || '',
-    ccp: company?.ccp || '',
-    bankName: company?.bankName || '',
-  });
-
-  const handleSave = useCallback(() => {
-    const result = setCompany({
-      id: company?.id || crypto.randomUUID().slice(0, 9),
-      ...form,
-      logo: logoData,
-      tvaRate: company?.tvaRate || 19,
-    });
-
-    if (result && !result.valid) {
-      setErrors(result.errors);
-      setOpenSections((prev) => {
-        const next = { ...prev };
-        for (const section of fieldSections) {
-          if (section.fields.some((f) => result.errors[f.field])) next[section.id] = true;
-        }
-        return next;
-      });
-      void notify('Vérifiez les champs en rouge');
-      return;
-    }
-
-    setErrors({});
-    void notify('Société enregistrée ✓');
-  }, [form, company, logoData, setCompany, fieldSections]);
-
-  // ── Logo upload (base64, max 500 KB) ──
-  const handleLogoPick = useCallback(() => {
-    setLogoError('');
-    fileInputRef.current?.click();
+  useEffect(() => {
+    fetchCurrentUser()
+      .then((u) => {
+        // Load company data from profile
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const handleLogoChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      e.target.value = ''; // allow re-picking the same file
-      if (!file) return;
-      if (!file.type.startsWith('image/')) {
-        setLogoError(t('company.logoError'));
-        return;
-      }
-      // Compress client-side (≤500 KB) instead of rejecting heavy photos —
-      // artisans pick camera shots, not optimized PNGs.
-      compressImageFile(file, 500)
-        .then((dataUrl) => {
-          setLogoData(dataUrl);
-          // Persist immediately if the company already exists; otherwise it is
-          // saved together with the form on "Enregistrer".
-          if (isSetup) setLogo(dataUrl);
-        })
-        .catch(() => setLogoError('Lecture du fichier impossible.'));
-    },
-    [isSetup, setLogo, t],
-  );
-
-  const handleFieldChange = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    }
+  const handleSave = async () => {
+    if (!company.name) return;
+    setSaving(true);
+    try {
+      await updateCompanyProfile(company as Company);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
   };
 
-  // ── Validation status ──
-  const validation = isSetup ? validate() : null;
-  const isValid = validation?.valid ?? false;
+  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-2.5 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
+  const labelCls = 'block text-sm font-medium text-[#4A5268] mb-1.5';
+
+  if (loading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-[#F4F6FA]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#2A6B52]/30 border-t-[#2A6B52]" />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* ── Header ──────────────────────────────────────────── */}
-      <div className="px-5 pt-4 pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-xl font-bold text-[var(--sand)]">{userMode === 'artisan' ? t('company.myActivity') : t('company.title')}</h1>
-        </div>
-        {isSetup && (
-          <div className="flex items-center gap-2">
-            <Badge variant={isValid ? 'success' : 'danger'}>
-              {isValid ? t('company.conforme') : t('company.nonConforme')}
-            </Badge>
-          </div>
-        )}
-      </div>
-
-      {/* ── Content ─────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-5 pb-24">
-        {(
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {/* Logo */}
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center overflow-hidden">
-                {(logoData || company?.logo) ? (
-                  <img src={logoData || company?.logo} alt="Logo de la société" className="w-full h-full object-cover" />
-                ) : (
-                  <Building size={28} className="text-[var(--sand-muted)]" />
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleLogoPick}
-                    className="flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-xl bg-[var(--navy-3)] text-[var(--sand-muted)] text-xs font-semibold active:scale-[0.97] transition-transform"
-                  >
-                    <ImageIcon size={14} />
-                    {(logoData || company?.logo) ? t('company.logoChange') : t('company.logoAdd')}
-                  </button>
-                  {logoError && <p className="text-[11px] text-red-400">{logoError}</p>}
-                </div>
-            </div>
-
-            {/* Form fields — grouped into collapsible sections */}
-            {fieldSections.map((section) => {
-              const isOpen = openSections[section.id] ?? false;
-              const errorCount = section.fields.filter((f) => errors[f.field]).length;
-              return (
-                <div key={section.id} className="rounded-2xl border border-[var(--border)] overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setOpenSections((s) => ({ ...s, [section.id]: !isOpen }))}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-[var(--navy-3)] active:bg-[var(--navy-4)] transition-colors"
-                  >
-                    <span className="flex items-center gap-2 text-sm font-semibold text-[var(--sand)]">
-                      {section.title}
-                      {errorCount > 0 && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-400/15 text-red-400">
-                          {errorCount}
-                        </span>
-                      )}
-                    </span>
-                    {isOpen
-                      ? <ChevronDown size={18} className="text-[var(--sand-muted)]" />
-                      : <ChevronRight size={18} className="text-[var(--sand-muted)] rtl:rotate-180" />}
-                  </button>
-                  {isOpen && (
-                    <div className="p-3 flex flex-col gap-3">
-                      {section.fields.map(({ label, field, placeholder }) => (
-                        <div key={field}>
-                          <label className="text-xs font-semibold text-[var(--sand-muted)] mb-1 block">{label}</label>
-                          <input
-                            type="text"
-                            value={form[field as keyof typeof form]}
-                            onChange={(e) => handleFieldChange(field, e.target.value)}
-                            placeholder={placeholder}
-                            className={cn(
-                              'w-full px-4 py-3 rounded-xl text-sm',
-                              'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-                              'border transition-colors',
-                              errors[field]
-                                ? 'border-red-400/50 focus:border-red-400'
-                                : 'border-[var(--border)] focus:border-[var(--green-2)]',
-                            )}
-                          />
-                          {errors[field] && <p className="text-[11px] text-red-400 mt-1">{errors[field]}</p>}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Save button */}
-            <button type="button" onClick={handleSave}
-              className={cn(
-                'w-full py-3.5 rounded-xl text-sm font-semibold',
-                'bg-[var(--green-2)] text-white active:scale-[0.98] transition-transform',
-              )}
-            >
-              {t('company.save')}
-            </button>
-
-            {/* Clients navigation */}
-            {isSetup && onGoToClients && (
-              <button type="button"                 onClick={onGoToClients}
-                className={cn(
-                  'w-full flex items-center justify-between px-4 py-3.5 rounded-xl',
-                  'bg-[var(--navy-2)] border border-[var(--border)]',
-                  'active:scale-[0.98] transition-transform',
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--blue-bg)] flex items-center justify-center">
-                    <Users size={18} className="text-[var(--green-3)]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-[var(--sand)]">{t('company.manageClients')}</p>
-                    <p className="text-[11px] text-[var(--sand-muted)]">
-                      {clientCount} {t('company.clientsCount')}
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight size={16} className="text-[var(--sand-muted)] rtl:rotate-180" />
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-dvh bg-[#F4F6FA] pb-24">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4A5268] hover:bg-[#F4F6FA]">
+                <ArrowLeft size={18} />
               </button>
             )}
+            <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('company.title')}</h1>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#2A6B52] px-4 text-xs font-bold text-white shadow-sm hover:bg-[#1C5E42] transition-all active:scale-[0.97] disabled:opacity-50"
+          >
+            {saving ? <Loader2 size={14} className="animate-spin" /> : saved ? <CheckCircle size={14} /> : <Save size={14} />}
+            {t('company.save')}
+          </button>
+        </div>
+      </div>
 
-            {/* Validation details */}
-            {isSetup && validation && !validation.valid && (
-              <div className="p-4 rounded-xl bg-red-400/5 border border-red-400/10">
-                <p className="text-xs font-semibold text-red-400 mb-2">{t('company.validationErrors')}</p>
-                {Object.entries(validation.errors).map(([key, msg]) => (
-                  <p key={key} className="text-[11px] text-red-400/80">
-                    • {msg}
-                  </p>
-                ))}
-              </div>
-            )}
-          </motion.div>
+      <div className="p-4 space-y-4">
+        {/* Status badge */}
+        <div className={cn(
+          'rounded-xl border p-3 text-center text-sm font-bold',
+          company.nif ? 'border-[#2F6B4F]/30 bg-[#2F6B4F]/10 text-[#2F6B4F]' : 'border-[#B5402C]/30 bg-[#B5402C]/10 text-[#B5402C]',
+        )}>
+          {company.nif ? t('company.conforme') : t('company.nonConforme')}
+        </div>
+
+        {/* Form */}
+        <div className="rounded-xl border border-[#E8E1CE] bg-white p-4 space-y-4">
+          <div>
+            <label className={labelCls}>{t('company.title')} *</label>
+            <input
+              value={company.name || ''}
+              onChange={(e) => setCompany((c) => ({ ...c, name: e.target.value }))}
+              placeholder="Company Name"
+              className={inputCls}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>NIF</label>
+              <input
+                value={company.nif || ''}
+                onChange={(e) => setCompany((c) => ({ ...c, nif: e.target.value }))}
+                placeholder="15 digits"
+                dir="ltr"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>RC</label>
+              <input
+                value={company.rc || ''}
+                onChange={(e) => setCompany((c) => ({ ...c, rc: e.target.value }))}
+                placeholder="9-14 chars"
+                dir="ltr"
+                className={inputCls}
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelCls}>NIS</label>
+            <input
+              value={company.nis || ''}
+              onChange={(e) => setCompany((c) => ({ ...c, nis: e.target.value }))}
+              placeholder="10 digits"
+              dir="ltr"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Address</label>
+            <input
+              value={company.address || ''}
+              onChange={(e) => setCompany((c) => ({ ...c, address: e.target.value }))}
+              placeholder="Full address"
+              className={inputCls}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Phone</label>
+              <input
+                value={company.phone || ''}
+                onChange={(e) => setCompany((c) => ({ ...c, phone: e.target.value }))}
+                placeholder="0xx xx xx xx"
+                dir="ltr"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>TVA</label>
+              <select
+                value={company.tvaRate || 19}
+                onChange={(e) => setCompany((c) => ({ ...c, tvaRate: Number(e.target.value) as 9 | 19 }))}
+                className={inputCls}
+              >
+                <option value={19}>19%</option>
+                <option value={9}>9%</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Manage clients */}
+        {onGoToClients && (
+          <button
+            onClick={onGoToClients}
+            className="w-full rounded-xl border border-[#E8E1CE] bg-white py-3.5 text-sm font-bold text-[#2A6B52] transition-all hover:bg-[#FBF8F2] active:scale-[0.99]"
+          >
+            {t('company.manageClients')}
+          </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

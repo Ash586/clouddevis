@@ -1,15 +1,11 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Login Screen
-// Dark navy theme · cookie-based session · CSRF via Origin header
-// ============================================================
-
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, FileText, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ApiError } from '@/mobile/lib/api';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 
 interface LoginScreenProps {
   onLogin: (email: string, password: string, rememberMe: boolean) => Promise<void>;
@@ -17,6 +13,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
+  const { t } = useMobileI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -27,7 +24,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) {
-      setError('Veuillez remplir tous les champs');
+      setError(t('login.error.fillAll'));
       return;
     }
     setError('');
@@ -36,174 +33,145 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
       await onLogin(email.trim(), password, rememberMe);
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401) {
-          setError('Email ou mot de passe incorrect');
-        } else if (err.status === 429) {
-          setError('Trop de tentatives. Réessayez dans 1 minute.');
-        } else if (err.status === 403) {
-          setError('Compte suspendu. Contactez le support.');
-        } else {
-          setError('Erreur serveur. Réessayez plus tard.');
-        }
+        if (err.status === 401) setError(t('login.error.invalid'));
+        else if (err.status === 429) setError(t('login.error.rateLimit'));
+        else if (err.status === 403) setError(t('login.error.suspended'));
+        else setError(t('login.error.server'));
       } else {
-        setError('Erreur réseau. Vérifiez votre connexion.');
+        setError(t('login.error.network'));
       }
     } finally {
       setLoading(false);
     }
-  }, [email, password, rememberMe, onLogin]);
+  }, [email, password, rememberMe, onLogin, t]);
+
+  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-3 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
+  const labelCls = 'block text-sm font-medium text-[#4A5268]';
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-5 bg-[var(--navy)]"
-      style={{ paddingTop: 'env(safe-area-inset-top, 24px)' }}
-    >
-      {/* ── Back button ─────────────────────────────────────────── */}
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#2A6B52] via-[#1C5E42] to-[#2A6B52] p-6">
+      {/* Back button */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-sm flex justify-start mb-4"
+        className="w-full max-w-sm"
       >
         <button
           onClick={onBackToWelcome}
-          className="flex items-center gap-2 text-sm text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors"
+          className="mb-6 flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
         >
-          <ArrowLeft size={18} />
-          Retour
+          <ArrowLeft size={16} />
+          {t('welcome.login')}
         </button>
       </motion.div>
 
-      {/* ── Brand ───────────────────────────────────────────── */}
+      {/* Logo */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col items-center mb-8"
+        className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm"
       >
-        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-xl overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0d3d24 0%, #0f5132 100%)' }}>
-          {/* Document icon matching the app icon */}
-          <svg width="44" height="44" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <rect x="148" y="110" width="200" height="260" rx="18" fill="#22c55e"/>
-            <path d="M298 110 L348 160 L298 160 Z" fill="rgba(0,0,0,0.18)"/>
-            <rect x="173" y="190" width="120" height="8" rx="4" fill="rgba(255,255,255,0.9)"/>
-            <rect x="173" y="214" width="80" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
-            <rect x="173" y="238" width="100" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
-            <rect x="173" y="290" width="140" height="1.5" rx="1" fill="rgba(255,255,255,0.2)"/>
-            <rect x="173" y="308" width="140" height="28" rx="8" fill="rgba(255,255,255,0.12)"/>
-            <circle cx="338" cy="338" r="52" fill="#0d3d24"/>
-            <circle cx="338" cy="338" r="44" fill="#4ade80"/>
-            <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          </svg>
-        </div>
-        <h1 className="text-3xl font-bold text-[var(--sand)]" style={{ fontFamily: 'serif' }}>رقمنة</h1>
-        <p className="text-sm text-[var(--sand-muted)] mt-1">
-          سجّل الدخول إلى حسابك
-        </p>
+        <svg width="36" height="36" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect x="148" y="110" width="200" height="260" rx="18" fill="rgba(255,255,255,0.9)"/>
+          <circle cx="338" cy="338" r="44" fill="#D6B462"/>
+          <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        </svg>
       </motion.div>
 
-      {/* ── Form card ────────────────────────────────────────── */}
+      <motion.h1
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="mb-8 text-center text-2xl font-black text-white"
+      >
+        Rakmana
+      </motion.h1>
+
+      {/* Form card */}
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="w-full max-w-sm bg-[var(--navy-2)] border border-[var(--border)] rounded-2xl p-6 space-y-4"
+        transition={{ delay: 0.1 }}
+        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
         noValidate
       >
-        {/* Error banner */}
+        {/* Error */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20"
-            role="alert"
-          >
-            <p className="text-sm text-red-400 font-medium">{error}</p>
-          </motion.div>
+          <div className="mb-4 rounded-lg border border-[#B5402C]/30 bg-[#B5402C]/10 p-3 text-sm font-medium text-[#B5402C]">
+            {error}
+          </div>
         )}
 
+        {/* Icon header */}
+        <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-[#2A6B52]/5 text-[#2A6B52]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+        </div>
+
+        <h2 className="mb-5 text-lg font-extrabold text-[#2A6B52]">
+          {t('login.title')}
+        </h2>
+
         {/* Email */}
-        <div>
-          <label
-            htmlFor="mobile-email"
-            className="block text-xs font-semibold text-[var(--sand-muted)] mb-1.5"
-          >
-            Adresse email
-          </label>
+        <div className="space-y-1.5">
+          <label htmlFor="login-email" className={labelCls}>{t('login.email')}</label>
           <input
-            id="mobile-email"
+            id="login-email"
             type="email"
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="vous@exemple.com"
             disabled={loading}
-            className={cn(
-              'w-full px-4 py-3 rounded-xl text-sm',
-              'bg-[var(--navy-3)] text-[var(--sand)]',
-              'placeholder:text-[var(--sand-muted)]',
-              'border border-[var(--border)]',
-              'focus:outline-none focus:border-[rgba(37,99,235,0.4)]',
-              'disabled:opacity-50',
-            )}
+            dir="ltr"
+            className={cn(inputCls, 'disabled:opacity-50')}
           />
         </div>
 
         {/* Password */}
-        <div>
-          <label
-            htmlFor="mobile-password"
-            className="block text-xs font-semibold text-[var(--sand-muted)] mb-1.5"
-          >
-            Mot de passe
-          </label>
+        <div className="mt-4 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="login-password" className={labelCls}>{t('login.password')}</label>
+            <button type="button" className="text-xs font-medium text-[#9AA1B4] hover:text-[#B5402C] transition-colors">
+              {t('login.forgotPassword')}
+            </button>
+          </div>
           <div className="relative">
             <input
-              id="mobile-password"
+              id="login-password"
               type={showPw ? 'text' : 'password'}
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
+              placeholder="••••••••"
               disabled={loading}
-              className={cn(
-                'w-full px-4 py-3 rounded-xl text-sm',
-                'pe-12', // logical end-padding for RTL/LTR eye button
-                'bg-[var(--navy-3)] text-[var(--sand)]',
-                'placeholder:text-[var(--sand-muted)]',
-                'border border-[var(--border)]',
-                'focus:outline-none focus:border-[rgba(37,99,235,0.4)]',
-                'disabled:opacity-50',
-              )}
+              dir="ltr"
+              className={cn(inputCls, 'pr-10 disabled:opacity-50')}
             />
             <button
               type="button"
               onClick={() => setShowPw((v) => !v)}
-              className="absolute end-3 top-1/2 -translate-y-1/2 p-1 text-[var(--sand-muted)] hover:text-[var(--sand)] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA1B4] hover:text-[#2A6B52] transition-colors"
               tabIndex={-1}
-              aria-label={showPw ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
             >
-              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
         {/* Remember me */}
-        <label className="flex items-center gap-3 cursor-pointer select-none">
+        <label className="mt-4 flex items-center gap-3 cursor-pointer select-none">
           <div
             onClick={() => setRememberMe((v) => !v)}
             className={cn(
-              'w-5 h-5 rounded-md border flex items-center justify-center transition-colors',
+              'flex h-5 w-5 items-center justify-center rounded border transition-colors',
               rememberMe
-                ? 'bg-[var(--green-2)] border-[var(--green-2)]'
-                : 'bg-[var(--navy-3)] border-[rgba(15,39,71,0.12)]',
+                ? 'border-[#2A6B52] bg-[#2A6B52]'
+                : 'border-[#E8E1CE] bg-white',
             )}
-            role="checkbox"
-            aria-checked={rememberMe}
-            tabIndex={0}
-            onKeyDown={(e) => e.key === ' ' && setRememberMe((v) => !v)}
           >
             {rememberMe && (
               <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
@@ -211,47 +179,26 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
               </svg>
             )}
           </div>
-          <span className="text-sm text-[var(--sand-muted)]">Se souvenir de moi (30 jours)</span>
+          <span className="text-sm text-[#4A5268]">{t('login.rememberMe')}</span>
         </label>
 
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className={cn(
-            'w-full py-3.5 rounded-xl text-sm font-semibold text-white',
-            'bg-[var(--green-2)] active:scale-[0.98] transition-transform',
-            'flex items-center justify-center gap-2',
-            'disabled:opacity-60 disabled:cursor-not-allowed',
-          )}
+          className="mt-6 w-full rounded-lg bg-[#2A6B52] py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#1C5E42] hover:shadow-md disabled:opacity-50 active:scale-[0.97]"
         >
           {loading ? (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              Connexion en cours…
-            </>
-          ) : (
-            'Se connecter'
-          )}
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 size={16} className="animate-spin" />
+              {t('login.loading')}
+            </span>
+          ) : t('login.button')}
         </button>
-
-        {/* Forgot password */}
-        <p className="text-center text-xs text-[var(--sand-muted)]">
-          نسيت كلمة المرور؟{' '}
-          <a
-            href="https://clouddevis.vercel.app/auth/reset-password"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--green-2)] underline underline-offset-2"
-          >
-            إعادة التعيين
-          </a>
-        </p>
       </motion.form>
 
-      {/* Footer */}
-      <p className="mt-8 text-[11px] text-[var(--sand-muted)]/50">
-        رقمنة · متوافق مع DGI الجزائر
+      <p className="mt-6 text-sm text-white/50">
+        Rakmana · DGI Algeria
       </p>
     </div>
   );

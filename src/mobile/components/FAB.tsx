@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, FileText, Receipt, Copy } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, FileText, Copy, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMobileI18n } from '@/mobile/lib/i18n';
 
 interface FABProps {
   onNewDevis: () => void;
@@ -13,120 +11,45 @@ interface FABProps {
   canDuplicate?: boolean;
 }
 
-export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate = false }: FABProps) {
+export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate }: FABProps) {
   const [open, setOpen] = useState(false);
-  const { t } = useMobileI18n();
-
-  const toggle = useCallback(() => setOpen((o) => !o), []);
-
-  const handleDevis = useCallback(() => {
-    setOpen(false);
-    onNewDevis();
-  }, [onNewDevis]);
-
-  const handleFacture = useCallback(() => {
-    setOpen(false);
-    onNewFacture();
-  }, [onNewFacture]);
-
-  const handleDuplicate = useCallback(() => {
-    setOpen(false);
-    onDuplicate?.();
-  }, [onDuplicate]);
 
   const actions = [
-    {
-      id: 'facture',
-      label: t('fab.facture'),
-      icon: Receipt,
-      color: 'bg-blue-500',
-      onPress: handleFacture,
-      show: true,
-    },
-    {
-      id: 'devis',
-      label: t('fab.devis'),
-      icon: FileText,
-      color: 'bg-emerald-500',
-      onPress: handleDevis,
-      show: true,
-    },
-    {
-      id: 'duplicate',
-      label: t('fab.duplicate'),
-      icon: Copy,
-      color: 'bg-amber-500',
-      onPress: handleDuplicate,
-      show: canDuplicate && !!onDuplicate,
-    },
+    { label: 'Devis', icon: FileText, onClick: () => { onNewDevis(); setOpen(false); }, color: '#2A6B52' },
+    { label: 'Facture', icon: FileText, onClick: () => { onNewFacture(); setOpen(false); }, color: '#B5402C' },
   ];
+  if (canDuplicate && onDuplicate) {
+    actions.push({ label: 'Duplicate', icon: Copy, onClick: () => { onDuplicate(); setOpen(false); }, color: '#D6B462' });
+  }
 
   return (
-    <>
-      {/* Backdrop */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[45] bg-black/30"
-            onClick={() => setOpen(false)}
-          />
+    <div className="fixed right-4 bottom-24 z-40 flex flex-col items-end gap-3 pb-[env(safe-area-inset-bottom,0px)]">
+      {/* Action items */}
+      {open && actions.map((action, i) => {
+        const Icon = action.icon;
+        return (
+          <button
+            key={action.label}
+            onClick={action.onClick}
+            className="flex items-center gap-2 rounded-xl border border-[#E8E1CE] bg-white px-4 py-2.5 shadow-lg transition-all active:scale-[0.97] animate-in slide-in-from-bottom-2 fade-in"
+            style={{ animationDelay: `${i * 50}ms` }}
+          >
+            <Icon size={16} style={{ color: action.color }} />
+            <span className="text-sm font-bold text-[#2A6B52]">{action.label}</span>
+          </button>
+        );
+      })}
+
+      {/* FAB button */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          'flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2A6B52] text-white shadow-lg shadow-[#2A6B52]/30 transition-all active:scale-95',
+          open && 'rotate-45 bg-[#B5402C] shadow-[#B5402C]/30',
         )}
-      </AnimatePresence>
-
-      {/* Speed-dial container */}
-      <div
-        className="fixed z-[46] flex flex-col items-end gap-3"
-        style={{
-          bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
-          right: '20px',
-        }}
       >
-        {/* Mini buttons */}
-        <AnimatePresence>
-          {open &&
-            actions
-              .filter((a) => a.show)
-              .map((action, i) => {
-                const Icon = action.icon;
-                return (
-                  <motion.button
-                    key={action.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                    transition={{ delay: i * 0.04 }}
-                    onClick={action.onPress}
-                    className={cn(
-                      'flex items-center gap-2 px-4 py-2.5 rounded-full text-white shadow-lg active:scale-95',
-                      action.color,
-                    )}
-                  >
-                    <Icon size={17} />
-                    <span className="text-sm font-bold">{action.label}</span>
-                  </motion.button>
-                );
-              })}
-        </AnimatePresence>
-
-        {/* Main FAB */}
-        <motion.button
-          onClick={toggle}
-          animate={{ rotate: open ? 45 : 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className={cn(
-            'w-14 h-14 rounded-full shadow-xl flex items-center justify-center',
-            'active:scale-90 transition-colors',
-          )}
-          style={{ background: open ? 'var(--sand-muted)' : 'var(--green-2)' }}
-          aria-label={open ? t('fab.close') : t('fab.open')}
-          aria-expanded={open}
-        >
-          <Plus size={26} className="text-white" strokeWidth={2.5} />
-        </motion.button>
-      </div>
-    </>
+        <Plus size={24} strokeWidth={2.5} />
+      </button>
+    </div>
   );
 }

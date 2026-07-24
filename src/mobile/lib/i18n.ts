@@ -87,7 +87,15 @@ type TranslationKeys =
   | 'register.error.emailTaken' | 'register.error.network'
   | 'register.error.server' | 'register.error.rateLimit'
   | 'register.error.nameRequired' | 'register.error.emailRequired'
-  | 'register.error.passwordRequired' | 'register.error.confirmRequired';
+  | 'register.error.passwordRequired' | 'register.error.confirmRequired'
+  | 'login.title' | 'login.email' | 'login.password' | 'login.button' | 'login.loading'
+  | 'login.forgotPassword' | 'login.rememberMe'
+  | 'login.error.fillAll' | 'login.error.invalid' | 'login.error.rateLimit'
+  | 'login.error.suspended' | 'login.error.server' | 'login.error.network'
+  | 'onboarding.skip' | 'onboarding.next' | 'onboarding.finish'
+  | 'onboarding.step1Title' | 'onboarding.step1Desc'
+  | 'onboarding.step2Title' | 'onboarding.step2Desc'
+  | 'onboarding.step3Title' | 'onboarding.step3Desc';
 
 type Translations = Record<TranslationKeys, string>;
 
@@ -340,6 +348,30 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': "L'email est requis",
     'register.error.passwordRequired': 'Le mot de passe est requis',
     'register.error.confirmRequired': 'Veuillez confirmer le mot de passe',
+
+    'login.title': 'Se connecter',
+    'login.email': 'Email',
+    'login.password': 'Mot de passe',
+    'login.button': 'Se connecter',
+    'login.loading': 'Connexion…',
+    'login.forgotPassword': 'Mot de passe oublié ?',
+    'login.rememberMe': 'Se souvenir de moi',
+    'login.error.fillAll': 'Veuillez remplir tous les champs',
+    'login.error.invalid': 'Email ou mot de passe incorrect',
+    'login.error.rateLimit': 'Trop de tentatives. Réessayez dans 1 minute.',
+    'login.error.suspended': 'Votre compte a été suspendu',
+    'login.error.server': 'Erreur serveur. Réessayez plus tard.',
+    'login.error.network': 'Erreur réseau. Vérifiez votre connexion.',
+
+    'onboarding.skip': 'Passer',
+    'onboarding.next': 'Suivant',
+    'onboarding.finish': 'Commencer',
+    'onboarding.step1Title': 'Créez vos documents',
+    'onboarding.step1Desc': 'Devis, factures, proformas — tout est conforme à la réglementation algérienne.',
+    'onboarding.step2Title': 'Partagez facilement',
+    'onboarding.step2Desc': 'Envoyez vos documents par email, WhatsApp ou imprimez-les directement.',
+    'onboarding.step3Title': 'Suivez vos revenus',
+    'onboarding.step3Desc': 'Tableau de bord complet avec statistiques, clients et historique.',
   },
 
   ar: {
@@ -590,6 +622,30 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': 'البريد الإلكتروني مطلوب',
     'register.error.passwordRequired': 'كلمة المرور مطلوبة',
     'register.error.confirmRequired': 'يرجى تأكيد كلمة المرور',
+
+    'login.title': 'تسجيل الدخول',
+    'login.email': 'البريد الإلكتروني',
+    'login.password': 'كلمة المرور',
+    'login.button': 'تسجيل الدخول',
+    'login.loading': 'جارٍ تسجيل الدخول…',
+    'login.forgotPassword': 'نسيت كلمة المرور؟',
+    'login.rememberMe': 'تذكرني',
+    'login.error.fillAll': 'يرجى ملء جميع الحقول',
+    'login.error.invalid': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+    'login.error.rateLimit': 'محاولات كثيرة جداً. أعد المحاولة بعد دقيقة.',
+    'login.error.suspended': 'تم تعليق حسابك',
+    'login.error.server': 'خطأ في الخادم. حاول لاحقاً.',
+    'login.error.network': 'خطأ في الشبكة. تحقق من اتصالك.',
+
+    'onboarding.skip': 'تخطي',
+    'onboarding.next': 'التالي',
+    'onboarding.finish': 'ابدأ',
+    'onboarding.step1Title': 'أنشئ وثائقك',
+    'onboarding.step1Desc': 'عروض أسعار، فواتير، برو فورما — كلها متوافقة مع التنظيم الجزائري.',
+    'onboarding.step2Title': 'شارك بسهولة',
+    'onboarding.step2Desc': 'أرسل وثائقك بالبريد الإلكتروني أو واتساب أو اطبعها مباشرة.',
+    'onboarding.step3Title': 'تتبع إيراداتك',
+    'onboarding.step3Desc': 'لوحة تحكم شاملة مع إحصائيات وعملاء وسجل.',
   },
 
   en: {
@@ -840,6 +896,30 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': 'Email is required',
     'register.error.passwordRequired': 'Password is required',
     'register.error.confirmRequired': 'Please confirm your password',
+
+    'login.title': 'Sign in',
+    'login.email': 'Email',
+    'login.password': 'Password',
+    'login.button': 'Sign in',
+    'login.loading': 'Signing in…',
+    'login.forgotPassword': 'Forgot password?',
+    'login.rememberMe': 'Remember me',
+    'login.error.fillAll': 'Please fill all fields',
+    'login.error.invalid': 'Invalid email or password',
+    'login.error.rateLimit': 'Too many attempts. Try in 1 minute.',
+    'login.error.suspended': 'Your account has been suspended',
+    'login.error.server': 'Server error. Try again later.',
+    'login.error.network': 'Network error. Check your connection.',
+
+    'onboarding.skip': 'Skip',
+    'onboarding.next': 'Next',
+    'onboarding.finish': 'Get started',
+    'onboarding.step1Title': 'Create your documents',
+    'onboarding.step1Desc': 'Quotes, invoices, proformas — all compliant with Algerian regulations.',
+    'onboarding.step2Title': 'Share easily',
+    'onboarding.step2Desc': 'Send documents via email, WhatsApp or print them directly.',
+    'onboarding.step3Title': 'Track your revenue',
+    'onboarding.step3Desc': 'Full dashboard with stats, clients and history.',
   },
 };
 

@@ -1,16 +1,5 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Foreground Push Notification Toast
-// Shown when a push arrives while the app is in the foreground.
-// Auto-dismisses after 4 s; tap to navigate to the document.
-// ============================================================
-
-import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
 export interface PushToastData {
   id: string;
   title: string;
@@ -25,82 +14,28 @@ interface PushToastProps {
 }
 
 export function PushToast({ toast, onDismiss, onTap }: PushToastProps) {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!toast) return;
-    timerRef.current = setTimeout(onDismiss, 4000);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [toast, onDismiss]);
+  if (!toast) return null;
 
   return (
-    <AnimatePresence>
-      {toast && (
-        <motion.div
-          key={toast.id}
-          initial={{ y: -80, opacity: 0, scale: 0.95 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: -80, opacity: 0, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-          className={cn(
-            'fixed top-0 left-0 right-0 z-[200]',
-            'mx-3 mt-3',
-            'rounded-2xl overflow-hidden',
-            'shadow-2xl',
-          )}
-          style={{
-            marginTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
-          }}
-          onClick={() => {
-            onDismiss();
-            if (toast.documentId) onTap?.(toast.documentId);
-          }}
-        >
-          {/* Glass card */}
-          <div
-            className="flex items-start gap-3 px-4 py-3.5"
-            style={{
-              background: 'rgba(11, 28, 51, 0.92)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            {/* Icon */}
-            <div className="w-8 h-8 rounded-xl bg-[var(--green-2)] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Bell size={14} className="text-white" />
-            </div>
-
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white leading-tight truncate">
-                {toast.title}
-              </p>
-              <p className="text-xs text-[rgba(255,255,255,0.65)] mt-0.5 leading-snug line-clamp-2">
-                {toast.body}
-              </p>
-            </div>
-
-            {/* Dismiss */}
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onDismiss(); }}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 flex-shrink-0"
-              aria-label="Fermer"
-            >
-              <X size={12} className="text-white/60" />
-            </button>
+    <div
+      className="fixed inset-x-0 top-4 z-[90] mx-auto max-w-sm px-4"
+      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+    >
+      <div className="rounded-xl border border-[#E8E1CE] bg-white px-4 py-3 shadow-xl animate-in slide-in-from-top-5 fade-in duration-300">
+        <div className="flex items-start gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#2A6B52]/10 text-[#2A6B52]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
           </div>
-
-          {/* Progress bar */}
-          <motion.div
-            initial={{ scaleX: 1 }}
-            animate={{ scaleX: 0 }}
-            transition={{ duration: 4, ease: 'linear' }}
-            className="h-0.5 bg-[var(--green-2)] origin-left"
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[#2A6B52]">{toast.title}</p>
+            <p className="text-xs text-[#4A5268] mt-0.5 truncate">{toast.body}</p>
+          </div>
+          <button onClick={onDismiss} className="text-[#9AA1B4] hover:text-[#2A6B52] text-xs">✕</button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,119 +1,90 @@
 'use client';
 
-import { FileText, Users, TrendingUp, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useUserStore } from '@/stores/userStore';
+import { FileText, Clock, Banknote, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import type { DashboardStats } from '@/mobile/lib/useDashboardStats';
 
-// ── Helpers ───────────────────────────────────────────────────
-
-function formatDA(n: number): string {
-  if (n >= 1_000_000) {
-    const m = (n / 1_000_000).toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-    return m + ' M';
-  }
-  return Math.round(n).toLocaleString('fr-DZ');
+interface StatCardsProps {
+  stats: DashboardStats | null;
+  loading: boolean;
 }
 
-// ── Single card ───────────────────────────────────────────────
-
-interface CardProps {
-  icon: React.ReactNode;
-  iconBg: string;
-  label: string;
-  value: string;
-  sub: string;
-  delay: number;
-  loading?: boolean;
-}
-
-function StatCard({ icon, iconBg, label, value, sub, delay, loading }: CardProps) {
+function SkeletonCard() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, delay }}
-      className={cn(
-        'rounded-2xl p-4',
-        'bg-[var(--navy-2)] border border-[var(--border)]',
-      )}
-    >
-      <div className="flex items-center gap-2.5 mb-2.5">
-        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', iconBg)}>
-          {icon}
-        </div>
-        <span className="text-[11px] font-medium text-[var(--sand-muted)] leading-tight">
-          {label}
-        </span>
-      </div>
-
-      {loading ? (
-        <div className="h-7 w-14 rounded-lg bg-[var(--navy-3)] animate-pulse" />
-      ) : (
-        <p
-          className="heading text-[22px] text-[var(--sand)] leading-none"
-        >
-          {value}
-        </p>
-      )}
-
-      <p className="text-[10px] text-[var(--sand-muted)] mt-1 leading-tight">{sub}</p>
-    </motion.div>
+    <div className="rounded-xl border border-[#E8E1CE] bg-white p-4">
+      <div className="pd-skeleton mb-3 h-10 w-10 rounded-xl" />
+      <div className="pd-skeleton mb-2 h-3 w-16 rounded" />
+      <div className="pd-skeleton h-6 w-10 rounded" />
+    </div>
   );
 }
 
-// ── 2×2 grid ─────────────────────────────────────────────────
-
-interface StatCardsProps {
-  stats: DashboardStats;
-  loading?: boolean;
-}
-
 export function StatCards({ stats, loading }: StatCardsProps) {
-  const privacyMode = useUserStore((s) => s.privacyMode);
   const { t } = useMobileI18n();
-  const cards: Omit<CardProps, 'loading'>[] = [
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 gap-3 px-5">
+        {[0, 1, 2, 3].map((i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  const cards = [
     {
-      icon: <FileText size={16} strokeWidth={2} className="text-[var(--green-3)]" />,
-      iconBg: 'bg-[var(--blue-bg)]',
-      label: t('stats.thisMonth'),
-      value: String(stats.monthDocs),
-      sub: t('stats.docsCreated'),
-      delay: 0.04,
+      icon: FileText,
+      label: t('stats.docsCreated'),
+      value: stats?.monthDocs ?? 0,
+      color: '#2A6B52',
+      bgColor: '#2A6B52',
     },
     {
-      icon: <TrendingUp size={16} strokeWidth={2} className="text-emerald-400" />,
-      iconBg: 'bg-[rgba(16,185,129,0.12)]',
+      icon: Banknote,
       label: t('stats.revenue'),
-      value: privacyMode ? '••••' : formatDA(stats.totalTTC),
-      sub: t('stats.revenueSub'),
-      delay: 0.08,
+      value: `${(stats?.totalTTC ?? 0).toLocaleString('fr-DZ')}`,
+      suffix: 'DA',
+      color: '#D6B462',
+      bgColor: '#D6B462',
     },
     {
-      icon: <Users size={16} strokeWidth={2} className="text-sky-400" />,
-      iconBg: 'bg-[rgba(56,189,248,0.12)]',
-      label: t('stats.clients'),
-      value: String(stats.totalClients),
-      sub: t('stats.clientsSub'),
-      delay: 0.12,
-    },
-    {
-      icon: <AlertCircle size={16} strokeWidth={2} className="text-red-400" />,
-      iconBg: 'bg-[rgba(239,68,68,0.12)]',
+      icon: AlertTriangle,
       label: t('stats.unpaid'),
-      value: privacyMode ? '••••' : formatDA(stats.unpaidTotal),
-      sub: `${stats.unpaidCount} ${t('stats.unpaidSub')}`,
-      delay: 0.16,
+      value: stats?.unpaidCount ?? 0,
+      color: '#B5402C',
+      bgColor: '#B5402C',
+    },
+    {
+      icon: Clock,
+      label: t('stats.drafts'),
+      value: stats?.draftCount ?? 0,
+      color: '#2F6B4F',
+      bgColor: '#2F6B4F',
     },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-3 px-5">
-      {cards.map((c) => (
-        <StatCard key={c.label} {...c} loading={loading} />
-      ))}
+      {cards.map((card) => {
+        const Icon = card.icon;
+        return (
+          <div key={card.label} className="rounded-xl border border-[#E8E1CE] bg-white p-4">
+            <div
+              className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ backgroundColor: `${card.bgColor}10` }}
+            >
+              <Icon size={20} style={{ color: card.color }} />
+            </div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#4A5268]">
+              {card.label}
+            </div>
+            <div className="mt-1 text-2xl font-bold text-[#2A6B52]" style={{ fontFamily: 'var(--font-mono, monospace)' }}>
+              {card.value}{card.suffix && <span className="text-xs font-medium text-[#9AA1B4] ml-1">{card.suffix}</span>}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

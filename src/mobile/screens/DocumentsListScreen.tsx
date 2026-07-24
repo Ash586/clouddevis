@@ -1,473 +1,168 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Documents List Screen
-// Filters: All | DEVIS | FACTURE | Payé | En attente | Ce mois
-// Swipe-to-action on each row
-// Long press opens ActionSheet
-// ============================================================
-
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, FilePlus, Files, X, Loader2 } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Filter, FileText, Plus, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDocumentStore } from '@/stores/documentStore';
-import { useSyncStore } from '@/stores/syncStore';
-import { useShallow } from 'zustand/react/shallow';
-import { DocumentRow } from '@/mobile/components/DocumentRow';
-import { DocumentListSkeleton } from '@/mobile/components/DocumentRowSkeleton';
-import { useSyncStatusStore } from '@/stores/syncStatusStore';
-import { refreshAllData } from '@/mobile/lib/useApiSync';
-import { updateDocumentStatus } from '@/mobile/lib/api';
 import { useMobileI18n } from '@/mobile/lib/i18n';
+import { DocumentRow } from '../components/DocumentRow';
 import { usePullToRefresh } from '@/mobile/lib/usePullToRefresh';
-import { ActionSheet } from '@/mobile/components/ActionSheet';
-import { ConfirmSheet } from '@/mobile/components/ConfirmSheet';
-import { generatePDFBase64FromDoc, printDocument, downloadDocument } from '@/mobile/lib/pdf';
-import { shareDocument } from '@/mobile/lib/whatsapp';
-import { notify } from '@/mobile/lib/toast';
-import type { Document } from '@/mobile/types';
-
-// ── Filter definitions ───────────────────────────────────────
-
-type FilterId = 'all' | 'devis' | 'facture' | 'paid' | 'pending' | 'thisMonth';
-
-interface Filter {
-  id: FilterId;
-  label: string;
-}
-
-// ── Helpers ──────────────────────────────────────────────────
-
-function isThisMonth(dateStr: string): boolean {
-  const date = new Date(dateStr);
-  const now = new Date();
-  return (
-    date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
-  );
-}
-
-function filterDocuments(docs: Document[], filter: FilterId): Document[] {
-  switch (filter) {
-    case 'devis':
-      return docs.filter((d) => d.type === 'DEVIS');
-    case 'facture':
-      return docs.filter((d) => d.type === 'FACTURE');
-    case 'paid':
-      return docs.filter((d) => d.status === 'PAID');
-    case 'pending':
-      return docs.filter((d) => d.status === 'SENT' || d.status === 'DRAFT');
-    case 'thisMonth':
-      return docs.filter((d) => isThisMonth(d.date));
-    default:
-      return docs;
-  }
-}
-
-// ── Props ────────────────────────────────────────────────────
+import { refreshAllData } from '@/mobile/lib/useApiSync';
+import type { Document, DocumentType, DocumentStatus } from '@/mobile/types';
 
 interface DocumentsListScreenProps {
   onNewDocument?: () => void;
   onEditDocument?: (doc: Document) => void;
-  /** Prefill the creator with a copy of this doc (new number/date). */
   onDuplicateDocument?: (doc: Document) => void;
 }
 
-// ── Component ────────────────────────────────────────────────
-
-export function DocumentsListScreen({
-  onNewDocument,
-  onEditDocument,
-  onDuplicateDocument,
-}: DocumentsListScreenProps) {
+export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicateDocument }: DocumentsListScreenProps) {
   const { t } = useMobileI18n();
-
-  const FILTERS: Filter[] = [
-    { id: 'all',       label: t('docs.filterAll')     },
-    { id: 'devis',     label: t('docs.filterDevis')   },
-    { id: 'facture',   label: t('docs.filterFacture') },
-    { id: 'paid',      label: t('docs.filterPaid')    },
-    { id: 'pending',   label: t('docs.filterPending') },
-    { id: 'thisMonth', label: t('docs.filterMonth')   },
-  ];
-
-  const [activeFilter, setActiveFilter] = useState<FilterId>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
-  const [actionSheetDoc, setActionSheetDoc] = useState<Document | null>(null);
-  const [actionSheetOpen, setActionSheetOpen] = useState(false);
-  const [docToDelete, setDocToDelete] = useState<Document | null>(null);
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
-
-  // Show swipe hint on first ever visit — localStorage persists across sessions
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem('rakmana_swipe_hinted')) {
-        setShowSwipeHint(true);
-      }
-    } catch { /* private browsing — ignore */ }
-  }, []);
-
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
-  const initialSyncDone = useSyncStatusStore((s) => s.initialSyncDone);
-  // Show skeleton only on first load when store is empty AND sync hasn't finished yet
-  const showSkeleton = !initialSyncDone && savedDocuments.length === 0;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<DocumentType | ''>('');
+  const [filterStatus, setFilterStatus] = useState<DocumentStatus | ''>('');
+  const [showFilters, setShowFilters] = useState(false);
 
-  // ── Single sync-queue subscription for the whole list (P1 perf fix) ─
-  // useShallow prevents re-render when unrelated queue items change.
-  // Each DocumentRow receives a pre-computed boolean instead of running
-  // its own .some() against the full queue on every store update.
-  const pendingDocIds = useSyncStore(
-    useShallow((s) =>
-      s.queue
-        .filter((item) => item.entity === 'document')
-        .map((item) => item.entityId),
-    ),
-  );
-  const pendingSet = useMemo(() => new Set(pendingDocIds), [pendingDocIds]);
-  const deleteDocument = useDocumentStore((s) => s.deleteDocument);
-  const duplicateDocument = useDocumentStore((s) => s.duplicateDocument);
-
-  // ── Pull-to-refresh ────────────────────────────────────────
-  const handleRefresh = useCallback(async () => {
-    try {
-      const ok = await refreshAllData();
-      void notify(ok ? 'Documents à jour ✓' : 'Hors ligne — impossible d’actualiser');
-    } catch {
-      void notify('Échec de l’actualisation');
-    }
-  }, []);
-  const { pull, refreshing, handlers } = usePullToRefresh(handleRefresh);
-
-  // ── Filter + search ────────────────────────────────────────
-  const filteredDocs = useMemo(() => {
-    let docs = filterDocuments(savedDocuments, activeFilter);
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      docs = docs.filter(
-        (d) =>
-          d.client?.name?.toLowerCase().includes(q) ||
-          d.number.toLowerCase().includes(q) ||
-          d.client?.nif?.includes(q)
-      );
-    }
-
-    // Sort: newest first
-    return [...docs].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-  }, [savedDocuments, activeFilter, searchQuery]);
-
-  // ── Count per filter for badges ────────────────────────────
-  const counts = useMemo(
-    () => ({
-      all: savedDocuments.length,
-      devis: savedDocuments.filter((d) => d.type === 'DEVIS').length,
-      facture: savedDocuments.filter((d) => d.type === 'FACTURE').length,
-      paid: savedDocuments.filter((d) => d.status === 'PAID').length,
-      pending: savedDocuments.filter((d) => d.status === 'SENT' || d.status === 'DRAFT').length,
-      thisMonth: savedDocuments.filter((d) => isThisMonth(d.date)).length,
-    }),
-    [savedDocuments]
+  const { pull, refreshing, handlers: pullHandlers } = usePullToRefresh(
+    useCallback(async () => { await refreshAllData(); }, []),
   );
 
-  // ── Handlers ───────────────────────────────────────────────
-  const handleEdit = useCallback(
-    (doc: Document) => {
-      onEditDocument?.(doc);
-    },
-    [onEditDocument]
-  );
+  const filtered = useMemo(() => {
+    return savedDocuments.filter((doc) => {
+      const matchesSearch = !searchQuery ||
+        doc.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.client?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = !filterType || doc.type === filterType;
+      const matchesStatus = !filterStatus || doc.status === filterStatus;
+      return matchesSearch && matchesType && matchesStatus;
+    });
+  }, [savedDocuments, searchQuery, filterType, filterStatus]);
 
-  const handleDuplicate = useCallback(
-    (doc: Document) => {
-      const newDoc = duplicateDocument(doc.id);
-      if (newDoc) {
-        void notify('Document dupliqué');
-      }
-    },
-    [duplicateDocument]
-  );
-
-  const handleDelete = useCallback(
-    (doc: Document) => {
-      setActionSheetDoc(doc);
-      setActionSheetOpen(true);
-    },
-    []
-  );
-
-  const handleLongPress = useCallback((doc: Document) => {
-    setActionSheetDoc(doc);
-    setActionSheetOpen(true);
-  }, []);
-
-  const handleActionSheet = useCallback(
-    async (actionId: string, doc: Document) => {
-      switch (actionId) {
-        case 'edit':
-          onEditDocument?.(doc);
-          break;
-        case 'duplicate':
-          // Open the creator prefilled (new number/date) instead of
-          // silently saving a hidden copy.
-          if (onDuplicateDocument) onDuplicateDocument(doc);
-          else if (duplicateDocument(doc.id)) void notify('Document dupliqué');
-          break;
-        case 'markPaid':
-          useDocumentStore.getState().setDocumentStatus(doc.id, 'PAID');
-          updateDocumentStatus(doc.id, 'PAID').catch(() => {
-            // Offline: queue the status change for replay on reconnect
-            useSyncStore.getState().enqueue({
-              action: 'UPDATE',
-              entity: 'document',
-              entityId: doc.id,
-              payload: { status: 'PAID' },
-            });
-          });
-          void notify('Marqué payé ✓');
-          break;
-        case 'convertToFacture': {
-          // Atomically prefill wizard with FACTURE type — no race condition
-          useDocumentStore.getState().loadDocumentIntoWizardAsType(doc.id, 'FACTURE');
-          onEditDocument?.(doc);
-          void notify('Converti en Facture');
-          break;
-        }
-        case 'delete':
-          setDocToDelete(doc);
-          break;
-        case 'share':
-          try {
-            const pdf = await generatePDFBase64FromDoc(doc);
-            await shareDocument({
-              pdfBase64: pdf,
-              docNumber: doc.number,
-              clientName: doc.client.name,
-              total: doc.totalTTC + doc.timbreAmount - (doc.acompte || 0),
-            });
-          } catch {
-            void notify(t('toast.shareFailed'));
-          }
-          break;
-        case 'download':
-          try {
-            const pdf = await generatePDFBase64FromDoc(doc);
-            await downloadDocument(pdf, `${doc.number}.pdf`);
-          } catch {
-            void notify(t('toast.pdfImpossible'));
-          }
-          break;
-        case 'print':
-          try {
-            const pdf = await generatePDFBase64FromDoc(doc);
-            await printDocument(pdf);
-          } catch {
-            void notify(t('toast.pdfImpossible'));
-          }
-          break;
-      }
-    },
-    [onEditDocument, onDuplicateDocument, duplicateDocument]
-  );
+  const activeFilters = (filterType ? 1 : 0) + (filterStatus ? 1 : 0);
 
   return (
-    <div className="flex flex-col h-full">
-      {/* ── Header ──────────────────────────────────────────── */}
-      <div className="px-5 pt-4 pb-3">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-[var(--sand)]">{t('docs.title')}</h1>
-            <p className="text-xs text-[var(--sand-muted)] mt-0.5">
-              {savedDocuments.length} document{savedDocuments.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button type="button"               onClick={() => setShowSearch(!showSearch)}
-              className={cn(
-                'w-11 h-11 rounded-xl flex items-center justify-center transition-colors',
-                showSearch
-                  ? 'bg-[var(--green-2)] text-white'
-                  : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
-              )}
-              aria-label={showSearch ? 'Fermer la recherche' : 'Rechercher'}
-            >
-              {showSearch ? <X size={18} /> : <Search size={18} />}
-            </button>
-            <button type="button"               onClick={onNewDocument}
-              className="w-11 h-11 rounded-xl bg-[var(--green-2)] flex items-center justify-center text-white active:scale-95 transition-transform"
-              aria-label="Nouveau document"
-            >
-              <FilePlus size={18} />
-            </button>
-          </div>
+    <div className="flex flex-col min-h-dvh bg-[#F4F6FA]">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('docs.title')}</h1>
+          <button
+            onClick={onNewDocument}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2A6B52] text-white shadow-md shadow-[#2A6B52]/25 active:scale-95 transition-all"
+          >
+            <Plus size={18} strokeWidth={2.5} />
+          </button>
         </div>
 
-        {/* ── Search bar ──────────────────────────────────────── */}
-        <AnimatePresence>
-          {showSearch && (
+        {/* Search */}
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA1B4]" />
+            <input
+              type="text"
+              placeholder={t('docs.searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] py-2.5 pl-9 pr-8 text-sm text-[#2A6B52] placeholder-[#9AA1B4] focus:border-[#2A6B52] focus:outline-none transition-colors"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9AA1B4] hover:text-[#2A6B52]">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Filter toggle */}
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className="mt-2 flex items-center gap-2 text-xs font-bold text-[#4A5268]"
+          >
+            <Filter size={14} />
+            {t('docs.filterAll')}
+            {activeFilters > 0 && (
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2A6B52] px-1 text-[9px] font-bold text-white">
+                {activeFilters}
+              </span>
+            )}
+            <ChevronDown size={12} className={cn('transition-transform', showFilters && 'rotate-180')} />
+          </button>
+
+          {/* Filters */}
+          {showFilters && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+              className="mt-2 flex flex-wrap gap-2"
             >
-              <div className="relative mb-3">
-                <Search
-                  size={16}
-                  className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-[var(--sand-muted)]"
-                />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('docs.searchPlaceholder')}
+              {/* Type filter */}
+              {(['', 'DEVIS', 'FACTURE'] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
                   className={cn(
-                    'w-full ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 py-2.5 rounded-xl text-sm',
-                    'bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)]',
-                    'border border-[var(--border)]',
-                    'focus:outline-none focus:border-[var(--green-2)]',
+                    'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
+                    filterType === type
+                      ? 'bg-[#2A6B52] text-white'
+                      : 'border border-[#E8E1CE] bg-white text-[#4A5268] hover:bg-[#FBF8F2]',
                   )}
-                  autoFocus
-                />
-              </div>
+                >
+                  {type || t('docs.filterAll')}
+                </button>
+              ))}
+
+              {/* Status filter */}
+              {(['', 'PAID', 'SENT', 'DRAFT'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={cn(
+                    'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
+                    filterStatus === status
+                      ? 'bg-[#2A6B52] text-white'
+                      : 'border border-[#E8E1CE] bg-white text-[#4A5268] hover:bg-[#FBF8F2]',
+                  )}
+                >
+                  {status || t('docs.filterAll')}
+                </button>
+              ))}
             </motion.div>
           )}
-        </AnimatePresence>
-
-        {/* ── Filters bar (horizontal scroll) ─────────────────── */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-          {FILTERS.map((filter) => {
-            const isActive = activeFilter === filter.id;
-            const count = counts[filter.id];
-            return (
-              <button type="button"                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={cn(
-                  'flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold',
-                  'transition-all duration-200 border',
-                  isActive
-                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)] active:bg-[var(--navy-2)]',
-                )}
-              >
-                {filter.label}
-                {count > 0 && (
-                  <span
-                    className={cn(
-                      'min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center px-1',
-                      isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-[var(--border)] text-[var(--sand-muted)]',
-                    )}
-                  >
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
         </div>
       </div>
 
-      {/* ── Document list ───────────────────────────────────── */}
-      <div
-        className="flex-1 overflow-y-auto px-5 pb-24 relative"
-        style={{ overscrollBehaviorY: 'contain' }}
-        onTouchStart={handlers.onTouchStart}
-        onTouchMove={handlers.onTouchMove}
-        onTouchEnd={handlers.onTouchEnd}
-      >
-        {/* Pull-to-refresh spinner */}
-        {(pull > 0 || refreshing) && (
-          <div
-            className="absolute left-0 right-0 top-0 flex items-center justify-center pointer-events-none z-10"
-            style={{ height: pull || 40, opacity: refreshing ? 1 : Math.min(1, pull / 70) }}
-          >
-            <Loader2
-              size={20}
-              className={cn('text-[var(--green-2)]', refreshing && 'animate-spin')}
-              style={{ transform: refreshing ? undefined : `rotate(${pull * 3}deg)` }}
-            />
-          </div>
-        )}
-        <div style={{ transform: `translateY(${pull}px)`, transition: pull === 0 ? 'transform 0.25s' : undefined }}>
-        {showSkeleton ? (
-          <DocumentListSkeleton count={6} />
-        ) : filteredDocs.length === 0 ? (
-          <motion.div
-            className="flex flex-col items-center justify-center py-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="w-16 h-16 rounded-2xl bg-[var(--navy-3)] flex items-center justify-center mb-4">
-              <Files size={28} className="text-[var(--sand-muted)]" />
+      {/* Pull to refresh */}
+      {(pull > 0 || refreshing) && (
+        <div className="flex items-center justify-center py-2">
+          <div className={cn('h-5 w-5 rounded-full border-2 border-[#2A6B52]/30 border-t-[#2A6B52] animate-spin', !refreshing && 'opacity-50')} />
+        </div>
+      )}
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center py-16">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2A6B52]/5">
+              <FileText size={28} className="text-[#2A6B52]/30" />
             </div>
-            <p className="text-sm font-semibold text-[var(--sand-muted)]">
-              {t('docs.empty')}
-            </p>
-            <p className="text-xs text-[var(--sand-muted)] mt-1 text-center max-w-[200px]">
-              {t('docs.emptyHint')}
-            </p>
-          </motion.div>
+            <p className="text-sm font-bold text-[#2A6B52]">{t('docs.empty')}</p>
+            <p className="mt-1 text-xs text-[#9AA1B4]">{t('docs.emptyHint')}</p>
+          </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            {filteredDocs.map((doc, i) => (
+          <div className="space-y-2">
+            {filtered.map((doc) => (
               <DocumentRow
                 key={doc.id}
                 document={doc}
-                index={i}
-                onEdit={handleEdit}
-                onDuplicate={handleDuplicate}
-                onDelete={handleDelete}
-                onLongPress={handleLongPress}
-                isPendingSync={pendingSet.has(doc.id)}
-                hintOnMount={i === 0 && showSwipeHint}
-                onHintComplete={i === 0 ? () => {
-                  setShowSwipeHint(false);
-                  try { localStorage.setItem('rakmana_swipe_hinted', '1'); } catch { /* ignore */ }
-                } : undefined}
+                onTap={() => onEditDocument?.(doc)}
+                onDuplicate={() => onDuplicateDocument?.(doc)}
               />
             ))}
-          </motion.div>
+          </div>
         )}
-        </div>
       </div>
-
-      {/* ── ActionSheet ──────────────────────────────────────── */}
-      <ActionSheet
-        open={actionSheetOpen}
-        actionDoc={actionSheetDoc}
-        onClose={() => {
-          setActionSheetOpen(false);
-          setActionSheetDoc(null);
-        }}
-        onAction={handleActionSheet}
-      />
-
-      {/* ── Delete confirmation ──────────────────────────────── */}
-      <ConfirmSheet
-        open={docToDelete !== null}
-        title="Supprimer ce document ?"
-        message={
-          docToDelete
-            ? `${docToDelete.number} — ${docToDelete.client?.name ?? ''}. Cette action est irréversible.`
-            : 'Cette action est irréversible.'
-        }
-        onConfirm={() => {
-          if (docToDelete) {
-            deleteDocument(docToDelete.id);
-            void notify('Document supprimé');
-          }
-        }}
-        onClose={() => setDocToDelete(null)}
-      />
     </div>
   );
 }

@@ -1,52 +1,9 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Recent Documents List
-// Last 5 documents with staggered animation
-// ============================================================
-
-import {
-  FileText,
-  Receipt,
-  ClipboardList,
-  ReceiptText,
-  PackageCheck,
-  Truck,
-  type LucideIcon,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useUserStore } from '@/stores/userStore';
-import { useSyncStatusStore } from '@/stores/syncStatusStore';
+import { useMemo } from 'react';
+import { FileText, ArrowRight, Clock } from 'lucide-react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
-import { Badge } from '@/components/ui/badge';
-import { formatAmount } from '@/mobile/lib/format';
-import { DocumentListSkeleton } from './DocumentRowSkeleton';
-import type { Document, DocumentType } from '@/mobile/types';
-
-// ── Document type → icon mapping ──────────────────────────────
-
-const DOC_ICONS: Record<DocumentType, LucideIcon> = {
-  DEVIS: FileText,
-  FACTURE: Receipt,
-  PROFORMA: ReceiptText,
-  BC: ClipboardList,
-  BR: PackageCheck,
-  BL: Truck,
-};
-
-// ── Status → badge variant mapping ────────────────────────────
-
-type BadgeVariant = 'success' | 'warning' | 'default' | 'danger';
-
-const STATUS_MAP: Record<string, { labelKey: 'docs.status.paid' | 'docs.status.pending' | 'docs.status.draft' | 'docs.status.cancelled'; variant: BadgeVariant }> = {
-  PAID: { labelKey: 'docs.status.paid', variant: 'success' },
-  SENT: { labelKey: 'docs.status.pending', variant: 'warning' },
-  DRAFT: { labelKey: 'docs.status.draft', variant: 'default' },
-  CANCELLED: { labelKey: 'docs.status.cancelled', variant: 'danger' },
-};
-
-// ── Component ─────────────────────────────────────────────────
+import type { Document } from '@/mobile/types';
 
 interface RecentDocumentsProps {
   documents: Document[];
@@ -54,127 +11,56 @@ interface RecentDocumentsProps {
   onSeeAll?: () => void;
 }
 
-const listVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.08, // 80ms stagger
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
-
 export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDocumentsProps) {
-  const privacyMode = useUserStore((s) => s.privacyMode);
-  const initialSyncDone = useSyncStatusStore((s) => s.initialSyncDone);
   const { t } = useMobileI18n();
-  const recentDocs = [...documents]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5);
 
-  if (!initialSyncDone && recentDocs.length === 0) {
-    return (
-      <div className="px-5">
-        <h3 className="text-base font-bold text-[var(--sand)] mb-3">{t('docs.recent')}</h3>
-        <DocumentListSkeleton count={3} />
-      </div>
-    );
-  }
+  const recent = useMemo(() => documents.slice(0, 5), [documents]);
 
-  if (recentDocs.length === 0) {
+  if (recent.length === 0) {
     return (
-      <div className="px-5">
-        <h3 className="text-base font-bold text-[var(--sand)] mb-3">{t('docs.recent')}</h3>
-        <div
-          className={cn(
-            'rounded-2xl p-8 text-center',
-            'bg-[var(--navy-2)] border border-[var(--border)]',
-          )}
-        >
-          <FileText size={32} strokeWidth={1.5} className="text-[var(--sand-muted)] mx-auto mb-3" />
-          <p className="text-sm text-[var(--sand-muted)]">{t('docs.noRecent')}</p>
-          <p className="text-xs text-[var(--sand-muted)] mt-1 opacity-60">
-            {t('docs.createFirst')}
-          </p>
+      <div className="mx-5 rounded-xl border-2 border-dashed border-[#E8E1CE] bg-white p-8 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2A6B52]/5">
+          <FileText size={28} className="text-[#2A6B52]/30" />
         </div>
+        <h3 className="text-sm font-bold text-[#2A6B52]">{t('docs.empty')}</h3>
+        <p className="mt-1 text-xs text-[#9AA1B4]">{t('docs.emptyHint')}</p>
       </div>
     );
   }
 
   return (
-    <div className="px-5">
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3
-          className="heading text-base text-[var(--sand)]"
-         
-        >
+    <div className="mx-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-[#4A5268]">
           {t('docs.recent')}
         </h3>
-        {onSeeAll && (
-          <button type="button"             onClick={onSeeAll}
-            className="text-xs font-semibold text-[var(--green-3)] active:opacity-60 transition-opacity"
-          >
-            {t('docs.seeAll')}
-          </button>
-        )}
+        <button onClick={onSeeAll} className="flex items-center gap-1 text-xs font-bold text-[#2A6B52] hover:text-[#B5402C] transition-colors">
+          {t('docs.seeAll')}
+          <ArrowRight size={12} />
+        </button>
       </div>
-
-      {/* Document list */}
-      <motion.div
-        variants={listVariants}
-        initial="hidden"
-        animate="visible"
-        className="flex flex-col gap-2.5"
-      >
-        {recentDocs.map((doc) => {
-          const Icon = DOC_ICONS[doc.type] || FileText;
-          const status = STATUS_MAP[doc.status] || STATUS_MAP.DRAFT;
-
-          return (
-            <motion.button
-              key={doc.id}
-              variants={itemVariants}
-              onClick={() => onDocumentTap?.(doc)}
-              className={cn(
-                'flex items-center gap-3 w-full p-3.5 rounded-2xl',
-                'bg-[var(--navy-2)] border border-[var(--border)]',
-                'active:scale-[0.98] active:bg-[var(--navy-3)] transition-all',
-                'min-h-[56px] text-left',
-              )}
-            >
-              {/* Document type icon */}
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-[var(--blue-bg)]">
-                <Icon size={18} strokeWidth={1.8} className="text-[var(--green-3)]" />
+      <div className="space-y-2">
+        {recent.map((doc) => (
+          <button
+            key={doc.id}
+            onClick={() => onDocumentTap?.(doc)}
+            className="flex w-full items-center gap-3 rounded-xl border border-[#E8E1CE] bg-white p-3 text-left transition-all hover:border-[#B5402C]/30 hover:bg-[#FBF8F2] active:scale-[0.99]"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#2A6B52]/5 text-[#2A6B52]">
+              <FileText size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-[#2A6B52] truncate">{doc.number}</div>
+              <div className="text-xs text-[#9AA1B4]">
+                {doc.client?.name || t('common.unknownClient')} · {doc.totalTTC.toLocaleString('fr-DZ')} DA
               </div>
-
-              {/* Client name + doc number */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[var(--sand)] truncate">
-                  {doc.client?.name || t('common.unknownClient')}
-                </p>
-                <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">
-                  {doc.number}
-                </p>
-              </div>
-
-              {/* Status badge + amount */}
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <Badge variant={status.variant}>
-                  {t(status.labelKey)}
-                </Badge>
-                <span className="text-xs font-semibold text-[var(--sand)] whitespace-nowrap">
-                  {privacyMode ? '••••' : formatAmount(doc.totalTTC)}
-                </span>
-              </div>
-            </motion.button>
-          );
-        })}
-      </motion.div>
+            </div>
+            <span className="shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#2A6B52]/10 text-[#2A6B52]">
+              {doc.type}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

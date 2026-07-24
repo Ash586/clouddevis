@@ -1,478 +1,136 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Settings Screen
-// App settings: language, TVA rate, theme, data management
-// ============================================================
-
-import { useState, useEffect, useCallback } from 'react';
-import { Languages, Receipt, CloudOff, Trash2, ChevronRight, Info, LogOut, Briefcase, HeadphonesIcon, UserX, Fingerprint, Bug, Globe } from 'lucide-react';
-import { checkBiometry, type BiometryInfo } from '@/mobile/lib/biometric';
-import { cn } from '@/lib/utils';
-import {
-  getSettings,
-  setSettings,
-  clearAllOfflineData,
-  type AppSettings,
-} from '@/lib/offline';
-import { useDocumentStore } from '@/stores/documentStore';
-import { useClientStore } from '@/stores/clientStore';
-import { useCompanyStore } from '@/stores/companyStore';
-import { useSyncStore } from '@/stores/syncStore';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Globe, LogOut, Building, Users, Trash2, Bug, ChevronRight, Info, Smartphone, Shield } from 'lucide-react';
+import { useMobileI18n } from '@/mobile/lib/i18n';
 import { useUserStore } from '@/stores/userStore';
-import { updateUserMode } from '@/mobile/lib/api';
-import { notify } from '@/mobile/lib/toast';
-import { useMobileI18n, getMobileT } from '@/mobile/lib/i18n';
-import { APP_VERSION } from '@/mobile/constants';
-import type { UserMode } from '@/mobile/types';
+import { cn } from '@/lib/utils';
 import type { MobileLocale } from '@/stores/userStore';
 
 interface SettingsScreenProps {
-  onLogout?: () => Promise<void>;
+  onLogout: () => void;
 }
 
 export function SettingsScreen({ onLogout }: SettingsScreenProps) {
-  const [settings, setLocalSettings] = useState<AppSettings>({
-    language: 'FR',
-    defaultTvaRate: 19,
-    currency: 'DA',
-    autoSync: true,
-    theme: 'light',
-    biometricEnabled: false,
-  });
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
-  const [biometryInfo, setBiometryInfo] = useState<BiometryInfo>({ available: false, type: '' });
-  const [deletingAccount, setDeletingAccount] = useState(false);
+  const { t, locale } = useMobileI18n();
+  const setLocale = useUserStore((s) => s.setLocale);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const { t, dir } = useMobileI18n();
-  const setLocale = useUserStore((s) => s.setLocale);
-
-  const handleLogout = useCallback(async () => {
-    if (!onLogout) return;
+  const handleLogout = async () => {
     setLoggingOut(true);
-    try {
-      await onLogout();
-    } finally {
-      setLoggingOut(false);
-    }
-  }, [onLogout]);
-
-  const savedDocuments = useDocumentStore((s) => s.savedDocuments);
-  const clients = useClientStore((s) => s.clients);
-  const company = useCompanyStore((s) => s.company);
-
-  // ── Load settings on mount ──
-  useEffect(() => {
-    getSettings().then(setLocalSettings);
-    void checkBiometry().then(setBiometryInfo);
-  }, []);
-
-  // ── Account persona (artisan | entreprise) ──
-  const userMode = useUserStore((s) => s.mode);
-  const setUserMode = useUserStore((s) => s.setMode);
-  const handleModeChange = async (next: UserMode) => {
-    if (next === userMode) return;
-    const previous = userMode;
-    setUserMode(next);
-    const currentLocale = useUserStore.getState().locale;
-    const tNow = getMobileT(currentLocale);
-    try {
-      await updateUserMode(next === 'entreprise' ? 'ENTREPRISE' : 'ARTISAN');
-      void notify(next === 'entreprise' ? tNow('settings.modeEntreprise') : tNow('settings.modeArtisan'));
-    } catch {
-      setUserMode(previous);
-      void notify(tNow('settings.modeError'));
-    }
+    await onLogout();
   };
 
-  const handleSettingChange = async (key: keyof AppSettings, value: unknown) => {
-    const updated = { ...settings, [key]: value };
-    setLocalSettings(updated);
-    await setSettings({ [key]: value });
+  const languages: { code: MobileLocale; label: string }[] = [
+    { code: 'fr', label: 'Français' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'en', label: 'English' },
+  ];
 
-    // Sync language change to i18n store immediately
-    if (key === 'language') {
-      const map: Record<string, MobileLocale> = { FR: 'fr', AR: 'ar', EN: 'en' };
-      setLocale(map[value as string] ?? 'fr');
-    }
+  const Section = ({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
+    <div className="rounded-xl border border-[#E8E1CE] bg-white overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#F4F6FA]">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2A6B52]/5 text-[#2A6B52]">
+          <Icon size={16} />
+        </div>
+        <span className="text-sm font-bold text-[#2A6B52]">{title}</span>
+      </div>
+      {children}
+    </div>
+  );
 
-    const currentLocale = useUserStore.getState().locale;
-    void notify(getMobileT(currentLocale)('settings.saved'));
-  };
-
-  const handleClearAllData = async () => {
-    await clearAllOfflineData();
-    useDocumentStore.getState().resetDocument();
-    useDocumentStore.setState({ savedDocuments: [], syncStatus: 'synced' });
-    useClientStore.getState().clearAll();
-    useCompanyStore.getState().clearCompany();
-    useSyncStore.getState().clearQueue();
-    setShowClearConfirm(false);
-    void notify(getMobileT(useUserStore.getState().locale)('settings.cleared'));
-  };
-
-  const handleDeleteAccount = async () => {
-    setDeletingAccount(true);
-    try {
-      const res = await fetch('/api/user/delete', {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: deletePassword }),
-      });
-      if (!res.ok) throw new Error();
-      // Clear all local data then trigger logout
-      await clearAllOfflineData();
-      useDocumentStore.getState().resetDocument();
-      useClientStore.getState().clearAll();
-      useCompanyStore.getState().clearCompany();
-      await onLogout?.();
-    } catch {
-      void notify(getMobileT(useUserStore.getState().locale)('settings.deleteAccountError'));
-    } finally {
-      setDeletingAccount(false);
-      setShowDeleteAccountConfirm(false);
-    }
-  };
+  const Row = ({ children, onClick, className }: { children: React.ReactNode; onClick?: () => void; className?: string }) => (
+    <button
+      onClick={onClick}
+      className={cn('flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-[#FBF8F2] border-b border-[#F4F6FA] last:border-0', className)}
+    >
+      {children}
+    </button>
+  );
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* ── Header ──────────────────────────────────────────── */}
-      <div className="px-5 pt-4 pb-3">
-        <h1 className="text-xl font-bold text-[var(--sand)]">{t('settings.title')}</h1>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-dvh bg-[#F4F6FA] pb-24"
+    >
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+        <div className="px-4 py-3">
+          <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('settings.title')}</h1>
+        </div>
       </div>
 
-      {/* ── Content — body scroll, pb-32 clears the fixed bottom tabs ── */}
-      <div className="px-5 pb-32 space-y-4">
-
-        {/* ── Account persona ───────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 flex items-center gap-3">
-            <Briefcase size={18} className="text-[var(--sand-muted)]" />
-            <div className="flex-1">
-              <span className="block text-sm font-semibold text-[var(--sand)]">{t('settings.accountType')}</span>
-              <span className="block text-[10px] text-[var(--sand-muted)]">{t('settings.accountTypeHint')}</span>
+      <div className="p-4 space-y-4">
+        {/* Account */}
+        <Section icon={Info} title={t('settings.accountType')}>
+          <Row>
+            <div>
+              <span className="text-sm text-[#4A5268]">{t('settings.accountTypeHint')}</span>
+              <div className="mt-0.5 text-sm font-bold text-[#2A6B52]">
+                {locale === 'ar' ? 'حرفي' : locale === 'en' ? 'Artisan' : 'Artisan'}
+              </div>
             </div>
-          </div>
-          <div className="px-4 pb-3 flex gap-2">
-            {([['artisan', t('common.artisan')], ['entreprise', t('common.entreprise')]] as Array<[UserMode, string]>).map(([m, label]) => (
-              <button type="button" key={m}
-                onClick={() => handleModeChange(m)}
-                className={cn(
-                  'flex-1 px-4 py-2 rounded-xl text-xs font-semibold transition-all border min-h-[40px]',
-                  userMode === m
-                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)]',
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+          </Row>
+        </Section>
 
-        {/* ── Language ──────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 flex items-center gap-3">
-            <Languages size={18} className="text-[var(--sand-muted)]" />
-            <span className="text-sm font-semibold text-[var(--sand)]">{t('settings.language')}</span>
-          </div>
-          <div className="px-4 pb-3 flex gap-2">
-            {(['FR', 'AR', 'EN'] as const).map((lang) => (
-              <button type="button" key={lang}
-                onClick={() => handleSettingChange('language', lang)}
-                className={cn(
-                  'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
-                  settings.language === lang
-                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)]',
-                )}
-              >
-                {lang === 'FR' ? 'Français' : lang === 'AR' ? 'العربية' : 'English'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Default TVA Rate ─────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          <div className="px-4 py-3 flex items-center gap-3">
-            <Receipt size={18} className="text-[var(--sand-muted)]" />
-            <span className="text-sm font-semibold text-[var(--sand)]">{t('settings.tva')}</span>
-          </div>
-          <div className="px-4 pb-3 flex gap-2">
-            {[0, 9, 19].map((rate) => (
-              <button type="button" key={rate}
-                onClick={() => handleSettingChange('defaultTvaRate', rate)}
-                className={cn(
-                  'px-4 py-2 rounded-xl text-xs font-semibold transition-all border',
-                  settings.defaultTvaRate === rate
-                    ? 'bg-[var(--green-2)] text-white border-[var(--green-2)]'
-                    : 'bg-[var(--navy-3)] text-[var(--sand-muted)] border-[var(--border)]',
-                )}
-              >
-                {rate}%
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Auto Sync ────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)]">
-          <button type="button"
-            onClick={() => handleSettingChange('autoSync', !settings.autoSync)}
-            className="w-full px-4 py-3 flex items-center gap-3"
-          >
-            <CloudOff size={18} className="text-[var(--sand-muted)]" />
-            <span className="text-sm font-semibold text-[var(--sand)] flex-1 text-start">
-              {t('settings.autoSync')}
-            </span>
-            <div
-              className={cn(
-                'w-12 h-7 rounded-full transition-colors relative flex-shrink-0',
-                settings.autoSync ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-3)]',
+        {/* Language */}
+        <Section icon={Globe} title={t('settings.language')}>
+          {languages.map((lang) => (
+            <Row key={lang.code} onClick={() => setLocale(lang.code)}>
+              <span className="text-sm text-[#4A5268]">{lang.label}</span>
+              {locale === lang.code && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2A6B52]">
+                  <svg width="10" height="8" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
               )}
-            >
-              <div
-                className={cn(
-                  'absolute top-1 w-5 h-5 rounded-full bg-white transition-transform',
-                  settings.autoSync
-                    ? dir === 'rtl' ? 'right-6' : 'left-6'
-                    : dir === 'rtl' ? 'right-1' : 'left-1',
-                )}
-              />
-            </div>
-          </button>
+            </Row>
+          ))}
+        </Section>
+
+        {/* Company */}
+        <Section icon={Building} title={t('settings.company')}>
+          <Row>
+            <span className="text-sm text-[#4A5268]">{t('settings.company')}</span>
+            <ChevronRight size={16} className="text-[#9AA1B4]" />
+          </Row>
+        </Section>
+
+        {/* Support */}
+        <Section icon={Bug} title={t('settings.support')}>
+          <Row>
+            <span className="text-sm text-[#4A5268]">{t('settings.supportHint')}</span>
+            <ChevronRight size={16} className="text-[#9AA1B4]" />
+          </Row>
+        </Section>
+
+        {/* Full site */}
+        <Section icon={Smartphone} title={t('settings.fullSite')}>
+          <Row onClick={() => { window.location.href = '/dashboard'; }}>
+            <span className="text-sm text-[#4A5268]">{t('settings.fullSiteHint')}</span>
+            <ChevronRight size={16} className="text-[#9AA1B4]" />
+          </Row>
+        </Section>
+
+        {/* Version */}
+        <div className="text-center text-xs text-[#9AA1B4]">
+          {t('settings.version')} 1.2.0
         </div>
 
-        {/* ── Biometric Lock ───────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)]">
-          <button type="button"
-            onClick={() => biometryInfo.available && handleSettingChange('biometricEnabled', !settings.biometricEnabled)}
-            disabled={!biometryInfo.available}
-            className="w-full px-4 py-3 flex items-center gap-3 disabled:opacity-50"
-          >
-            <Fingerprint size={18} className="text-[var(--sand-muted)]" />
-            <div className="flex-1 text-start">
-              <span className="text-sm font-semibold text-[var(--sand)]">{t('settings.biometric')}</span>
-              <p className="text-[11px] text-[var(--sand-muted)] mt-0.5">
-                {biometryInfo.available ? t('settings.biometricHint') : t('settings.biometricUnavailable')}
-              </p>
-            </div>
-            {biometryInfo.available && (
-              <div
-                className={cn(
-                  'w-12 h-7 rounded-full transition-colors relative flex-shrink-0',
-                  settings.biometricEnabled ? 'bg-[var(--green-2)]' : 'bg-[var(--navy-3)]',
-                )}
-              >
-                <div
-                  className={cn(
-                    'absolute top-1 w-5 h-5 rounded-full bg-white transition-transform',
-                    settings.biometricEnabled
-                      ? dir === 'rtl' ? 'right-6' : 'left-6'
-                      : dir === 'rtl' ? 'right-1' : 'left-1',
-                  )}
-                />
-              </div>
-            )}
-          </button>
-        </div>
-
-        {/* ── Data Summary ─────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Info size={16} className="text-[var(--sand-muted)]" />
-            <span className="text-xs font-semibold text-[var(--sand-muted)]">{t('settings.localData')}</span>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center">
-              <p className="text-lg font-bold text-[var(--sand)]">{savedDocuments.length}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{t('settings.documents')}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-[var(--sand)]">{clients.length}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{t('settings.clients')}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-[var(--sand)]">{company ? '1' : '0'}</p>
-              <p className="text-[10px] text-[var(--sand-muted)]">{t('settings.company')}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Clear All Data ───────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          {showClearConfirm ? (
-            <div className="p-4">
-              <p className="text-sm font-semibold text-red-400 mb-2">
-                {t('settings.clearConfirmTitle')}
-              </p>
-              <p className="text-xs text-[var(--sand-muted)] mb-4">
-                {t('settings.clearConfirmBody')}
-              </p>
-              <div className="flex gap-2">
-                <button type="button"
-                  onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)]"
-                >
-                  {t('settings.cancel')}
-                </button>
-                <button type="button"
-                  onClick={handleClearAllData}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-red-500 text-white"
-                >
-                  {t('settings.deleteAll')}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button type="button"
-              onClick={() => setShowClearConfirm(true)}
-              className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
-            >
-              <Trash2 size={18} className="text-red-400" />
-              <span className="text-sm font-semibold text-red-400 flex-1 text-start">
-                {t('settings.clearData')}
-              </span>
-              <ChevronRight size={16} className={cn('text-red-400/50', dir === 'rtl' && 'rotate-180')} />
-            </button>
-          )}
-        </div>
-
-        {/* ── Support & Bug Report ─────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden divide-y divide-[var(--border)]">
-          <a
-            href="mailto:support@rakmana.app"
-            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
-          >
-            <HeadphonesIcon size={18} className="text-[var(--sand-muted)]" />
-            <div className="flex-1">
-              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
-                {t('settings.support')}
-              </span>
-              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
-                {t('settings.supportHint')}
-              </span>
-            </div>
-            <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
-          </a>
-          <a
-            href="mailto:support@rakmana.app?subject=Rapport%20de%20bug%20%E2%80%94%20Rakmana&body=D%C3%A9crivez%20le%20bug%20ici..."
-            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
-          >
-            <Bug size={18} className="text-amber-400" />
-            <div className="flex-1">
-              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
-                {t('settings.bugReport')}
-              </span>
-              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
-                {t('settings.bugReportHint')}
-              </span>
-            </div>
-            <ChevronRight size={16} className={cn('text-[var(--sand-muted)]/50', dir === 'rtl' && 'rotate-180')} />
-          </a>
-        </div>
-
-        {/* ── Full Site ─────────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          <button
-            type="button"
-            onClick={() => { window.location.href = '/dashboard'; }}
-            className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
-          >
-            <Globe size={18} className="text-[var(--green-2)]" />
-            <div className="flex-1">
-              <span className="block text-sm font-semibold text-[var(--sand)] text-start">
-                {t('settings.fullSite')}
-              </span>
-              <span className="block text-[10px] text-[var(--sand-muted)] text-start">
-                {t('settings.fullSiteHint')}
-              </span>
-            </div>
-            <ChevronRight size={16} className={cn('text-[var(--green-2)]/50', dir === 'rtl' && 'rotate-180')} />
-          </button>
-        </div>
-
-        {/* ── Delete Account ────────────────────────────────── */}
-        <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-          {showDeleteAccountConfirm ? (
-            <div className="p-4">
-              <p className="text-sm font-semibold text-red-400 mb-2">
-                {t('settings.deleteAccountConfirmTitle')}
-              </p>
-              <p className="text-xs text-[var(--sand-muted)] mb-3">
-                {t('settings.deleteAccountConfirmBody')}
-              </p>
-              <input
-                type="password"
-                autoComplete="current-password"
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                placeholder={t('settings.enterPasswordToConfirm')}
-                className="w-full px-3 py-2.5 mb-3 rounded-xl text-sm bg-[var(--navy-3)] text-[var(--sand)] placeholder:text-[var(--sand-muted)] border border-[var(--border)] focus:border-red-400 focus:outline-none"
-              />
-              <div className="flex gap-2">
-                <button type="button"
-                  onClick={() => { setShowDeleteAccountConfirm(false); setDeletePassword(''); }}
-                  disabled={deletingAccount}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-[var(--navy-3)] text-[var(--sand-muted)] disabled:opacity-50"
-                >
-                  {t('settings.cancel')}
-                </button>
-                <button type="button"
-                  onClick={handleDeleteAccount}
-                  disabled={deletingAccount || !deletePassword.trim()}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-red-500 text-white disabled:opacity-50"
-                >
-                  {deletingAccount ? t('settings.deleteAccounting') : t('settings.deleteAccount')}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button type="button"
-              onClick={() => setShowDeleteAccountConfirm(true)}
-              className="w-full px-4 py-3 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors"
-            >
-              <UserX size={18} className="text-red-400" />
-              <span className="text-sm font-semibold text-red-400 flex-1 text-start">
-                {t('settings.deleteAccount')}
-              </span>
-              <ChevronRight size={16} className={cn('text-red-400/50', dir === 'rtl' && 'rotate-180')} />
-            </button>
-          )}
-        </div>
-
-        {/* ── Logout ───────────────────────────────────────── */}
-        {onLogout && (
-          <div className="rounded-2xl bg-[var(--navy-2)] border border-[var(--border)] overflow-hidden">
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="w-full px-4 py-3.5 flex items-center gap-3 active:bg-[var(--navy-3)] transition-colors disabled:opacity-50"
-            >
-              <LogOut size={18} className="text-[var(--sand-muted)]" />
-              <span className="text-sm font-semibold text-[var(--sand)] flex-1 text-start">
-                {loggingOut ? t('settings.loggingOut') : t('settings.logout')}
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* ── App Version ──────────────────────────────────── */}
-        <div className="text-center py-4">
-          <p className="text-[11px] text-[var(--sand-muted)]">
-            رقمنة v{APP_VERSION}
-          </p>
-          <p className="text-[10px] text-[var(--sand-muted)]/50 mt-1">
-            {t('settings.version')}
-          </p>
-        </div>
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="w-full rounded-xl border border-[#B5402C]/30 bg-[#B5402C]/5 py-3.5 text-sm font-bold text-[#B5402C] transition-all hover:bg-[#B5402C]/10 active:scale-[0.99] disabled:opacity-50"
+        >
+          <span className="flex items-center justify-center gap-2">
+            <LogOut size={16} />
+            {loggingOut ? t('settings.loggingOut') : t('settings.logout')}
+          </span>
+        </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,14 +1,8 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Home Header
-// Logo left, user avatar right
-// ============================================================
-
-import { Bell, Eye, EyeOff } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useUserStore } from '@/stores/userStore';
-import { hapticLight } from '@/mobile/lib/haptics';
+import { useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { Bell, ChevronLeft } from 'lucide-react';
 
 interface HomeHeaderProps {
   userName: string;
@@ -17,82 +11,58 @@ interface HomeHeaderProps {
   onNotificationTap?: () => void;
 }
 
-export function HomeHeader({
-  userName,
-  userInitials,
-  hasNotifications = false,
-  onNotificationTap,
-}: HomeHeaderProps) {
-  return (
-    <header
-      className="flex items-center justify-between px-5 pt-2 pb-3"
-      style={{ paddingTop: 'max(8px, env(safe-area-inset-top, 8px))' }}
-    >
-      {/* Logo */}
-      <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white bg-gradient-to-br from-[var(--green)] to-[var(--teal)]">
-          CD
-        </div>
-        <span className="heading text-lg text-[var(--sand)]">
-          Rakmana
-        </span>
-      </div>
-
-      {/* Right side: privacy toggle + notification bell + avatar */}
-      <div className="flex items-center gap-3">
-        {/* Privacy mode: mask amounts when showing the phone to a client */}
-        <PrivacyToggle />
-        {/* Notification bell */}
-        <button type="button"           onClick={onNotificationTap}
-          className={cn(
-            'relative w-11 h-11 rounded-full flex items-center justify-center',
-            'bg-[var(--navy-3)] text-[var(--sand-muted)]',
-            'active:scale-95 transition-transform',
-          )}
-          aria-label="Notifications"
-        >
-          <Bell size={20} strokeWidth={1.8} />
-          {hasNotifications && (
-            <span
-              className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full border-2"
-              style={{
-                background: '#EF4444',
-                borderColor: 'var(--navy-3)',
-              }}
-            />
-          )}
-        </button>
-
-        {/* User avatar (initials) */}
-        <div
-          className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center',
-            'text-sm font-bold text-white',
-            'bg-gradient-to-br from-[var(--green-2)] to-[var(--teal)]',
-          )}
-        >
-          {userInitials}
-        </div>
-      </div>
-    </header>
-  );
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
 }
 
-function PrivacyToggle() {
-  const privacyMode = useUserStore((s) => s.privacyMode);
-  const togglePrivacy = useUserStore((s) => s.togglePrivacy);
+export function HomeHeader({ userName, userInitials, hasNotifications, onNotificationTap }: HomeHeaderProps) {
   return (
-    <button
-      type="button"
-      onClick={() => { hapticLight(); togglePrivacy(); }}
-      className={cn(
-        'w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-transform',
-        privacyMode ? 'bg-[var(--blue-bg)] text-[var(--green-2)]' : 'bg-[var(--navy-3)] text-[var(--sand-muted)]',
-      )}
-      aria-label={privacyMode ? 'Afficher les montants' : 'Masquer les montants'}
-      aria-pressed={privacyMode}
-    >
-      {privacyMode ? <EyeOff size={19} strokeWidth={1.8} /> : <Eye size={19} strokeWidth={1.8} />}
-    </button>
+    <div className="px-5 pt-2">
+      {/* Hero card */}
+      <div className="relative overflow-hidden rounded-2xl bg-[#2A6B52] p-6 shadow-lg">
+        {/* Dot pattern */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '22px 22px',
+          }}
+        />
+        {/* Gold accent line */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#D6B462]" />
+
+        <div className="relative flex items-start justify-between">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D6B462]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#D6B462]">
+              Pro
+            </span>
+            <h1 className="mt-3 text-2xl font-extrabold text-white">
+              {getGreeting()}, {userName || '...'}
+            </h1>
+            <p className="mt-1 text-sm text-white/60">Devis & Factures · DGI Compliant</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Notification bell */}
+            <button
+              onClick={onNotificationTap}
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/15"
+            >
+              <Bell size={18} />
+              {hasNotifications && (
+                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-[#B5402C] border-2 border-[#2A6B52]" />
+              )}
+            </button>
+            {/* Avatar */}
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D6B462] text-sm font-bold text-[#2A6B52]">
+              {userInitials}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

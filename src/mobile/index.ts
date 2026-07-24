@@ -20,18 +20,24 @@ export {
 } from './types/schemas';
 
 // ── Components ────────────────────────────────────────────────
+export { MobileShell } from './components/MobileShell';
 export { BottomTabs } from './components/BottomTabs';
 export type { TabId } from './components/BottomTabs';
 export { HomeHeader } from './components/HomeHeader';
 export { StatCards } from './components/StatCards';
-export { QuickActions } from './components/QuickActions';
 export { RecentDocuments } from './components/RecentDocuments';
-export { MobileShell } from './components/MobileShell';
 export { DocumentRow } from './components/DocumentRow';
-export { ActionSheet } from './components/ActionSheet';
+export { FAB } from './components/FAB';
 export { OfflineBanner } from './components/OfflineBanner';
+export { UpdateBanner } from './components/UpdateBanner';
+export { PushToast } from './components/PushToast';
+export { OnboardingScreen } from './components/OnboardingScreen';
+export { BiometricLockScreen } from './components/BiometricLockScreen';
 
 // ── Screens ───────────────────────────────────────────────────
+export { WelcomeScreen } from './screens/WelcomeScreen';
+export { LoginScreen } from './screens/LoginScreen';
+export { RegisterScreen } from './screens/RegisterScreen';
 export { HomeScreen } from './screens/HomeScreen';
 export { CreateScreen } from './screens/CreateScreen';
 export { DocumentsListScreen } from './screens/DocumentsListScreen';
@@ -39,16 +45,10 @@ export { CompanyProfileScreen } from './screens/CompanyProfileScreen';
 export { ClientsScreen } from './screens/ClientsScreen';
 export { SettingsScreen } from './screens/SettingsScreen';
 
-// ── Document creation (FlashFacture single-canvas) ────────────
-export { LivePaper } from './components/create/LivePaper';
-export { CreateDock } from './components/create/CreateDock';
-export type { DockMode, CatalogItem } from './components/create/CreateDock';
-
 // ── Lib ──────────────────────────────────────────────────────
-export { initDatabase, getDB, saveClient, searchClients, saveDocument, getDocuments, getUnsyncedDocuments, markSynced } from './lib/sqlite';
 export { shareDocument, openWhatsApp, generatePaymentReminder } from './lib/whatsapp';
-export { initNetworkListener, checkNetworkStatus, getOnlineStatus, onReconnect, syncPendingDocuments } from './lib/network';
 export { generatePDFBase64, printDocument } from './lib/pdf';
+export { checkNetworkStatus } from './lib/network';
 
 // ── Hooks ────────────────────────────────────────────────────
 export { useNetwork } from '@/hooks/useNetwork';

@@ -1,12 +1,5 @@
 'use client';
 
-// ============================================================
-// Rakmana Mobile — Bottom Tab Navigation
-// 4 tabs: Accueil | Documents | Société | Réglages
-// No backdrop-filter blur — causes jank in Capacitor WebView
-// on mid/low-end Android (Infinix, Tecno, Samsung A-series).
-// ============================================================
-
 import { Home, Files, Building, Settings, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
@@ -34,15 +27,8 @@ interface BottomTabsProps {
 export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   const { t } = useMobileI18n();
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto"
-      style={{
-        background: 'var(--navy-2)',
-        borderTop: '1px solid var(--border-2)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
-    >
-      <div className="flex items-stretch justify-around h-16 px-1">
+    <nav className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">
+      <div className="mx-auto flex max-w-md items-stretch justify-around gap-1 rounded-[22px] border border-[#E8E1CE]/80 bg-white/85 p-1.5 shadow-[0_8px_30px_rgba(28,37,65,0.12)] backdrop-blur-xl">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -50,43 +36,28 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
 
           return (
             <button
-              type="button"
               key={tab.id}
+              type="button"
               onClick={() => onTabChange(tab.id)}
-              className={cn(
-                'relative flex flex-col items-center justify-center gap-1 flex-1 h-full min-w-[44px]',
-                'transition-colors duration-150',
-                'active:scale-95 transform',
-              )}
+              className="group relative flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 transition-colors"
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Active indicator pill (top) */}
-              {isActive && (
-                <span
-                  className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full"
-                  style={{ background: 'var(--green-2)' }}
-                />
-              )}
-
-              {/* Icon container */}
               <span
                 className={cn(
-                  'flex items-center justify-center w-10 h-7 rounded-lg transition-all duration-150',
-                  isActive && 'bg-[var(--green-bg)]',
+                  'flex h-9 w-full items-center justify-center rounded-xl transition-all duration-300',
+                  isActive
+                    ? 'bg-[#2A6B52] text-white shadow-sm shadow-[#2A6B52]/30'
+                    : 'text-[#9AA1B4] group-active:bg-[#2A6B52]/5',
                 )}
               >
-                <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2.3 : 1.8}
-                  style={{ color: isActive ? 'var(--green-2)' : 'var(--sand-muted)' }}
-                />
+                <Icon size={20} strokeWidth={isActive ? 2.4 : 1.9} />
               </span>
-
-              {/* Label */}
               <span
-                className="text-[10.5px] font-semibold leading-tight truncate transition-colors duration-150"
-                style={{ color: isActive ? 'var(--green-2)' : 'var(--sand-muted)' }}
+                className={cn(
+                  'max-w-full truncate px-0.5 text-[10px] leading-none transition-colors',
+                  isActive ? 'font-bold text-[#2A6B52]' : 'font-medium text-[#9AA1B4]',
+                )}
               >
                 {label}
               </span>
