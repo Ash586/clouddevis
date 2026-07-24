@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef } from 'react';
 import { Plus, FileText, Copy, X } from 'lucide-react';
@@ -15,11 +15,11 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate }: FAB
   const [open, setOpen] = useState(false);
 
   const actions = [
-    { label: 'Devis', icon: FileText, onClick: () => { onNewDevis(); setOpen(false); }, color: '#2A6B52' },
-    { label: 'Facture', icon: FileText, onClick: () => { onNewFacture(); setOpen(false); }, color: '#B5402C' },
+    { label: 'Devis', icon: FileText, onClick: () => { onNewDevis(); setOpen(false); }, color: '#2563EB' },
+    { label: 'Facture', icon: FileText, onClick: () => { onNewFacture(); setOpen(false); }, color: '#E8542E' },
   ];
   if (canDuplicate && onDuplicate) {
-    actions.push({ label: 'Duplicate', icon: Copy, onClick: () => { onDuplicate(); setOpen(false); }, color: '#D6B462' });
+    actions.push({ label: 'Duplicate', icon: Copy, onClick: () => { onDuplicate(); setOpen(false); }, color: '#D4A843' });
   }
 
   return (
@@ -31,11 +31,11 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate }: FAB
           <button
             key={action.label}
             onClick={action.onClick}
-            className="flex items-center gap-2 rounded-xl border border-[#E8E1CE] bg-white px-4 py-2.5 shadow-lg transition-all active:scale-[0.97] animate-in slide-in-from-bottom-2 fade-in"
+            className="flex items-center gap-2 rounded-xl border border-[rgba(15,39,71,0.09)] bg-white px-4 py-2.5 shadow-lg transition-all active:scale-[0.97] animate-in slide-in-from-bottom-2 fade-in"
             style={{ animationDelay: `${i * 50}ms` }}
           >
             <Icon size={16} style={{ color: action.color }} />
-            <span className="text-sm font-bold text-[#2A6B52]">{action.label}</span>
+            <span className="text-sm font-bold text-[#2563EB]">{action.label}</span>
           </button>
         );
       })}
@@ -44,8 +44,8 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate }: FAB
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2A6B52] text-white shadow-lg shadow-[#2A6B52]/30 transition-all active:scale-95',
-          open && 'rotate-45 bg-[#B5402C] shadow-[#B5402C]/30',
+          'flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/30 transition-all active:scale-95',
+          open && 'rotate-45 bg-[#E8542E] shadow-[#E8542E]/30',
         )}
       >
         <Plus size={24} strokeWidth={2.5} />

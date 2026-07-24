@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
@@ -51,11 +51,11 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
     }
   }, [name, email, password, confirm, mode, onRegister, t]);
 
-  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-3 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
-  const labelCls = 'block text-sm font-medium text-[#4A5268]';
+  const inputCls = 'w-full rounded-lg border border-[rgba(15,39,71,0.09)] bg-[#EDF2FB] px-4 py-3 text-sm text-[#2563EB] placeholder-[#5A6B85] transition-colors focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15';
+  const labelCls = 'block text-sm font-medium text-[#33425C]';
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#2A6B52] via-[#1C5E42] to-[#2A6B52] p-6">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#2563EB] p-6">
       {/* Back */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-sm">
         <button
@@ -75,7 +75,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
       >
         <svg width="36" height="36" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
           <rect x="148" y="110" width="200" height="260" rx="18" fill="rgba(255,255,255,0.9)"/>
-          <circle cx="338" cy="338" r="44" fill="#D6B462"/>
+          <circle cx="338" cy="338" r="44" fill="#D4A843"/>
           <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         </svg>
       </motion.div>
@@ -98,12 +98,12 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
         noValidate
       >
         {error && (
-          <div className="mb-4 rounded-lg border border-[#B5402C]/30 bg-[#B5402C]/10 p-3 text-sm font-medium text-[#B5402C]">
+          <div className="mb-4 rounded-lg border border-[#E8542E]/30 bg-[#E8542E]/10 p-3 text-sm font-medium text-[#E8542E]">
             {error}
           </div>
         )}
 
-        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#B5402C]/10 text-[#B5402C]">
+        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#E8542E]/10 text-[#E8542E]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
@@ -160,7 +160,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
               <button
                 type="button"
                 onClick={() => setShowPw((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA1B4] hover:text-[#2A6B52]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A6B85] hover:text-[#2563EB]"
                 tabIndex={-1}
               >
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -196,8 +196,8 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                   className={cn(
                     'rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.97]',
                     mode === m
-                      ? 'bg-[#2A6B52] text-white shadow-sm'
-                      : 'border border-[#E8E1CE] bg-white text-[#4A5268] hover:bg-[#FBF8F2]',
+                      ? 'bg-[#2563EB] text-white shadow-sm'
+                      : 'border border-[rgba(15,39,71,0.09)] bg-white text-[#33425C] hover:bg-[#EDF2FB]',
                     'disabled:opacity-50',
                   )}
                 >
@@ -211,7 +211,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
         <button
           type="submit"
           disabled={loading}
-          className="mt-6 w-full rounded-lg bg-[#2A6B52] py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#1C5E42] hover:shadow-md disabled:opacity-50 active:scale-[0.97]"
+          className="mt-6 w-full rounded-lg bg-[#2563EB] py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#1D4ED8] hover:shadow-md disabled:opacity-50 active:scale-[0.97]"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -221,9 +221,9 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
           ) : t('register.submit')}
         </button>
 
-        <p className="mt-5 text-center text-sm text-[#4A5268]">
+        <p className="mt-5 text-center text-sm text-[#33425C]">
           {t('register.alreadyHave')}{' '}
-          <button type="button" onClick={onBackToLogin} className="font-bold text-[#B5402C] hover:underline">
+          <button type="button" onClick={onBackToLogin} className="font-bold text-[#E8542E] hover:underline">
             {t('register.signIn')}
           </button>
         </p>

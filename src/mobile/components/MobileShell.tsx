@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -250,12 +250,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   // Loading
   if (authState === 'loading') {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#F4F6FA]">
+      <div className="flex min-h-dvh items-center justify-center bg-[#F3F6FC]">
         <div className="flex flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2A6B52]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2563EB]">
             <Loader2 size={26} className="text-white animate-spin" />
           </div>
-          <p className="text-sm text-[#9AA1B4]">Chargement…</p>
+          <p className="text-sm text-[#5A6B85]">Chargementâ€¦</p>
         </div>
       </div>
     );
@@ -274,7 +274,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   return (
     <div
       dir={dir}
-      className={cn('relative min-h-dvh bg-[#F4F6FA]', 'max-w-lg mx-auto')}
+      className={cn('relative min-h-dvh bg-[#F3F6FC]', 'max-w-lg mx-auto')}
       style={{ paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
     >
       <UpdateBanner
@@ -323,7 +323,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             animate="center"
             exit="exit"
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] bg-[#F4F6FA]"
+            className="fixed inset-0 z-[60] bg-[#F3F6FC]"
           >
             <CreateScreen
               onExit={handleWizardClose}

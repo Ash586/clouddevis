@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -23,18 +23,18 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   };
 
   const languages: { code: MobileLocale; label: string }[] = [
-    { code: 'fr', label: 'Français' },
-    { code: 'ar', label: 'العربية' },
+    { code: 'fr', label: 'FranÃ§ais' },
+    { code: 'ar', label: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©' },
     { code: 'en', label: 'English' },
   ];
 
   const Section = ({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
-    <div className="rounded-xl border border-[#E8E1CE] bg-white overflow-hidden">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#F4F6FA]">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2A6B52]/5 text-[#2A6B52]">
+    <div className="rounded-xl border border-[rgba(15,39,71,0.09)] bg-white overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#F3F6FC]">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2563EB]/5 text-[#2563EB]">
           <Icon size={16} />
         </div>
-        <span className="text-sm font-bold text-[#2A6B52]">{title}</span>
+        <span className="text-sm font-bold text-[#2563EB]">{title}</span>
       </div>
       {children}
     </div>
@@ -43,7 +43,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   const Row = ({ children, onClick, className }: { children: React.ReactNode; onClick?: () => void; className?: string }) => (
     <button
       onClick={onClick}
-      className={cn('flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-[#FBF8F2] border-b border-[#F4F6FA] last:border-0', className)}
+      className={cn('flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-[#EDF2FB] border-b border-[#F3F6FC] last:border-0', className)}
     >
       {children}
     </button>
@@ -53,13 +53,13 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-dvh bg-[#F4F6FA] pb-24"
+      className="min-h-dvh bg-[#F3F6FC] pb-24"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[rgba(15,39,71,0.09)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#2563EB] via-[#1E40AF] to-[#2563EB]" />
         <div className="px-4 py-3">
-          <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('settings.title')}</h1>
+          <h1 className="text-lg font-extrabold text-[#2563EB]">{t('settings.title')}</h1>
         </div>
       </div>
 
@@ -68,9 +68,9 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         <Section icon={Info} title={t('settings.accountType')}>
           <Row>
             <div>
-              <span className="text-sm text-[#4A5268]">{t('settings.accountTypeHint')}</span>
-              <div className="mt-0.5 text-sm font-bold text-[#2A6B52]">
-                {locale === 'ar' ? 'حرفي' : locale === 'en' ? 'Artisan' : 'Artisan'}
+              <span className="text-sm text-[#33425C]">{t('settings.accountTypeHint')}</span>
+              <div className="mt-0.5 text-sm font-bold text-[#2563EB]">
+                {locale === 'ar' ? 'Ø­Ø±ÙÙŠ' : locale === 'en' ? 'Artisan' : 'Artisan'}
               </div>
             </div>
           </Row>
@@ -80,9 +80,9 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         <Section icon={Globe} title={t('settings.language')}>
           {languages.map((lang) => (
             <Row key={lang.code} onClick={() => setLocale(lang.code)}>
-              <span className="text-sm text-[#4A5268]">{lang.label}</span>
+              <span className="text-sm text-[#33425C]">{lang.label}</span>
               {locale === lang.code && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2A6B52]">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#2563EB]">
                   <svg width="10" height="8" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </span>
               )}
@@ -93,29 +93,29 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         {/* Company */}
         <Section icon={Building} title={t('settings.company')}>
           <Row>
-            <span className="text-sm text-[#4A5268]">{t('settings.company')}</span>
-            <ChevronRight size={16} className="text-[#9AA1B4]" />
+            <span className="text-sm text-[#33425C]">{t('settings.company')}</span>
+            <ChevronRight size={16} className="text-[#5A6B85]" />
           </Row>
         </Section>
 
         {/* Support */}
         <Section icon={Bug} title={t('settings.support')}>
           <Row>
-            <span className="text-sm text-[#4A5268]">{t('settings.supportHint')}</span>
-            <ChevronRight size={16} className="text-[#9AA1B4]" />
+            <span className="text-sm text-[#33425C]">{t('settings.supportHint')}</span>
+            <ChevronRight size={16} className="text-[#5A6B85]" />
           </Row>
         </Section>
 
         {/* Full site */}
         <Section icon={Smartphone} title={t('settings.fullSite')}>
           <Row onClick={() => { window.location.href = '/dashboard'; }}>
-            <span className="text-sm text-[#4A5268]">{t('settings.fullSiteHint')}</span>
-            <ChevronRight size={16} className="text-[#9AA1B4]" />
+            <span className="text-sm text-[#33425C]">{t('settings.fullSiteHint')}</span>
+            <ChevronRight size={16} className="text-[#5A6B85]" />
           </Row>
         </Section>
 
         {/* Version */}
-        <div className="text-center text-xs text-[#9AA1B4]">
+        <div className="text-center text-xs text-[#5A6B85]">
           {t('settings.version')} 1.2.0
         </div>
 
@@ -123,7 +123,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="w-full rounded-xl border border-[#B5402C]/30 bg-[#B5402C]/5 py-3.5 text-sm font-bold text-[#B5402C] transition-all hover:bg-[#B5402C]/10 active:scale-[0.99] disabled:opacity-50"
+          className="w-full rounded-xl border border-[#E8542E]/30 bg-[#E8542E]/5 py-3.5 text-sm font-bold text-[#E8542E] transition-all hover:bg-[#E8542E]/10 active:scale-[0.99] disabled:opacity-50"
         >
           <span className="flex items-center justify-center gap-2">
             <LogOut size={16} />

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
@@ -53,7 +53,7 @@ export function HomeScreen({
       {/* Pull-to-refresh */}
       {(pull > 0 || refreshing) && (
         <div className="flex items-center justify-center" style={{ height: `${pull}px` }}>
-          <Loader2 size={20} className={cn('text-[#2A6B52]', refreshing && 'animate-spin')} style={{ opacity: Math.min(1, pull / 50) }} />
+          <Loader2 size={20} className={cn('text-[#2563EB]', refreshing && 'animate-spin')} style={{ opacity: Math.min(1, pull / 50) }} />
         </div>
       )}
 
@@ -72,14 +72,14 @@ export function HomeScreen({
       <button
         type="button"
         onClick={() => { window.location.href = '/dashboard'; }}
-        className="mx-5 flex items-center gap-3 rounded-xl border border-[#E8E1CE] bg-white px-4 py-3 transition-all hover:bg-[#FBF8F2] active:scale-[0.99]"
+        className="mx-5 flex items-center gap-3 rounded-xl border border-[rgba(15,39,71,0.09)] bg-white px-4 py-3 transition-all hover:bg-[#EDF2FB] active:scale-[0.99]"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#2A6B52]/5 text-[#2A6B52]">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#2563EB]/5 text-[#2563EB]">
           <Globe size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <span className="block text-sm font-bold text-[#2A6B52]">{t('settings.fullSite')}</span>
-          <span className="block text-[10px] text-[#9AA1B4]">{t('settings.fullSiteHint')}</span>
+          <span className="block text-sm font-bold text-[#2563EB]">{t('settings.fullSite')}</span>
+          <span className="block text-[10px] text-[#5A6B85]">{t('settings.fullSiteHint')}</span>
         </div>
       </button>
 

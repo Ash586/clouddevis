@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -40,35 +40,35 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
     setSaving(false);
   };
 
-  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-2.5 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
-  const labelCls = 'block text-sm font-medium text-[#4A5268] mb-1.5';
+  const inputCls = 'w-full rounded-lg border border-[rgba(15,39,71,0.09)] bg-[#EDF2FB] px-4 py-2.5 text-sm text-[#2563EB] placeholder-[#5A6B85] transition-colors focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15';
+  const labelCls = 'block text-sm font-medium text-[#33425C] mb-1.5';
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#F4F6FA]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#2A6B52]/30 border-t-[#2A6B52]" />
+      <div className="flex min-h-dvh items-center justify-center bg-[#F3F6FC]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#2563EB]/30 border-t-[#2563EB]" />
       </div>
     );
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-dvh bg-[#F4F6FA] pb-24">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-dvh bg-[#F3F6FC] pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[rgba(15,39,71,0.09)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#2563EB] via-[#1E40AF] to-[#2563EB]" />
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             {onBack && (
-              <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#4A5268] hover:bg-[#F4F6FA]">
+              <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#33425C] hover:bg-[#F3F6FC]">
                 <ArrowLeft size={18} />
               </button>
             )}
-            <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('company.title')}</h1>
+            <h1 className="text-lg font-extrabold text-[#2563EB]">{t('company.title')}</h1>
           </div>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#2A6B52] px-4 text-xs font-bold text-white shadow-sm hover:bg-[#1C5E42] transition-all active:scale-[0.97] disabled:opacity-50"
+            className="flex h-9 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-xs font-bold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.97] disabled:opacity-50"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : saved ? <CheckCircle size={14} /> : <Save size={14} />}
             {t('company.save')}
@@ -80,13 +80,13 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
         {/* Status badge */}
         <div className={cn(
           'rounded-xl border p-3 text-center text-sm font-bold',
-          company.nif ? 'border-[#2F6B4F]/30 bg-[#2F6B4F]/10 text-[#2F6B4F]' : 'border-[#B5402C]/30 bg-[#B5402C]/10 text-[#B5402C]',
+          company.nif ? 'border-[#1E40AF]/30 bg-[#1E40AF]/10 text-[#1E40AF]' : 'border-[#E8542E]/30 bg-[#E8542E]/10 text-[#E8542E]',
         )}>
           {company.nif ? t('company.conforme') : t('company.nonConforme')}
         </div>
 
         {/* Form */}
-        <div className="rounded-xl border border-[#E8E1CE] bg-white p-4 space-y-4">
+        <div className="rounded-xl border border-[rgba(15,39,71,0.09)] bg-white p-4 space-y-4">
           <div>
             <label className={labelCls}>{t('company.title')} *</label>
             <input
@@ -166,7 +166,7 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
         {onGoToClients && (
           <button
             onClick={onGoToClients}
-            className="w-full rounded-xl border border-[#E8E1CE] bg-white py-3.5 text-sm font-bold text-[#2A6B52] transition-all hover:bg-[#FBF8F2] active:scale-[0.99]"
+            className="w-full rounded-xl border border-[rgba(15,39,71,0.09)] bg-white py-3.5 text-sm font-bold text-[#2563EB] transition-all hover:bg-[#EDF2FB] active:scale-[0.99]"
           >
             {t('company.manageClients')}
           </button>

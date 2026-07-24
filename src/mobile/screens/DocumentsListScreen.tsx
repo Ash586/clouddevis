@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
@@ -43,15 +43,15 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
   const activeFilters = (filterType ? 1 : 0) + (filterStatus ? 1 : 0);
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[#F4F6FA]">
+    <div className="flex flex-col min-h-dvh bg-[#F3F6FC]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[#E8E1CE]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#2A6B52]" />
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[rgba(15,39,71,0.09)]">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#2563EB] via-[#1E40AF] to-[#2563EB]" />
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-extrabold text-[#2A6B52]">{t('docs.title')}</h1>
+          <h1 className="text-lg font-extrabold text-[#2563EB]">{t('docs.title')}</h1>
           <button
             onClick={onNewDocument}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2A6B52] text-white shadow-md shadow-[#2A6B52]/25 active:scale-95 transition-all"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/25 active:scale-95 transition-all"
           >
             <Plus size={18} strokeWidth={2.5} />
           </button>
@@ -60,16 +60,16 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
         {/* Search */}
         <div className="px-4 pb-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AA1B4]" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5A6B85]" />
             <input
               type="text"
               placeholder={t('docs.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] py-2.5 pl-9 pr-8 text-sm text-[#2A6B52] placeholder-[#9AA1B4] focus:border-[#2A6B52] focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-[rgba(15,39,71,0.09)] bg-[#EDF2FB] py-2.5 pl-9 pr-8 text-sm text-[#2563EB] placeholder-[#5A6B85] focus:border-[#2563EB] focus:outline-none transition-colors"
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9AA1B4] hover:text-[#2A6B52]">
+              <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5A6B85] hover:text-[#2563EB]">
                 <X size={14} />
               </button>
             )}
@@ -78,12 +78,12 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
           {/* Filter toggle */}
           <button
             onClick={() => setShowFilters((v) => !v)}
-            className="mt-2 flex items-center gap-2 text-xs font-bold text-[#4A5268]"
+            className="mt-2 flex items-center gap-2 text-xs font-bold text-[#33425C]"
           >
             <Filter size={14} />
             {t('docs.filterAll')}
             {activeFilters > 0 && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2A6B52] px-1 text-[9px] font-bold text-white">
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#2563EB] px-1 text-[9px] font-bold text-white">
                 {activeFilters}
               </span>
             )}
@@ -105,8 +105,8 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
                   className={cn(
                     'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
                     filterType === type
-                      ? 'bg-[#2A6B52] text-white'
-                      : 'border border-[#E8E1CE] bg-white text-[#4A5268] hover:bg-[#FBF8F2]',
+                      ? 'bg-[#2563EB] text-white'
+                      : 'border border-[rgba(15,39,71,0.09)] bg-white text-[#33425C] hover:bg-[#EDF2FB]',
                   )}
                 >
                   {type || t('docs.filterAll')}
@@ -121,8 +121,8 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
                   className={cn(
                     'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
                     filterStatus === status
-                      ? 'bg-[#2A6B52] text-white'
-                      : 'border border-[#E8E1CE] bg-white text-[#4A5268] hover:bg-[#FBF8F2]',
+                      ? 'bg-[#2563EB] text-white'
+                      : 'border border-[rgba(15,39,71,0.09)] bg-white text-[#33425C] hover:bg-[#EDF2FB]',
                   )}
                 >
                   {status || t('docs.filterAll')}
@@ -136,7 +136,7 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
       {/* Pull to refresh */}
       {(pull > 0 || refreshing) && (
         <div className="flex items-center justify-center py-2">
-          <div className={cn('h-5 w-5 rounded-full border-2 border-[#2A6B52]/30 border-t-[#2A6B52] animate-spin', !refreshing && 'opacity-50')} />
+          <div className={cn('h-5 w-5 rounded-full border-2 border-[#2563EB]/30 border-t-[#2563EB] animate-spin', !refreshing && 'opacity-50')} />
         </div>
       )}
 
@@ -144,11 +144,11 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center py-16">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2A6B52]/5">
-              <FileText size={28} className="text-[#2A6B52]/30" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+              <FileText size={28} className="text-[#2563EB]/30" />
             </div>
-            <p className="text-sm font-bold text-[#2A6B52]">{t('docs.empty')}</p>
-            <p className="mt-1 text-xs text-[#9AA1B4]">{t('docs.emptyHint')}</p>
+            <p className="text-sm font-bold text-[#2563EB]">{t('docs.empty')}</p>
+            <p className="mt-1 text-xs text-[#5A6B85]">{t('docs.emptyHint')}</p>
           </div>
         ) : (
           <div className="space-y-2">

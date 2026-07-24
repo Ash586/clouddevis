@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -22,7 +22,7 @@ export function HomeHeader({ userName, userInitials, hasNotifications, onNotific
   return (
     <div className="px-5 pt-2">
       {/* Hero card */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#2A6B52] p-6 shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-[#2563EB] p-6 shadow-lg">
         {/* Dot pattern */}
         <div
           className="pointer-events-none absolute inset-0 opacity-50"
@@ -32,17 +32,17 @@ export function HomeHeader({ userName, userInitials, hasNotifications, onNotific
           }}
         />
         {/* Gold accent line */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#D6B462] via-[#B5402C] to-[#D6B462]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#2563EB] via-[#1E40AF] to-[#2563EB]" />
 
         <div className="relative flex items-start justify-between">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D6B462]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#D6B462]">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D4A843]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#D4A843]">
               Pro
             </span>
             <h1 className="mt-3 text-2xl font-extrabold text-white">
               {getGreeting()}, {userName || '...'}
             </h1>
-            <p className="mt-1 text-sm text-white/60">Devis & Factures · DGI Compliant</p>
+            <p className="mt-1 text-sm text-white/60">Devis & Factures Â· DGI Compliant</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -53,11 +53,11 @@ export function HomeHeader({ userName, userInitials, hasNotifications, onNotific
             >
               <Bell size={18} />
               {hasNotifications && (
-                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-[#B5402C] border-2 border-[#2A6B52]" />
+                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-[#E8542E] border-2 border-[#2563EB]" />
               )}
             </button>
             {/* Avatar */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D6B462] text-sm font-bold text-[#2A6B52]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4A843] text-sm font-bold text-[#2563EB]">
               {userInitials}
             </div>
           </div>

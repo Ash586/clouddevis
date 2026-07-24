@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
@@ -45,11 +45,11 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
     }
   }, [email, password, rememberMe, onLogin, t]);
 
-  const inputCls = 'w-full rounded-lg border border-[#E8E1CE] bg-[#FBF8F2] px-4 py-3 text-sm text-[#2A6B52] placeholder-[#9AA1B4] transition-colors focus:border-[#2A6B52] focus:outline-none focus:ring-2 focus:ring-[#2A6B52]/15';
-  const labelCls = 'block text-sm font-medium text-[#4A5268]';
+  const inputCls = 'w-full rounded-lg border border-[rgba(15,39,71,0.09)] bg-[#EDF2FB] px-4 py-3 text-sm text-[#2563EB] placeholder-[#5A6B85] transition-colors focus:border-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/15';
+  const labelCls = 'block text-sm font-medium text-[#33425C]';
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#2A6B52] via-[#1C5E42] to-[#2A6B52] p-6">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#2563EB] p-6">
       {/* Back button */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -73,7 +73,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
       >
         <svg width="36" height="36" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
           <rect x="148" y="110" width="200" height="260" rx="18" fill="rgba(255,255,255,0.9)"/>
-          <circle cx="338" cy="338" r="44" fill="#D6B462"/>
+          <circle cx="338" cy="338" r="44" fill="#D4A843"/>
           <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         </svg>
       </motion.div>
@@ -97,13 +97,13 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
       >
         {/* Error */}
         {error && (
-          <div className="mb-4 rounded-lg border border-[#B5402C]/30 bg-[#B5402C]/10 p-3 text-sm font-medium text-[#B5402C]">
+          <div className="mb-4 rounded-lg border border-[#E8542E]/30 bg-[#E8542E]/10 p-3 text-sm font-medium text-[#E8542E]">
             {error}
           </div>
         )}
 
         {/* Icon header */}
-        <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-[#2A6B52]/5 text-[#2A6B52]">
+        <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-[#2563EB]/5 text-[#2563EB]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
             <polyline points="10 17 15 12 10 7"/>
@@ -111,7 +111,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
           </svg>
         </div>
 
-        <h2 className="mb-5 text-lg font-extrabold text-[#2A6B52]">
+        <h2 className="mb-5 text-lg font-extrabold text-[#2563EB]">
           {t('login.title')}
         </h2>
 
@@ -135,7 +135,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
         <div className="mt-4 space-y-1.5">
           <div className="flex items-center justify-between">
             <label htmlFor="login-password" className={labelCls}>{t('login.password')}</label>
-            <button type="button" className="text-xs font-medium text-[#9AA1B4] hover:text-[#B5402C] transition-colors">
+            <button type="button" className="text-xs font-medium text-[#5A6B85] hover:text-[#E8542E] transition-colors">
               {t('login.forgotPassword')}
             </button>
           </div>
@@ -146,7 +146,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               disabled={loading}
               dir="ltr"
               className={cn(inputCls, 'pr-10 disabled:opacity-50')}
@@ -154,7 +154,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
             <button
               type="button"
               onClick={() => setShowPw((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9AA1B4] hover:text-[#2A6B52] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5A6B85] hover:text-[#2563EB] transition-colors"
               tabIndex={-1}
             >
               {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -169,8 +169,8 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
             className={cn(
               'flex h-5 w-5 items-center justify-center rounded border transition-colors',
               rememberMe
-                ? 'border-[#2A6B52] bg-[#2A6B52]'
-                : 'border-[#E8E1CE] bg-white',
+                ? 'border-[#2563EB] bg-[#2563EB]'
+                : 'border-[rgba(15,39,71,0.09)] bg-white',
             )}
           >
             {rememberMe && (
@@ -179,14 +179,14 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
               </svg>
             )}
           </div>
-          <span className="text-sm text-[#4A5268]">{t('login.rememberMe')}</span>
+          <span className="text-sm text-[#33425C]">{t('login.rememberMe')}</span>
         </label>
 
         {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="mt-6 w-full rounded-lg bg-[#2A6B52] py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#1C5E42] hover:shadow-md disabled:opacity-50 active:scale-[0.97]"
+          className="mt-6 w-full rounded-lg bg-[#2563EB] py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#1D4ED8] hover:shadow-md disabled:opacity-50 active:scale-[0.97]"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -198,7 +198,7 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
       </motion.form>
 
       <p className="mt-6 text-sm text-white/50">
-        Rakmana · DGI Algeria
+        Rakmana Â· DGI Algeria
       </p>
     </div>
   );
