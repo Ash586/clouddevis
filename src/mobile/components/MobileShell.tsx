@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 
 type AuthView = 'landing' | 'login' | 'register';
 
@@ -16,8 +17,9 @@ export function MobileShell() {
   const handleLogin = useCallback(() => setAuthView('login'), []);
   const handleRegister = useCallback(() => setAuthView('register'), []);
   const handleBackToLanding = useCallback(() => setAuthView('landing'), []);
+  const handleBackToLogin = useCallback(() => setAuthView('login'), []);
 
-  // Once authenticated → dashboard (Phase 5)
+  // Authenticated → dashboard (Phase 5)
   if (authState === 'authenticated') {
     return (
       <div dir={dir} className="min-h-dvh bg-[#F3F6FC] flex items-center justify-center">
@@ -26,20 +28,13 @@ export function MobileShell() {
     );
   }
 
-  // Register view (Phase 4)
   if (authView === 'register') {
-    return (
-      <div dir={dir} className="min-h-dvh bg-[#F3F6FC] flex items-center justify-center">
-        <p className="text-sm text-[#5A6B85]">Register — coming soon</p>
-      </div>
-    );
+    return <RegisterScreen onBackToLogin={handleBackToLogin} />;
   }
 
-  // Login view
   if (authView === 'login') {
     return <LoginScreen onBackToLanding={handleBackToLanding} onGoToRegister={handleRegister} />;
   }
 
-  // Landing page
   return <HomeScreen onLogin={handleLogin} onRegister={handleRegister} />;
 }
