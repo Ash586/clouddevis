@@ -9,7 +9,7 @@ import { useUserStore, type MobileLocale } from '@/stores/userStore';
 // ── Translations ─────────────────────────────────────────────
 
 type TranslationKeys =
-  | 'nav.home' | 'nav.documents' | 'nav.company' | 'nav.settings' | 'nav.pressAgainToExit'
+  | 'nav.home' | 'nav.documents' | 'nav.clients' | 'nav.company' | 'nav.settings' | 'nav.pressAgainToExit'
   | 'stats.thisMonth' | 'stats.docsCreated' | 'stats.revenue' | 'stats.revenueSub'
   | 'stats.clients' | 'stats.clientsSub' | 'stats.drafts' | 'stats.draftsSub'
   | 'stats.unpaid' | 'stats.unpaidSub' | 'stats.trendTitle'
@@ -95,7 +95,15 @@ type TranslationKeys =
   | 'onboarding.skip' | 'onboarding.next' | 'onboarding.finish'
   | 'onboarding.step1Title' | 'onboarding.step1Desc'
   | 'onboarding.step2Title' | 'onboarding.step2Desc'
-  | 'onboarding.step3Title' | 'onboarding.step3Desc';
+    | 'onboarding.step3Title' | 'onboarding.step3Desc'
+    | 'dashboard.greetingMorning' | 'dashboard.greetingAfternoon' | 'dashboard.greetingEvening'
+    | 'dashboard.businessMode' | 'dashboard.artisanMode'
+    | 'dashboard.allClear' | 'dashboard.alertUnpaid' | 'dashboard.alertDrafts'
+    | 'dashboard.searchDocs' | 'dashboard.quickCreate'
+    | 'dashboard.continueDraft' | 'dashboard.untitledDoc' | 'dashboard.statusBreakdown'
+    | 'dashboard.docDevis' | 'dashboard.docFacture' | 'dashboard.docProforma'
+    | 'dashboard.docBonCommande' | 'dashboard.docBonReception' | 'dashboard.docBonLivraison'
+    | 'dashboard.docIntervention' | 'dashboard.docAttachement';
 
 type Translations = Record<TranslationKeys, string>;
 
@@ -103,6 +111,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
   fr: {
     'nav.home': 'Accueil',
     'nav.documents': 'Documents',
+    'nav.clients': 'Clients',
     'nav.company': 'Société',
     'nav.settings': 'Réglages',
     'nav.pressAgainToExit': 'Appuyez encore pour quitter',
@@ -372,11 +381,34 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'onboarding.step2Desc': 'Envoyez vos documents par email, WhatsApp ou imprimez-les directement.',
     'onboarding.step3Title': 'Suivez vos revenus',
     'onboarding.step3Desc': 'Tableau de bord complet avec statistiques, clients et historique.',
+
+    'dashboard.greetingMorning': 'Bonjour',
+    'dashboard.greetingAfternoon': 'Bon après-midi',
+    'dashboard.greetingEvening': 'Bonsoir',
+    'dashboard.businessMode': 'Entreprise',
+    'dashboard.artisanMode': 'Artisan',
+    'dashboard.allClear': 'Tout est en ordre',
+    'dashboard.alertUnpaid': 'Impayées',
+    'dashboard.alertDrafts': 'Brouillons',
+    'dashboard.searchDocs': 'Rechercher un document…',
+    'dashboard.quickCreate': 'Création rapide',
+    'dashboard.continueDraft': 'Reprendre le brouillon',
+    'dashboard.untitledDoc': 'Document sans titre',
+    'dashboard.statusBreakdown': 'Répartition par statut',
+    'dashboard.docDevis': 'Devis',
+    'dashboard.docFacture': 'Facture',
+    'dashboard.docProforma': 'Proforma',
+    'dashboard.docBonCommande': 'Bon de commande',
+    'dashboard.docBonReception': 'Bon de réception',
+    'dashboard.docBonLivraison': 'Bon de livraison',
+    'dashboard.docIntervention': 'Intervention',
+    'dashboard.docAttachement': 'Attachement',
   },
 
   ar: {
     'nav.home': 'الرئيسية',
     'nav.documents': 'الوثائق',
+    'nav.clients': 'العملاء',
     'nav.company': 'الشركة',
     'nav.settings': 'الإعدادات',
     'nav.pressAgainToExit': 'اضغط مرة أخرى للخروج',
@@ -646,11 +678,34 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'onboarding.step2Desc': 'أرسل وثائقك بالبريد الإلكتروني أو واتساب أو اطبعها مباشرة.',
     'onboarding.step3Title': 'تتبع إيراداتك',
     'onboarding.step3Desc': 'لوحة تحكم شاملة مع إحصائيات وعملاء وسجل.',
+
+    'dashboard.greetingMorning': 'صباح الخير',
+    'dashboard.greetingAfternoon': 'مساء الخير',
+    'dashboard.greetingEvening': 'مساء الخير',
+    'dashboard.businessMode': 'شركة',
+    'dashboard.artisanMode': 'حرفي',
+    'dashboard.allClear': 'كل شيء على ما يرام',
+    'dashboard.alertUnpaid': 'غير مدفوعة',
+    'dashboard.alertDrafts': 'مسودات',
+    'dashboard.searchDocs': 'البحث عن وثيقة…',
+    'dashboard.quickCreate': 'إنشاء سريع',
+    'dashboard.continueDraft': 'استئناف المسودة',
+    'dashboard.untitledDoc': 'وثيقة بدون عنوان',
+    'dashboard.statusBreakdown': 'التوزيع حسب الحالة',
+    'dashboard.docDevis': 'عرض سعر',
+    'dashboard.docFacture': 'فاتورة',
+    'dashboard.docProforma': 'برو فورما',
+    'dashboard.docBonCommande': 'أمر شراء',
+    'dashboard.docBonReception': 'استلام',
+    'dashboard.docBonLivraison': 'تسليم',
+    'dashboard.docIntervention': 'تدخّل',
+    'dashboard.docAttachement': 'ملحق',
   },
 
   en: {
     'nav.home': 'Home',
     'nav.documents': 'Documents',
+    'nav.clients': 'Clients',
     'nav.company': 'Company',
     'nav.pressAgainToExit': 'Press again to exit',
     'nav.settings': 'Settings',
@@ -920,6 +975,28 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'onboarding.step2Desc': 'Send documents via email, WhatsApp or print them directly.',
     'onboarding.step3Title': 'Track your revenue',
     'onboarding.step3Desc': 'Full dashboard with stats, clients and history.',
+
+    'dashboard.greetingMorning': 'Good morning',
+    'dashboard.greetingAfternoon': 'Good afternoon',
+    'dashboard.greetingEvening': 'Good evening',
+    'dashboard.businessMode': 'Enterprise',
+    'dashboard.artisanMode': 'Artisan',
+    'dashboard.allClear': 'All clear',
+    'dashboard.alertUnpaid': 'Unpaid',
+    'dashboard.alertDrafts': 'Drafts',
+    'dashboard.searchDocs': 'Search documents…',
+    'dashboard.quickCreate': 'Quick create',
+    'dashboard.continueDraft': 'Continue draft',
+    'dashboard.untitledDoc': 'Untitled document',
+    'dashboard.statusBreakdown': 'Status breakdown',
+    'dashboard.docDevis': 'Quote',
+    'dashboard.docFacture': 'Invoice',
+    'dashboard.docProforma': 'Proforma',
+    'dashboard.docBonCommande': 'Purchase order',
+    'dashboard.docBonReception': 'Reception note',
+    'dashboard.docBonLivraison': 'Delivery note',
+    'dashboard.docIntervention': 'Intervention',
+    'dashboard.docAttachement': 'Attachement',
   },
 };
 
