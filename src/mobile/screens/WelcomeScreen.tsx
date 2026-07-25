@@ -14,7 +14,7 @@ export function WelcomeScreen({ onLogin, onRegister }: WelcomeScreenProps) {
   return (
     <div
       className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#0052CC] via-[#001A4D] to-[#0052CC] p-6"
-      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))' }}
+      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <motion.div
         initial={{ opacity: 0, y: -16 }}
@@ -89,7 +89,7 @@ export function WelcomeScreen({ onLogin, onRegister }: WelcomeScreenProps) {
       </motion.div>
 
       <p className="mt-4 text-[10px] text-white/25">
-        Rakmana v1.0 \u00b7 DGI Algeria
+        Rakmana v1.0 · DGI Algeria
       </p>
     </div>
   );

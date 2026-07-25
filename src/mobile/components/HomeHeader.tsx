@@ -13,7 +13,7 @@ interface HomeHeaderProps {
 function getGreeting(): string {
   const h = new Date().getHours();
   if (h < 12) return 'Bonjour';
-  if (h < 17) return 'Bon apr\u00e8s-midi';
+  if (h < 17) return 'Bon après-midi';
   return 'Bonsoir';
 }
 
@@ -43,7 +43,7 @@ export function HomeHeader({ userName, userInitials, hasNotifications, onNotific
             <h1 className="mt-2 text-xl font-extrabold text-white leading-tight">
               {getGreeting()},<br />{userName || '...'}
             </h1>
-            <p className="mt-0.5 text-xs text-white/55">Devis & Factures \u00b7 DGI Algeria</p>
+            <p className="mt-0.5 text-xs text-white/55">Devis & Factures · DGI Algeria</p>
           </div>
 
           <div className="flex items-center gap-2">

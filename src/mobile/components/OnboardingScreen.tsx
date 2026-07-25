@@ -9,9 +9,9 @@ interface OnboardingScreenProps {
 }
 
 const STEPS = [
-  { titleKey: 'onboarding.step1Title' as const, descKey: 'onboarding.step1Desc' as const, icon: '\uD83D\uDCDD' },
-  { titleKey: 'onboarding.step2Title' as const, descKey: 'onboarding.step2Desc' as const, icon: '\uD83D\uDCC4' },
-  { titleKey: 'onboarding.step3Title' as const, descKey: 'onboarding.step3Desc' as const, icon: '\uD83D\uDCC9' },
+  { titleKey: 'onboarding.step1Title' as const, descKey: 'onboarding.step1Desc' as const, icon: '📝' },
+  { titleKey: 'onboarding.step2Title' as const, descKey: 'onboarding.step2Desc' as const, icon: '📄' },
+  { titleKey: 'onboarding.step3Title' as const, descKey: 'onboarding.step3Desc' as const, icon: '📉' },
 ];
 
 export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
@@ -27,7 +27,7 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
   return (
     <div
       className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#0052CC] via-[#001A4D] to-[#0052CC] p-5"
-      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}
+      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-1.5 mb-6">

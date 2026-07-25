@@ -58,7 +58,7 @@ export function LoginScreen({ onLogin, onBackToWelcome, onGoToRegister }: LoginS
   return (
     <div
       className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#0052CC] via-[#001A4D] to-[#0052CC] p-5"
-      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))' }}
+      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -140,7 +140,7 @@ export function LoginScreen({ onLogin, onBackToWelcome, onGoToRegister }: LoginS
               autoComplete="current-password"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setFieldErrors((p) => ({ ...p, password: undefined })); }}
-              placeholder={Array(8).fill('\u2022').join('')}
+              placeholder={Array(8).fill('•').join('')}
               disabled={loading}
               dir="ltr"
               className={cn(inputCls, 'pr-10 disabled:opacity-50', fieldErrors.password && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
@@ -204,7 +204,7 @@ export function LoginScreen({ onLogin, onBackToWelcome, onGoToRegister }: LoginS
       </motion.form>
 
       <p className="mt-4 text-[10px] text-white/40">
-        Rakmana \u00b7 DGI Algeria
+        Rakmana · DGI Algeria
       </p>
     </div>
   );

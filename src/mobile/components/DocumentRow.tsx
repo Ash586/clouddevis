@@ -14,9 +14,9 @@ interface DocumentRowProps {
 
 const STATUS_STYLES: Record<DocumentStatus, { bg: string; text: string; label: string }> = {
   DRAFT: { bg: 'bg-[#718096]/10', text: 'text-[#718096]', label: 'Brouillon' },
-  SENT: { bg: 'bg-[#0052CC]/10', text: 'text-[#0052CC]', label: 'Envoy\u00e9' },
-  PAID: { bg: 'bg-[#001A4D]/10', text: 'text-[#001A4D]', label: 'Pay\u00e9' },
-  CANCELLED: { bg: 'bg-[#DC3545]/10', text: 'text-[#DC3545]', label: 'Annul\u00e9' },
+  SENT: { bg: 'bg-[#0052CC]/10', text: 'text-[#0052CC]', label: 'Envoyé' },
+  PAID: { bg: 'bg-[#001A4D]/10', text: 'text-[#001A4D]', label: 'Payé' },
+  CANCELLED: { bg: 'bg-[#DC3545]/10', text: 'text-[#DC3545]', label: 'Annulé' },
 };
 
 export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: DocumentRowProps) {
@@ -51,7 +51,7 @@ export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: Doc
             </span>
           </div>
           <div className="mt-0.5 text-[11px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {doc.client?.name || '\u2014'} \u00b7 {doc.totalTTC.toLocaleString('fr-DZ')}\u00a0DA
+            {doc.client?.name || '—'} · {doc.totalTTC.toLocaleString('fr-DZ')}\u00a0DA
           </div>
         </div>
       </button>

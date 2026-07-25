@@ -23,8 +23,8 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
   };
 
   const languages: { code: MobileLocale; label: string }[] = [
-    { code: 'fr', label: 'Fran\u00e7ais' },
-    { code: 'ar', label: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629' },
+    { code: 'fr', label: 'Français' },
+    { code: 'ar', label: 'العربية' },
     { code: 'en', label: 'English' },
   ];
 
@@ -55,7 +55,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
       animate={{ opacity: 1 }}
       className="min-h-dvh bg-[#F8FAFD] pb-24"
     >
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]">
+      <div className="sticky z-10 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#001A4D] via-[#0052CC] to-[#001A4D]" />
         <div className="px-4 py-2.5">
           <h1 className="text-base font-extrabold text-[#001A4D]">{t('settings.title')}</h1>
@@ -68,7 +68,7 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
             <div>
               <span className="text-xs text-[#718096]">{t('settings.accountTypeHint')}</span>
               <div className="mt-0.5 text-xs font-bold text-[#001A4D]">
-                {locale === 'ar' ? '\u062d\u0631\u0641\u064a' : locale === 'en' ? 'Artisan' : 'Artisan'}
+                {locale === 'ar' ? 'حرفي' : locale === 'en' ? 'Artisan' : 'Artisan'}
               </div>
             </div>
           </Row>

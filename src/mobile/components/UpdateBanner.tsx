@@ -32,7 +32,7 @@ export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDism
             </a>
           )}
           <button onClick={onDismiss} aria-label="Fermer" className="text-[#B8860B] hover:text-[#B8860B]/60 transition-colors duration-150 text-sm">
-            \u2715
+            ✕
           </button>
         </div>
       </div>

@@ -33,7 +33,7 @@ export function PushToast({ toast, onDismiss, onTap }: PushToastProps) {
             <p className="text-xs font-bold text-[#001A4D]">{toast.title}</p>
             <p className="text-[10px] text-[#718096] mt-0.5 truncate">{toast.body}</p>
           </div>
-          <button onClick={onDismiss} aria-label="Fermer" className="text-[#718096] hover:text-[#0052CC] text-[10px] transition-colors duration-150">\u2715</button>
+          <button onClick={onDismiss} aria-label="Fermer" className="text-[#718096] hover:text-[#0052CC] text-[10px] transition-colors duration-150">✕</button>
         </div>
       </div>
     </div>

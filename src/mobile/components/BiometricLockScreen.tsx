@@ -22,18 +22,18 @@ export function BiometricLockScreen({ biometryType, onUnlock, onLogout }: Biomet
   return (
     <div
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#F8FAFD] p-5"
-      style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))' }}
+      style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0052CC]/8">
         <Lock size={28} className="text-[#0052CC]" />
       </div>
       <h2 className="mb-1 text-lg font-extrabold text-[#0052CC]">Rakmana</h2>
-      <p className="mb-6 text-xs text-[#718096]">Application verrouill\u00e9e</p>
+      <p className="mb-6 text-xs text-[#718096]">Application verrouillée</p>
 
       <button
         onClick={handleUnlock}
         disabled={unlocking}
-        aria-label={biometryType || 'D\u00e9verrouiller'}
+        aria-label={biometryType || 'Déverrouiller'}
         className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#0052CC] text-white shadow-lg shadow-[#0052CC]/25 transition-all duration-200 active:scale-95 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#0052CC]/40"
       >
         <Fingerprint size={26} />

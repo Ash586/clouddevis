@@ -6,9 +6,9 @@
         <item name="colorPrimaryDark">#0a2e1c</item>
         <item name="colorAccent">#14B8A6</item>
         <item name="android:windowBackground">#0F2747</item>
-        <item name="android:statusBarColor">#0d3d24</item>
-        <item name="android:navigationBarColor">#0d3d24</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#F8FAFD</item>
+        <item name="android:navigationBarColor">#F8FAFD</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">

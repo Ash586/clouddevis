@@ -248,7 +248,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0052CC] shadow-lg shadow-[#0052CC]/20">
             <Loader2 size={22} className="text-white animate-spin" />
           </div>
-          <p className="text-xs text-[#718096]">Chargement\u2026</p>
+          <p className="text-xs text-[#718096]">Chargement…</p>
         </div>
       </div>
     );
