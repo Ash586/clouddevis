@@ -242,7 +242,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     return (
       <div
         className="flex min-h-dvh items-center justify-center bg-[#F8FAFD]"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        style={{ paddingTop: 'var(--sat, env(safe-area-inset-top, 0px))' }}
       >
         <div className="flex flex-col items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0052CC] shadow-lg shadow-[#0052CC]/20">
@@ -266,7 +266,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     <div
       dir={dir}
       className={cn('relative min-h-dvh bg-[#F8FAFD]', 'max-w-lg mx-auto')}
-      style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      style={{ paddingBottom: 'calc(60px + var(--sab, env(safe-area-inset-bottom, 0px)))', paddingTop: 'var(--sat, env(safe-area-inset-top, 0px))' }}
     >
       <UpdateBanner
         visible={updateInfo.visible}

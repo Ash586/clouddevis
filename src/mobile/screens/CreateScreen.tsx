@@ -328,7 +328,7 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
     <motion.div initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.25 }} className="flex flex-col h-full bg-[#F5F7FA]">
 
       {/* ── HEADER ── */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]" style={{ paddingTop: 'var(--sat, env(safe-area-inset-top, 0px))' }}>
         <div className="h-0.5 bg-[#E6F0FF]"><motion.div className="h-full bg-[#0052CC]" animate={{ width: `${progress}%` }} transition={{ duration: 0.3, ease: 'easeOut' }} /></div>
         <div className="flex items-center justify-between px-3 py-2">
           <div className="flex items-center gap-2">
@@ -587,7 +587,7 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
       </div>
 
       {/* ── BOTTOM BUTTONS ── */}
-      <div className="border-t border-[rgba(0,26,77,0.06)] bg-white px-3 py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="border-t border-[rgba(0,26,77,0.06)] bg-white px-3 py-2.5 pb-[max(0.75rem,var(--sab,env(safe-area-inset-bottom)))]">
         <div className="flex gap-2">
           <button onClick={() => setView((v) => v === 'form' ? 'preview' : 'form')} className="flex items-center justify-center gap-1.5 rounded-2xl border border-[rgba(0,26,77,0.12)] px-4 py-2.5 text-[11px] font-bold text-[#4A5568] transition-all duration-200 hover:bg-[#F0F4FF] active:scale-[0.97]"><Eye size={14} /> Aperçu</button>
           <button onClick={handleSave} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 rounded-2xl bg-[#0052CC] py-2.5 text-[11px] font-bold text-white shadow-md shadow-[#0052CC]/20 transition-all duration-200 hover:bg-[#0047B3] active:scale-[0.97] disabled:opacity-50">

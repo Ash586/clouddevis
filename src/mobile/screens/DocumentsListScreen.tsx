@@ -45,7 +45,7 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
   return (
     <div className="flex flex-col min-h-dvh bg-[#F8FAFD]">
       {/* Header */}
-      <div className="sticky z-10 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="sticky z-10 bg-white/95 backdrop-blur border-b border-[rgba(0,26,77,0.06)]" style={{ top: 'var(--sat, env(safe-area-inset-top, 0px))' }}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#001A4D] via-[#0052CC] to-[#001A4D]" />
         <div className="flex items-center justify-between px-4 py-2.5">
           <h1 className="text-base font-extrabold text-[#001A4D]">{t('docs.title')}</h1>

@@ -22,7 +22,7 @@ export function BiometricLockScreen({ biometryType, onUnlock, onLogout }: Biomet
   return (
     <div
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#F8FAFD] p-5"
-      style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{ paddingTop: 'max(3rem, var(--sat, env(safe-area-inset-top)))', paddingBottom: 'var(--sab, env(safe-area-inset-bottom, 0px))' }}
     >
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0052CC]/8">
         <Lock size={28} className="text-[#0052CC]" />

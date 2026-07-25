@@ -12,7 +12,7 @@ function showDomToast(message: string): void {
     host = document.createElement('div');
     host.id = 'cd-toast-host';
     host.style.cssText =
-      'position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));' +
+      'position:fixed;left:50%;bottom:calc(88px + var(--sab,env(safe-area-inset-bottom,0px)));' +
       'transform:translateX(-50%);z-index:2147483647;display:flex;flex-direction:column;' +
       'gap:8px;align-items:center;pointer-events:none';
     document.body.appendChild(host);

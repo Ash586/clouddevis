@@ -19,7 +19,7 @@ export function PushToast({ toast, onDismiss, onTap }: PushToastProps) {
   return (
     <div
       className="fixed inset-x-0 top-3 z-[90] mx-auto max-w-sm px-3"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      style={{ paddingTop: 'var(--sat, env(safe-area-inset-top, 0px))' }}
     >
       <div className="rounded-xl border border-[rgba(0,26,77,0.06)] bg-white px-3.5 py-2.5 shadow-xl animate-in slide-in-from-top-5 fade-in duration-300">
         <div className="flex items-start gap-2.5">

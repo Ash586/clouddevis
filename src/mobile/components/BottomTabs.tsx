@@ -28,7 +28,7 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   const { t } = useMobileI18n();
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1"
+      className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,var(--sab,env(safe-area-inset-bottom)))] pt-1"
       role="tablist"
       aria-label="Navigation"
     >

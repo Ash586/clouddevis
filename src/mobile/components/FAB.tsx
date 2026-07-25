@@ -23,7 +23,7 @@ export function FAB({ onNewDevis, onNewFacture, onDuplicate, canDuplicate }: FAB
   }
 
   return (
-    <div className="fixed right-3 bottom-24 z-40 flex flex-col items-end gap-2.5 pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="fixed right-3 bottom-24 z-40 flex flex-col items-end gap-2.5 pb-[var(--sab,env(safe-area-inset-bottom,0px))]">
       {open && actions.map((action, i) => {
         const Icon = action.icon;
         return (

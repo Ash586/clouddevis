@@ -31,7 +31,10 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import java.io.File;
@@ -63,7 +66,31 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressbar);
 
         setupWebView();
+        setupWindowInsetsPolyfill();
         webView.loadUrl(APP_URL);
+    }
+
+    private void setupWindowInsetsPolyfill() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            int top = systemBars.top;
+            int bottom = systemBars.bottom;
+            injectSafeAreaInsets(top, bottom);
+            return insets;
+        });
+    }
+
+    private void injectSafeAreaInsets(int topPx, int bottomPx) {
+        if (webView == null) return;
+        float density = getResources().getDisplayMetrics().density;
+        int topDp = Math.round(topPx / density);
+        int bottomDp = Math.round(bottomPx / density);
+        String js = "(function(){" +
+                "var s=document.documentElement.style;" +
+                "s.setProperty('--sat','" + topDp + "px');" +
+                "s.setProperty('--sab','" + bottomDp + "px');" +
+                "})()";
+        webView.evaluateJavascript(js, null);
     }
 
     private void setupStatusBar() {
@@ -144,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+                    Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    injectSafeAreaInsets(systemBars.top, systemBars.bottom);
+                    return insets;
+                });
             }
         });
 

@@ -27,7 +27,7 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
   return (
     <div
       className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#0052CC] via-[#001A4D] to-[#0052CC] p-5"
-      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{ paddingTop: 'max(2rem, var(--sat, env(safe-area-inset-top)))', paddingBottom: 'var(--sab, env(safe-area-inset-bottom, 0px))' }}
     >
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-1.5 mb-6">
