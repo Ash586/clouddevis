@@ -255,7 +255,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   }
 
   if (authState === 'unauthenticated') {
-    if (authView === 'login') return <LoginScreen onLogin={login} onBackToWelcome={() => setAuthView('welcome')} />;
+    if (authView === 'login') return <LoginScreen onLogin={login} onBackToWelcome={() => setAuthView('welcome')} onGoToRegister={() => setAuthView('register')} />;
     if (authView === 'register') return <RegisterScreen onRegister={register} onBackToLogin={() => setAuthView('login')} />;
     return <WelcomeScreen onLogin={() => setAuthView('login')} onRegister={() => setAuthView('register')} />;
   }

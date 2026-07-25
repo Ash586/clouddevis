@@ -96,6 +96,7 @@ type TranslationKeys =
   | 'login.error.fillAll' | 'login.error.invalid' | 'login.error.rateLimit'
   | 'login.error.suspended' | 'login.error.server' | 'login.error.network'
   | 'login.error.emailRequired' | 'login.error.passwordRequired'
+  | 'login.goToRegister'
   | 'onboarding.skip' | 'onboarding.next' | 'onboarding.finish'
   | 'onboarding.step1Title' | 'onboarding.step1Desc'
   | 'onboarding.step2Title' | 'onboarding.step2Desc'
@@ -373,6 +374,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.network': 'Erreur réseau. Vérifiez votre connexion.',
     'login.error.emailRequired': "L'email est requis",
     'login.error.passwordRequired': 'Le mot de passe est requis',
+    'login.goToRegister': 'Pas encore de compte ?',
 
     'onboarding.skip': 'Passer',
     'onboarding.next': 'Suivant',
@@ -654,6 +656,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.network': 'خطأ في الشبكة. تحقق من اتصالك.',
     'login.error.emailRequired': 'البريد الإلكتروني مطلوب',
     'login.error.passwordRequired': 'كلمة المرور مطلوبة',
+    'login.goToRegister': 'ليس لديك حساب بعد؟',
 
     'onboarding.skip': 'تخطي',
     'onboarding.next': 'التالي',
@@ -935,6 +938,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.network': 'Network error. Check your connection.',
     'login.error.emailRequired': 'Email is required',
     'login.error.passwordRequired': 'Password is required',
+    'login.goToRegister': "Don't have an account?",
 
     'onboarding.skip': 'Skip',
     'onboarding.next': 'Next',

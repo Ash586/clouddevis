@@ -10,9 +10,10 @@ import { useMobileI18n } from '@/mobile/lib/i18n';
 interface LoginScreenProps {
   onLogin: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   onBackToWelcome: () => void;
+  onGoToRegister: () => void;
 }
 
-export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onBackToWelcome, onGoToRegister }: LoginScreenProps) {
   const { t } = useMobileI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -193,6 +194,13 @@ export function LoginScreen({ onLogin, onBackToWelcome }: LoginScreenProps) {
             </span>
           ) : t('login.button')}
         </button>
+
+        <p className="mt-3 text-center text-xs text-[#4A5568]">
+          {t('login.goToRegister')}{' '}
+          <button type="button" onClick={onGoToRegister} className="font-bold text-[#0052CC] hover:underline">
+            {t('welcome.register')}
+          </button>
+        </p>
       </motion.form>
 
       <p className="mt-4 text-[10px] text-white/40">

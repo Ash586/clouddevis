@@ -22,17 +22,9 @@ export function WelcomeScreen({ onLogin, onRegister }: WelcomeScreenProps) {
         transition={{ duration: 0.45, ease: 'easeOut' }}
         className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-xl"
       >
-        <svg width="48" height="48" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-          <rect x="148" y="110" width="200" height="260" rx="18" fill="rgba(255,255,255,0.9)"/>
-          <path d="M298 110 L348 160 L298 160 Z" fill="rgba(255,255,255,0.3)"/>
-          <rect x="173" y="190" width="120" height="8" rx="4" fill="rgba(0,82,204,0.6)"/>
-          <rect x="173" y="214" width="80" height="6" rx="3" fill="rgba(0,82,204,0.3)"/>
-          <rect x="173" y="238" width="100" height="6" rx="3" fill="rgba(0,82,204,0.3)"/>
-          <rect x="173" y="290" width="140" height="1.5" rx="1" fill="rgba(0,82,204,0.15)"/>
-          <rect x="173" y="308" width="140" height="28" rx="8" fill="rgba(0,82,204,0.1)"/>
-          <circle cx="338" cy="338" r="52" fill="#D4A843"/>
-          <circle cx="338" cy="338" r="44" fill="white"/>
-          <path d="M318 338 L330 350 L360 322" stroke="#0052CC" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <svg width="48" height="48" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" rx="22" fill="rgba(255,255,255,0.95)"/>
+          <text x="50" y="68" fontSize="54" fontWeight="900" fontFamily="system-ui, sans-serif" textAnchor="middle" fill="#0052CC">R</text>
         </svg>
       </motion.div>
 
@@ -73,8 +65,31 @@ export function WelcomeScreen({ onLogin, onRegister }: WelcomeScreenProps) {
         </button>
       </motion.div>
 
-      <p className="mt-8 text-[10px] text-white/25">
-        Rakmana \u00b7 DGI Algeria Compliant
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="mt-8 w-full max-w-sm"
+      >
+        <svg viewBox="0 0 320 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full opacity-[0.12]">
+          <rect x="40" y="10" width="120" height="80" rx="8" fill="white"/>
+          <rect x="52" y="24" width="60" height="5" rx="2.5" fill="#0052CC"/>
+          <rect x="52" y="35" width="40" height="3.5" rx="1.75" fill="#0052CC" opacity="0.5"/>
+          <rect x="52" y="44" width="85" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="52" y="52" width="85" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="52" y="60" width="85" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="52" y="70" width="50" height="3.5" rx="1.75" fill="#D4A843" opacity="0.7"/>
+          <rect x="180" y="15" width="100" height="70" rx="8" fill="white"/>
+          <rect x="192" y="28" width="50" height="4" rx="2" fill="#0052CC"/>
+          <rect x="192" y="38" width="70" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="192" y="45" width="70" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="192" y="52" width="70" height="1" rx="0.5" fill="#0052CC" opacity="0.25"/>
+          <rect x="192" y="62" width="35" height="3" rx="1.5" fill="#D4A843" opacity="0.7"/>
+        </svg>
+      </motion.div>
+
+      <p className="mt-4 text-[10px] text-white/25">
+        Rakmana v1.0 \u00b7 DGI Algeria
       </p>
     </div>
   );
