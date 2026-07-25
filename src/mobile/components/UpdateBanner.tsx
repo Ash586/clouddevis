@@ -1,8 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
-import { isNativePlatform, addBackPressListener, exitApp } from '@/lib/native';
 
 interface UpdateBannerProps {
   visible: boolean;
@@ -17,22 +15,24 @@ export function UpdateBanner({ visible, newVersion, releaseNotes, apkUrl, onDism
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[90] border-b border-[#D4A843]/30 bg-[#D4A843]/10 px-4 py-3 backdrop-blur"
-      style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+    <div
+      className="fixed inset-x-0 top-0 z-[90] border-b border-[#D4A843]/25 bg-[#D4A843]/10 px-4 py-2.5 backdrop-blur"
+      style={{ paddingTop: 'max(0.625rem, env(safe-area-inset-top))' }}
+      role="alert"
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-bold text-[#C77D11]">{t('update.title')} v{newVersion}</p>
-          {releaseNotes && <p className="text-xs text-[#C77D11]/70 mt-0.5">{releaseNotes}</p>}
+          <p className="text-xs font-bold text-[#B8860B]">{t('update.title')} v{newVersion}</p>
+          {releaseNotes && <p className="text-[10px] text-[#B8860B]/65 mt-0.5">{releaseNotes}</p>}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {apkUrl && (
-            <a href={apkUrl} className="rounded-lg bg-[#D4A843] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#C77D11] transition-colors">
+            <a href={apkUrl} className="rounded-lg bg-[#D4A843] px-2.5 py-1 text-[10px] font-bold text-white transition-colors duration-150 hover:bg-[#B8860B]">
               {t('update.download')}
             </a>
           )}
-          <button onClick={onDismiss} className="text-[#C77D11] hover:text-[#C77D11]/70 transition-colors">
-            âœ•
+          <button onClick={onDismiss} aria-label="Fermer" className="text-[#B8860B] hover:text-[#B8860B]/60 transition-colors duration-150 text-sm">
+            \u2715
           </button>
         </div>
       </div>

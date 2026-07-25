@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupStatusBar() {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.parseColor("#F3F6FC"));
-        window.setNavigationBarColor(Color.parseColor("#F3F6FC"));
+        window.setStatusBarColor(Color.parseColor("#F8FAFD"));
+        window.setNavigationBarColor(Color.parseColor("#F8FAFD"));
 
         WindowInsetsControllerCompat controller =
                 WindowCompat.getInsetsController(window, window.getDecorView());

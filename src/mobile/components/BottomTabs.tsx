@@ -27,8 +27,12 @@ interface BottomTabsProps {
 export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
   const { t } = useMobileI18n();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">
-      <div className="mx-auto flex max-w-md items-stretch justify-around gap-1 rounded-[22px] border border-[rgba(15,39,71,0.09)]/80 bg-white/85 p-1.5 shadow-[0_8px_30px_rgba(28,37,65,0.12)] backdrop-blur-xl">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1"
+      role="tablist"
+      aria-label="Navigation"
+    >
+      <div className="mx-auto flex max-w-md items-stretch justify-around gap-1 rounded-[18px] border border-[rgba(0,26,77,0.06)] bg-white/90 p-1 shadow-[0_4px_20px_rgba(0,26,77,0.08)] backdrop-blur-xl">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -38,25 +42,26 @@ export function BottomTabs({ activeTab, onTabChange }: BottomTabsProps) {
             <button
               key={tab.id}
               type="button"
-              onClick={() => onTabChange(tab.id)}
-              className="group relative flex flex-1 flex-col items-center gap-1 rounded-2xl py-1.5 transition-colors"
+              role="tab"
+              aria-selected={isActive}
               aria-label={label}
-              aria-current={isActive ? 'page' : undefined}
+              onClick={() => onTabChange(tab.id)}
+              className="group relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-1.5 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#0052CC]/40"
             >
               <span
                 className={cn(
-                  'flex h-9 w-full items-center justify-center rounded-xl transition-all duration-300',
+                  'flex h-8 w-full items-center justify-center rounded-xl transition-all duration-200',
                   isActive
-                    ? 'bg-[#2563EB] text-white shadow-sm shadow-[#2563EB]/30'
-                    : 'text-[#5A6B85] group-active:bg-[#2563EB]/5',
+                    ? 'bg-[#0052CC] text-white shadow-sm shadow-[#0052CC]/25'
+                    : 'text-[#718096] group-hover:bg-[#0052CC]/5 group-active:bg-[#0052CC]/10',
                 )}
               >
-                <Icon size={20} strokeWidth={isActive ? 2.4 : 1.9} />
+                <Icon size={18} strokeWidth={isActive ? 2.3 : 1.8} />
               </span>
               <span
                 className={cn(
-                  'max-w-full truncate px-0.5 text-[10px] leading-none transition-colors',
-                  isActive ? 'font-bold text-[#2563EB]' : 'font-medium text-[#5A6B85]',
+                  'max-w-full truncate px-0.5 text-[9px] leading-none transition-colors duration-200',
+                  isActive ? 'font-bold text-[#0052CC]' : 'font-medium text-[#718096]',
                 )}
               >
                 {label}

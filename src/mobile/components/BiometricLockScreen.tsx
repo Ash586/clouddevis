@@ -16,35 +16,37 @@ export function BiometricLockScreen({ biometryType, onUnlock, onLogout }: Biomet
 
   const handleUnlock = () => {
     setUnlocking(true);
-    setTimeout(() => {
-      onUnlock();
-    }, 500);
+    setTimeout(() => { onUnlock(); }, 400);
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#F3F6FC] p-6">
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-        <Lock size={32} className="text-[#2563EB]" />
+    <div
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#F8FAFD] p-5"
+      style={{ paddingTop: 'max(3rem, env(safe-area-inset-top))' }}
+    >
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0052CC]/8">
+        <Lock size={28} className="text-[#0052CC]" />
       </div>
-      <h2 className="mb-2 text-xl font-extrabold text-[#2563EB]">Rakmana</h2>
-      <p className="mb-8 text-sm text-[#5A6B85]">App locked</p>
+      <h2 className="mb-1 text-lg font-extrabold text-[#0052CC]">Rakmana</h2>
+      <p className="mb-6 text-xs text-[#718096]">Application verrouill\u00e9e</p>
 
       <button
         onClick={handleUnlock}
         disabled={unlocking}
-        className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563EB] text-white shadow-lg shadow-[#2563EB]/30 transition-all active:scale-95 disabled:opacity-50"
+        aria-label={biometryType || 'D\u00e9verrouiller'}
+        className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#0052CC] text-white shadow-lg shadow-[#0052CC]/25 transition-all duration-200 active:scale-95 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#0052CC]/40"
       >
-        <Fingerprint size={28} />
+        <Fingerprint size={26} />
       </button>
-      <p className="text-xs text-[#5A6B85]">
+      <p className="text-[10px] text-[#718096]">
         {biometryType || 'Touch to unlock'}
       </p>
 
       <button
         onClick={onLogout}
-        className="mt-8 flex items-center gap-2 text-sm text-[#E8542E] hover:text-[#C43D1C] transition-colors"
+        className="mt-6 flex items-center gap-1.5 text-xs text-[#DC3545] transition-colors duration-150 hover:text-[#B23030]"
       >
-        <LogOut size={14} /> {t('settings.logout')}
+        <LogOut size={12} /> {t('settings.logout')}
       </button>
     </div>
   );

@@ -70,7 +70,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const [hasUnread, setHasUnread] = useState(false);
   const toastIdRef = useRef(0);
 
-  // Android back button refs
   const activeTabRef = useRef<TabId>(initialTab);
   const showWizardRef = useRef(false);
   const companyViewRef = useRef<CompanyView>('profile');
@@ -81,7 +80,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   useEffect(() => { showWizardRef.current = showWizard; }, [showWizard]);
   useEffect(() => { companyViewRef.current = companyView; }, [companyView]);
 
-  // Android back button
   useEffect(() => {
     if (!isNativePlatform()) return;
     const removeListener = addBackPressListener(() => {
@@ -102,7 +100,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     return () => { removeListener(); if (backPressTimer.current) clearTimeout(backPressTimer.current); };
   }, []);
 
-  // Update check
   const [updateInfo, setUpdateInfo] = useState({ visible: false, version: '', apkUrl: '', releaseNotes: '' });
   useEffect(() => {
     fetch('/api/mobile/version').then((r) => r.ok ? r.json() : null).then((data) => {
@@ -112,17 +109,15 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     }).catch(() => {});
   }, []);
 
-  // Auth
   const { authState, userName, onUnauthorized, login, register, logout } = useAuthGuard();
   useApiSync({ enabled: authState === 'authenticated', onUnauthorized });
 
-  // Push notifications
   useEffect(() => {
     if (authState !== 'authenticated') return;
     void (async () => {
       try {
-        const { initPushNotifications, teardownPushNotifications } = await import('@/mobile/lib/pushNotifications');
-        const cleanup = await initPushNotifications({
+        const { initPushNotifications } = await import('@/mobile/lib/pushNotifications');
+        await initPushNotifications({
           onForeground: (title, body, payload) => {
             toastIdRef.current += 1;
             setPushToast({ id: String(toastIdRef.current), title, body, documentId: payload.documentId });
@@ -136,7 +131,6 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     })();
   }, [authState]);
 
-  // Biometric
   useEffect(() => {
     if (authState !== 'authenticated') return;
     void checkBiometry().then(setBiometryInfo);
@@ -156,13 +150,11 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     return () => { removeListener(); };
   }, [authState]);
 
-  // Onboarding
   useEffect(() => {
     if (authState !== 'authenticated') return;
     try { if (!localStorage.getItem('rakmana_onboarded')) setShowOnboarding(true); } catch {}
   }, [authState]);
 
-  // Language sync
   const setLocale = useUserStore((s) => s.setLocale);
   useEffect(() => {
     getSettings().then((s) => {
@@ -175,14 +167,12 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   const { dir } = useMobileI18n();
   const hasSavedDocs = useDocumentStore((s) => s.savedDocuments.length > 0);
 
-  // Tab navigation
   const handleTabChange = useCallback((tab: TabId) => {
     setActiveTab(tab);
     if (tab === 'company') setCompanyView('profile');
     onTabChange?.(tab);
   }, [onTabChange]);
 
-  // Wizard handlers
   const handleNewDevis = useCallback(() => { useDocumentStore.getState().setType('DEVIS'); setShowWizard(true); }, []);
   const handleNewFacture = useCallback(() => { useDocumentStore.getState().setType('FACTURE'); setShowWizard(true); }, []);
   const handleDuplicate = useCallback(() => setShowWizard(true), []);
@@ -213,10 +203,8 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
     if (checkIsOnline()) void processQueue(processWebSyncItem);
   }, [processQueue]);
 
-  // Reset authView on session expiry
   useEffect(() => { if (authState === 'unauthenticated') setAuthView('welcome'); }, [authState]);
 
-  // Render tab screen
   const renderScreen = () => {
     switch (activeTab) {
       case 'home':
@@ -225,6 +213,9 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             userName={userName || 'User'}
             onDocumentTap={handleEditDocument}
             onSeeAll={() => setActiveTab('documents')}
+            onNewDevis={handleNewDevis}
+            onNewFacture={handleNewFacture}
+            onDuplicate={hasSavedDocs ? handleDuplicate : undefined}
             hasNotifications={hasUnread}
             onNotificationTap={() => { setHasUnread(false); setActiveTab('documents'); }}
           />
@@ -243,39 +234,39 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
       case 'settings':
         return <SettingsScreen onLogout={handleLogout} />;
       default:
-        return <HomeScreen userName={userName || 'User'} onDocumentTap={handleEditDocument} onSeeAll={() => setActiveTab('documents')} />;
+        return <HomeScreen userName={userName || 'User'} onDocumentTap={handleEditDocument} onSeeAll={() => setActiveTab('documents')} onNewDevis={handleNewDevis} onNewFacture={handleNewFacture} />;
     }
   };
 
-  // Loading
   if (authState === 'loading') {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#F3F6FC]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2563EB]">
-            <Loader2 size={26} className="text-white animate-spin" />
+      <div
+        className="flex min-h-dvh items-center justify-center bg-[#F8FAFD]"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0052CC] shadow-lg shadow-[#0052CC]/20">
+            <Loader2 size={22} className="text-white animate-spin" />
           </div>
-          <p className="text-sm text-[#5A6B85]">Chargementâ€¦</p>
+          <p className="text-xs text-[#718096]">Chargement\u2026</p>
         </div>
       </div>
     );
   }
 
-  // Auth screens
   if (authState === 'unauthenticated') {
     if (authView === 'login') return <LoginScreen onLogin={login} onBackToWelcome={() => setAuthView('welcome')} />;
     if (authView === 'register') return <RegisterScreen onRegister={register} onBackToLogin={() => setAuthView('login')} />;
     return <WelcomeScreen onLogin={() => setAuthView('login')} onRegister={() => setAuthView('register')} />;
   }
 
-  // Onboarding
   if (showOnboarding) return <OnboardingScreen onDone={() => setShowOnboarding(false)} />;
 
   return (
     <div
       dir={dir}
-      className={cn('relative min-h-dvh bg-[#F3F6FC]', 'max-w-lg mx-auto')}
-      style={{ paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      className={cn('relative min-h-dvh bg-[#F8FAFD]', 'max-w-lg mx-auto')}
+      style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       <UpdateBanner
         visible={updateInfo.visible}
@@ -323,7 +314,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             animate="center"
             exit="exit"
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] bg-[#F3F6FC]"
+            className="fixed inset-0 z-[60] bg-[#F8FAFD]"
           >
             <CreateScreen
               onExit={handleWizardClose}

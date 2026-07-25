@@ -13,10 +13,10 @@ interface DocumentRowProps {
 }
 
 const STATUS_STYLES: Record<DocumentStatus, { bg: string; text: string; label: string }> = {
-  DRAFT: { bg: 'bg-[#5A6B85]/10', text: 'text-[#5A6B85]', label: 'Brouillon' },
-  SENT: { bg: 'bg-[#2563EB]/10', text: 'text-[#2563EB]', label: 'Envoy\u00e9' },
-  PAID: { bg: 'bg-[#1E40AF]/10', text: 'text-[#1E40AF]', label: 'Pay\u00e9' },
-  CANCELLED: { bg: 'bg-[#E8542E]/10', text: 'text-[#E8542E]', label: 'Annul\u00e9' },
+  DRAFT: { bg: 'bg-[#718096]/10', text: 'text-[#718096]', label: 'Brouillon' },
+  SENT: { bg: 'bg-[#0052CC]/10', text: 'text-[#0052CC]', label: 'Envoy\u00e9' },
+  PAID: { bg: 'bg-[#001A4D]/10', text: 'text-[#001A4D]', label: 'Pay\u00e9' },
+  CANCELLED: { bg: 'bg-[#DC3545]/10', text: 'text-[#DC3545]', label: 'Annul\u00e9' },
 };
 
 export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: DocumentRowProps) {
@@ -37,51 +37,55 @@ export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: Doc
     <div className="relative">
       <button
         onClick={onTap}
-        className="flex w-full items-center gap-3 rounded-xl border border-[rgba(15,39,71,0.09)] bg-white p-3.5 text-left transition-all hover:border-[#E8542E]/30 hover:bg-[#EDF2FB] active:scale-[0.99]"
+        aria-label={`${doc.number} - ${doc.client?.name || 'Client'} - ${doc.totalTTC.toLocaleString('fr-DZ')} DA`}
+        className="flex w-full items-center gap-2.5 rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3 text-left transition-all duration-200 hover:border-[#0052CC]/20 hover:shadow-sm active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#2563EB]/5 text-[#2563EB]">
-          <FileText size={18} />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0052CC]/5 text-[#0052CC]">
+          <FileText size={16} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-[#2563EB] truncate">{doc.number}</span>
-            <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold', st.bg, st.text)}>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-[#0052CC] truncate">{doc.number}</span>
+            <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold', st.bg, st.text)}>
               {st.label}
             </span>
           </div>
-          <div className="mt-0.5 text-xs text-[#5A6B85]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <div className="mt-0.5 text-[11px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {doc.client?.name || '\u2014'} \u00b7 {doc.totalTTC.toLocaleString('fr-DZ')}\u00a0DA
           </div>
         </div>
       </button>
 
-      {/* Three-dot menu */}
-      <div ref={menuRef} className="absolute right-3 top-3">
+      <div ref={menuRef} className="absolute right-2.5 top-2.5">
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#5A6B85] hover:bg-[#F3F6FC] hover:text-[#2563EB] transition-colors"
+          aria-label="Options"
+          className="flex h-6 w-6 items-center justify-center rounded-lg text-[#718096] transition-colors duration-200 hover:bg-[#F5F7FA] hover:text-[#0052CC] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
         >
-          <MoreVertical size={14} />
+          <MoreVertical size={13} />
         </button>
         {menuOpen && (
-          <div className="absolute right-0 top-8 z-50 w-40 rounded-xl border border-[rgba(15,39,71,0.09)] bg-white py-1.5 shadow-xl">
+          <div className="absolute right-0 top-7 z-50 w-36 rounded-xl border border-[rgba(0,26,77,0.06)] bg-white py-1 shadow-xl" role="menu">
             <button
               onClick={() => { onTap?.(); setMenuOpen(false); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#2563EB] hover:bg-[#EDF2FB] transition-colors"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[#001A4D] transition-colors duration-150 hover:bg-[#E6F0FF]"
             >
-              <Eye size={14} /> Modifier
+              <Eye size={13} /> Modifier
             </button>
             <button
               onClick={() => { onDuplicate?.(); setMenuOpen(false); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#2563EB] hover:bg-[#EDF2FB] transition-colors"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[#001A4D] transition-colors duration-150 hover:bg-[#E6F0FF]"
             >
-              <Copy size={14} /> Dupliquer
+              <Copy size={13} /> Dupliquer
             </button>
             <button
               onClick={() => { onDelete?.(); setMenuOpen(false); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#E8542E] hover:bg-[#E8542E]/5 transition-colors"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[#DC3545] transition-colors duration-150 hover:bg-[#DC3545]/5"
             >
-              <Trash2 size={14} /> Supprimer
+              <Trash2 size={13} /> Supprimer
             </button>
           </div>
         )}

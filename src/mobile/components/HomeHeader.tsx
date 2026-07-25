@@ -1,8 +1,7 @@
 ﻿'use client';
 
-import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, ChevronLeft } from 'lucide-react';
+import { Bell } from 'lucide-react';
 
 interface HomeHeaderProps {
   userName: string;
@@ -13,56 +12,57 @@ interface HomeHeaderProps {
 
 function getGreeting(): string {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return 'Bonjour';
+  if (h < 17) return 'Bon apr\u00e8s-midi';
+  return 'Bonsoir';
 }
 
 export function HomeHeader({ userName, userInitials, hasNotifications, onNotificationTap }: HomeHeaderProps) {
   return (
-    <div className="px-5 pt-2">
-      {/* Hero card */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#2563EB] p-6 shadow-lg">
-        {/* Dot pattern */}
+    <div className="px-4 pt-1">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="relative overflow-hidden rounded-2xl bg-[#0052CC] p-5 shadow-lg shadow-[#0052CC]/20"
+      >
         <div
-          className="pointer-events-none absolute inset-0 opacity-50"
+          className="pointer-events-none absolute inset-0 opacity-40"
           style={{
-            backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
-            backgroundSize: '22px 22px',
+            backgroundImage: 'radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
           }}
         />
-        {/* Gold accent line */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-l from-[#2563EB] via-[#1E40AF] to-[#2563EB]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#001A4D] via-[#0052CC] to-[#001A4D]" />
 
         <div className="relative flex items-start justify-between">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D4A843]/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#D4A843]">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#D4A843]/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#D4A843]">
               Pro
             </span>
-            <h1 className="mt-3 text-2xl font-extrabold text-white">
-              {getGreeting()}, {userName || '...'}
+            <h1 className="mt-2 text-xl font-extrabold text-white leading-tight">
+              {getGreeting()},<br />{userName || '...'}
             </h1>
-            <p className="mt-1 text-sm text-white/60">Devis & Factures Â· DGI Compliant</p>
+            <p className="mt-0.5 text-xs text-white/55">Devis & Factures \u00b7 DGI Algeria</p>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Notification bell */}
             <button
               onClick={onNotificationTap}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-colors hover:bg-white/15"
+              aria-label="Notifications"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-all duration-200 hover:bg-white/20 active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40"
             >
-              <Bell size={18} />
+              <Bell size={17} />
               {hasNotifications && (
-                <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-[#E8542E] border-2 border-[#2563EB]" />
+                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#DC3545] border-[1.5px] border-[#0052CC]" />
               )}
             </button>
-            {/* Avatar */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4A843] text-sm font-bold text-[#2563EB]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D4A843] text-xs font-bold text-[#001A4D]">
               {userInitials}
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
