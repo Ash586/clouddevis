@@ -61,13 +61,13 @@ export function WelcomeScreen({ onLogin, onRegister }: WelcomeScreenProps) {
       >
         <button
           onClick={onLogin}
-          className="w-full rounded-xl bg-white py-3 text-sm font-bold text-[#0052CC] shadow-lg transition-all duration-200 hover:bg-white/90 hover:shadow-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/50"
+          className="w-full rounded-2xl bg-white py-3.5 text-sm font-bold text-[#0052CC] shadow-lg transition-all duration-200 hover:bg-white/90 hover:shadow-xl active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/50"
         >
           {t('welcome.login')}
         </button>
         <button
           onClick={onRegister}
-          className="w-full rounded-xl border-2 border-white/20 bg-white/10 py-3 text-sm font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40"
+          className="w-full rounded-2xl border-2 border-white/20 bg-white/10 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/15 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40"
         >
           {t('welcome.register')}
         </button>

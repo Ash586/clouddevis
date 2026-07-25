@@ -88,10 +88,14 @@ type TranslationKeys =
   | 'register.error.server' | 'register.error.rateLimit'
   | 'register.error.nameRequired' | 'register.error.emailRequired'
   | 'register.error.passwordRequired' | 'register.error.confirmRequired'
+  | 'register.error.termsRequired'
+  | 'register.strength.weak' | 'register.strength.medium' | 'register.strength.strong'
+  | 'register.terms'
   | 'login.title' | 'login.email' | 'login.password' | 'login.button' | 'login.loading'
   | 'login.forgotPassword' | 'login.rememberMe'
   | 'login.error.fillAll' | 'login.error.invalid' | 'login.error.rateLimit'
   | 'login.error.suspended' | 'login.error.server' | 'login.error.network'
+  | 'login.error.emailRequired' | 'login.error.passwordRequired'
   | 'onboarding.skip' | 'onboarding.next' | 'onboarding.finish'
   | 'onboarding.step1Title' | 'onboarding.step1Desc'
   | 'onboarding.step2Title' | 'onboarding.step2Desc'
@@ -348,6 +352,11 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': "L'email est requis",
     'register.error.passwordRequired': 'Le mot de passe est requis',
     'register.error.confirmRequired': 'Veuillez confirmer le mot de passe',
+    'register.error.termsRequired': "Vous devez accepter les conditions d'utilisation",
+    'register.strength.weak': 'Faible',
+    'register.strength.medium': 'Moyen',
+    'register.strength.strong': 'Fort',
+    'register.terms': "J'accepte les conditions d'utilisation",
 
     'login.title': 'Se connecter',
     'login.email': 'Email',
@@ -362,6 +371,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.suspended': 'Votre compte a été suspendu',
     'login.error.server': 'Erreur serveur. Réessayez plus tard.',
     'login.error.network': 'Erreur réseau. Vérifiez votre connexion.',
+    'login.error.emailRequired': "L'email est requis",
+    'login.error.passwordRequired': 'Le mot de passe est requis',
 
     'onboarding.skip': 'Passer',
     'onboarding.next': 'Suivant',
@@ -622,6 +633,11 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': 'البريد الإلكتروني مطلوب',
     'register.error.passwordRequired': 'كلمة المرور مطلوبة',
     'register.error.confirmRequired': 'يرجى تأكيد كلمة المرور',
+    'register.error.termsRequired': 'يجب قبول شروط الاستخدام',
+    'register.strength.weak': 'ضعيف',
+    'register.strength.medium': 'متوسط',
+    'register.strength.strong': 'قوي',
+    'register.terms': 'أوافق على شروط الاستخدام',
 
     'login.title': 'تسجيل الدخول',
     'login.email': 'البريد الإلكتروني',
@@ -636,6 +652,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.suspended': 'تم تعليق حسابك',
     'login.error.server': 'خطأ في الخادم. حاول لاحقاً.',
     'login.error.network': 'خطأ في الشبكة. تحقق من اتصالك.',
+    'login.error.emailRequired': 'البريد الإلكتروني مطلوب',
+    'login.error.passwordRequired': 'كلمة المرور مطلوبة',
 
     'onboarding.skip': 'تخطي',
     'onboarding.next': 'التالي',
@@ -896,6 +914,11 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.emailRequired': 'Email is required',
     'register.error.passwordRequired': 'Password is required',
     'register.error.confirmRequired': 'Please confirm your password',
+    'register.error.termsRequired': 'You must accept the terms of use',
+    'register.strength.weak': 'Weak',
+    'register.strength.medium': 'Medium',
+    'register.strength.strong': 'Strong',
+    'register.terms': 'I accept the terms of use',
 
     'login.title': 'Sign in',
     'login.email': 'Email',
@@ -910,6 +933,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'login.error.suspended': 'Your account has been suspended',
     'login.error.server': 'Server error. Try again later.',
     'login.error.network': 'Network error. Check your connection.',
+    'login.error.emailRequired': 'Email is required',
+    'login.error.passwordRequired': 'Password is required',
 
     'onboarding.skip': 'Skip',
     'onboarding.next': 'Next',

@@ -50,6 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} dir={dir} data-theme="light" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable}`}>
       <head>
+        <meta charSet="utf-8" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#2563EB" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
