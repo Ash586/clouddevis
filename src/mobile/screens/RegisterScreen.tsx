@@ -17,9 +17,10 @@ function getPasswordStrength(pw: string): { level: 'weak' | 'medium' | 'strong';
   const hasUpper = /[A-Z]/.test(pw);
   const hasNumber = /[0-9]/.test(pw);
   const hasSpecial = /[^A-Za-z0-9]/.test(pw);
-  const score = (hasUpper ? 1 : 0) + (hasNumber ? 1 : 0) + (hasSpecial ? 1 : 0);
-  if (pw.length >= 8 && score >= 2) return { level: 'strong', key: 'register.strength.strong' };
-  return { level: 'medium', key: 'register.strength.medium' };
+  const score = (pw.length >= 12 ? 1 : 0) + (hasUpper ? 1 : 0) + (hasNumber ? 1 : 0) + (hasSpecial ? 1 : 0);
+  if (score >= 3) return { level: 'strong', key: 'register.strength.strong' };
+  if (score === 2) return { level: 'medium', key: 'register.strength.medium' };
+  return { level: 'weak', key: 'register.strength.weak' };
 }
 
 const strengthColors = {
@@ -50,6 +51,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
     if (!name.trim()) errs.name = t('register.error.nameRequired');
     if (!email.trim()) errs.email = t('register.error.emailRequired');
     if (!password) errs.password = t('register.error.passwordRequired');
+    else if (password.length < 12) errs.password = t('register.error.passwordTooShort');
     if (!confirm) errs.confirm = t('register.error.confirmRequired');
     else if (password !== confirm) errs.confirm = t('register.error.passwordMismatch');
     if (!acceptedTerms) errs.terms = t('register.error.termsRequired');
@@ -69,6 +71,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
         if (err.status === 409) setError(t('register.error.emailTaken'));
         else if (err.status === 429) setError(t('register.error.rateLimit'));
         else if (err.status >= 500) setError(t('register.error.server'));
+        else if (err.status === 400) setError(err.message || t('register.error.network'));
         else setError(t('register.error.network'));
       } else {
         setError(t('register.error.network'));
@@ -197,7 +200,7 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); clearField('password'); }}
-                placeholder="8+ caractères"
+                placeholder="12+ caractères"
                 disabled={loading}
                 dir="ltr"
                 className={cn(inputCls, 'pr-10 disabled:opacity-50', fieldErrors.password && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}

@@ -88,7 +88,7 @@ type TranslationKeys =
   | 'register.error.server' | 'register.error.rateLimit'
   | 'register.error.nameRequired' | 'register.error.emailRequired'
   | 'register.error.passwordRequired' | 'register.error.confirmRequired'
-  | 'register.error.termsRequired'
+  | 'register.error.termsRequired' | 'register.error.passwordTooShort' | 'register.error.passwordWeak'
   | 'register.strength.weak' | 'register.strength.medium' | 'register.strength.strong'
   | 'register.terms'
   | 'login.title' | 'login.email' | 'login.password' | 'login.button' | 'login.loading'
@@ -367,6 +367,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.passwordRequired': 'Le mot de passe est requis',
     'register.error.confirmRequired': 'Veuillez confirmer le mot de passe',
     'register.error.termsRequired': "Vous devez accepter les conditions d'utilisation",
+    'register.error.passwordTooShort': 'Le mot de passe doit contenir au moins 12 caractères',
+    'register.error.passwordWeak': 'Ajoutez une majuscule, un chiffre ou un caractère spécial',
     'register.strength.weak': 'Faible',
     'register.strength.medium': 'Moyen',
     'register.strength.strong': 'Fort',
@@ -701,6 +703,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.passwordRequired': 'كلمة المرور مطلوبة',
     'register.error.confirmRequired': 'يرجى تأكيد كلمة المرور',
     'register.error.termsRequired': 'يجب قبول شروط الاستخدام',
+    'register.error.passwordTooShort': 'يجب أن تحتوي كلمة المرور على 12 حرفاً على الأقل',
+    'register.error.passwordWeak': 'أضف حرفاً كبيراً أو رقم أو رمزاً خاصاً',
     'register.strength.weak': 'ضعيف',
     'register.strength.medium': 'متوسط',
     'register.strength.strong': 'قوي',
@@ -1035,6 +1039,8 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.error.passwordRequired': 'Password is required',
     'register.error.confirmRequired': 'Please confirm your password',
     'register.error.termsRequired': 'You must accept the terms of use',
+    'register.error.passwordTooShort': 'Password must be at least 12 characters',
+    'register.error.passwordWeak': 'Add an uppercase letter, number, or special character',
     'register.strength.weak': 'Weak',
     'register.strength.medium': 'Medium',
     'register.strength.strong': 'Strong',

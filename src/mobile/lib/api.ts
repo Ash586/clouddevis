@@ -27,7 +27,12 @@ async function request<T>(path: string, opts?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new ApiError(res.status, text);
+    let message = text;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed.error === 'string') message = parsed.error;
+    } catch { /* keep raw text */ }
+    throw new ApiError(res.status, message);
   }
   return res.json() as Promise<T>;
 }
@@ -271,7 +276,7 @@ export async function registerApi(
 ): Promise<{ id: string; name: string; email: string }> {
   const res = await request<{ success: boolean; user: { id: string; name: string; email: string } }>(
     '/api/auth/register',
-    { method: 'POST', body: JSON.stringify({ name, email, password, mode, country: 'algeria', language: 'fr' }) }
+    { method: 'POST', body: JSON.stringify({ name, email, password, mode, sector: 'btp', country: 'algeria', language: 'fr' }) }
   );
   return res.user;
 }

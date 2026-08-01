@@ -78,10 +78,12 @@ export function useAuthGuard(): AuthGuard {
   ) => {
     const user = await registerApi(name, email, password, mode);
     setUserName(user.name);
+    // Verify the session cookie actually works BEFORE flipping to authenticated.
+    // If the cookie failed to persist, fetchCurrentUser throws → RegisterScreen
+    // shows the error instead of the user silently bouncing back to Welcome.
+    const profile = await fetchCurrentUser();
+    useUserStore.getState().setMode(profile.mode === 'ENTREPRISE' ? 'entreprise' : 'artisan');
     setAuthState('authenticated');
-    fetchCurrentUser()
-      .then((u) => useUserStore.getState().setMode(u.mode === 'ENTREPRISE' ? 'entreprise' : 'artisan'))
-      .catch(() => {});
   }, []);
 
   // ── Logout ────────────────────────────────────────────────
