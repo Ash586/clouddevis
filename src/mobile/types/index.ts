@@ -144,6 +144,41 @@ export interface Document {
   transporterName?: string;
   transporterIdCard?: string;
   deliveryAddress?: string;
+
+  // Editor section data (persisted locally with the document)
+  // ── Générales ──
+  docNumber?: string;
+  issueDate?: string;
+  city?: string;
+  tvaRate?: 9 | 19;
+  // ── Complémentaires ──
+  ccp?: string;
+  // ── Paiement ──
+  paymentDeposit?: number;
+  paymentConditions?: string;
+  // ── Garanties ──
+  garantieLabor?: string;
+  garantieMaterials?: string;
+  garantieDuration?: string;
+  garantieNotes?: string;
+  // ── Signature ──
+  signatoryName?: string;
+  signatoryTitle?: string;
+  sigClientName?: string;
+  sigClientRole?: string;
+  // ── Remise ──
+  remiseType?: string;
+  remiseValue?: number;
+  remiseReason?: string;
+  // ── Chantier ──
+  chantierAddress?: string;
+  chantierType?: string;
+  chantierSurface?: string;
+  // ── Matériaux ──
+  materiauxBrand?: string;
+  materiauxType?: string;
+  materiauxColor?: string;
+  materiauxQty?: number;
 }
 
 // ── User & Auth ──────────────────────────────────────────────

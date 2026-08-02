@@ -103,11 +103,14 @@ const TYPE_MAP: Record<DocumentType, string> = {
 };
 
 /** Convert a mobile Document to the shape the /api/documents POST endpoint expects. */
-function toApiDocumentBody(doc: Document) {
+export function toApiDocumentBody(doc: Document) {
   // Use the TVA rate from the first item (all items should have the same base rate)
   const tvaRate = doc.items[0]?.tvaRate ?? 19;
   return {
     documentType: TYPE_MAP[doc.type] ?? 'devis',
+    documentNumber: doc.number || '',
+    date: doc.date || undefined,
+    validUntil: doc.validUntil || doc.dueDate || undefined,
     items: doc.items.map((item) => ({
       id: item.id,
       designation: item.label,

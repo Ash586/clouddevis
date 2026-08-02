@@ -18,7 +18,7 @@ type TranslationKeys =
   | 'docs.filterPaid' | 'docs.filterPending' | 'docs.filterMonth'
   | 'docs.recent' | 'docs.noRecent' | 'docs.createFirst' | 'docs.seeAll'
   | 'docs.status.paid' | 'docs.status.pending' | 'docs.status.draft' | 'docs.status.cancelled'
-  | 'docs.swipeEdit' | 'docs.swipeDuplicate' | 'docs.swipeDelete'
+  | 'docs.swipeEdit' | 'docs.swipeDuplicate' | 'docs.swipeDelete' | 'docs.downloading'
   | 'common.unknownClient' | 'common.synced' | 'common.offline' | 'common.pendingChanges' | 'common.retry'
   | 'clients.title' | 'clients.searchPlaceholder' | 'clients.empty' | 'clients.emptyHint'
   | 'clients.noResults' | 'clients.noResultsHint' | 'clients.edit' | 'clients.add'
@@ -270,6 +270,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'docs.swipeEdit': 'Modifier',
     'docs.swipeDuplicate': 'Dupliquer',
     'docs.swipeDelete': 'Supprimer',
+    'docs.downloading': 'Téléchargement du PDF…',
     'common.unknownClient': 'Client inconnu',
     'common.synced': 'Synchronisé ✓',
     'common.offline': 'Hors ligne',
@@ -606,6 +607,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'docs.swipeEdit': 'تعديل',
     'docs.swipeDuplicate': 'نسخ',
     'docs.swipeDelete': 'حذف',
+    'docs.downloading': 'جارٍ تحميل PDF…',
     'common.unknownClient': 'عميل غير معروف',
     'common.synced': 'تمت المزامنة ✓',
     'common.offline': 'غير متصل',
@@ -942,6 +944,7 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'docs.swipeEdit': 'Edit',
     'docs.swipeDuplicate': 'Duplicate',
     'docs.swipeDelete': 'Delete',
+    'docs.downloading': 'Downloading PDF…',
     'common.unknownClient': 'Unknown client',
     'common.synced': 'Synced ✓',
     'common.offline': 'Offline',

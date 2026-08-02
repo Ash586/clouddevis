@@ -15,11 +15,13 @@ interface DocumentsListScreenProps {
   onNewDocument?: () => void;
   onEditDocument?: (doc: Document) => void;
   onDuplicateDocument?: (doc: Document) => void;
+  onDownloadDocument?: (doc: Document) => void;
 }
 
-export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicateDocument }: DocumentsListScreenProps) {
+export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicateDocument, onDownloadDocument }: DocumentsListScreenProps) {
   const { t } = useMobileI18n();
   const savedDocuments = useDocumentStore((s) => s.savedDocuments);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<DocumentType | ''>('');
   const [filterStatus, setFilterStatus] = useState<DocumentStatus | ''>('');
@@ -154,12 +156,27 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
         ) : (
           <div className="space-y-1.5">
             {filtered.map((doc) => (
-              <DocumentRow
-                key={doc.id}
-                document={doc}
-                onTap={() => onEditDocument?.(doc)}
-                onDuplicate={() => onDuplicateDocument?.(doc)}
-              />
+              <div key={doc.id} className="space-y-0">
+                <DocumentRow
+                  document={doc}
+                  onTap={() => onEditDocument?.(doc)}
+                  onDownload={() => {
+                    setDownloadingId(doc.id);
+                    try {
+                      void Promise.resolve(onDownloadDocument?.(doc)).finally(() => setDownloadingId(null));
+                    } catch {
+                      setDownloadingId(null);
+                    }
+                  }}
+                  onDuplicate={() => onDuplicateDocument?.(doc)}
+                />
+                {downloadingId === doc.id && (
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-[10px] text-[#718096]">
+                    <div className="h-3 w-3 rounded-full border-2 border-[#0052CC]/30 border-t-[#0052CC] animate-spin" />
+                    {t('docs.downloading')}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}

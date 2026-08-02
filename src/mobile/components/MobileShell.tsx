@@ -12,6 +12,8 @@ import { useAuthGuard } from '@/mobile/lib/useAuthGuard';
 import { useMobileI18n, getMobileT } from '@/mobile/lib/i18n';
 import { useUserStore } from '@/stores/userStore';
 import { getSettings } from '@/lib/offline';
+import { generatePDFBase64FromDoc, downloadDocument } from '@/mobile/lib/pdf';
+import { notify } from '@/mobile/lib/toast';
 import type { MobileLocale } from '@/stores/userStore';
 import { isNativePlatform, exitApp, addBackPressListener, addAppStateListener, checkIsOnline } from '@/lib/native';
 import { BottomTabs, type TabId } from './BottomTabs';
@@ -185,6 +187,16 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
   }, [logout]);
 
   const handleEditDocument = useCallback((doc: Document) => { setEditingDocId(doc.id); setShowWizard(true); }, []);
+  const handleDownloadDocument = useCallback(async (doc: Document) => {
+    const t = getMobileT(useUserStore.getState().locale);
+    try {
+      const base64 = await generatePDFBase64FromDoc(doc);
+      await downloadDocument(base64, doc.number || `${doc.type}-${doc.date}`);
+      await notify(t('editor.downloadPdf'));
+    } catch {
+      await notify(t('toast.saveError'));
+    }
+  }, []);
   const handleDuplicateDocument = useCallback((doc: Document) => {
     useDocumentStore.getState().loadDocumentIntoWizard(doc.id);
     setEditingDocId(null);
@@ -226,6 +238,7 @@ export function MobileShell({ initialTab = 'home', onTabChange }: MobileShellPro
             onNewDocument={handleNewDevis}
             onEditDocument={handleEditDocument}
             onDuplicateDocument={handleDuplicateDocument}
+            onDownloadDocument={handleDownloadDocument}
           />
         );
       case 'company':

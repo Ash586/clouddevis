@@ -6,6 +6,7 @@
 
 import type { SyncQueueItem } from '@/stores/syncStore';
 import { useDocumentStore } from '@/stores/documentStore';
+import { toApiDocumentBody } from '@/mobile/lib/api';
 
 const ENTITY_PATHS: Record<string, string> = {
   document: '/api/documents',
@@ -39,11 +40,17 @@ export async function processWebSyncItem(item: SyncQueueItem): Promise<boolean> 
   const url = !isCreate ? `${basePath}/${item.entityId}` : basePath;
   const method = isCreate ? 'POST' : isDelete ? 'DELETE' : 'PUT';
 
+  // Documents are stored in the mobile shape — convert to the API shape before sending.
+  const body =
+    isDelete || item.entity !== 'document' || !item.payload
+      ? item.payload
+      : toApiDocumentBody(item.payload as Parameters<typeof toApiDocumentBody>[0]);
+
   const res = await fetch(url, {
     method,
     credentials: 'include',
     headers: isDelete ? undefined : { 'Content-Type': 'application/json' },
-    body: isDelete ? undefined : JSON.stringify(item.payload),
+    body: isDelete ? undefined : JSON.stringify(body),
   });
 
   if (res.status === 409) {

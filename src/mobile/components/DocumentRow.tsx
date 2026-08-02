@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { FileText, MoreVertical, Copy, Trash2, Eye } from 'lucide-react';
+import { FileText, MoreVertical, Copy, Trash2, Eye, Download } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import type { Document, DocumentStatus } from '@/mobile/types';
@@ -8,6 +8,7 @@ import type { Document, DocumentStatus } from '@/mobile/types';
 interface DocumentRowProps {
   document: Document;
   onTap?: () => void;
+  onDownload?: () => void;
   onDuplicate?: () => void;
   onDelete?: () => void;
 }
@@ -19,7 +20,7 @@ const STATUS_STYLES: Record<DocumentStatus, { bg: string; text: string; label: s
   CANCELLED: { bg: 'bg-[#DC3545]/10', text: 'text-[#DC3545]', label: 'Annulé' },
 };
 
-export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: DocumentRowProps) {
+export function DocumentRow({ document: doc, onTap, onDownload, onDuplicate, onDelete }: DocumentRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const st = STATUS_STYLES[doc.status] || STATUS_STYLES.DRAFT;
@@ -56,7 +57,16 @@ export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: Doc
         </div>
       </button>
 
-      <div ref={menuRef} className="absolute right-2.5 top-2.5">
+      <div ref={menuRef} className="absolute right-2.5 top-2.5 flex items-center gap-1">
+        {onDownload && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDownload?.(); }}
+            aria-label="Télécharger PDF"
+            className="flex h-6 w-6 items-center justify-center rounded-lg text-[#0052CC] transition-colors duration-200 hover:bg-[#E6F0FF] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
+          >
+            <Download size={13} />
+          </button>
+        )}
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
           aria-label="Options"
@@ -73,6 +83,15 @@ export function DocumentRow({ document: doc, onTap, onDuplicate, onDelete }: Doc
             >
               <Eye size={13} /> Modifier
             </button>
+            {onDownload && (
+              <button
+                onClick={() => { onDownload?.(); setMenuOpen(false); }}
+                role="menuitem"
+                className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[#001A4D] transition-colors duration-150 hover:bg-[#E6F0FF]"
+              >
+                <Download size={13} /> Télécharger PDF
+              </button>
+            )}
             <button
               onClick={() => { onDuplicate?.(); setMenuOpen(false); }}
               role="menuitem"

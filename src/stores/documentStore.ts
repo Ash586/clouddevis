@@ -110,6 +110,10 @@ export interface DocumentStore {
   saveDocument: (company: Company) => Document | null;
   /** Pure build of the current draft (no local append, no sync enqueue) — for the edit/update path. */
   buildFromCurrent: (company: Company) => Document | null;
+  /** Append a pre-built document to savedDocuments and enqueue a CREATE sync. */
+  addDocument: (doc: Document) => void;
+  /** Replace an existing saved document and enqueue an UPDATE sync. */
+  updateDocument: (id: string, doc: Document) => void;
   deleteDocument: (id: string) => void;
   duplicateDocument: (id: string) => Document | null;
   loadDocumentIntoWizard: (id: string) => void;
@@ -353,6 +357,62 @@ export const useDocumentStore = create<DocumentStore>()(
         });
 
         return doc;
+      },
+
+      addDocument: (doc) => {
+        const sequenceNumber = get().docSequenceCounter + 1;
+        const fullDoc: Document = {
+          ...doc,
+          id: doc.id || generateId(),
+          number: doc.number || generateDocNumber(doc.type, sequenceNumber),
+          date: doc.date || new Date().toISOString().split('T')[0],
+          status: doc.status || 'DRAFT',
+          items: doc.items.map((item) => ({
+            ...item,
+            id: item.id || generateId(),
+            totalHT: item.totalHT ?? round2(item.quantity * (item.unitPrice * (1 - (item.remise ?? 0) / 100))),
+          })),
+        };
+
+        set((prevState) => ({
+          savedDocuments: [...prevState.savedDocuments, fullDoc],
+          syncStatus: 'pending',
+          docSequenceCounter: sequenceNumber,
+        }));
+
+        useSyncStore.getState().enqueue({
+          action: 'CREATE',
+          entity: 'document',
+          entityId: fullDoc.id,
+          payload: fullDoc,
+        });
+      },
+
+      updateDocument: (id, doc) => {
+        set((state) => ({
+          savedDocuments: state.savedDocuments.map((existing) =>
+            existing.id === id
+              ? {
+                  ...doc,
+                  id: existing.id,
+                  number: existing.number,
+                  items: doc.items.map((item) => ({
+                    ...item,
+                    id: item.id || generateId(),
+                    totalHT: item.totalHT ?? round2(item.quantity * (item.unitPrice * (1 - (item.remise ?? 0) / 100))),
+                  })),
+                }
+              : existing
+          ),
+          syncStatus: 'pending',
+        }));
+
+        useSyncStore.getState().enqueue({
+          action: 'UPDATE',
+          entity: 'document',
+          entityId: id,
+          payload: { ...doc, id },
+        });
       },
 
       deleteDocument: (id) => {

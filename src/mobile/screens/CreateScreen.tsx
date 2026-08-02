@@ -6,12 +6,21 @@ import {
   ArrowLeft, Check, Plus, Trash2, ChevronDown, ChevronUp,
   Eye, FileText, Search, X, PenLine,
   FileCheck, Building, Palette, CreditCard, Shield, Truck,
-  MapPin, Package, Stamp, ClipboardList,
+  MapPin, Package, Stamp, ClipboardList, Download,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import { fetchAllClients, type ApiClientRecord } from '@/mobile/lib/api';
-import type { LineItem, DocumentType, Client, Company } from '@/mobile/types';
+import { notify } from '@/mobile/lib/toast';
+import { generatePDFBase64FromDoc, downloadDocument } from '@/mobile/lib/pdf';
+import { checkIsOnline } from '@/lib/native';
+import { generateId, round2 } from '@/lib/calculations';
+import { calculateDocumentTotals } from '@/lib/dgi';
+import { processWebSyncItem } from '@/lib/webSync';
+import { useDocumentStore } from '@/stores/documentStore';
+import { useCompanyStore } from '@/stores/companyStore';
+import { useSyncStore } from '@/stores/syncStore';
+import type { LineItem, Document, DocumentType, Client, Company, PaymentMode, UnitMeasure } from '@/mobile/types';
 
 // ── localStorage product catalog ───────────────────────────────
 
@@ -263,6 +272,101 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
   // ── Fetch clients on mount ──
   useEffect(() => { fetchAllClients().then(setClients).catch(() => {}); }, []);
 
+  // ── Load document being edited ──
+  useEffect(() => {
+    if (!editingDocId) return;
+    const doc = useDocumentStore.getState().savedDocuments.find((d) => d.id === editingDocId);
+    if (!doc) return;
+
+    setDocType(doc.type);
+    if (doc.client?.name) {
+      setSelectedClient({
+        id: doc.client.id,
+        name: doc.client.name,
+        phone: doc.client.phone ?? null,
+        email: doc.client.email ?? null,
+        address: doc.client.address ?? null,
+        nif: doc.client.nif ?? null,
+        rc: doc.client.rc ?? null,
+        nis: doc.client.nis ?? null,
+        ai: doc.client.ai ?? null,
+      });
+      setClientSearch(doc.client.name);
+      setClientNif(doc.client.nif || '');
+    }
+    if (doc.items?.length) {
+      setItems(doc.items.map((it) => ({ ...it })));
+    }
+    setNotes(doc.notes || '');
+
+    // ── Section state ──
+    setGeneral({
+      docNumber: doc.number || doc.docNumber || '',
+      issueDate: doc.date || new Date().toISOString().split('T')[0],
+      validUntil: doc.validUntil || doc.dueDate || '',
+      tvaRate: doc.tvaRate ? String(doc.tvaRate) : '19',
+      city: doc.city || '',
+    });
+    setComplement((prev) => ({
+      ...prev,
+      rc: doc.rcNumber || doc.company?.rc || '',
+      nis: doc.nisNumber || doc.company?.nis || '',
+      ai: doc.aiNumber || doc.company?.ai || '',
+      rib: doc.rib || '',
+      bankName: doc.bankName || '',
+      bankAgency: doc.bankAgency || '',
+      ccp: doc.ccp || '',
+      validityDays: doc.validityDays ? String(doc.validityDays) : '',
+    }));
+    setPaiement((prev) => ({
+      ...prev,
+      paymentMethod: doc.paymentMode || '',
+      paymentDeposit: doc.acompte ? String(doc.acompte) : '',
+      paymentConditions: doc.paymentConditions || '',
+      paymentIban: '',
+    }));
+    setGaranties((prev) => ({
+      ...prev,
+      garantieLabor: doc.garantieLabor || '',
+      garantieMaterials: doc.garantieMaterials || '',
+      garantieDuration: doc.garantieDuration || '',
+      garantieNotes: doc.garantieNotes || '',
+    }));
+    setSignature((prev) => ({
+      ...prev,
+      signatoryName: doc.signatoryName || '',
+      signatoryTitle: doc.signatoryTitle || '',
+      sigClientName: doc.sigClientName || '',
+      sigClientRole: doc.sigClientRole || '',
+    }));
+    setRemise((prev) => ({
+      ...prev,
+      remiseType: doc.remiseType || 'percent',
+      remiseValue: doc.remiseValue ? String(doc.remiseValue) : '',
+      remiseReason: doc.remiseReason || '',
+    }));
+    setLivraison((prev) => ({
+      ...prev,
+      delivererName: doc.delivererName || '',
+      delivererIdCard: doc.delivererIdCard || '',
+      transporterName: doc.transporterName || '',
+      deliveryAddress: doc.deliveryAddress || '',
+    }));
+    setChantier((prev) => ({
+      ...prev,
+      chantierAddress: doc.chantierAddress || '',
+      chantierType: doc.chantierType || '',
+      chantierSurface: doc.chantierSurface ? String(doc.chantierSurface) : '',
+    }));
+    setMateriaux((prev) => ({
+      ...prev,
+      materiauxBrand: doc.materiauxBrand || '',
+      materiauxType: doc.materiauxType || '',
+      materiauxColor: doc.materiauxColor || '',
+      materiauxQty: doc.materiauxQty ? String(doc.materiauxQty) : '',
+    }));
+  }, [editingDocId]);
+
   // ── Client autocomplete ──
   const filteredClients = useMemo(() => {
     if (!clientSearch.trim() || selectedClient) return [];
@@ -311,8 +415,172 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
     return Math.round((filled / total) * 100);
   }, [selectedClient, items, notes]);
 
+  // ── Build a Document from the current form state (shared by save + PDF) ──
+  const buildDraft = useCallback((): Document | null => {
+    const companyState = useCompanyStore.getState();
+    if (!companyState.isSetup || !companyState.company) return null;
+
+    const lineItems = items
+      .filter((it) => (it.label || '').trim())
+      .map((it) => ({
+        id: generateId(),
+        label: it.label!.trim(),
+        quantity: Number(it.quantity) || 1,
+        unit: (it.unit as UnitMeasure) || 'u',
+        unitPrice: Number(it.unitPrice) || 0,
+        tvaRate: (Number(it.tvaRate) || 19) as 0 | 9 | 19,
+        totalHT: round2(Number(it.quantity || 1) * (Number(it.unitPrice) || 0)),
+      }));
+
+    if (lineItems.length === 0) return null;
+
+    const client: Client = selectedClient
+      ? {
+          id: selectedClient.id,
+          name: selectedClient.name,
+          nif: selectedClient.nif || undefined,
+          rc: selectedClient.rc || undefined,
+          nis: selectedClient.nis || undefined,
+          ai: selectedClient.ai || undefined,
+          phone: selectedClient.phone || '',
+          email: selectedClient.email || undefined,
+          address: selectedClient.address || undefined,
+        }
+      : {
+          id: generateId(),
+          name: clientSearch.trim(),
+          nif: clientNif || undefined,
+          phone: '',
+        };
+
+    const totals = calculateDocumentTotals(
+      lineItems.map((it) => ({ quantity: it.quantity, unitPrice: it.unitPrice, tvaRate: it.tvaRate })),
+      docType,
+      Number(paiement.paymentDeposit) || 0,
+      paiement.paymentMethod as PaymentMode
+    );
+
+    return {
+      id: editingDocId || generateId(),
+      type: docType,
+      number: general.docNumber || '',
+      date: general.issueDate || new Date().toISOString().split('T')[0],
+      dueDate: general.validUntil || undefined,
+      company: companyState.company,
+      client,
+      items: lineItems,
+      totalHT: totals.subTotalHT,
+      totalTVA: totals.totalTVA,
+      timbreFiscal: totals.timbreFiscal,
+      timbreAmount: totals.timbreAmount,
+      totalTTC: totals.totalTTC,
+      status: 'DRAFT',
+      language: 'FR',
+      paymentMode: (paiement.paymentMethod as PaymentMode) || 'especes',
+      notes: notes || undefined,
+      validUntil: general.validUntil || undefined,
+      acompte: Number(paiement.paymentDeposit) || undefined,
+      // ── Section fields ──
+      docNumber: general.docNumber || undefined,
+      issueDate: general.issueDate || undefined,
+      city: general.city || undefined,
+      tvaRate: (Number(general.tvaRate) === 9 ? 9 : 19),
+      ccp: complement.ccp || undefined,
+      validityDays: Number(complement.validityDays) || undefined,
+      rib: complement.rib || undefined,
+      bankName: complement.bankName || undefined,
+      bankAgency: complement.bankAgency || undefined,
+      rcNumber: complement.rc || undefined,
+      nisNumber: complement.nis || undefined,
+      aiNumber: complement.ai || undefined,
+      paymentDeposit: Number(paiement.paymentDeposit) || undefined,
+      paymentConditions: paiement.paymentConditions || undefined,
+      garantieLabor: garanties.garantieLabor || undefined,
+      garantieMaterials: garanties.garantieMaterials || undefined,
+      garantieDuration: garanties.garantieDuration || undefined,
+      garantieNotes: garanties.garantieNotes || undefined,
+      signatoryName: signature.signatoryName || undefined,
+      signatoryTitle: signature.signatoryTitle || undefined,
+      sigClientName: signature.sigClientName || undefined,
+      sigClientRole: signature.sigClientRole || undefined,
+      remiseType: remise.remiseType || undefined,
+      remiseValue: Number(remise.remiseValue) || undefined,
+      remiseReason: remise.remiseReason || undefined,
+      chantierAddress: chantier.chantierAddress || undefined,
+      chantierType: chantier.chantierType || undefined,
+      chantierSurface: chantier.chantierSurface || undefined,
+      materiauxBrand: materiaux.materiauxBrand || undefined,
+      materiauxType: materiaux.materiauxType || undefined,
+      materiauxColor: materiaux.materiauxColor || undefined,
+      materiauxQty: Number(materiaux.materiauxQty) || undefined,
+      delivererName: livraison.delivererName || undefined,
+      delivererIdCard: livraison.delivererIdCard || undefined,
+      transporterName: livraison.transporterName || undefined,
+      deliveryAddress: livraison.deliveryAddress || undefined,
+    };
+  }, [items, selectedClient, clientSearch, clientNif, docType, general, paiement, complement, garanties, signature, remise, chantier, materiaux, livraison, editingDocId]);
+
+  // ── PDF download ──
+  const handleDownloadPdf = useCallback(async () => {
+    if (!selectedClient?.name && !clientSearch.trim()) {
+      await notify(t('toast.chooseClient'));
+      return;
+    }
+    const draft = buildDraft();
+    if (!draft || draft.items.length === 0) {
+      await notify(t('toast.noLines'));
+      return;
+    }
+    setSaving(true);
+    try {
+      const base64 = await generatePDFBase64FromDoc(draft);
+      await downloadDocument(base64, draft.number || `${draft.type}-${draft.date}`);
+      await notify(t('editor.downloadPdf'));
+    } catch {
+      await notify(t('toast.saveError'));
+    } finally {
+      setSaving(false);
+    }
+  }, [buildDraft, selectedClient, clientSearch, t]);
+
   // ── Save ──
-  const handleSave = useCallback(() => { setSaving(true); setTimeout(() => { setSaving(false); onExit(); }, 800); }, [onExit]);
+  const handleSave = useCallback(async () => {
+    const companyState = useCompanyStore.getState();
+    if (!companyState.isSetup || !companyState.company) {
+      await notify(t('toast.configureFirst'));
+      onConfigureCompany?.();
+      return;
+    }
+
+    const draft = buildDraft();
+    if (!draft) {
+      await notify(t('toast.noLines'));
+      return;
+    }
+
+    if (!selectedClient?.name && !clientSearch.trim()) {
+      await notify(t('toast.chooseClient'));
+      return;
+    }
+
+    const { addDocument, updateDocument } = useDocumentStore.getState();
+    setSaving(true);
+    try {
+      if (editingDocId) {
+        updateDocument(editingDocId, draft);
+      } else {
+        addDocument(draft);
+      }
+      if (checkIsOnline()) {
+        void useSyncStore.getState().processQueue(processWebSyncItem);
+      }
+      await notify(t('toast.saved'));
+      onExit();
+    } catch {
+      await notify(t('toast.saveError'));
+      setSaving(false);
+    }
+  }, [onExit, onConfigureCompany, editingDocId, buildDraft, selectedClient, clientSearch, t]);
 
   // ── Styles ──
   const tc = TYPE_COLORS[docType] || TYPE_COLORS.FACTURE;
@@ -590,6 +858,10 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
       <div className="border-t border-[rgba(0,26,77,0.06)] bg-white px-3 py-2.5 pb-[max(0.75rem,var(--sab,env(safe-area-inset-bottom)))]">
         <div className="flex gap-2">
           <button onClick={() => setView((v) => v === 'form' ? 'preview' : 'form')} className="flex items-center justify-center gap-1.5 rounded-2xl border border-[rgba(0,26,77,0.12)] px-4 py-2.5 text-[11px] font-bold text-[#4A5568] transition-all duration-200 hover:bg-[#F0F4FF] active:scale-[0.97]"><Eye size={14} /> Aperçu</button>
+          <button onClick={handleDownloadPdf} disabled={saving} aria-label={t('editor.downloadPdf')} className="flex items-center justify-center gap-1.5 rounded-2xl border border-[#0052CC]/20 bg-[#E6F0FF] px-3 py-2.5 text-[11px] font-bold text-[#0052CC] transition-all duration-200 hover:bg-[#D6E6FF] active:scale-[0.97] disabled:opacity-50">
+            <Download size={14} strokeWidth={2.5} />
+            <span className="hidden sm:inline">{t('editor.downloadPdf')}</span>
+          </button>
           <button onClick={handleSave} disabled={saving} className="flex-1 flex items-center justify-center gap-1.5 rounded-2xl bg-[#0052CC] py-2.5 text-[11px] font-bold text-white shadow-md shadow-[#0052CC]/20 transition-all duration-200 hover:bg-[#0047B3] active:scale-[0.97] disabled:opacity-50">
             {saving ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Check size={14} strokeWidth={2.5} />}
             {saving ? 'Enregistrement…' : 'Enregistrer'}
