@@ -324,3 +324,11 @@ export async function updateCompanyProfile(company: Company): Promise<void> {
     }),
   });
 }
+
+/** Fetch the user's company info (companyInfo) from the profile endpoint. */
+export async function fetchCompanyInfo(): Promise<Partial<Company> | null> {
+  const res = await request<{ user: { companyInfo?: Record<string, unknown> | null } }>('/api/user/profile');
+  const info = res.user?.companyInfo;
+  if (!info || typeof info !== 'object') return null;
+  return info as Partial<Company>;
+}

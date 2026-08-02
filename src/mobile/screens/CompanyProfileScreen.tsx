@@ -5,7 +5,10 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
-import { fetchCurrentUser, updateCompanyProfile } from '@/mobile/lib/api';
+import { notify } from '@/mobile/lib/toast';
+import { updateCompanyProfile, fetchCompanyInfo } from '@/mobile/lib/api';
+import { useCompanyStore } from '@/stores/companyStore';
+import { generateId } from '@/lib/calculations';
 import type { Company } from '@/mobile/types';
 
 interface CompanyProfileScreenProps {
@@ -21,16 +24,51 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetchCurrentUser()
-      .then(() => { setLoading(false); })
-      .catch(() => setLoading(false));
+    let cancelled = false;
+    (async () => {
+      try {
+        // Prefill from the local store first (already persisted)
+        const stored = useCompanyStore.getState().company;
+        if (stored) {
+          if (!cancelled) setCompany(stored);
+          return;
+        }
+        // Otherwise try to hydrate from the server profile
+        const info = await fetchCompanyInfo();
+        if (info && info.name && !cancelled) {
+          setCompany(info);
+          useCompanyStore.getState().setCompany({
+            ...(info as Company),
+            id: info.id || generateId(),
+            name: info.name,
+            tvaRate: info.tvaRate ?? 19,
+          });
+        }
+      } catch {
+        // ignore — user can still fill the form
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const handleSave = async () => {
     if (!company.name) return;
+    const full: Company = {
+      ...(company as Company),
+      id: company.id || generateId(),
+      name: company.name,
+      tvaRate: company.tvaRate ?? 19,
+    };
+    const result = useCompanyStore.getState().setCompany(full);
+    if (result && !result.valid) {
+      await notify(Object.values(result.errors)[0] || t('toast.saveError'));
+      return;
+    }
     setSaving(true);
     try {
-      await updateCompanyProfile(company as Company);
+      await updateCompanyProfile(full);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {}

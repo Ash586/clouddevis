@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { loginApi, registerApi, logoutApi, fetchCurrentUser, ApiError } from './api';
 import { useClientStore } from '@/stores/clientStore';
+import { useCompanyStore } from '@/stores/companyStore';
 import { useDocumentStore } from '@/stores/documentStore';
 import { useSyncStore } from '@/stores/syncStore';
 import { useUserStore } from '@/stores/userStore';
@@ -95,6 +96,7 @@ export function useAuthGuard(): AuthGuard {
     }
     // Wipe all local stores
     useClientStore.getState().clearAll();
+    useCompanyStore.getState().clearCompany();
     useDocumentStore.getState().resetDocument();
     // Also wipe saved documents to prevent data leakage between accounts
     useDocumentStore.setState({ savedDocuments: [], syncStatus: 'synced' });
