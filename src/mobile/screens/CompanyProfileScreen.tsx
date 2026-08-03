@@ -1,8 +1,8 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, CheckCircle, ImagePlus, Building, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import { notify } from '@/mobile/lib/toast';
@@ -22,6 +22,7 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,6 +76,23 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
     setSaving(false);
   };
 
+  const handleLogoPick = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      await notify(t('company.logoError'));
+      return;
+    }
+    // localStorage (≈5MB) and the encrypted companyInfo column both store the
+    // base64 as-is — cap oversized uploads so persistence keeps working.
+    if (file.size > 2.5 * 1024 * 1024) {
+      await notify(t('toast.saveError'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setCompany((c) => ({ ...c, logo: typeof reader.result === 'string' ? reader.result : undefined }));
+    reader.readAsDataURL(file);
+  };
+
   const inputCls = 'w-full rounded-lg border border-[rgba(0,26,77,0.08)] bg-[#F0F4FF] px-3.5 py-2.5 text-sm text-[#001A4D] placeholder-[#718096] transition-all duration-200 focus:border-[#0052CC] focus:outline-none focus:ring-2 focus:ring-[#0052CC]/15';
   const labelCls = 'block text-xs font-bold text-[#4A5568] mb-1';
 
@@ -116,6 +134,44 @@ export function CompanyProfileScreen({ onGoToClients, onBack }: CompanyProfileSc
           company.nif ? 'border-[#001A4D]/20 bg-[#001A4D]/8 text-[#001A4D]' : 'border-[#DC3545]/20 bg-[#DC3545]/8 text-[#DC3545]',
         )}>
           {company.nif ? t('company.conforme') : t('company.nonConforme')}
+        </div>
+
+        {/* ── Logo ── */}
+        <div className="rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3.5 space-y-2.5">
+          <div className="flex items-center gap-3">
+            {company.logo ? (
+              <div className="relative">
+                <img src={company.logo} alt="Logo" className="h-16 w-16 rounded-xl border border-[rgba(0,26,77,0.06)] object-contain bg-[#F5F7FA] p-1" />
+                <button
+                  onClick={() => setCompany((c) => ({ ...c, logo: undefined }))}
+                  aria-label="Supprimer le logo"
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#DC3545] text-white shadow-sm transition-all duration-150 hover:bg-[#B23030]"
+                >
+                  <X size={11} strokeWidth={2.5} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-[rgba(0,26,77,0.12)] bg-[#F5F7FA] text-[#718096]">
+                <Building size={24} />
+              </div>
+            )}
+            <div className="flex-1">
+              <button
+                onClick={() => logoInputRef.current?.click()}
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#0052CC] px-3.5 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:bg-[#0047B3] active:scale-[0.97]"
+              >
+                <ImagePlus size={14} />
+                {company.logo ? t('company.logoChange') : t('company.logoAdd')}
+              </button>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { void handleLogoPick(e.target.files?.[0]); e.target.value = ''; }}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3.5 space-y-3">

@@ -29,6 +29,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
@@ -53,10 +55,23 @@ public class MainActivity extends AppCompatActivity {
     private static final String APP_URL = "https://clouddevis.vercel.app/app";
     private static final String APP_URL_DEV = "http://10.0.2.2:3000/app";
 
+    private ValueCallback<Uri[]> filePathCallback;
+    private ActivityResultLauncher<String> filePicker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainHandler = new Handler(Looper.getMainLooper());
+
+        filePicker = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (filePathCallback != null) {
+                        filePathCallback.onReceiveValue(uri != null ? new Uri[]{uri} : null);
+                        filePathCallback = null;
+                    }
+                }
+        );
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setupStatusBar();
@@ -180,6 +195,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (filePathCallback != null) {
+                    filePathCallback.onReceiveValue(null);
+                }
+                filePathCallback = callback;
+                try {
+                    filePicker.launch(params != null && params.getAcceptTypes() != null
+                            && params.getAcceptTypes().length > 0
+                            ? params.getAcceptTypes()[0] : "image/*");
+                } catch (Exception e) {
+                    filePathCallback = null;
+                    return false;
+                }
+                return true;
+            }
+
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
