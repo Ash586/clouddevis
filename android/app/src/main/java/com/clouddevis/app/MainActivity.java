@@ -302,12 +302,13 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void downloadFile(String base64Data, String fileName) {
-            mainHandler.post(() -> {
+            new Thread(() -> {
                 try {
                     byte[] decoded = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
-                    File cacheDir = new File(getCacheDir(), "downloads");
-                    cacheDir.mkdirs();
-                    File file = new File(cacheDir, fileName);
+                    File downloadsDir = getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS);
+                    if (downloadsDir != null && !downloadsDir.exists()) downloadsDir.mkdirs();
+                    if (downloadsDir == null) downloadsDir = getCacheDir();
+                    File file = new File(downloadsDir, fileName);
                     FileOutputStream fos = new FileOutputStream(file);
                     fos.write(decoded);
                     fos.flush();
@@ -324,15 +325,22 @@ public class MainActivity extends AppCompatActivity {
                                 android.os.Environment.DIRECTORY_DOWNLOADS, fileName);
                         dm.enqueue(request);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    mainHandler.post(() -> {
+                        try {
+                            webView.evaluateJavascript(
+                                "if(typeof window.__cdDownloadError==='function'){window.__cdDownloadError();}",
+                                null);
+                        } catch (Exception ignored) {}
+                    });
                 }
-            });
+            }).start();
         }
 
         @JavascriptInterface
         public void downloadFileDirect(String base64Data, String fileName, String mimeType) {
-            mainHandler.post(() -> {
+            new Thread(() -> {
                 try {
                     byte[] decoded = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
                     File cacheDir = new File(getCacheDir(), "shared");
@@ -355,12 +363,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            });
+            }).start();
         }
 
         @JavascriptInterface
         public void shareFile(String base64Data, String fileName, String title) {
-            mainHandler.post(() -> {
+            new Thread(() -> {
                 try {
                     byte[] decoded = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT);
                     File cacheDir = new File(getCacheDir(), "shared");
@@ -387,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            });
+            }).start();
         }
 
         @JavascriptInterface
