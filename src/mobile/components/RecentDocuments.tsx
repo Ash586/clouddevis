@@ -60,7 +60,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
             onClick={() => onDocumentTap?.(doc)}
             className="flex w-full items-center gap-2.5 rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3 text-left transition-all duration-200 hover:border-[#0052CC]/20 hover:shadow-sm active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0052CC]/5 text-[#0052CC]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0052CC]/5 text-[#0052CC]">
               <FileText size={16} />
             </div>
             <div className="flex-1 min-w-0">

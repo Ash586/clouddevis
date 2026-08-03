@@ -138,7 +138,7 @@ export function DocumentsListScreen({ onNewDocument, onEditDocument, onDuplicate
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto px-4 py-2.5">
+      <div className="flex-1 overflow-y-auto px-4 pt-2.5 pb-24">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center py-12">
             <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0052CC]/5">

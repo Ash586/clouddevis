@@ -3,6 +3,7 @@
 import { FileText, MoreVertical, Copy, Trash2, Eye, Download } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { formatAmount, formatDate } from '@/mobile/lib/format';
 import type { Document, DocumentStatus } from '@/mobile/types';
 
 interface DocumentRowProps {
@@ -38,22 +39,34 @@ export function DocumentRow({ document: doc, onTap, onDownload, onDuplicate, onD
     <div className="relative">
       <button
         onClick={onTap}
-        aria-label={`${doc.number} - ${doc.client?.name || 'Client'} - ${doc.totalTTC.toLocaleString('fr-DZ')} DA`}
-        className="flex w-full items-center gap-2.5 rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3 text-left transition-all duration-200 hover:border-[#0052CC]/20 hover:shadow-sm active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
+        aria-label={`${doc.number} - ${doc.client?.name || 'Client'} - ${formatAmount(doc.totalTTC)}`}
+        className="flex w-full items-center justify-between gap-2.5 rounded-xl border border-[rgba(0,26,77,0.06)] bg-white p-3 text-left transition-all duration-200 hover:border-[#0052CC]/20 hover:shadow-sm active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0052CC]/30"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0052CC]/5 text-[#0052CC]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0052CC]/5 text-[#0052CC]">
           <FileText size={16} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-bold text-[#0052CC] truncate">{doc.number}</span>
+            <span className="text-sm font-bold text-[#001A4D] truncate">{doc.number}</span>
             <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold', st.bg, st.text)}>
               {st.label}
             </span>
           </div>
-          <div className="mt-0.5 text-[11px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {doc.client?.name || '—'} · {doc.totalTTC.toLocaleString('fr-DZ')}\u00a0DA
+          <div className="mt-0.5 flex items-center gap-1.5 min-w-0">
+            <span className="truncate text-[11px] text-[#4A5568]">{doc.client?.name || '—'}</span>
+            <span className="shrink-0 text-[#A0AEC0]">·</span>
+            <span className="shrink-0 text-[10px] text-[#A0AEC0]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {formatDate(doc.date)}
+            </span>
           </div>
+        </div>
+        <div className="shrink-0 pl-2 pr-1 text-right">
+          <span
+            className="whitespace-nowrap text-[13px] font-bold text-[#001A4D]"
+            style={{ fontVariantNumeric: 'tabular-nums' }}
+          >
+            {formatAmount(doc.totalTTC)}
+          </span>
         </div>
       </button>
 
