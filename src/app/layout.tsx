@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Montserrat, Playfair_Display, Cormorant_Garamond } from 'next/font/google';
+import { Inter, Montserrat, Playfair_Display, Cormorant_Garamond, Cairo } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import './rtl.css';
@@ -18,6 +18,7 @@ const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-int
 const montserrat = Montserrat({ subsets: ['latin'], display: 'swap', variable: '--font-montserrat', weight: ['400', '500', '600', '700', '800'] });
 const playfairDisplay = Playfair_Display({ subsets: ['latin'], display: 'swap', variable: '--font-playfair', style: ['normal', 'italic'], weight: ['400', '600', '700'] });
 const cormorantGaramond = Cormorant_Garamond({ subsets: ['latin'], display: 'swap', variable: '--font-cormorant', style: ['normal', 'italic'], weight: ['400', '600', '700'] });
+const cairo = Cairo({ subsets: ['arabic', 'latin'], display: 'swap', variable: '--font-cairo', weight: ['400', '600', '700', '900'] });
 
 export const metadata: Metadata = {
   title: {
@@ -48,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = cookieStore.get('NEXT_LOCALE')?.value ?? 'fr';
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   return (
-    <html lang={locale} dir={dir} data-theme="light" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable}`}>
+    <html lang={locale} dir={dir} data-theme="light" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${playfairDisplay.variable} ${cormorantGaramond.variable} ${cairo.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <link rel="manifest" href="/manifest.json" />

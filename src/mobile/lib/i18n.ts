@@ -76,6 +76,8 @@ type TranslationKeys =
   | 'editor.delivery' | 'editor.deliverer' | 'editor.idCard' | 'editor.transporter'
   | 'editor.deliveryAddress' | 'editor.notes'
   | 'welcome.title' | 'welcome.subtitle' | 'welcome.login' | 'welcome.register'
+  | 'login.heroTitle' | 'login.heroSubtitle' | 'login.heroSwitch'
+  | 'register.heroTitle' | 'register.heroSubtitle' | 'register.heroSwitch'
   | 'register.title' | 'register.name' | 'register.namePh'
   | 'register.email' | 'register.emailPh'
   | 'register.password' | 'register.passwordPh'
@@ -339,11 +341,14 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.done': 'Terminé',
 
     'welcome.title': 'رقمنة',
-    'welcome.subtitle': 'Créez vos factures, devis et plus',
+    'welcome.subtitle': 'Devis & Factures conformes DGI',
     'welcome.login': 'Se connecter',
     'welcome.register': 'Créer un compte',
 
     'register.title': 'Créer un compte',
+    'register.heroTitle': 'Rejoignez Rakmana',
+    'register.heroSubtitle': 'Créez vos devis et factures avec facilité',
+    'register.heroSwitch': "J'ai un compte",
     'register.name': 'Nom complet',
     'register.namePh': 'Votre nom',
     'register.email': 'Email',
@@ -376,6 +381,9 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.terms': "J'accepte les conditions d'utilisation",
 
     'login.title': 'Se connecter',
+    'login.heroTitle': 'Bon retour parmi nous',
+    'login.heroSubtitle': 'Connectez-vous pour reprendre là où vous vous êtes arrêté',
+    'login.heroSwitch': 'Compte nouveau ?',
     'login.email': 'Email',
     'login.password': 'Mot de passe',
     'login.button': 'Se connecter',
@@ -676,11 +684,14 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.done': 'تم',
 
     'welcome.title': 'رقمنة',
-    'welcome.subtitle': 'أنشئ فواتيرك وعروض أسعارك',
+    'welcome.subtitle': 'عروض أسعار وفواتير متوافقة مع DGI',
     'welcome.login': 'تسجيل الدخول',
     'welcome.register': 'إنشاء حساب',
 
     'register.title': 'إنشاء حساب',
+    'register.heroTitle': 'انضم إلى Rakmana',
+    'register.heroSubtitle': 'أنشئ فواتيرك وتقديراتك بسهولة واحترافية',
+    'register.heroSwitch': 'لديّ حساب',
     'register.name': 'الاسم الكامل',
     'register.namePh': 'اسمك',
     'register.email': 'البريد الإلكتروني',
@@ -713,6 +724,9 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.terms': 'أوافق على شروط الاستخدام',
 
     'login.title': 'تسجيل الدخول',
+    'login.heroTitle': 'مرحباً بعودتك',
+    'login.heroSubtitle': 'سجّل الدخول وتابع من حيث توقفت',
+    'login.heroSwitch': 'حساب جديد ؟',
     'login.email': 'البريد الإلكتروني',
     'login.password': 'كلمة المرور',
     'login.button': 'تسجيل الدخول',
@@ -1013,11 +1027,14 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'editor.done': 'Done',
 
     'welcome.title': 'Rakmana',
-    'welcome.subtitle': 'Create your invoices, quotes & more',
+    'welcome.subtitle': 'DGI-compliant Quotes & Invoices',
     'welcome.login': 'Sign in',
     'welcome.register': 'Create account',
 
     'register.title': 'Create account',
+    'register.heroTitle': 'Join Rakmana',
+    'register.heroSubtitle': 'Create quotes and invoices with ease',
+    'register.heroSwitch': 'I have an account',
     'register.name': 'Full name',
     'register.namePh': 'Your name',
     'register.email': 'Email',
@@ -1050,6 +1067,9 @@ const TRANSLATIONS: Record<MobileLocale, Translations> = {
     'register.terms': 'I accept the terms of use',
 
     'login.title': 'Sign in',
+    'login.heroTitle': 'Welcome back',
+    'login.heroSubtitle': 'Sign in to continue where you left off',
+    'login.heroSwitch': 'New account?',
     'login.email': 'Email',
     'login.password': 'Password',
     'login.button': 'Sign in',

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, Lock, User, Rocket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ApiError } from '@/mobile/lib/api';
 import { useMobileI18n } from '@/mobile/lib/i18n';
@@ -83,60 +83,100 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
 
   const clearField = (field: keyof typeof fieldErrors) => setFieldErrors((p) => ({ ...p, [field]: undefined }));
 
-  const inputCls = 'w-full rounded-xl border border-[rgba(0,26,77,0.08)] bg-[#F0F4FF] px-4 py-3 text-sm text-[#001A4D] placeholder-[#718096] transition-all duration-200 focus:border-[#0052CC] focus:outline-none focus:ring-2 focus:ring-[#0052CC]/15';
-  const labelCls = 'block text-xs font-bold text-[#4A5568]';
+  const inputCls = 'w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] py-3 pl-4 pr-10 text-sm text-[#0a0e27] placeholder-[#a0aec0] transition-all duration-200 focus:border-[#8b5cf6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/15';
+  const labelCls = 'block text-xs font-bold text-[#4a5568] mb-1.5';
+  const cairoFont = { fontFamily: 'var(--font-cairo), sans-serif' };
 
   return (
-    <div
-      className="flex min-h-dvh flex-col items-center justify-center bg-gradient-to-br from-[#0052CC] via-[#001A4D] to-[#0052CC] p-5"
-      style={{ paddingTop: 'max(1.5rem, var(--sat, env(safe-area-inset-top)))', paddingBottom: 'var(--sab, env(safe-area-inset-bottom, 0px))' }}
-    >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-sm">
-        <button
-          onClick={onBackToLogin}
-          className="mb-4 flex items-center gap-1.5 text-xs text-white/55 hover:text-white transition-colors duration-200"
+    <div className="flex min-h-dvh flex-col bg-white">
+      {/* Hero Section */}
+      <div
+        className="relative flex flex-col items-center px-6 pt-14 pb-8 text-center"
+        style={{
+          background: 'linear-gradient(145deg, #6b21a8, #8b5cf6 60%, #a78bfa)',
+        }}
+      >
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -left-10 -top-10 h-36 w-36 rounded-full bg-white/5" />
+        <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-white/5" />
+
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm"
+          style={{ border: '1.5px solid rgba(255,255,255,0.25)' }}
         >
-          <ArrowLeft size={14} />
-        </button>
-      </motion.div>
+          <Rocket size={26} className="text-white" />
+        </motion.div>
 
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.08 }}
+          className="mb-1 text-xl font-black text-white"
+          style={cairoFont}
+        >
+          {t('register.heroTitle')}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.12 }}
+          className="mb-5 text-xs text-white/70"
+          style={cairoFont}
+        >
+          {t('register.heroSubtitle')}
+        </motion.p>
+
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          onClick={onBackToLogin}
+          className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-white/40 bg-white/10 px-5 py-2 text-xs font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20 active:scale-[0.97]"
+          style={cairoFont}
+        >
+          {t('register.heroSwitch')}
+        </motion.button>
+      </div>
+
+      {/* Form Section */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm"
-      >
-        <svg width="30" height="30" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-          <rect x="148" y="110" width="200" height="260" rx="18" fill="rgba(255,255,255,0.9)"/>
-          <circle cx="338" cy="338" r="44" fill="#D4A843"/>
-          <path d="M318 338 L330 350 L360 322" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-        </svg>
-      </motion.div>
-
-      <motion.h1
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="mb-4 text-center text-xl font-black text-white"
-      >
-        {t('register.title')}
-      </motion.h1>
-
-      <motion.form
-        onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08 }}
-        className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl"
-        noValidate
+        transition={{ delay: 0.2 }}
+        className="flex-1 overflow-y-auto px-6 py-6"
       >
-        {error && (
-          <div className="mb-3 rounded-xl border border-[#DC3545]/30 bg-[#DC3545]/8 p-2.5 text-xs font-medium text-[#DC3545]" role="alert">
-            {error}
+        {/* Logo */}
+        <div className="mb-5 flex items-center gap-2">
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black text-white"
+            style={{ background: 'linear-gradient(135deg, #6b21a8, #a78bfa)' }}
+          >
+            R
           </div>
-        )}
+          <span className="text-lg font-black text-[#0a0e27]" style={cairoFont}>
+            Rakmana
+          </span>
+        </div>
 
-        <div className="space-y-2.5">
-          <div>
-            <label className={cn(labelCls, 'mb-1.5 block')}>{t('settings.accountType')}</label>
+        <h2 className="mb-1 text-xl font-black text-[#0a0e27]" style={cairoFont}>
+          {t('register.title')}
+        </h2>
+        <p className="mb-5 text-xs text-[#718096]" style={cairoFont}>
+          {t('register.heroSubtitle')}
+        </p>
+
+        <form onSubmit={handleSubmit} noValidate>
+          {error && (
+            <div className="mb-3 rounded-xl border border-[#DC3545]/30 bg-[#DC3545]/8 p-2.5 text-xs font-medium text-[#DC3545]" role="alert" style={cairoFont}>
+              {error}
+            </div>
+          )}
+
+          <div className="mb-3">
+            <label className={labelCls} style={cairoFont}>{t('settings.accountType')}</label>
             <div className="grid grid-cols-2 gap-2">
               {(['artisan', 'entreprise'] as const).map((m) => (
                 <button
@@ -147,10 +187,11 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                   className={cn(
                     'rounded-xl py-2.5 text-xs font-bold transition-all duration-200 active:scale-[0.97]',
                     mode === m
-                      ? 'bg-[#0052CC] text-white shadow-sm'
-                      : 'border border-[rgba(0,26,77,0.08)] bg-white text-[#4A5568] hover:bg-[#E6F0FF]',
+                      ? 'text-white shadow-sm'
+                      : 'border border-[#e2e8f0] bg-white text-[#4a5568] hover:bg-[#f8fafc]',
                     'disabled:opacity-50',
                   )}
+                  style={mode === m ? { background: 'linear-gradient(135deg, #6b21a8, #a78bfa)', ...cairoFont } : cairoFont}
                 >
                   {t(`register.mode${m.charAt(0).toUpperCase() + m.slice(1)}` as 'register.modeArtisan' | 'register.modeEntreprise')}
                 </button>
@@ -158,41 +199,47 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
             </div>
           </div>
 
-          <div>
-            <label htmlFor="reg-name" className={labelCls}>{t('register.name')}</label>
-            <input
-              id="reg-name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => { setName(e.target.value); clearField('name'); }}
-              disabled={loading}
-              className={cn(inputCls, 'disabled:opacity-50', fieldErrors.name && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
-            />
+          <div className="mb-3">
+            <label htmlFor="reg-name" className={labelCls} style={cairoFont}>{t('register.name')}</label>
+            <div className="relative">
+              <input
+                id="reg-name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => { setName(e.target.value); clearField('name'); }}
+                disabled={loading}
+                className={cn(inputCls, 'disabled:opacity-50', fieldErrors.name && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
+              />
+              <User size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0aec0]" />
+            </div>
             {fieldErrors.name && (
-              <p className="text-[11px] font-medium text-[#DC3545] mt-1">{fieldErrors.name}</p>
+              <p className="mt-1 text-[11px] font-medium text-[#DC3545]">{fieldErrors.name}</p>
             )}
           </div>
 
-          <div>
-            <label htmlFor="reg-email" className={labelCls}>{t('register.email')}</label>
-            <input
-              id="reg-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); clearField('email'); }}
-              disabled={loading}
-              dir="ltr"
-              className={cn(inputCls, 'disabled:opacity-50', fieldErrors.email && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
-            />
+          <div className="mb-3">
+            <label htmlFor="reg-email" className={labelCls} style={cairoFont}>{t('register.email')}</label>
+            <div className="relative">
+              <input
+                id="reg-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); clearField('email'); }}
+                disabled={loading}
+                dir="ltr"
+                className={cn(inputCls, 'disabled:opacity-50', fieldErrors.email && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
+              />
+              <Mail size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0aec0]" />
+            </div>
             {fieldErrors.email && (
-              <p className="text-[11px] font-medium text-[#DC3545] mt-1">{fieldErrors.email}</p>
+              <p className="mt-1 text-[11px] font-medium text-[#DC3545]">{fieldErrors.email}</p>
             )}
           </div>
 
-          <div>
-            <label htmlFor="reg-password" className={labelCls}>{t('register.password')}</label>
+          <div className="mb-3">
+            <label htmlFor="reg-password" className={labelCls} style={cairoFont}>{t('register.password')}</label>
             <div className="relative">
               <input
                 id="reg-password"
@@ -200,41 +247,42 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); clearField('password'); }}
-                placeholder="12+ caractères"
+                placeholder="••••••••"
                 disabled={loading}
                 dir="ltr"
-                className={cn(inputCls, 'pr-10 disabled:opacity-50', fieldErrors.password && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
+                className={cn(inputCls, 'disabled:opacity-50', fieldErrors.password && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
               />
+              <Lock size={16} className="absolute right-10 top-1/2 -translate-y-1/2 text-[#a0aec0]" />
               <button
                 type="button"
                 onClick={() => setShowPw((v) => !v)}
                 aria-label={showPw ? 'Masquer' : 'Afficher'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#718096] hover:text-[#0052CC] transition-colors duration-150"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0aec0] transition-colors duration-150 hover:text-[#8b5cf6]"
                 tabIndex={-1}
               >
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {fieldErrors.password && (
-              <p className="text-[11px] font-medium text-[#DC3545] mt-1">{fieldErrors.password}</p>
+              <p className="mt-1 text-[11px] font-medium text-[#DC3545]">{fieldErrors.password}</p>
             )}
             {password.length > 0 && (
               <div className="mt-1.5">
-                <div className="h-1.5 w-full rounded-full bg-[rgba(0,26,77,0.06)]">
+                <div className="h-1.5 w-full rounded-full bg-[#e2e8f0]">
                   <div
                     className={cn('h-full rounded-full transition-all duration-300', strengthColors[strength.level])}
                     style={{ width: strengthWidths[strength.level] }}
                   />
                 </div>
-                <p className={cn('mt-0.5 text-[10px] font-bold', strength.level === 'weak' ? 'text-[#DC3545]' : strength.level === 'medium' ? 'text-[#F59E0B]' : 'text-[#10B981]')}>
+                <p className={cn('mt-0.5 text-[10px] font-bold', strength.level === 'weak' ? 'text-[#DC3545]' : strength.level === 'medium' ? 'text-[#F59E0B]' : 'text-[#10B981]')} style={cairoFont}>
                   {t(strength.key as 'register.strength.weak')}
                 </p>
               </div>
             )}
           </div>
 
-          <div>
-            <label htmlFor="reg-confirm" className={labelCls}>{t('register.confirmPassword')}</label>
+          <div className="mb-3">
+            <label htmlFor="reg-confirm" className={labelCls} style={cairoFont}>{t('register.confirmPassword')}</label>
             <div className="relative">
               <input
                 id="reg-confirm"
@@ -244,25 +292,26 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                 onChange={(e) => { setConfirm(e.target.value); clearField('confirm'); }}
                 disabled={loading}
                 dir="ltr"
-                className={cn(inputCls, 'pr-10 disabled:opacity-50', fieldErrors.confirm && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
+                className={cn(inputCls, 'disabled:opacity-50', fieldErrors.confirm && 'border-[#DC3545]/50 focus:border-[#DC3545] focus:ring-[#DC3545]/15')}
               />
+              <Lock size={16} className="absolute right-10 top-1/2 -translate-y-1/2 text-[#a0aec0]" />
               <button
                 type="button"
                 onClick={() => setShowConfirm((v) => !v)}
                 aria-label={showConfirm ? 'Masquer la confirmation' : 'Afficher la confirmation'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#718096] hover:text-[#0052CC] transition-colors duration-150"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0aec0] transition-colors duration-150 hover:text-[#8b5cf6]"
                 tabIndex={-1}
               >
                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {fieldErrors.confirm && (
-              <p className="text-[11px] font-medium text-[#DC3545] mt-1">{fieldErrors.confirm}</p>
+              <p className="mt-1 text-[11px] font-medium text-[#DC3545]">{fieldErrors.confirm}</p>
             )}
           </div>
 
-          <div>
-            <label className="flex items-start gap-2.5 cursor-pointer select-none">
+          <div className="mb-4">
+            <label className="flex cursor-pointer items-start gap-2.5 select-none">
               <div
                 onClick={() => { setAcceptedTerms((v) => !v); clearField('terms'); }}
                 role="checkbox"
@@ -271,48 +320,52 @@ export function RegisterScreen({ onRegister, onBackToLogin }: RegisterScreenProp
                 className={cn(
                   'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-150',
                   acceptedTerms
-                    ? 'border-[#0052CC] bg-[#0052CC]'
+                    ? 'border-[#8b5cf6] bg-[#8b5cf6]'
                     : fieldErrors.terms
                       ? 'border-[#DC3545]/50 bg-white'
-                      : 'border-[rgba(0,26,77,0.15)] bg-white hover:border-[#0052CC]/50',
+                      : 'border-[#e2e8f0] bg-white hover:border-[#8b5cf6]/50',
                 )}
               >
                 {acceptedTerms && (
                   <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-                    <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
-              <span className="text-xs text-[#4A5568] leading-relaxed">
+              <span className="text-xs leading-relaxed text-[#4a5568]" style={cairoFont}>
                 {t('register.terms')}
               </span>
             </label>
             {fieldErrors.terms && (
-              <p className="text-[11px] font-medium text-[#DC3545] mt-1 ml-7">{fieldErrors.terms}</p>
+              <p className="ml-7 mt-1 text-[11px] font-medium text-[#DC3545]">{fieldErrors.terms}</p>
             )}
           </div>
-        </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-4 w-full rounded-2xl bg-[#0052CC] py-3.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-[#0047B3] hover:shadow-md disabled:opacity-50 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[#0052CC]/40"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <Loader2 size={16} className="animate-spin" />
-              {t('register.loading')}
-            </span>
-          ) : t('register.submit')}
-        </button>
-
-        <p className="mt-3 text-center text-xs text-[#4A5568]">
-          {t('register.alreadyHave')}{' '}
-          <button type="button" onClick={onBackToLogin} className="font-bold text-[#0052CC] hover:underline">
-            {t('register.signIn')}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl py-3.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, #6b21a8, #a78bfa)',
+              fontFamily: 'var(--font-cairo), sans-serif',
+            }}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 size={16} className="animate-spin" />
+                {t('register.loading')}
+              </span>
+            ) : t('register.submit')}
           </button>
-        </p>
-      </motion.form>
+
+          <p className="mt-4 text-center text-xs text-[#4a5568]" style={cairoFont}>
+            {t('register.alreadyHave')}{' '}
+            <button type="button" onClick={onBackToLogin} className="font-bold text-[#8b5cf6] hover:underline">
+              {t('register.signIn')}
+            </button>
+          </p>
+        </form>
+      </motion.div>
     </div>
   );
 }
