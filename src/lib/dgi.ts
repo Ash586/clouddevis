@@ -388,11 +388,23 @@ export function generateDocNumber(
  * @param currency - Currency code (default: DA)
  * @returns Formatted string, e.g. "1 234,56 DA"
  */
+// Cached Intl.NumberFormat for consistent, professional number formatting.
+// fr-DZ uses comma as decimal separator and space as thousands separator.
+// We force a regular non-breaking space (U+00A0) instead of the thin space
+// (U+202F) that toLocaleString produces, which renders too narrow and makes
+// numbers look "stuck together".
+const _moneyFormatter = new Intl.NumberFormat('fr-DZ', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  useGrouping: true,
+});
+
 export function formatCurrency(amount: number, currency: string = 'DA'): string {
-  return amount.toLocaleString('fr-DZ', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }) + ' ' + currency;
+  // Intl.NumberFormat('fr-DZ') emits U+202F (narrow no-break space) as the
+  // thousands separator. Replace with U+00A0 (non-breaking space) for a wider,
+  // more readable gap between digit groups.
+  const formatted = _moneyFormatter.format(amount).replace(/\u202F/g, '\u00A0');
+  return formatted + '\u00A0' + currency;
 }
 
 /**

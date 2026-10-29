@@ -35,7 +35,9 @@ const DOC_LABELS: Record<string, string> = {
 };
 
 function numFmt(n: number) {
-  return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return new Intl.NumberFormat('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true })
+    .format(n)
+    .replace(/\u202F/g, '\u00A0');
 }
 
 interface Props {
