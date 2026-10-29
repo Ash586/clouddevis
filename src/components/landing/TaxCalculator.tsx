@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { calculateDocument } from '@/lib/calculations';
+import { calculateDocument, formatCurrency } from '@/lib/calculations';
 
 interface Props {
   defaultAmount?: number;
@@ -86,19 +86,19 @@ export function TaxCalculator({ defaultAmount = 100000, defaultTva = 19 }: Props
         <div className="calc-results">
           <div className="calc-result-row">
             <span className="calc-result-label">{t('tva')}</span>
-            <span className="calc-result-value">{results.tvaAmount.toLocaleString('fr-DZ')} DA</span>
+            <span className="calc-result-value">{formatCurrency(results.tvaAmount, 'DA')}</span>
           </div>
 
           {results.timbreFiscal > 0 && (
             <div className="calc-result-row highlight">
               <span className="calc-result-label">{t('timbreFiscal')}</span>
-              <span className="calc-result-value">{results.timbreFiscal.toLocaleString('fr-DZ')} DA</span>
+              <span className="calc-result-value">{formatCurrency(results.timbreFiscal, 'DA')}</span>
             </div>
           )}
 
           <div className="calc-result-row total">
             <span className="calc-total-label">{t('totalTTC')}</span>
-            <span className="calc-total-value">{results.totalTTC.toLocaleString('fr-DZ')} DA</span>
+            <span className="calc-total-value">{formatCurrency(results.totalTTC, 'DA')}</span>
           </div>
         </div>
       </div>

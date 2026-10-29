@@ -10,17 +10,18 @@ import { useTranslations, useLocale } from 'next-intl';
 import { BarChart3, Crown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { DashboardStats } from './dashboardConstants';
+import { formatCurrency, formatNumber } from '@/lib/calculations';
 
 const INTL_LOCALE: Record<string, string> = { fr: 'fr-FR', ar: 'ar-DZ', en: 'en-US' };
 
 function fmtDA(n: number): string {
   if (n >= 1_000_000) {
-    return (n / 1_000_000).toLocaleString('fr-DZ', { maximumFractionDigits: 1 }) + ' M';
+    return new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 1, useGrouping: true }).format(n / 1_000_000).replace(/\u202F/g, '\u00A0') + ' M';
   }
   if (n >= 10_000) {
-    return Math.round(n / 1_000).toLocaleString('fr-DZ') + ' K';
+    return new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 0, useGrouping: true }).format(Math.round(n / 1_000)).replace(/\u202F/g, '\u00A0') + ' K';
   }
-  return Math.round(n).toLocaleString('fr-DZ');
+  return formatNumber(Math.round(n));
 }
 
 interface Props { stats: DashboardStats }
@@ -73,7 +74,7 @@ export function DashboardInsights({ stats }: Props) {
                     </span>
                   )}
                   <div
-                    title={`${m.total.toLocaleString('fr-DZ')} ${tc('currency')}`}
+                    title={`${formatCurrency(m.total, tc('currency'))}`}
                     className={`w-full rounded-lg transition-all ${
                       isCurrent
                         ? 'bg-gradient-to-t from-[var(--green)] to-[var(--green-2)]'

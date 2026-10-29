@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { MobileTable } from '@/components/mobile/MobileTable';
+import { formatCurrency } from '@/lib/calculations';
 
 interface SharedDoc {
   id: string; number: string; type: string; status: string;
@@ -38,7 +39,7 @@ export default function SharedDocumentsPage() {
     { key: 'number', label: t('table.number') },
     { key: 'type', label: t('table.type') },
     { key: 'sharedBy', label: t('table.sharedBy') },
-    { key: 'total', label: t('table.total'), render: (v: unknown) => `${Number(v).toLocaleString()} ${tc('currency')}` },
+    { key: 'total', label: t('table.total'), render: (v: unknown) => formatCurrency(Number(v), tc('currency')) },
     { key: 'permission', label: t('table.permission') },
     { key: 'date', label: t('table.date') },
   ];

@@ -8,6 +8,7 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatNumber } from '@/lib/calculations';
 
 interface ClientInfo {
   id: string;
@@ -81,7 +82,7 @@ export default function ClientDetailPage() {
   useEffect(() => { fetchClient(); }, [fetchClient]);
 
   function formatCurrency(value: number) {
-    return value.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formatNumber(value);
   }
 
   if (loading) {

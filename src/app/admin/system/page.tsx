@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
+import { formatNumber } from '@/lib/calculations';
 import {
   Activity, Server, HardDrive, Cpu,
   Users, FileText, AlertTriangle, LogIn,
@@ -122,7 +123,7 @@ export default function AdminSystemPage() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {counts.map(c => (
             <div key={c.label} className="text-center">
-              <p className={`text-2xl font-black ${c.color}`}>{c.value.toLocaleString()}</p>
+              <p className={`text-2xl font-black ${c.color}`}>{typeof c.value === 'number' ? formatNumber(c.value) : c.value}</p>
               <p className="text-xs text-slate-500 font-semibold mt-1">{c.label}</p>
             </div>
           ))}
@@ -135,7 +136,7 @@ export default function AdminSystemPage() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {extraCounts.map(c => (
             <div key={c.label} className="text-center">
-              <p className={`text-lg font-black ${c.color}`}>{c.value.toLocaleString()}</p>
+              <p className={`text-lg font-black ${c.color}`}>{typeof c.value === 'number' ? formatNumber(c.value) : c.value}</p>
               <p className="text-xs text-slate-500 font-semibold mt-1">{c.label}</p>
             </div>
           ))}

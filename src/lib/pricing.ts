@@ -1,3 +1,5 @@
+import { formatCurrency } from '@/lib/calculations';
+
 export type PlanId = 'free' | 'standard' | 'enterprise';
 
 export interface PlanLimit {
@@ -95,5 +97,5 @@ export function getPlanByStatus(status: string): Plan {
 }
 
 export function formatPrice(price: number): string {
-  return price.toLocaleString('fr-DZ') + ' DA';
+  return formatCurrency(price, 'DA');
 }

@@ -407,6 +407,11 @@ export function formatCurrency(amount: number, currency: string = 'DA'): string 
   return formatted + '\u00A0' + currency;
 }
 
+// Format a number (no currency) with consistent fr-DZ locale formatting.
+export function formatNumber(amount: number): string {
+  return _moneyFormatter.format(amount).replace(/\u202F/g, '\u00A0').replace(/\u00A0DA$/, '');
+}
+
 /**
  * Format date in Algerian format (DD/MM/YYYY)
  *

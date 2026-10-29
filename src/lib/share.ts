@@ -5,6 +5,7 @@
 // ============================================================
 
 import { logger } from '@/lib/logger';
+import { formatCurrency } from '@/lib/calculations';
 import { generatePDFBase64 } from '../../packages/pdf-engine';
 import type { PDFDocumentData } from '../../packages/pdf-engine';
 import type { Document } from '../mobile/types';
@@ -102,7 +103,7 @@ export async function shareWhatsApp(options: WhatsAppOptions): Promise<ShareResu
     const base64 = await generatePDFBase64(pdfData);
     const typeLabel = getTypeLabel(doc.type);
     const message = encodeURIComponent(
-      `${typeLabel} ${doc.number}\nClient: ${doc.client.name}\nTotal TTC: ${doc.totalTTC.toLocaleString('fr-DZ')} DA\n\nVeuillez trouver ci-joint votre ${typeLabel.toLowerCase()}.`
+      `${typeLabel} ${doc.number}\nClient: ${doc.client.name}\nTotal TTC: ${formatCurrency(doc.totalTTC, 'DA')}\n\nVeuillez trouver ci-joint votre ${typeLabel.toLowerCase()}.`
     );
 
     const phoneFormatted = phone ? formatPhoneForWhatsApp(phone) : '';

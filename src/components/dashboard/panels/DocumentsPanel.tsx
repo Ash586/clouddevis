@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { PullToRefresh } from '@/components/mobile/PullToRefresh';
 import { cn } from '@/lib/utils';
+import { formatNumber } from '@/lib/calculations';
 import { useHaptics } from '@/hooks/useHaptics';
 
 type DocStatus = 'DRAFT' | 'ACCEPTED' | 'PROGRESS' | 'DELIVERED' | 'SENT' | 'PAID';
@@ -69,7 +70,7 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_OPTIONS: DocStatus[] = ['DRAFT', 'ACCEPTED', 'PROGRESS', 'DELIVERED', 'SENT', 'PAID'];
 
 const CURRENCY = 'DA';
-const fmt = (n: number) => n.toLocaleString('fr-DZ', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const fmt = (n: number) => formatNumber(n);
 
 const STALE_MS = 2 * 60 * 1000;
 
@@ -325,7 +326,7 @@ export function DocumentsPanel() {
               <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalDocs')}</p>
             </Card>
             <Card className="text-center">
-              <p className="text-2xl font-black text-[var(--sand)]">{totalRevenue.toLocaleString()} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
+              <p className="text-2xl font-black text-[var(--sand)]">{formatNumber(totalRevenue)} <span className="text-sm font-normal text-[var(--sand-muted)]">{tc('currency')}</span></p>
               <p className="text-xs text-[var(--sand-muted)] font-semibold">{t('totalRevenue')}</p>
             </Card>
             <Card className="text-center">

@@ -2,6 +2,7 @@
 
 import type { LineItem } from '@/types';
 import { categoryLabelKey } from '@/types';
+import { formatCurrency } from '@/lib/calculations';
 
 interface CatalogModalProps {
   open: boolean;
@@ -37,7 +38,7 @@ export function CatalogModal({ open, onClose, loading, items, onSelect, tp, tc, 
                 <div className="text-[11px] font-medium text-[var(--sand-2)] truncate">{item.designation}</div>
                 {item.category && <div className="text-[8px] text-[var(--sand-muted)] uppercase mt-0.5">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</div>}
               </div>
-              <div className="text-[11px] font-bold text-[var(--green-3)] whitespace-nowrap">{item.unitPrice.toLocaleString('fr-DZ')} {tc('currency')}</div>
+              <div className="text-[11px] font-bold text-[var(--green-3)] whitespace-nowrap">{formatCurrency(item.unitPrice, tc('currency'))}</div>
             </button>
           ))}
         </div>

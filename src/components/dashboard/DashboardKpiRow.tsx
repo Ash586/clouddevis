@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Wallet, FileText, Users, AlertCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { DashboardStats } from './dashboardConstants';
+import { formatNumber } from '@/lib/calculations';
 
 interface Props { stats: DashboardStats; }
 
@@ -14,8 +15,8 @@ export function DashboardKpiRow({ stats }: Props) {
   const unpaidTotal = stats.unpaidTotal ?? 0;
   const fmtDA = (n: number) =>
     n >= 1_000_000
-      ? (n / 1_000_000).toLocaleString('fr-DZ', { maximumFractionDigits: 1 }) + ' M'
-      : Math.round(n).toLocaleString('fr-DZ');
+      ? new Intl.NumberFormat('fr-DZ', { maximumFractionDigits: 1, useGrouping: true }).format(n / 1_000_000).replace(/\u202F/g, '\u00A0') + ' M'
+      : formatNumber(Math.round(n));
 
   return (
     <div data-tour="kpi-row" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -29,7 +30,7 @@ export function DashboardKpiRow({ stats }: Props) {
             </div>
             <p className="text-[11px] font-bold text-white/70 uppercase tracking-wider mb-0.5">{t('statTotal')}</p>
             <p className="font-sora font-extrabold text-white text-2xl leading-tight">
-              {stats.totalTTC}
+              {formatNumber(Number(stats.totalTTC))}
               <span className="text-sm font-bold text-white/70 ms-1">{tc('currency')}</span>
             </p>
             <p className="text-[11px] text-white/60 mt-0.5">{t('totalTTC')}</p>

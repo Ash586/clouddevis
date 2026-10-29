@@ -6,7 +6,7 @@
 // the document's total and payment mode.
 // ============================================================
 
-import { validateNIF, validateNIS, validateAI, validateRC, shouldApplyTimbre, TIMBRE_FISCAL_AMOUNT, TIMBRE_FISCAL_THRESHOLD } from '@/lib/dgi';
+import { validateNIF, validateNIS, validateAI, validateRC, shouldApplyTimbre, TIMBRE_FISCAL_AMOUNT, TIMBRE_FISCAL_THRESHOLD, formatCurrency } from '@/lib/dgi';
 import type { DocumentState, CalculationResult, SectionId } from '@/types';
 
 export type ComplianceSeverity = 'error' | 'warning';
@@ -52,7 +52,7 @@ export function auditDocument(doc: DocumentState, results: CalculationResult): C
     issues.push({
       id: 'timbre-missing',
       severity: 'error',
-      message: `Timbre fiscal manquant : le montant TTC (${results.totalTTC.toLocaleString('fr-DZ')} DA) dépasse le seuil de ${TIMBRE_FISCAL_THRESHOLD.toLocaleString('fr-DZ')} DA — ${TIMBRE_FISCAL_AMOUNT} DA de timbre sont dus (Art. 220 CII).`,
+      message: `Timbre fiscal manquant : le montant TTC (${formatCurrency(results.totalTTC, 'DA')}) dépasse le seuil de ${formatCurrency(TIMBRE_FISCAL_THRESHOLD, 'DA')} — ${TIMBRE_FISCAL_AMOUNT} DA de timbre sont dus (Art. 220 CII).`,
       section: 'general',
     });
   } else if (!timbreRequired && timbreApplied) {

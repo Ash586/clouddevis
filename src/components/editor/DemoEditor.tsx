@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { DocumentPreview } from './DocumentPreview';
-import { calculateDocument, formatDateISO, generateId } from '@/lib/calculations';
+import { calculateDocument, formatDateISO, generateId, formatCurrency } from '@/lib/calculations';
 import type { DocumentState, LineItem, UnitMeasure } from '@/types';
 import { Button } from '@/components/ui/button';
 import { DEFAULT_SECTION_ORDER } from '@/types';
@@ -178,7 +178,7 @@ export function DemoEditor({ onDownload }: Props) {
                         placeholder={t('unitPricePlaceholder')}
                       />
                       <span className="text-[11px] font-bold text-slate-600 whitespace-nowrap self-center min-w-[60px] text-right">
-                        {(item.quantity * item.unitPrice).toLocaleString('fr-DZ')} {tc('currency')}
+                        {formatCurrency(item.quantity * item.unitPrice, tc('currency'))}
                       </span>
                       <button type="button" onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 text-sm leading-none mt-0.5">✕</button>
                     </div>

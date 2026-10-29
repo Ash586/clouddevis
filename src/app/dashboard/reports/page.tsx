@@ -7,6 +7,7 @@ import { TrialGate } from '@/components/layout/TrialGate';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatCurrency, formatNumber } from '@/lib/calculations';
 
 type Period = 'month' | 'quarter' | 'year' | 'custom';
 
@@ -230,7 +231,7 @@ export default function ReportsPage() {
                           const monthLabel = m.month.length === 7 ? `${MONTH_NAMES[parseInt(m.month.split('-')[1]) - 1]} ${m.month.split('-')[0].slice(-2)}` : m.month;
                           return (
                             <div key={m.month} className="flex flex-col items-center min-w-[60px] flex-1">
-                              <span className="text-[9px] font-semibold text-[var(--sand-muted)] mb-1 whitespace-nowrap">{val.toLocaleString()}</span>
+                              <span className="text-[9px] font-semibold text-[var(--sand-muted)] mb-1 whitespace-nowrap">{typeof val === 'number' ? formatNumber(val) : val}</span>
                               <div className="w-full max-w-[40px] bg-[var(--green-2)] rounded-t-lg transition-all" style={{ height: `${Math.max(4, pct)}%` }} />
                               <span className="text-[10px] font-semibold text-[var(--sand-muted)] mt-2 whitespace-nowrap">{monthLabel}</span>
                             </div>
@@ -319,7 +320,7 @@ export default function ReportsPage() {
                               <tr key={i} className="border-b border-[rgba(15,39,71,0.04)]">
                                 <td className="py-2 px-3 font-semibold text-[var(--sand)]">{r.name}</td>
                                 <td className="py-2 px-3 text-end text-[var(--sand-2)]">{r.count}</td>
-                                <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{r.total.toLocaleString()} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
+                                <td className="py-2 px-3 text-end font-bold text-[var(--sand)]">{formatNumber(r.total)} <span className="text-xs font-normal text-[var(--sand-muted)]">{tc('currency')}</span></td>
                               </tr>
                             ))}
                           </tbody>
@@ -338,7 +339,7 @@ export default function ReportsPage() {
                                 <span className="text-[10px] text-[var(--sand-muted)]">{r.count} docs</span>
                               </div>
                             </div>
-                            <span className="text-sm font-bold text-[var(--sand)] whitespace-nowrap">{r.total.toLocaleString()} {tc('currency')}</span>
+                            <span className="text-sm font-bold text-[var(--sand)] whitespace-nowrap">{formatCurrency(r.total, tc('currency'))}</span>
                           </div>
                         ))}
                       </div>

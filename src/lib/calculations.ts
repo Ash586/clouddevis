@@ -4,6 +4,7 @@ import {
   numberToFrenchWords as dgiNumberToFrenchWords,
   numberToArabicWords as dgiNumberToArabicWords,
   formatCurrency as dgiFormatCurrency,
+  formatNumber as dgiFormatNumber,
   generateDocNumber as dgiGenerateDocNumber,
 } from './dgi';
 
@@ -70,6 +71,10 @@ export function tafqitAr(n: number): string {
 
 export function formatCurrency(amount: number, currency = 'DA'): string {
   return dgiFormatCurrency(amount, currency);
+}
+
+export function formatNumber(amount: number): string {
+  return dgiFormatNumber(amount);
 }
 
 export function generateDocumentNumber(type: string, mode: string, sequenceNumber?: number): string {

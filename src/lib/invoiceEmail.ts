@@ -1,4 +1,5 @@
 import { BRAND_NAME } from '@/lib/brand';
+import { formatCurrency } from '@/lib/calculations';
 
 interface EmailItem {
   designation?: string;
@@ -34,7 +35,7 @@ const DOC_LABELS: Record<string, string> = {
 const e = (s: unknown) =>
   String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-const money = (n: number) => `${n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA`;
+const money = (n: number) => formatCurrency(n, 'DA');
 const dateFr = (d: Date) => d.toLocaleDateString('fr-DZ');
 
 /**

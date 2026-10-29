@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { TrendingUp, FileText, BarChart3, Activity, Eye, MousePointerClick } from 'lucide-react';
+import { formatCurrency, formatNumber } from '@/lib/calculations';
 
 interface AnalyticsData {
   userGrowth: { date: string; count: number; artisans: number; enterprises: number }[];
@@ -121,9 +122,9 @@ export default function AdminAnalyticsPage() {
 
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
-        <MetricIconCard icon={<TrendingUp size={18} style={{ color: clr.blue }} />} val={totalUsersGrowth.toLocaleString()} label="Nouveaux utilisateurs" bg={clr.blueBg} />
-        <MetricIconCard icon={<FileText size={18} style={{ color: clr.green }} />} val={totalDocsCreated.toLocaleString()} label="Nouveaux documents" bg={clr.greenBg} />
-        <MetricIconCard icon={<BarChart3 size={18} style={{ color: clr.amber }} />} val={`${totalRevenue.toLocaleString()} DA`} label="Revenu" bg={clr.amberBg} />
+        <MetricIconCard icon={<TrendingUp size={18} style={{ color: clr.blue }} />} val={formatNumber(totalUsersGrowth)} label="Nouveaux utilisateurs" bg={clr.blueBg} />
+        <MetricIconCard icon={<FileText size={18} style={{ color: clr.green }} />} val={formatNumber(totalDocsCreated)} label="Nouveaux documents" bg={clr.greenBg} />
+        <MetricIconCard icon={<BarChart3 size={18} style={{ color: clr.amber }} />} val={formatCurrency(totalRevenue, 'DA')} label="Revenu" bg={clr.amberBg} />
         <MetricIconCard icon={<Activity size={18} style={{ color: clr.purple }} />} val={String(avgDailyDocs)} label="Moy. documents/jour" bg={clr.purpleBg} />
       </div>
 

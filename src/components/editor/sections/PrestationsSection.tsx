@@ -7,6 +7,7 @@ import { CatalogModal } from '@/components/editor/CatalogModal';
 import { validateLineItem } from '@/lib/validation';
 import { categoryLabelKey, getCategoryOptions } from '@/types';
 import { useSectionContext } from './SectionProps';
+import { formatCurrency, formatNumber } from '@/lib/calculations';
 
 export function PrestationsSection() {
   const {
@@ -92,7 +93,7 @@ export function PrestationsSection() {
           {newItem.designation && newItem.unitPrice > 0 && (
             <div className="flex items-center justify-between px-2.5 py-1.5 bg-[var(--green-glow)] rounded-lg ring-1 ring-[rgba(37,99,235,0.2)]">
               <span className="text-[10px] text-[var(--green-3)] font-medium">{te('prestations.lineTotal') || 'Total ligne'}</span>
-              <span className="text-[13px] font-bold text-[var(--green-3)]">{(newItem.quantity * newItem.unitPrice).toLocaleString(locale)} {tc('currency')}</span>
+              <span className="text-[13px] font-bold text-[var(--green-3)]">{formatCurrency(newItem.quantity * newItem.unitPrice, tc('currency'))}</span>
             </div>
           )}
           {itemErrors && <div className="text-[10px] text-red-400 bg-[rgba(232,84,46,0.1)] px-3 py-1.5 rounded-lg border border-red-400/20">{itemErrors}</div>}
@@ -170,10 +171,10 @@ export function PrestationsSection() {
           </div>
           <div className="grid grid-cols-5 gap-1.5 text-[10px] text-[var(--sand-muted)]">
             <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
-            <span>{te('prestations.puLabel')} <strong>{item.unitPrice.toLocaleString(locale)}</strong></span>
+            <span>{te('prestations.puLabel')} <strong>{formatNumber(item.unitPrice)}</strong></span>
             <span>{te('prestations.vatLabel')} <strong>{doc.tvaRate}%</strong></span>
             <span>{te('prestations.unitLabel')} <strong>{tu(item.unit)}</strong></span>
-            <span className="text-right font-bold text-[var(--sand)]">{(item.quantity * item.unitPrice).toLocaleString(locale)} {tc('currency')}</span>
+            <span className="text-right font-bold text-[var(--sand)]">{formatCurrency(item.quantity * item.unitPrice, tc('currency'))}</span>
           </div>
         </div>
       ))}

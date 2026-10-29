@@ -1,5 +1,6 @@
 import type { LineItem, DocumentState, CalculationResult } from '@/types';
 import { BRAND_NAME } from '@/lib/brand';
+import { formatNumber } from '@/lib/calculations';
 
 /**
  * Single clean "Classique" HTML generator — black text on white paper.
@@ -29,7 +30,7 @@ const DOC_LABELS: Record<string, string> = {
 const CAT_ORDER = ['preparation', 'peinture', 'finition', 'revetement', 'facade', 'enduit', 'main_oeuvre', 'materiaux', 'transport', 'divers'];
 
 function numFmt(n: number) {
-  return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return formatNumber(n);
 }
 
 export function generateClassiqueHTML(params: {
