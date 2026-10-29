@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { formatCurrency } from '@/lib/calculations';
 
 interface DashboardData {
   stats: {
@@ -55,7 +56,7 @@ export default function AdminDashboardPage() {
   const totalActive = (stats?.activeBasicUsers || 0) + (stats?.activeProUsers || 0);
   const totalSubs = totalActive + (stats?.activeTrialUsers || 0);
   const conversionRate = totalSubs > 0 ? Math.round((totalActive / totalSubs) * 100) : 0;
-  const revenue = ((stats?.activeProUsers || 0) * 2000 + (stats?.activeBasicUsers || 0) * 1000).toLocaleString();
+  const revenue = (stats?.activeProUsers || 0) * 2000 + (stats?.activeBasicUsers || 0) * 1000;
   const countryData = analytics?.countryBreakdown || [];
   const totalCountryViews = countryData.reduce((s, c) => s + c.count, 0) || 1;
   const errorCount = system?.activity?.errorCount ?? 0;
@@ -141,7 +142,7 @@ export default function AdminDashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
         <MetricBox label="Utilisateurs" value={stats?.totalUsers?.toLocaleString() ?? '—'} sub={`+${stats?.newUsersThisMonth ?? 0} ce mois`} subColor={colors.green} />
         <MetricBox label="Documents" value={stats?.totalDocs?.toLocaleString() ?? '—'} sub={`+${stats?.docsThisMonth ?? 0} ce mois`} subColor={colors.green} />
-        <MetricBox label="Revenus" value={`${revenue} DA`} sub="MRR estimé" subColor={colors.green} />
+        <MetricBox label="Revenus" value={formatCurrency(revenue, 'DA')} sub="MRR estimé" subColor={colors.green} />
         <MetricBox label="Visiteurs" value={(analytics?.visitorStats?.totalPageViews ?? 0).toLocaleString()} sub={`${analytics?.visitorStats?.uniqueSessions ?? 0} sessions`} subColor={colors.amber} />
       </div>
 

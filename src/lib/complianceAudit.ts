@@ -59,7 +59,7 @@ export function auditDocument(doc: DocumentState, results: CalculationResult): C
     issues.push({
       id: 'timbre-unexpected',
       severity: 'warning',
-      message: `Un timbre fiscal est appliqué alors qu'il ne devrait pas l'être pour ce document (type exempté, paiement par chèque/virement, ou montant sous le seuil de ${TIMBRE_FISCAL_THRESHOLD.toLocaleString('fr-DZ')} DA).`,
+      message: `Un timbre fiscal est appliqué alors qu'il ne devrait pas l'être pour ce document (type exempté, paiement par chèque/virement, ou montant sous le seuil de ${formatCurrency(TIMBRE_FISCAL_THRESHOLD, 'DA')}).`,
       section: 'general',
     });
   }

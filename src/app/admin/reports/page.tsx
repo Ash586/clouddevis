@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FileText, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { formatCurrency } from '@/lib/calculations';
 
 interface ReportData {
   revenue: { total: string; tva: string; docCount: number };
@@ -135,7 +136,7 @@ export default function AdminReportsPage() {
               <div key={d.type}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>
                   <span style={{ fontWeight: 600, color: '#111827' }}>{typeLabels[d.type] || d.type}</span>
-                  <span style={{ color: '#94a3b8' }}>{d.count} — {d.revenue.toLocaleString()} DA</span>
+                  <span style={{ color: '#94a3b8' }}>{d.count} — {formatCurrency(d.revenue, 'DA')}</span>
                 </div>
                 <div style={{ height: 4, background: '#eef1f5', borderRadius: 2, overflow: 'hidden' }}>
                   <div style={{ width: `${(d.count / maxDocs) * 100}%`, height: '100%', borderRadius: 2, background: c.green }} />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Copy, CheckCheck, MousePointerClick, Users, TrendingUp, ExternalLink, ArrowUpRight, ShieldCheck, Clock } from 'lucide-react';
+import { formatCurrency } from '@/lib/calculations';
 
 interface PartnerData {
   partner: { id: string; code: string; tier: string; status: string; parent: { id: string; code: string; user: { name: string } } | null };
@@ -184,7 +185,7 @@ export default function PartnerDashboardPage() {
               style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
             >
               <p className="text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: mutedColor }}>{item.label}</p>
-              <p className="text-xl font-bold" style={{ color: item.color }}>{item.value.toLocaleString('fr-DZ')} DA</p>
+              <p className="text-xl font-bold" style={{ color: item.color }}>{formatCurrency(item.value, 'DA')}</p>
             </div>
           ))}
         </div>
@@ -195,7 +196,7 @@ export default function PartnerDashboardPage() {
         >
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold" style={{ color: textColor }}>Progression vers le paiement minimum</p>
-            <p className="text-xs font-semibold" style={{ color: mutedColor }}>{minPayout.toLocaleString('fr-DZ')} DA</p>
+            <p className="text-xs font-semibold" style={{ color: mutedColor }}>{formatCurrency(minPayout, 'DA')}</p>
           </div>
           <div className="h-2 rounded-full overflow-hidden mb-2" style={{ background: 'var(--navy-3, #1C2537)' }}>
             <div
@@ -204,7 +205,7 @@ export default function PartnerDashboardPage() {
             />
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-xs" style={{ color: mutedColor }}>{pendingAmount.toLocaleString('fr-DZ')} DA / {minPayout.toLocaleString('fr-DZ')} DA</p>
+            <p className="text-xs" style={{ color: mutedColor }}>{formatCurrency(pendingAmount, 'DA')} / {formatCurrency(minPayout, 'DA')}</p>
             {data.stats.nextPayoutAvailable ? (
               <button type="button"                 className="px-4 py-2 rounded-lg text-xs font-semibold text-white min-h-[44px]"
                 style={{ background: 'var(--green-2, #1E40AF)' }}
@@ -212,7 +213,7 @@ export default function PartnerDashboardPage() {
                 Demander un paiement
               </button>
             ) : (
-              <p className="text-xs" style={{ color: mutedColor }}>Paiement disponible à {minPayout.toLocaleString('fr-DZ')} DA</p>
+              <p className="text-xs" style={{ color: mutedColor }}>Paiement disponible à {formatCurrency(minPayout, 'DA')}</p>
             )}
           </div>
         </div>
@@ -251,7 +252,7 @@ export default function PartnerDashboardPage() {
               {data.recentCommissions.map(c => (
                 <div key={c.id} className="flex items-center justify-between py-2 border-b text-sm" style={{ borderColor: cardBorder }}>
                   <div>
-                    <span className="font-semibold" style={{ color: textColor }}>{c.amount.toLocaleString('fr-DZ')} DA</span>
+                    <span className="font-semibold" style={{ color: textColor }}>{formatCurrency(c.amount, 'DA')}</span>
                     <span className="ms-2 text-xs" style={{ color: mutedColor }}>{c.type === 'OVERRIDE' ? 'Override' : 'Directe'}</span>
                   </div>
                   <div className="flex items-center gap-2">

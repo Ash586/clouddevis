@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/calculations';
 import { CheckCircle, Users, DollarSign, Clock, AlertTriangle, Search, XCircle, Ban } from 'lucide-react';
 
 interface Partner {
@@ -90,8 +91,8 @@ export default function AdminPartnersPage() {
           <Card className="p-4"><Users className="w-5 h-5 text-blue-600 mb-2" /><p className="text-2xl font-bold">{stats.totalPartners}</p><p className="text-xs text-slate-500 font-semibold">Total</p></Card>
           <Card className="p-4"><CheckCircle className="w-5 h-5 text-emerald-600 mb-2" /><p className="text-2xl font-bold">{stats.activePartners}</p><p className="text-xs text-slate-500 font-semibold">Actifs</p></Card>
           <Card className="p-4"><Clock className="w-5 h-5 text-amber-600 mb-2" /><p className="text-2xl font-bold">{stats.pendingPartners}</p><p className="text-xs text-slate-500 font-semibold">En attente</p></Card>
-          <Card className="p-4"><DollarSign className="w-5 h-5 text-purple-600 mb-2" /><p className="text-2xl font-bold">{stats.totalCommissions.toLocaleString()} DA</p><p className="text-xs text-slate-500 font-semibold">Commissions</p></Card>
-          <Card className="p-4"><AlertTriangle className="w-5 h-5 text-red-600 mb-2" /><p className="text-2xl font-bold">{stats.pendingPayouts.toLocaleString()} DA</p><p className="text-xs text-slate-500 font-semibold">Paiements en attente</p></Card>
+          <Card className="p-4"><DollarSign className="w-5 h-5 text-purple-600 mb-2" /><p className="text-2xl font-bold">{formatCurrency(stats.totalCommissions, 'DA')}</p><p className="text-xs text-slate-500 font-semibold">Commissions</p></Card>
+          <Card className="p-4"><AlertTriangle className="w-5 h-5 text-red-600 mb-2" /><p className="text-2xl font-bold">{formatCurrency(stats.pendingPayouts, 'DA')}</p><p className="text-xs text-slate-500 font-semibold">Paiements en attente</p></Card>
         </div>
       )}
 
