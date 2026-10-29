@@ -13,6 +13,10 @@ export function formatAmount(amount: number): string {
   return formatted + '\u00A0DA';
 }
 
+export function formatNumber(amount: number): string {
+  return _moneyFormatter.format(amount).replace(/\u202F/g, '\u00A0');
+}
+
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-FR', {
     day: '2-digit',

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { FileText, ArrowRight } from 'lucide-react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import type { Document } from '@/mobile/types';
+import { formatAmount } from '@/mobile/lib/format';
 
 interface RecentDocumentsProps {
   documents: Document[];
@@ -66,7 +67,7 @@ export function RecentDocuments({ documents, onDocumentTap, onSeeAll }: RecentDo
             <div className="flex-1 min-w-0">
               <div className="text-sm font-bold text-[#001A4D] truncate">{doc.number}</div>
               <div className="text-[11px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {doc.client?.name || t('common.unknownClient')} · {doc.totalTTC.toLocaleString('fr-DZ')}\u00a0DA
+                {doc.client?.name || t('common.unknownClient')} · {formatAmount(doc.totalTTC)}
               </div>
             </div>
             <span className={`shrink-0 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${TYPE_COLORS[doc.type] || TYPE_COLORS.DEVIS}`}>

@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import { fetchAllClients, type ApiClientRecord } from '@/mobile/lib/api';
 import { notify } from '@/mobile/lib/toast';
+import { formatAmount, formatNumber } from '@/mobile/lib/format';
 import { generatePDFBase64FromDoc, downloadDocument } from '@/mobile/lib/pdf';
 import { checkIsOnline } from '@/lib/native';
 import { generateId, round2 } from '@/lib/calculations';
@@ -126,17 +127,17 @@ function DocumentPreview({
           <div key={i} className="grid grid-cols-[1fr_40px_55px_60px] gap-0 px-2.5 py-1.5 border-t border-[rgba(0,26,77,0.04)]">
             <span className="text-[#001A4D] font-medium truncate">{item.label}</span>
             <span className="text-center text-[#4A5568]">{item.quantity}</span>
-            <span className="text-right text-[#4A5568]" style={{ fontVariantNumeric: 'tabular-nums' }}>{(item.unitPrice || 0).toLocaleString('fr-DZ')}</span>
-            <span className="text-right font-bold text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{(item.totalHT || 0).toLocaleString('fr-DZ')}</span>
+            <span className="text-right text-[#4A5568]" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.unitPrice || 0)}</span>
+            <span className="text-right font-bold text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(item.totalHT || 0)}</span>
           </div>
         ))}
         {items.every((it) => !it.label) && <div className="px-2.5 py-3 text-center text-[9px] text-[#718096]">Aucun article</div>}
       </div>
       <div className="space-y-1 text-right">
-        <div className="flex justify-between"><span className="text-[#718096]">Total HT</span><span className="text-[#001A4D] font-bold" style={{ fontVariantNumeric: 'tabular-nums' }}>{totalHT.toLocaleString('fr-DZ')} DA</span></div>
-        <div className="flex justify-between"><span className="text-[#718096]">TVA</span><span className="text-[#001A4D] font-bold" style={{ fontVariantNumeric: 'tabular-nums' }}>{totalTVA.toLocaleString('fr-DZ')} DA</span></div>
+        <div className="flex justify-between"><span className="text-[#718096]">Total HT</span><span className="text-[#001A4D] font-bold" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(totalHT)}</span></div>
+        <div className="flex justify-between"><span className="text-[#718096]">TVA</span><span className="text-[#001A4D] font-bold" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(totalTVA)}</span></div>
         <div className="h-px bg-[rgba(0,26,77,0.06)]" />
-        <div className="flex justify-between text-sm"><span className="font-extrabold text-[#001A4D]">Total TTC</span><span className={cn('font-extrabold', tc.text)} style={{ fontVariantNumeric: 'tabular-nums' }}>{totalTTC.toLocaleString('fr-DZ')} DA</span></div>
+        <div className="flex justify-between text-sm"><span className="font-extrabold text-[#001A4D]">Total TTC</span><span className={cn('font-extrabold', tc.text)} style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(totalTTC)}</span></div>
       </div>
       {notes && <div className="border-t border-[rgba(0,26,77,0.06)] pt-2"><div className="text-[9px] uppercase tracking-wider text-[#718096] font-bold mb-0.5">Notes</div><div className="text-[#4A5568]">{notes}</div></div>}
     </div>
@@ -166,7 +167,7 @@ function ArticleRow({
         <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#0052CC]/8 text-[#0052CC] text-[10px] font-bold shrink-0">{idx + 1}</div>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] font-bold text-[#001A4D] truncate">{item.label || 'Nouvel article'}</div>
-          {!expanded && item.label && <div className="text-[9px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.quantity || 1} × {(item.unitPrice || 0).toLocaleString('fr-DZ')} = {total.toLocaleString('fr-DZ')} DA</div>}
+          {!expanded && item.label && <div className="text-[9px] text-[#718096]" style={{ fontVariantNumeric: 'tabular-nums' }}>{item.quantity || 1} × {formatNumber(item.unitPrice || 0)} = {formatAmount(total)}</div>}
         </div>
         {canDelete && <button onClick={(e) => { e.stopPropagation(); onRemove(); }} aria-label="Supprimer" className="flex h-6 w-6 items-center justify-center rounded-lg text-[#DC3545]/60 hover:text-[#DC3545] hover:bg-[#DC3545]/8 transition-all duration-150"><Trash2 size={12} /></button>}
         <div className="text-[#718096] shrink-0">{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</div>
@@ -190,7 +191,7 @@ function ArticleRow({
               </div>
               <div className="flex items-center justify-between rounded-xl bg-[#F0F4FF] px-3 py-1.5">
                 <span className="text-[9px] font-bold text-[#718096]">Total ligne</span>
-                <span className="text-[11px] font-extrabold text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{total.toLocaleString('fr-DZ')} DA</span>
+                <span className="text-[11px] font-extrabold text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(total)}</span>
               </div>
             </div>
           </motion.div>
@@ -847,10 +848,10 @@ export function CreateScreen({ onExit, editingDocId, onConfigureCompany }: Creat
       <div className="border-t border-[rgba(0,26,77,0.06)] bg-white/95 backdrop-blur px-3 py-2">
         <div className="flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-3">
-            <span className="text-[#718096]">HT: <b className="text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{totalHT.toLocaleString('fr-DZ')}</b></span>
-            <span className="text-[#718096]">TVA: <b className="text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{totalTVA.toLocaleString('fr-DZ')}</b></span>
+            <span className="text-[#718096]">HT: <b className="text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(totalHT)}</b></span>
+            <span className="text-[#718096]">TVA: <b className="text-[#001A4D]" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(totalTVA)}</b></span>
           </div>
-          <span className="font-extrabold text-[13px]">TTC: <span className={tc.text} style={{ fontVariantNumeric: 'tabular-nums' }}>{totalTTC.toLocaleString('fr-DZ')} DA</span></span>
+          <span className="font-extrabold text-[13px]">TTC: <span className={tc.text} style={{ fontVariantNumeric: 'tabular-nums' }}>{formatAmount(totalTTC)}</span></span>
         </div>
       </div>
 

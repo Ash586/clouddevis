@@ -3,6 +3,7 @@
 import { FileText, Clock, Banknote, AlertTriangle } from 'lucide-react';
 import { useMobileI18n } from '@/mobile/lib/i18n';
 import type { DashboardStats } from '@/mobile/lib/useDashboardStats';
+import { formatAmount } from '@/mobile/lib/format';
 
 interface StatCardsProps {
   stats: DashboardStats | null;
@@ -32,13 +33,14 @@ export function StatCards({ stats, loading }: StatCardsProps) {
     );
   }
 
-  const fmt = (n: number) => n.toLocaleString('fr-DZ');
+  const fmtCount = (n: number) => n.toLocaleString('fr-DZ');
+const fmtMoney = (n: number) => formatAmount(n).replace(' DA', '');
 
   const cards = [
-    { icon: FileText, label: t('stats.docsCreated'), value: fmt(stats?.monthDocs ?? 0), color: '#0052CC' },
-    { icon: Banknote, label: t('stats.revenue'), value: fmt(stats?.totalTTC ?? 0), suffix: 'DA', color: '#D4A843' },
-    { icon: AlertTriangle, label: t('stats.unpaid'), value: fmt(stats?.unpaidCount ?? 0), color: '#DC3545' },
-    { icon: Clock, label: t('stats.drafts'), value: fmt(stats?.draftCount ?? 0), color: '#001A4D' },
+    { icon: FileText, label: t('stats.docsCreated'), value: fmtCount(stats?.monthDocs ?? 0), color: '#0052CC' },
+    { icon: Banknote, label: t('stats.revenue'), value: fmtMoney(stats?.totalTTC ?? 0), suffix: 'DA', color: '#D4A843' },
+    { icon: AlertTriangle, label: t('stats.unpaid'), value: fmtCount(stats?.unpaidCount ?? 0), color: '#DC3545' },
+    { icon: Clock, label: t('stats.drafts'), value: fmtCount(stats?.draftCount ?? 0), color: '#001A4D' },
   ];
 
   return (

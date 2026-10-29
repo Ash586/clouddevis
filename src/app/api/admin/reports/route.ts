@@ -3,6 +3,7 @@ import { withApiErrorHandling } from '@/lib/sentry/api';
 import { withAdminAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { formatCurrency } from '@/lib/calculations';
 
 export const GET = withApiErrorHandling(withAdminAuth(async (req, session) => {
   try {
@@ -32,8 +33,8 @@ export const GET = withApiErrorHandling(withAdminAuth(async (req, session) => {
 
     return NextResponse.json({
       revenue: {
-        total: (revenueAgg._sum.totalTTC || 0).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
-        tva: (revenueAgg._sum.tvaAmount || 0).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
+        total: formatCurrency(revenueAgg._sum.totalTTC || 0, 'DA'),
+        tva: formatCurrency(revenueAgg._sum.tvaAmount || 0, 'DA'),
         docCount: revenueAgg._count,
       },
       userGrowth: Object.entries(monthlyUsers).map(([month, count]) => ({ month, count })),

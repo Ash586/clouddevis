@@ -4,6 +4,7 @@
 
 import { downloadDocument } from './pdf';
 import { isNativePlatform, nativeShareFile, nativeOpenUrl } from '@/lib/native';
+import { formatNumber } from '@/mobile/lib/format';
 
 export type ShareResult = 'shared' | 'downloaded';
 
@@ -41,7 +42,7 @@ export async function shareDocument(options: {
   const { pdfBase64, docNumber, clientName, total, currency = 'DA' } = options;
   const fileName = `${docNumber}.pdf`;
   const title = `${docNumber} — ${clientName}`;
-  const text = `${docNumber}\nClient: ${clientName}\nTotal: ${total.toLocaleString('fr-DZ')} ${currency}`;
+  const text = `${docNumber}\nClient: ${clientName}\nTotal: ${formatNumber(total)} ${currency}`;
 
   // 1. Native (WebView) — share via Android Intent
   if (isNativePlatform()) {
@@ -105,7 +106,7 @@ export function generatePaymentReminder(options: {
 
   return `Bonjour ${clientName},
 
-Je me permets de vous rappeler que la facture ${docNumber} d'un montant de ${total.toLocaleString('fr-DZ')} ${currency} est en retard de paiement depuis ${daysOverdue} jours.
+Je me permets de vous rappeler que la facture ${docNumber} d'un montant de ${formatNumber(total)} ${currency} est en retard de paiement depuis ${daysOverdue} jours.
 
 Merci de procéder au règlement dans les meilleurs délais.
 

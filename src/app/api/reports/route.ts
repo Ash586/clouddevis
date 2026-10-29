@@ -3,6 +3,7 @@ import { withApiErrorHandling } from '@/lib/sentry/api';
 import { withAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { formatCurrency } from '@/lib/calculations';
 
 export const GET = withApiErrorHandling(withAuth(async (req, session) => {
   try {
@@ -96,7 +97,7 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
     const byType = typeGroup.map(row => ({
       type: row.type,
       count: row._count.type,
-      total: (row._sum.totalTTC || 0).toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
+      total: formatCurrency(row._sum.totalTTC || 0, 'DA'),
     }));
 
     // Group by status
@@ -120,14 +121,14 @@ export const GET = withApiErrorHandling(withAuth(async (req, session) => {
 
     return NextResponse.json({
       summary: {
-        totalRevenue: totalRevenue.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-        totalTVA: totalTVA.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        totalRevenue: formatCurrency(totalRevenue, 'DA'),
+        totalTVA: formatCurrency(totalTVA, 'DA'),
         totalCount,
-        avgInvoice: avgInvoice.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        avgInvoice: formatCurrency(avgInvoice, 'DA'),
       },
       monthly: Object.entries(monthlyData).map(([month, data]) => ({
         month,
-        revenue: data.revenue.toLocaleString('fr-DZ', { minimumFractionDigits: 2 }),
+        revenue: formatCurrency(data.revenue, 'DA'),
         count: data.count,
         tva: data.tva,
       })),
