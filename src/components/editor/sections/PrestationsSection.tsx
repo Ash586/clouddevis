@@ -1,7 +1,7 @@
 'use client';
 import { useLocale } from 'next-intl';
-import { useState } from 'react';
-import { Plus, Trash2, ChevronRight, Package } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Plus, Trash2, ChevronRight, Package, Pencil } from 'lucide-react';
 import { UNIT_OPTIONS } from '@/types';
 import { CatalogModal } from '@/components/editor/CatalogModal';
 import { validateLineItem } from '@/lib/validation';
@@ -17,6 +17,16 @@ export function PrestationsSection() {
   } = useSectionContext();
   const locale = useLocale();
   const [showCatalog, setShowCatalog] = useState(false);
+  // Auto-scroll to newly added item (Defect 1 mitigation)
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const prevItemsLenRef = useRef(doc.items.length);
+  useEffect(() => {
+    if (doc.items.length > prevItemsLenRef.current) {
+      // A new line was just added — scroll it into view so the user can verify it
+      sentinelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    prevItemsLenRef.current = doc.items.length;
+  }, [doc.items.length]);
 
   if (hiddenFields.has('itemsTable')) return null;
 
@@ -89,50 +99,8 @@ export function PrestationsSection() {
         </div>
       )}
 
-      {doc.items.map((item, idx) => (
-        <div key={item.id} draggable
-          onDragStart={() => setDragIdx(idx)}
-          onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx); }}
-          onDragEnter={(e) => e.preventDefault()}
-          onDragLeave={() => setDragOverIdx(null)}
-          onDrop={() => { if (dragIdx !== null && dragIdx !== idx) { moveItem(dragIdx, idx); } setDragIdx(null); setDragOverIdx(null); }}
-          onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
-          className={`bg-[var(--navy-3)] p-2 sm:p-3 rounded-xl border space-y-1.5 transition-all ${dragOverIdx === idx ? 'border-[var(--green-2)] shadow-md scale-[1.02]' : 'border-[rgba(15,39,71,0.1)]'} ${dragIdx === idx ? 'opacity-40' : ''}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-              <span className="text-[var(--sand-muted)] cursor-grab active:cursor-grabbing text-[14px] select-none px-0.5" title={te('dragToReorder') || 'Drag to reorder'} role="img" aria-label="Drag handle">⠿</span>
-              <div className="flex-1 min-w-0">
-                <span className="text-[11px] font-medium text-[var(--sand-2)] truncate block">{item.designation}</span>
-                {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</span>}
-              </div>
-            </div>
-            <div className="flex items-center gap-0.5 shrink-0 ms-1">
-              <button type="button" onClick={() => idx > 0 && moveItem(idx, idx - 1)} disabled={idx === 0}
-                className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move up" aria-label="Move item up">
-                <ChevronRight size={14} className="rotate-[270deg]" />
-              </button>
-              <button type="button" onClick={() => idx < doc.items.length - 1 && moveItem(idx, idx + 1)} disabled={idx === doc.items.length - 1}
-                className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move down" aria-label="Move item down">
-                <ChevronRight size={14} className="rotate-90" />
-              </button>
-              <button type="button" onClick={() => handleRemoveItem(item.id)}
-                className="text-red-500 hover:text-red-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(232,84,46,0.08)] transition" title="Delete" aria-label="Delete item">
-                <Trash2 size={15} />
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-5 gap-1.5 text-[10px] text-[var(--sand-muted)]">
-            <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
-            <span>{te('prestations.puLabel')} <strong>{item.unitPrice.toLocaleString(locale)}</strong></span>
-            <span>{te('prestations.vatLabel')} <strong>{doc.tvaRate}%</strong></span>
-            <span>{te('prestations.unitLabel')} <strong>{tu(item.unit)}</strong></span>
-            <span className="text-right font-bold text-[var(--sand)]">{(item.quantity * item.unitPrice).toLocaleString(locale)} {tc('currency')}</span>
-          </div>
-        </div>
-      ))}
-
       {!addingItem && (
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <button type="button" onClick={startNewItem}
             className="flex-1 py-3 sm:py-2.5 border-2 border-dashed border-[rgba(15,39,71,0.12)] rounded-xl text-[var(--sand-muted)] font-bold hover:bg-[var(--navy-4)] transition text-[11px] min-h-[44px]">
             {te('prestations.addLine')}
@@ -163,6 +131,54 @@ export function PrestationsSection() {
           </button>
         </div>
       )}
+
+      {doc.items.map((item, idx) => (
+        <div key={item.id} draggable
+          onDragStart={() => setDragIdx(idx)}
+          onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx); }}
+          onDragEnter={(e) => e.preventDefault()}
+          onDragLeave={() => setDragOverIdx(null)}
+          onDrop={() => { if (dragIdx !== null && dragIdx !== idx) { moveItem(dragIdx, idx); } setDragIdx(null); setDragOverIdx(null); }}
+          onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
+          className={`bg-[var(--navy-3)] p-2 sm:p-3 rounded-xl border space-y-1.5 transition-all ${dragOverIdx === idx ? 'border-[var(--green-2)] shadow-md scale-[1.02]' : 'border-[rgba(15,39,71,0.1)]'} ${dragIdx === idx ? 'opacity-40' : ''}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+              <span className="text-[var(--sand-muted)] cursor-grab active:cursor-grabbing text-[14px] select-none px-0.5" title={te('dragToReorder') || 'Drag to reorder'} role="img" aria-label="Drag handle">⠿</span>
+              <div className="flex-1 min-w-0">
+                <span className="text-[11px] font-medium text-[var(--sand-2)] truncate block">{item.designation}</span>
+                {item.category && <span className="text-[8px] text-[var(--sand-muted)] uppercase">{tp((categoryLabelKey(item.category) ?? 'preview.categories.none').replace(/^preview\./, ''))}</span>}
+              </div>
+            </div>
+            <div className="flex items-center gap-0.5 shrink-0 ms-1">
+              <button type="button" onClick={() => idx > 0 && moveItem(idx, idx - 1)} disabled={idx === 0}
+                className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move up" aria-label="Move item up">
+                <ChevronRight size={14} className="rotate-[270deg]" />
+              </button>
+              <button type="button" onClick={() => idx < doc.items.length - 1 && moveItem(idx, idx + 1)} disabled={idx === doc.items.length - 1}
+                className="text-[var(--sand-muted)] hover:text-[var(--sand)] disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(15,39,71,0.08)] transition" title="Move down" aria-label="Move item down">
+                <ChevronRight size={14} className="rotate-90" />
+              </button>
+              <button type="button" onClick={() => { setNewItem({ ...item }); setAddingItem(true); handleRemoveItem(item.id); }}
+                className="text-[var(--green-3)] hover:text-[var(--green-2)] min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--green-glow)] transition" title="Modifier" aria-label="Edit item">
+                <Pencil size={15} />
+              </button>
+              <button type="button" onClick={() => handleRemoveItem(item.id)}
+                className="text-red-500 hover:text-red-700 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-[rgba(232,84,46,0.08)] transition" title="Delete" aria-label="Delete item">
+                <Trash2 size={15} />
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-1.5 text-[10px] text-[var(--sand-muted)]">
+            <span>{te('prestations.qtyLabel')} <strong>{item.quantity}</strong></span>
+            <span>{te('prestations.puLabel')} <strong>{item.unitPrice.toLocaleString(locale)}</strong></span>
+            <span>{te('prestations.vatLabel')} <strong>{doc.tvaRate}%</strong></span>
+            <span>{te('prestations.unitLabel')} <strong>{tu(item.unit)}</strong></span>
+            <span className="text-right font-bold text-[var(--sand)]">{(item.quantity * item.unitPrice).toLocaleString(locale)} {tc('currency')}</span>
+          </div>
+        </div>
+      ))}
+
+      <div ref={sentinelRef} aria-hidden="true" />
 
       <CatalogModal
         open={showCatalog}
