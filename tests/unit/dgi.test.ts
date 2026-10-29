@@ -472,6 +472,6 @@ describe('numberToArabicWords', () => {
   test('5000 contains خمسة', () => {
     const result = dgi.numberToArabicWords(5000)
     expect(result).toContain('خمسة')
-    expect(result).toContain('ألف')
+    expect(result).toContain('آلاف')
   })
 })
